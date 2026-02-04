@@ -116,11 +116,11 @@ const { calKey } = useCalEmbed({
       <div class="card card-border bg-base-200 flex flex-col sm:flex-row items-center p-4 gap-4">
         <!-- Left: Status + Info -->
         <div class="flex items-center gap-3 flex-1">
-          <div class="text-success" :aria-label="$t('check_in_coverage.orientation.completed_label')">
+          <span class="text-success" role="img" :aria-label="$t('check_in_coverage.orientation.completed_label')">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
             </svg>
-          </div>
+          </span>
           <div>
             <h3 class="font-bold text-base">{{ $t('check_in_coverage.orientation.heading') }}</h3>
             <p class="text-sm text-base-content">{{ $t('check_in_coverage.orientation.duration') }}</p>
@@ -138,7 +138,7 @@ const { calKey } = useCalEmbed({
   <dialog id="orientation_modal" class="modal" :aria-label="$t('check_in_coverage.orientation.modal_label')">
     <div class="modal-box max-w-4xl p-0">
       <div class="aspect-video bg-base-300 flex items-center justify-center">
-        <span class="text-base-content/50">{{ $t('check_in_coverage.orientation.video_placeholder') }}</span>
+        <span class="text-base-content/80">{{ $t('check_in_coverage.orientation.video_placeholder') }}</span>
       </div>
     </div>
     <form method="dialog" class="modal-backdrop">
@@ -152,7 +152,11 @@ const { calKey } = useCalEmbed({
       <!-- Calendar - Full Width -->
       <h2 class="text-2xl font-bold mb-2">{{ $t('check_in_coverage.schedule.heading') }}</h2>
       <p class="text-sm text-base-content mb-4">{{ $t('check_in_coverage.schedule.calendar_refresh_note') }}</p>
-      <div class="card card-border bg-base-200 overflow-hidden mb-6" :aria-label="$t('check_in_coverage.schedule.calendar_label')">
+      <div
+        class="card card-border bg-base-200 overflow-hidden mb-6"
+        role="region"
+        :aria-label="$t('check_in_coverage.schedule.calendar_label')"
+      >
         <ClientOnly>
           <div :key="calKey" id="my-cal-inline-checkincoverage" class="min-h-[350px] md:min-h-[500px]" style="width:100%;height:100%;overflow:scroll"></div>
           <template #fallback>
