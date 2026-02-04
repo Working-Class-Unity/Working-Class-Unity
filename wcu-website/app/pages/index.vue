@@ -52,7 +52,7 @@ const upcomingEvents = computed(() => getUpcomingEvents(3))
 </script>
 
 <template>
-  <main class="min-h-screen bg-base-100">
+  <div class="min-h-screen bg-base-100">
     <!-- Hero Section -->
     <section class="py-16 md:py-24 bg-base-200" aria-labelledby="hero-heading">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -131,5 +131,5 @@ const upcomingEvents = computed(() => getUpcomingEvents(3))
         </div>
       </div>
     </section>
-  </main>
+  </div>
 </template>

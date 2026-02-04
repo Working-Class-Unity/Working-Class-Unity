@@ -1,6 +1,6 @@
 <template>
   <div class="bg-white min-h-screen">
-    <main>
+    <div>
     <div class="max-w-[700px] mx-auto px-4 sm:px-6">
       
       <!-- Doc Header -->
@@ -207,7 +207,7 @@
         </div>
       </footer>
     </div>
-    </main>
+    </div>
   </div>
 </template>
 

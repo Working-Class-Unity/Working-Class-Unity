@@ -66,11 +66,6 @@ const contacts = [
 
 <template>
   <div class="min-h-screen bg-base-100">
-    <!-- Skip Navigation -->
-    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-content focus:rounded-lg">
-      Skip to main content
-    </a>
-
     <!-- Hero Section -->
     <section class="py-8 md:py-12 bg-gradient-to-b from-base-200 to-base-100">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -94,7 +89,7 @@ const contacts = [
       </div>
     </section>
 
-    <main id="main-content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
 
       <!-- Section: Before You Leave Home -->
       <section aria-labelledby="before-heading">
@@ -652,7 +647,6 @@ const contacts = [
         <LazyKnowYourRightsNav hydrate-on-visible />
       </div>
 
-    </main>
+    </div>
   </div>
 </template>
-

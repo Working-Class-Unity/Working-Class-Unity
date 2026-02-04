@@ -45,11 +45,6 @@ useSchemaOrg([
 
 <template>
   <div class="min-h-screen bg-base-100">
-    <!-- Skip Navigation -->
-    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-content focus:rounded-lg">
-      {{ $t('common.skip_to_main') }}
-    </a>
-    
     <section class="py-12 md:py-16">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
@@ -66,7 +61,7 @@ useSchemaOrg([
         </header>
 
         <!-- Main Timeline Content -->
-        <ul id="main-content" class="timeline timeline-vertical timeline-compact max-w-4xl mx-auto" role="list" aria-label="Steps to follow if ICE comes to your home">
+        <ul id="kyr-ice-at-home-steps" class="timeline timeline-vertical timeline-compact max-w-4xl mx-auto" role="list" aria-label="Steps to follow if ICE comes to your home">
           
           <!-- Step 1: Entry Protocol -->
           <li>

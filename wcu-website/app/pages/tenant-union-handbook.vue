@@ -225,7 +225,7 @@ const highlightMatch = (text: string): string => {
 </script>
 
 <template>
-  <main class="min-h-screen bg-base-100">
+  <div class="min-h-screen bg-base-100">
     <!-- Hero Section -->
     <section class="py-12 md:py-16 bg-base-200">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1190,7 +1190,7 @@ const highlightMatch = (text: string): string => {
         </div>
       </div>
     </div>
-  </main>
+  </div>
 </template>
 
 <style scoped>
