@@ -24,10 +24,10 @@ This application is built with a modern stack featuring **Nuxt 4**, **Tailwind C
 
 ### Installation
 
-1.  **Clone the repository:**
+1.  **Clone the repository and move into the Nuxt app:**
     ```bash
     git clone <repository-url>
-    cd wcu-website
+    cd Working-Class-Unity/wcu-website
     ```
 
 2.  **Install dependencies:**
@@ -40,6 +40,25 @@ This application is built with a modern stack featuring **Nuxt 4**, **Tailwind C
     npm run dev
     ```
     The app will be available at `http://localhost:3000`.
+
+## Testing
+
+Run tests from `wcu-website/`.
+
+If you have not installed Playwright browsers yet:
+
+```bash
+npx playwright install --with-deps chromium
+```
+
+Then run:
+
+```bash
+npm test
+npm run test:a11y
+```
+
+CI runs the accessibility suite on pushes/PRs that touch `wcu-website/**` (see `.github/workflows/a11y.yml`).
 
 ## Project Structure
 
@@ -320,11 +339,12 @@ const { calKey } = useCalEmbed({
 Formbricks surveys are integrated via a Nuxt client plugin at [`app/plugins/formbricks.client.ts`](wcu-website/app/plugins/formbricks.client.ts).
 
 **Configuration:**
-- **App URL**: `https://form.workingclassunity.com`
-- **Environment ID**: Configured in the plugin
+- **Runtime config (public)**: `wcu-website/nuxt.config.ts` (`runtimeConfig.public.formbricksAppUrl`, `runtimeConfig.public.formbricksEnvironmentId`)
+- **Env overrides (public)**: `NUXT_PUBLIC_FORMBRICKS_APP_URL`, `NUXT_PUBLIC_FORMBRICKS_ENVIRONMENT_ID`
 
 **How it works:**
 1. Plugin initializes on client-side only (`typeof window !== "undefined"`)
+   - Reads configuration via `useRuntimeConfig()`
 2. Registers route changes via `router.afterEach()` hook for page-specific survey targeting
 3. Automatically tracks navigation for survey triggering
 
@@ -1076,6 +1096,12 @@ Deploy using Coolify's **Dockerfile** build pack:
 
 See the full [Coolify Deployment Guide](wcu-website/docs/coolify-deployment.md) for details.
 
+### Security Headers & CSP
+
+Security headers (including `Content-Security-Policy`) are set via Nitro `routeRules` in `wcu-website/nuxt.config.ts`. If you add a new third-party script, iframe/embed, or API domain, you will likely need to update the CSP allowlist there.
+
+See `wcu-website/docs/security-review.md` for details.
+
 ## Production Build
 
 To build the application for production:
@@ -1092,7 +1118,7 @@ To build the application for production:
     ```
     This starts a server to preview the production build locally.
 
-## 📚 Resources
+## Resources
 
 *   [Nuxt 4 Documentation](https://nuxt.com/docs)
 *   [Tailwind CSS 4 Upgrade Guide](https://tailwindcss.com/docs/upgrade-guide)
