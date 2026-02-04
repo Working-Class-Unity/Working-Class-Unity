@@ -16,7 +16,7 @@ The project uses a **multi-stage Docker build** to create an optimized productio
 ┌─────────────────────────────────────────────────────────────────┐
 │                     Stage 1: Builder                            │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌────────┐  │
-│  │ package.json│→ │ npm install │→ │  COPY . .   │→ │ build  │  │
+│  │ package.json│→ │   npm ci    │→ │  COPY . .   │→ │ build  │  │
 │  │   (cached)  │  │  (cached)   │  │ (rebuilds)  │  │        │  │
 │  └─────────────┘  └─────────────┘  └─────────────┘  └────────┘  │
 │                                                          ↓      │
@@ -28,7 +28,7 @@ The project uses a **multi-stage Docker build** to create an optimized productio
 ┌─────────────────────────────────────────────────────────────────┐
 │                     Stage 2: Runner                             │
 │  ┌─────────────────────────────────────────────────────────┐    │
-│  │ node:22-alpine + .output/ only (~150MB total)           │    │
+│  │ node:22.12-alpine + .output/ only (~150MB total)        │    │
 │  │ CMD: node .output/server/index.mjs                      │    │
 │  └─────────────────────────────────────────────────────────┘    │
 └─────────────────────────────────────────────────────────────────┘
@@ -46,7 +46,7 @@ The project uses a **multi-stage Docker build** to create an optimized productio
 ### Stage 1: Builder
 
 ```dockerfile
-FROM node:22-alpine AS builder
+FROM node:22.12-alpine AS builder
 ```
 Uses Node.js 22 on Alpine Linux as the base image. Named `builder` for reference in the second stage.
 
@@ -56,21 +56,21 @@ WORKDIR /app
 Sets `/app` as the working directory for all subsequent commands.
 
 ```dockerfile
-COPY package.json ./
+COPY package.json package-lock.json ./
 ```
-**Layer caching key:** Copies only `package.json` first. This layer is cached until `package.json` changes.
+**Layer caching key:** Copies `package.json` and `package-lock.json` first. This layer is cached until either file changes.
 
 ```dockerfile
-RUN npm install
+RUN npm ci
 ```
-Installs dependencies. **This layer is cached as long as `package.json` doesn't change**, even when source code changes.
+Installs dependencies. **This layer is cached as long as `package.json` and `package-lock.json` don't change**, even when source code changes.
 
-> **Note:** We deliberately exclude `package-lock.json` (see [.dockerignore](../.dockerignore)) to ensure platform-specific native binaries like `oxc-parser` are resolved correctly for Linux during the Docker build, rather than using binaries compiled for your development machine's OS.
+> **Note:** The Dockerfile uses `npm ci` with the committed `package-lock.json` for reproducible installs.
 
 ```dockerfile
 COPY . .
 ```
-Copies all remaining source code. This layer changes on every code change, but **doesn't invalidate the cached `npm install` layer above it**.
+Copies all remaining source code. This layer changes on every code change, but **doesn't invalidate the cached `npm ci` layer above it**.
 
 ```dockerfile
 RUN npm run build
@@ -83,7 +83,7 @@ Runs `nuxt build`, generating the `.output/` directory containing:
 ### Stage 2: Runner
 
 ```dockerfile
-FROM node:22-alpine AS runner
+FROM node:22.12-alpine AS runner
 ```
 Starts a **fresh image** - the builder stage is discarded. This is why the final image is so small.
 
@@ -133,7 +133,8 @@ The [`.dockerignore`](../.dockerignore) file excludes files from the Docker buil
 | `.output`, `.nuxt`, `dist` | Excludes build artifacts |
 | `.git`, `docs`, `*.md` | Excludes version control and documentation |
 | `.vscode`, `.idea` | Excludes IDE configuration |
-| `package-lock.json` | Allows npm to resolve platform-specific binaries for Linux |
+
+> **Note:** `package-lock.json` is intentionally included in the Docker build context so `npm ci` is deterministic.
 
 ## Layer Caching
 
@@ -142,8 +143,8 @@ Docker caches layers top-to-bottom. Each layer only invalidates layers **below**
 ### When Only Source Code Changes
 
 ```
-package.json    → CACHED ✓ (unchanged)
-npm install     → CACHED ✓ (package.json unchanged)
+package.json + package-lock.json → CACHED ✓ (unchanged)
+npm ci          → CACHED ✓ (package files unchanged)
 COPY . .        → REBUILDS (source changed)
 npm run build   → REBUILDS (depends on source)
 ```
@@ -153,8 +154,8 @@ npm run build   → REBUILDS (depends on source)
 ### When Dependencies Change
 
 ```
-package.json    → REBUILDS (changed)
-npm install     → REBUILDS (package.json changed)
+package.json + package-lock.json → REBUILDS (changed)
+npm ci          → REBUILDS (package files changed)
 COPY . .        → REBUILDS (cache invalidated)
 npm run build   → REBUILDS (cache invalidated)
 ```
@@ -194,7 +195,7 @@ docker images wcu-website
 
 ### Dependencies Reinstalling on Every Build
 
-**Symptoms:** `npm install` runs even when only source code changed.
+**Symptoms:** `npm ci` runs even when only source code changed.
 
 **Causes:**
 1. Local `node_modules/` folder exists and isn't in `.dockerignore`
@@ -208,9 +209,12 @@ docker images wcu-website
 
 **Symptoms:** Errors about `oxc-parser` or other native modules not found.
 
-**Cause:** `package-lock.json` locks binaries for your development OS.
+**Common causes:**
+- `package-lock.json` is missing/out of sync
+- The build isn't using `npm ci`
+- Node/npm version mismatch between local and container
 
-**Solution:** Ensure `package-lock.json` is in `.dockerignore` (it should be by default).
+**Solution:** Ensure Docker builds use `npm ci` and the committed `package-lock.json`. If the lockfile needs updating, regenerate it locally and commit the updated `package-lock.json`.
 
 ### Container Won't Start
 
@@ -232,5 +236,5 @@ docker images wcu-website
 
 ## Related Documentation
 
-- [Coolify Deployment Guide](coolify-deployment.md) - Deploying with Coolify/Nixpacks
+- [Coolify Deployment Guide](coolify-deployment.md) - Deploying with Coolify + Dockerfile
 - [README.md](../../README.md) - Project overview and development setup

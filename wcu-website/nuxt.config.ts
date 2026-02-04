@@ -1,8 +1,11 @@
 import tailwindcss from "@tailwindcss/vite";
 
+const isDevelopment = process.env.NODE_ENV === 'development'
+const isProduction = process.env.NODE_ENV === 'production'
+
 export default defineNuxtConfig({
   compatibilityDate: "2024-11-01",
-  devtools: { enabled: true },
+  devtools: { enabled: isDevelopment },
 
   // Site configuration for SEO and Schema.org
   site: {
@@ -80,7 +83,7 @@ export default defineNuxtConfig({
           'Permissions-Policy': 'geolocation=(), microphone=(), camera=()',
           'Content-Security-Policy': [
             "default-src 'self'",
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://app.cal.com https://form.workingclassunity.com",
+            `script-src 'self' 'unsafe-inline'${isProduction ? '' : " 'unsafe-eval'"} https://app.cal.com https://form.workingclassunity.com`,
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
             "font-src 'self' data: https://fonts.gstatic.com",
             "img-src 'self' data: blob: https:",

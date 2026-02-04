@@ -13,7 +13,7 @@ This application is built with a modern stack featuring **Nuxt 4**, **Tailwind C
 - **Icons**: Inline SVGs / Heroicons (via Tailwind)
 - **Scheduling**: [Cal.com](https://cal.com) embed integration
 - **Surveys**: [Formbricks](https://formbricks.com) client SDK
-- **Deployment**: Docker / Nixpacks / Coolify
+- **Deployment**: Coolify (Dockerfile) / Docker
 
 ## Getting Started
 
@@ -60,11 +60,15 @@ wcu-website/
 ├── i18n/
 │   └── locales/         # Translation JSON files
 ├── public/              # Public static files
-├── Dockerfile           # Docker deployment config
-├── nixpacks.toml        # Nixpacks deployment config
+├── Dockerfile           # Docker SSR deployment config
 ├── nuxt.config.ts       # Nuxt configuration
-└── package.json         # Project dependencies
+├── package.json         # Project dependencies
+├── package-lock.json    # Lockfile (npm ci)
+├── playwright.config.ts # Playwright config
+└── tests/               # Playwright tests
 ```
+
+CI workflows live in `.github/workflows/`.
 
 ## Styling & Theming
 
@@ -1057,30 +1061,20 @@ docker run -p 3000:3000 wcu-website
 ```
 
 **Important Notes:**
-- Uses Node.js 22 Alpine base image
-- Deliberately does NOT copy `package-lock.json` to ensure platform-specific native dependencies (like `oxc-parser`) resolve correctly for Linux during the build
+- Uses pinned `node:22.12-alpine` base image
+- Uses `npm ci` with the committed `package-lock.json` for reproducible installs
+- Runs as a non-root user in the runtime image
 
-### Nixpacks Deployment (Coolify)
+### Coolify Deployment (Dockerfile)
 
-For platforms like Coolify that use Nixpacks, configuration is in [`nixpacks.toml`](wcu-website/nixpacks.toml).
+Deploy using Coolify's **Dockerfile** build pack:
 
-**Configuration:**
-```toml
-[phases.setup]
-nixPkgs = ["nodejs_22"]
+- **Base Directory**: `wcu-website`
+- **Exposed Port**: `3000`
+- **Health Check Path**: `/`
+- **Optional env vars**: `NUXT_PUBLIC_FORMBRICKS_ENVIRONMENT_ID`, `NUXT_PUBLIC_FORMBRICKS_APP_URL`
 
-[phases.install]
-cmds = ["npm install"]
-
-[phases.build]
-cmds = ["npm run build"]
-```
-
-**Key Points:**
-- Uses Node.js 22 to meet Nuxt 4.2.1 requirements
-- Fresh `npm install` ensures correct platform-specific binaries
-
-See the full [Coolify Deployment Guide](wcu-website/docs/coolify-deployment.md) for detailed instructions including environment variables, health checks, and troubleshooting.
+See the full [Coolify Deployment Guide](wcu-website/docs/coolify-deployment.md) for details.
 
 ## Production Build
 

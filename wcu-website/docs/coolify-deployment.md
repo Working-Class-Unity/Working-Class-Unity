@@ -13,7 +13,7 @@ This application uses **Server-Side Rendering (SSR)** for optimal SEO and intern
 - **Dynamic Content**: Cal.com embeds and Formbricks surveys function properly
 - **Performance**: Initial page loads are faster with server-rendered content
 
-Coolify is a self-hosted Platform-as-a-Service (PaaS) that deploys applications as Docker containers. It supports Nuxt applications through the Nixpacks build pack, which automatically detects and builds Node.js projects.
+Coolify is a self-hosted Platform-as-a-Service (PaaS) that deploys applications as Docker containers. For this repo, the most predictable path is to use Coolify's **Dockerfile** build pack with the Dockerfile in `wcu-website/`.
 
 > ⚠️ **Important**: Do **NOT** enable "Is it a static site?" for this application. That option is only for static site generation (SSG), which is not recommended for this project.
 
@@ -31,7 +31,7 @@ Before deploying, ensure you have:
 | Component | Version | Notes |
 |-----------|---------|-------|
 | Nuxt | 4.2.1 | SSR enabled by default |
-| Node.js | 18+ | Required for Nuxt 4 |
+| Node.js | ^20.19.0 \|\| >=22.12.0 | Required for Nuxt 4.2.1 |
 | Vue | 3.5.25 | |
 | Tailwind CSS | 4.1.17 | With Vite plugin |
 | DaisyUI | 5.5.5 | Component library |
@@ -39,28 +39,26 @@ Before deploying, ensure you have:
 
 ## Deployment Configuration
 
-### Option 1: SSR Deployment (Recommended)
+### Option 1: Dockerfile SSR Deployment (Recommended)
 
 Server-Side Rendering provides better SEO and initial load performance.
 
-#### Coolify Settings
+This repo includes a production Dockerfile at `wcu-website/Dockerfile`.
+
+#### Coolify Settings (Dockerfile build pack)
 
 | Setting | Value |
 |---------|-------|
-| **Build Pack** | `nixpacks` |
+| **Build Pack** | `dockerfile` |
 | **Base Directory** | `wcu-website` |
 | **Port Exposes** | `3000` |
-| **Install Command** | *(leave empty - auto-detected)* |
-| **Build Command** | `npm run build` or *(leave empty)* |
-| **Start Command** | `node .output/server/index.mjs` |
+| **Health Check Path** | `/` |
 
 #### How It Works
 
-1. Nixpacks detects the Node.js project via `package.json`
-2. Runs `npm install` (or `npm ci` if lock file present)
-3. Executes `npm run build` which runs `nuxt build`
-4. Starts the Node.js server on port 3000
-5. Coolify's Traefik proxy routes traffic to the container
+1. Coolify builds the image using `wcu-website/Dockerfile`
+2. The container starts via the Dockerfile `CMD` (Nuxt Nitro server)
+3. Coolify routes traffic to the container on port 3000
 
 ### Option 2: Static Site Generation (SSG)
 
@@ -84,38 +82,19 @@ Generate static HTML files for hosting without a Node.js server.
 
 > **Note**: SSG may have limitations with dynamic content and is **not recommended** for this application due to i18n support requirements. Use SSR (Option 1) instead for best SEO and internationalization support.
 
-### Option 3: Custom Dockerfile
+### Option 3: Nixpacks SSR (Alternative)
 
-For advanced control, create a Dockerfile in the `wcu-website` directory:
+If you prefer, you can deploy SSR with Coolify's Nixpacks build pack instead of using a Dockerfile.
 
-```dockerfile
-# wcu-website/Dockerfile
-FROM node:20-alpine AS builder
+#### Coolify Settings (Nixpacks)
 
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY . .
-RUN npm run build
-
-FROM node:20-alpine AS runner
-
-WORKDIR /app
-COPY --from=builder /app/.output .output
-
-ENV NODE_ENV=production
-ENV HOST=0.0.0.0
-ENV PORT=3000
-
-EXPOSE 3000
-
-CMD ["node", ".output/server/index.mjs"]
-```
-
-Then in Coolify:
-- Set **Build Pack** to `dockerfile`
-- Set **Base Directory** to `wcu-website`
-- Set **Port Exposes** to `3000`
+| Setting | Value |
+|---------|-------|
+| **Build Pack** | `nixpacks` |
+| **Base Directory** | `wcu-website` |
+| **Port Exposes** | `3000` |
+| **Build Command** | `npm run build` |
+| **Start Command** | `node .output/server/index.mjs` |
 
 ## Environment Variables
 
@@ -123,8 +102,8 @@ Configure these in Coolify's **Environment Variables** section if needed:
 
 | Variable | Description | Example |
 |----------|-------------|---------|
-| `NUXT_PUBLIC_API_URL` | Public API endpoint | `https://api.example.com` |
-| `NUXT_PUBLIC_SITE_URL` | Public site URL | `https://wcu.example.com` |
+| `NUXT_PUBLIC_FORMBRICKS_ENVIRONMENT_ID` | Formbricks environment ID (public, used client-side) | `cminsehli0009o8015hjuzkuz` |
+| `NUXT_PUBLIC_FORMBRICKS_APP_URL` | Formbricks app URL (public, used client-side) | `https://form.workingclassunity.com` |
 | `NODE_ENV` | Environment mode | `production` |
 
 ### Build-time vs Runtime Variables
@@ -164,19 +143,18 @@ If you encounter health check issues:
 3. Check container logs in Coolify dashboard
 4. Temporarily disable health checks to debug
 
-## Nixpacks Configuration
+## Nixpacks Configuration (Optional)
 
-Nixpacks automatically detects and builds Node.js projects. The default configuration should work without any changes.
+If you deploy with Nixpacks (Option 3), you may want to pin the Node.js version to match Nuxt 4.2.1 requirements.
 
-If you need to customize the build, create a [`nixpacks.toml`](wcu-website/nixpacks.toml) file in the `wcu-website` directory:
+To customize the build, add a `nixpacks.toml` file in the `wcu-website` directory:
 
 ```toml
-# wcu-website/nixpacks.toml
 [phases.build]
 cmds = ["npm run build"]
 
 [phases.setup]
-nixPkgs = ["nodejs_20"]
+nixPkgs = ["nodejs_22"]
 
 [start]
 cmd = "node .output/server/index.mjs"
@@ -206,7 +184,7 @@ Enable automatic deployments when pushing to your repository:
 
 1. Connect your GitHub repository via GitHub App integration
 2. Enable **Auto Deploy** in application settings
-3. Configure the target branch (e.g., `main` or `production`)
+3. Configure the target branch (e.g., `master` or a dedicated `production` branch)
 
 ### Preview Deployments
 
@@ -222,19 +200,17 @@ For pull request previews:
 **Check Base Directory**: Ensure `wcu-website` is set correctly since the Nuxt app is in a subdirectory.
 
 **Node Version Mismatch**: If you see errors related to Node.js version:
-1. Ensure Nixpacks is using Node.js 18+ (required for Nuxt 4)
-2. Create a [`nixpacks.toml`](wcu-website/nixpacks.toml) file to specify Node.js version (see Nixpacks Configuration section)
-3. Alternatively, add `"engines": { "node": ">=18" }` to your `package.json`
+1. Ensure Node.js meets Nuxt 4.2.1 requirements: `^20.19.0 || >=22.12.0`
+2. If using Nixpacks, pin Node via `nixpacks.toml` (for example: `nodejs_22`)
 
-**Lock File Issues**: If build fails on dependencies:
+**Lock File Issues**: Dockerfile builds use `npm ci` + the committed `package-lock.json`. If you need to update dependencies, regenerate the lockfile locally and commit it:
+
 ```bash
-# Regenerate lock file locally
 cd wcu-website
-rm package-lock.json
+rm -rf node_modules
 npm install
 git add package-lock.json
-git commit -m "Regenerate package-lock.json"
-git push
+git commit -m "Update package-lock.json"
 ```
 
 ### Container Won't Start
