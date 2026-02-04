@@ -111,6 +111,26 @@ const chapters: Chapter[] = [
 const searchQuery = ref('')
 const searchInputRef = ref<HTMLInputElement | null>(null)
 const mobileDrawerOpen = ref(false)
+const mobileDrawerButtonRef = ref<HTMLButtonElement | null>(null)
+const mobileDrawerPanelRef = ref<HTMLElement | null>(null)
+const mobileDrawerCloseButtonRef = ref<HTMLButtonElement | null>(null)
+
+const prefersReducedMotion = ref(false)
+
+const drawerReturnFocusEl = ref<HTMLElement | null>(null)
+const drawerPendingSectionId = ref<string | null>(null)
+
+const openMobileDrawer = () => {
+  if (process.client) {
+    drawerReturnFocusEl.value = document.activeElement instanceof HTMLElement ? document.activeElement : null
+  }
+  drawerPendingSectionId.value = null
+  mobileDrawerOpen.value = true
+}
+
+const closeMobileDrawer = () => {
+  mobileDrawerOpen.value = false
+}
 
 // Filter chapters and sections based on search query
 const filteredChapters = computed(() => {
@@ -165,10 +185,16 @@ onMounted(() => {
       e.preventDefault()
       searchInputRef.value?.focus()
     }
-    // Escape to clear search
-    if (e.key === 'Escape' && searchQuery.value) {
-      searchQuery.value = ''
-      searchInputRef.value?.blur()
+    // Escape to close drawer or clear search
+    if (e.key === 'Escape') {
+      if (mobileDrawerOpen.value) {
+        closeMobileDrawer()
+        return
+      }
+      if (searchQuery.value) {
+        searchQuery.value = ''
+        searchInputRef.value?.blur()
+      }
     }
   }
   window.addEventListener('keydown', handleKeydown)
@@ -176,6 +202,21 @@ onMounted(() => {
   // Cleanup
   onUnmounted(() => {
     window.removeEventListener('keydown', handleKeydown)
+  })
+})
+
+// Reduced motion preference
+onMounted(() => {
+  const media = window.matchMedia('(prefers-reduced-motion: reduce)')
+  prefersReducedMotion.value = media.matches
+
+  const onChange = (event: MediaQueryListEvent) => {
+    prefersReducedMotion.value = event.matches
+  }
+
+  media.addEventListener('change', onChange)
+  onUnmounted(() => {
+    media.removeEventListener('change', onChange)
   })
 })
 
@@ -205,14 +246,64 @@ onMounted(() => {
 // =============================================================================
 // Navigation
 // =============================================================================
-const scrollToSection = (id: string) => {
+const scrollAndFocusSection = (id: string) => {
   const element = document.getElementById(id)
-  if (element) {
-    element.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    // Close mobile drawer after navigation
-    mobileDrawerOpen.value = false
+  if (!element) return
+
+  const behavior: ScrollBehavior = prefersReducedMotion.value ? 'auto' : 'smooth'
+  element.scrollIntoView({ behavior, block: 'start' })
+
+  if (!element.hasAttribute('tabindex')) {
+    element.setAttribute('tabindex', '-1')
+  }
+
+  if (element instanceof HTMLElement) {
+    element.focus({ preventScroll: true })
   }
 }
+
+const scrollToSection = (id: string) => {
+  // If drawer is open, close it first and then scroll/focus.
+  if (mobileDrawerOpen.value) {
+    drawerPendingSectionId.value = id
+    closeMobileDrawer()
+    return
+  }
+
+  scrollAndFocusSection(id)
+}
+
+useFocusTrap({
+  active: mobileDrawerOpen,
+  container: mobileDrawerPanelRef,
+  initialFocus: mobileDrawerCloseButtonRef,
+  onEscape: closeMobileDrawer,
+  restoreFocus: false,
+})
+
+watch(mobileDrawerOpen, async (open) => {
+  if (open) return
+
+  await nextTick()
+
+  const pendingId = drawerPendingSectionId.value
+  drawerPendingSectionId.value = null
+
+  if (pendingId) {
+    scrollAndFocusSection(pendingId)
+    return
+  }
+
+  const fallback = drawerReturnFocusEl.value
+  drawerReturnFocusEl.value = null
+
+  if (fallback) {
+    fallback.focus()
+    return
+  }
+
+  mobileDrawerButtonRef.value?.focus()
+})
 
 // Highlight matching text in search results
 const highlightMatch = (text: string): string => {
@@ -243,11 +334,15 @@ const highlightMatch = (text: string): string => {
     <!-- Mobile TOC Toggle Button - Fixed at bottom -->
     <div class="lg:hidden fixed bottom-4 right-4 z-40">
       <button
+        ref="mobileDrawerButtonRef"
         class="btn btn-primary btn-circle shadow-lg"
-        aria-label="Open table of contents"
-        @click="mobileDrawerOpen = true"
+        :aria-label="mobileDrawerOpen ? $t('common.close') : $t('tenant_handbook.a11y.open_toc')"
+        :aria-expanded="mobileDrawerOpen"
+        aria-controls="toc-drawer-panel"
+        type="button"
+        @click="openMobileDrawer"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6" aria-hidden="true" focusable="false">
           <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
         </svg>
       </button>
@@ -263,17 +358,26 @@ const highlightMatch = (text: string): string => {
         @change="mobileDrawerOpen = ($event.target as HTMLInputElement).checked"
       />
       <div class="drawer-side">
-        <label for="toc-drawer" class="drawer-overlay" aria-label="Close sidebar" @click="mobileDrawerOpen = false"></label>
-        <div class="menu bg-base-100 min-h-full w-80 p-4">
+        <label for="toc-drawer" class="drawer-overlay" :aria-label="$t('common.close')" @click="closeMobileDrawer"></label>
+        <div
+          ref="mobileDrawerPanelRef"
+          id="toc-drawer-panel"
+          class="menu bg-base-100 min-h-full w-80 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="toc-title"
+        >
           <!-- Mobile Drawer Header -->
           <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-semibold text-base-content">Contents</h2>
+            <h2 id="toc-title" class="text-lg font-semibold text-base-content">Contents</h2>
             <button 
+              ref="mobileDrawerCloseButtonRef"
               class="btn btn-sm btn-ghost btn-circle"
-              aria-label="Close"
-              @click="mobileDrawerOpen = false"
+              :aria-label="$t('common.close')"
+              type="button"
+              @click="closeMobileDrawer"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5" aria-hidden="true" focusable="false">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
               </svg>
             </button>
@@ -285,16 +389,17 @@ const highlightMatch = (text: string): string => {
               <input
                 v-model="searchQuery"
                 type="text"
-                placeholder="Search sections..."
+                :placeholder="$t('tenant_handbook.a11y.search_placeholder')"
                 class="input input-bordered input-sm w-full pr-8"
               />
               <button
                 v-if="searchQuery"
                 class="absolute right-2 top-1/2 -translate-y-1/2 text-base-content/50 hover:text-base-content"
-                aria-label="Clear search"
+                :aria-label="$t('tenant_handbook.a11y.clear_search')"
+                type="button"
                 @click="searchQuery = ''"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4" aria-hidden="true" focusable="false">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
                 </svg>
               </button>
