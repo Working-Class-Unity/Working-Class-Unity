@@ -434,7 +434,7 @@ const highlightMatch = (text: string): string => {
           </ul>
 
           <!-- No results -->
-          <div v-if="filteredChapters.length === 0" class="text-center py-8 text-base-content/60">
+          <div v-if="filteredChapters.length === 0" class="text-center py-8 text-base-content/80">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 mx-auto mb-2 opacity-50">
               <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
             </svg>
@@ -463,12 +463,12 @@ const highlightMatch = (text: string): string => {
                   placeholder="Search..."
                   class="grow bg-transparent text-sm"
                 />
-                <kbd class="kbd kbd-xs opacity-50">⌘K</kbd>
+                <kbd class="kbd kbd-xs opacity-80">⌘K</kbd>
               </label>
             </div>
 
             <!-- TOC Header -->
-            <h2 class="text-xs font-semibold text-base-content/60 uppercase tracking-wider mb-3">
+            <h2 class="text-xs font-semibold text-base-content/80 uppercase tracking-wider mb-3">
               On This Page
             </h2>
 
@@ -528,7 +528,7 @@ const highlightMatch = (text: string): string => {
             </ul>
 
             <!-- No results -->
-            <div v-if="filteredChapters.length === 0" class="text-center py-6 text-base-content/60">
+            <div v-if="filteredChapters.length === 0" class="text-center py-6 text-base-content/80">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 mx-auto mb-2 opacity-50">
                 <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
               </svg>
@@ -544,7 +544,7 @@ const highlightMatch = (text: string): string => {
             <!-- Collapse/Expand All -->
             <div class="mt-4 pt-4 border-t border-base-300">
               <button
-                class="text-xs text-base-content/60 hover:text-primary transition-colors"
+                class="text-xs text-base-content/80 hover:text-primary transition-colors"
                 @click="expandedChapters = expandedChapters.size === chapters.length ? new Set() : new Set(chapters.map(c => c.id))"
               >
                 {{ expandedChapters.size === chapters.length ? 'Collapse all' : 'Expand all' }}

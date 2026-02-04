@@ -129,7 +129,7 @@ useSchemaOrg([
           </a>
         </div>
         
-        <p class="text-xs text-base-content/60 italic mt-8 max-w-2xl mx-auto">
+        <p class="text-xs text-base-content/80 italic mt-8 max-w-2xl mx-auto">
           {{ $t('kyr_home.disclaimer') }}
         </p>
       </div>

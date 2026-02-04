@@ -4,7 +4,7 @@
       
       <!-- Hero Section -->
       <section class="pt-12 pb-16">
-        <span class="text-xs uppercase tracking-[0.15em] text-base-content/50 block mb-3">Our Story</span>
+        <span class="text-xs uppercase tracking-[0.15em] text-base-content/80 block mb-3">Our Story</span>
         <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-base-content mb-6">
           {{ $t('about_page.title') }}
         </h1>
@@ -12,7 +12,7 @@
 
       <!-- The Problem Section -->
       <section class="py-16 border-t border-base-content/10">
-        <h2 class="text-xs uppercase tracking-[0.2em] font-medium text-base-content/60 mb-8">
+        <h2 class="text-xs uppercase tracking-[0.2em] font-medium text-base-content/80 mb-8">
           The Problem
         </h2>
         <div class="space-y-6">
@@ -30,7 +30,7 @@
 
       <!-- Our Solution Section -->
       <section class="py-16 border-t border-base-content/10">
-        <h2 class="text-xs uppercase tracking-[0.2em] font-medium text-base-content/60 mb-8">
+        <h2 class="text-xs uppercase tracking-[0.2em] font-medium text-base-content/80 mb-8">
           Our Solution
         </h2>
         <div class="space-y-6">
@@ -64,7 +64,7 @@
 
       <!-- Footer Navigation -->
       <footer class="py-12 border-t border-base-content/10 flex flex-wrap gap-4 justify-between items-center">
-        <NuxtLinkLocale to="/" class="text-sm text-base-content/50 hover:text-base-content">
+        <NuxtLinkLocale to="/" class="text-sm text-base-content/80 hover:text-base-content">
           ← Return Home
         </NuxtLinkLocale>
         <div class="flex gap-4">
