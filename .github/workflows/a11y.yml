@@ -1,0 +1,49 @@
+name: Accessibility (axe)
+
+on:
+  pull_request:
+    paths:
+      - "wcu-website/**"
+      - ".github/workflows/a11y.yml"
+  push:
+    branches:
+      - master
+    paths:
+      - "wcu-website/**"
+      - ".github/workflows/a11y.yml"
+  workflow_dispatch:
+
+jobs:
+  a11y:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: wcu-website
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: wcu-website/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright (Chromium)
+        run: npx playwright install --with-deps chromium
+
+      - name: Run a11y checks
+        run: npm run test:a11y
+
+      - name: Upload Playwright results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-test-results
+          path: wcu-website/test-results
