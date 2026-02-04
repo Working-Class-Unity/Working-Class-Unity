@@ -64,7 +64,7 @@ useSchemaOrg([
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <!-- Tactic 1: Follow/Surveillance -->
-          <div class="card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-colors" tabindex="0" role="article">
+          <div class="card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-colors">
             <div class="card-body p-4">
               <div class="flex items-start gap-3">
                 <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
@@ -83,7 +83,7 @@ useSchemaOrg([
           </div>
 
           <!-- Tactic 2: Plain Clothes -->
-          <div class="card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-colors" tabindex="0" role="article">
+          <div class="card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-colors">
             <div class="card-body p-4">
               <div class="flex items-start gap-3">
                 <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
@@ -101,7 +101,7 @@ useSchemaOrg([
           </div>
 
           <!-- Tactic 3: Name Calling -->
-          <div class="card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-colors" tabindex="0" role="article">
+          <div class="card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-colors">
             <div class="card-body p-4">
               <div class="flex items-start gap-3">
                 <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
@@ -157,7 +157,7 @@ useSchemaOrg([
         <!-- Decision Path Cards -->
         <div class="grid md:grid-cols-2 gap-6">
           <!-- YES Path -->
-          <div class="card card-border border-l-4 border-l-success focus-within:ring-2 focus-within:ring-success/20" tabindex="0" role="article">
+          <div class="card card-border border-l-4 border-l-success focus-within:ring-2 focus-within:ring-success/20">
             <div class="card-body p-5">
               <h3 class="font-bold text-base flex items-center gap-2">
                 <span class="status status-success" aria-hidden="true"></span>
@@ -175,7 +175,7 @@ useSchemaOrg([
           </div>
           
           <!-- NO Path -->
-          <div class="card card-border border-l-4 border-l-error focus-within:ring-2 focus-within:ring-error/20" tabindex="0" role="article">
+          <div class="card card-border border-l-4 border-l-error focus-within:ring-2 focus-within:ring-error/20">
             <div class="card-body p-5">
               <h3 class="font-bold text-base flex items-center gap-2">
                 <span class="status status-error" aria-hidden="true"></span>
@@ -200,7 +200,7 @@ useSchemaOrg([
         
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <!-- Item 1: Record -->
-          <div class="group card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-all" tabindex="0" role="article">
+          <div class="group card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-all">
             <div class="card-body p-5">
               <div class="flex items-start gap-4">
                 <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
@@ -218,7 +218,7 @@ useSchemaOrg([
           </div>
 
           <!-- Item 2: Anonymity -->
-          <div class="group card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-all" tabindex="0" role="article">
+          <div class="group card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-all">
             <div class="card-body p-5">
               <div class="flex items-start gap-4">
                 <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
@@ -236,7 +236,7 @@ useSchemaOrg([
           </div>
 
           <!-- Item 3: Emergency Card -->
-          <div class="group card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-all" tabindex="0" role="article">
+          <div class="group card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-all">
             <div class="card-body p-5">
               <div class="flex items-start gap-4">
                 <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
@@ -254,7 +254,7 @@ useSchemaOrg([
           </div>
 
           <!-- Item 4: Non-Consent -->
-          <div class="group card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-all" tabindex="0" role="article">
+          <div class="group card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-all">
             <div class="card-body p-5">
               <div class="flex items-start gap-4">
                 <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">

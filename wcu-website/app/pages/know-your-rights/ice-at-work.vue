@@ -77,7 +77,7 @@ useSchemaOrg([
               </div>
               
               <!-- Step Content Card -->
-              <div class="card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-colors" tabindex="0" role="article">
+              <div class="card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-colors">
                 <div class="card-body p-5">
                   
                   <div class="grid md:grid-cols-2 gap-6">
@@ -153,7 +153,7 @@ useSchemaOrg([
               </div>
               
               <!-- Step Content Card -->
-              <div class="card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-colors" tabindex="0" role="article">
+              <div class="card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-colors">
                 <div class="card-body p-5">
                   
                   <p class="text-sm text-base-content mb-4">{{ $t('kyr_ice_at_work.rights_at_work.intro') }}</p>
@@ -190,7 +190,7 @@ useSchemaOrg([
               </div>
               
               <!-- Step Content Card -->
-              <div class="card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-colors" tabindex="0" role="article">
+              <div class="card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-colors">
                 <div class="card-body p-5">
                   
                   <!-- DO NOT / DO Section -->
@@ -238,7 +238,7 @@ useSchemaOrg([
               </div>
               
               <!-- Step Content Card -->
-              <div class="card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-colors" tabindex="0" role="article">
+              <div class="card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-colors">
                 <div class="card-body p-5">
                   
                   <p class="text-sm text-base-content mb-4">{{ $t('kyr_ice_at_work.employer.intro') }}</p>

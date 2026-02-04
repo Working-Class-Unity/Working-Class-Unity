@@ -75,7 +75,7 @@ useSchemaOrg([
             </div>
             
             <!-- Step Content Card -->
-            <div class="card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-colors" tabindex="0" role="article">
+            <div class="card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-colors">
               <div class="card-body p-5">
                 <p class="text-sm text-base-content mb-4">{{ $t('kyr_ice_pulls_you_over.always_pull_over.content') }}</p>
                 
@@ -111,7 +111,7 @@ useSchemaOrg([
             </div>
             
             <!-- Step Content Card -->
-            <div class="card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-colors" tabindex="0" role="article">
+            <div class="card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-colors">
               <div class="card-body p-5">
                 
                 <div class="grid md:grid-cols-2 gap-6">
@@ -127,7 +127,7 @@ useSchemaOrg([
                   </div>
                   
                   <!-- Warning Card -->
-                  <div class="card card-border border-l-4 border-l-warning focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20" tabindex="0" role="article">
+                  <div class="card card-border border-l-4 border-l-warning focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20">
                     <div class="card-body p-4">
                       <h3 class="font-bold text-sm flex items-center gap-2">
                         <svg class="w-4 h-4 text-warning shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
@@ -166,7 +166,7 @@ useSchemaOrg([
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               
               <!-- Top Left: Your Window -->
-              <div class="card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-colors" tabindex="0" role="article">
+              <div class="card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-colors">
                 <div class="card-body p-5">
                   <div class="flex items-start gap-3 mb-3">
                     <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
@@ -192,7 +192,7 @@ useSchemaOrg([
               </div>
 
               <!-- Top Right: Driver Requirements -->
-              <div class="card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-colors" tabindex="0" role="article">
+              <div class="card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-colors">
                 <div class="card-body p-5">
                   <div class="flex items-start gap-3 mb-3">
                     <div class="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center shrink-0">
@@ -218,7 +218,7 @@ useSchemaOrg([
               </div>
 
               <!-- Bottom Left: Passenger Rights -->
-              <div class="card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-colors" tabindex="0" role="article">
+              <div class="card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-colors">
                 <div class="card-body p-5">
                   <div class="flex items-start gap-3 mb-3">
                     <div class="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
@@ -244,7 +244,7 @@ useSchemaOrg([
               </div>
 
               <!-- Bottom Right: Critical Advice -->
-              <div class="card card-border border-l-4 border-l-error focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20" tabindex="0" role="article">
+              <div class="card card-border border-l-4 border-l-error focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20">
                 <div class="card-body p-5">
                   <div class="flex items-start gap-3 mb-3">
                     <span class="badge badge-soft badge-error text-xs" aria-hidden="true">{{ $t('kyr_ice_pulls_you_over.warnings.critical') }}</span>
@@ -262,7 +262,7 @@ useSchemaOrg([
             </div>
 
             <!-- All Occupants Info + Script Callout -->
-            <div class="mt-6 card card-border bg-base-200 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20" tabindex="0" role="article">
+            <div class="mt-6 card card-border bg-base-200 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20">
               <div class="card-body p-5">
                 <h4 class="font-bold text-sm mb-3">{{ $t('kyr_ice_pulls_you_over.during_stop.providing_info.all_occupants.title') }}</h4>
                 <ul class="space-y-2 text-sm text-base-content mb-4">
@@ -305,7 +305,7 @@ useSchemaOrg([
             </div>
             
             <!-- Sub-section A: Exiting Vehicle -->
-            <div class="card card-border bg-base-100 mb-4 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20" tabindex="0" role="article">
+            <div class="card card-border bg-base-100 mb-4 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20">
               <div class="card-body p-5">
                 <div class="flex items-center gap-3 mb-4">
                   <div class="w-8 h-8 rounded-full bg-base-200 flex items-center justify-center text-xs font-mono text-base-content shrink-0" aria-hidden="true">A</div>
@@ -335,7 +335,7 @@ useSchemaOrg([
             </div>
 
             <!-- Sub-section B: Search Limitations -->
-            <div class="card card-border bg-base-100 mb-4 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20" tabindex="0" role="article">
+            <div class="card card-border bg-base-100 mb-4 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20">
               <div class="card-body p-5">
                 <div class="flex items-center gap-3 mb-4">
                   <div class="w-8 h-8 rounded-full bg-base-200 flex items-center justify-center text-xs font-mono text-base-content shrink-0" aria-hidden="true">B</div>
@@ -366,7 +366,7 @@ useSchemaOrg([
             </div>
 
             <!-- Sub-section C: Fingerprints -->
-            <div class="card card-border bg-base-100 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20" tabindex="0" role="article">
+            <div class="card card-border bg-base-100 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20">
               <div class="card-body p-5">
                 <div class="flex items-center gap-3 mb-4">
                   <div class="w-8 h-8 rounded-full bg-base-200 flex items-center justify-center text-xs font-mono text-base-content shrink-0" aria-hidden="true">C</div>

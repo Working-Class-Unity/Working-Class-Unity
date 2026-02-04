@@ -44,7 +44,7 @@ const dateClass = computed(() =>
 
 const cardClass = computed(() =>
   props.variant === 'compact'
-    ? 'card bg-base-100 border border-base-300 shadow-sm hover:shadow-md hover:border-primary/50 transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.98] focus:shadow-md focus:border-primary/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
+    ? 'group card bg-base-100 border border-base-300 shadow-sm hover:shadow-md hover:border-primary/50 transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.98] focus-within:shadow-md focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2'
     : 'group card bg-base-100 border border-base-300 shadow-sm hover:shadow-md hover:border-primary/50 focus-within:shadow-md focus-within:border-primary/50 transition-all duration-300'
 )
 
@@ -56,12 +56,7 @@ const rsvpButtonClass = computed(() =>
 </script>
 
 <template>
-  <article
-    :class="cardClass"
-    tabindex="0"
-    role="article"
-    :aria-label="$t(event.titleKey)"
-  >
+  <article :class="cardClass">
     <div class="card-body p-4">
       <div class="flex items-start" :class="variant === 'compact' ? 'gap-3' : 'gap-4'">
         <!-- Icon container based on event type -->

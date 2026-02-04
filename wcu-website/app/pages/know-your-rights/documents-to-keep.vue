@@ -86,7 +86,7 @@ useSchemaOrg([
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           
           <!-- Card 1: Legal Status (Success/Green theme) -->
-          <div class="card card-border border-l-4 border-l-success focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-colors" role="article" tabindex="0">
+          <div class="card card-border border-l-4 border-l-success transition-colors">
             <div class="card-body p-5">
               <div class="flex items-start gap-4">
                 <!-- Shield with checkmark icon -->
@@ -140,7 +140,7 @@ useSchemaOrg([
           </div>
 
           <!-- Card 2: Pending Status (Warning/Yellow theme) -->
-          <div class="card card-border border-l-4 border-l-warning focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-colors" role="article" tabindex="0">
+          <div class="card card-border border-l-4 border-l-warning transition-colors">
             <div class="card-body p-5">
               <div class="flex items-start gap-4">
                 <!-- Clock/hourglass icon -->
@@ -201,7 +201,7 @@ useSchemaOrg([
           </div>
 
           <!-- Card 3: Undocumented (Error/Red theme - most critical) -->
-          <div class="card card-border border-l-4 border-l-error focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-colors" role="article" tabindex="0">
+          <div class="card card-border border-l-4 border-l-error transition-colors">
             <div class="card-body p-5">
               <div class="flex items-start gap-4">
                 <!-- Document/ID card icon -->
