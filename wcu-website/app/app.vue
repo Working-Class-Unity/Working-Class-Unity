@@ -1,11 +1,16 @@
 <script setup lang="ts">
-// Global SEO configuration with title template
-// Individual pages set their own title, which gets appended with " | Working Class Unity"
-useHead({
+const { locale } = useI18n()
+
+// Global SEO configuration with title template.
+// Individual pages set their own title, which gets appended with " | Working Class Unity".
+useHead(() => ({
+  htmlAttrs: {
+    lang: locale.value,
+  },
   titleTemplate: (titleChunk) => {
     return titleChunk ? `${titleChunk} | Working Class Unity` : 'Working Class Unity'
   },
-})
+}))
 
 // Global Schema.org - defines the Organization and WebSite for the entire app
 // The nuxt-schema-org module handles deduplication, so this runs once at the app level

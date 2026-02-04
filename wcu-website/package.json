@@ -7,11 +7,12 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "test": "playwright test",
+    "test:a11y": "playwright test tests/a11y.spec.ts"
   },
   "dependencies": {
     "@formbricks/js": "^4.2.1",
-    "nuxt-schema-org": "^5.0.9",
     "@nuxt/fonts": "^0.12.1",
     "@nuxt/image": "^2.0.0",
     "@nuxt/scripts": "^0.13.0",
@@ -19,9 +20,13 @@
     "@tailwindcss/vite": "^4.1.17",
     "daisyui": "^5.5.5",
     "nuxt": "^4.2.1",
+    "nuxt-schema-org": "^5.0.9",
     "tailwindcss": "^4.1.17"
   },
   "devDependencies": {
-    "@nuxtjs/i18n": "^10.2.1"
+    "@axe-core/playwright": "^4.11.1",
+    "@nuxt/test-utils": "^3.23.0",
+    "@nuxtjs/i18n": "^10.2.1",
+    "@playwright/test": "^1.58.1"
   }
 }
