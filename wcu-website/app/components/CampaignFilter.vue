@@ -18,14 +18,16 @@ const emit = defineEmits<{
   'update:modelValue': [value: string]
 }>()
 
+const { t } = useI18n()
+
 // Filter options configuration
 const filterOptions = [
-  { value: 'active', label: 'Active' },
-  { value: 'paused', label: 'Paused' },
-  { value: 'completed', label: 'Completed' },
-  { value: 'membership', label: 'Membership' },
-  { value: 'education', label: 'Education' },
-  { value: 'treasurer', label: 'Treasurer' }
+  { value: 'active', labelKey: 'campaigns.status.active' },
+  { value: 'paused', labelKey: 'campaigns.status.paused' },
+  { value: 'completed', labelKey: 'campaigns.status.completed' },
+  { value: 'membership', labelKey: 'campaigns.committee.membership' },
+  { value: 'education', labelKey: 'campaigns.committee.education' },
+  { value: 'treasurer', labelKey: 'campaigns.committee.treasurer' }
 ]
 
 /**
@@ -53,26 +55,18 @@ const handleFilterChange = (value: string) => {
 
 <template>
   <div class="flex justify-center overflow-x-auto py-2">
-    <div class="filter" role="group" aria-label="Campaign filters">
-      <!-- Reset button - clears filter back to 'all' state -->
-      <input
-        class="btn filter-reset"
-        type="radio"
-        name="campaign-filter"
-        aria-label="×"
-        @change="handleFilterChange('all')"
-      />
-      <!-- Filter options -->
+    <form class="filter" role="group" :aria-label="t('campaigns.a11y.filter_group_label')" @reset.prevent="handleFilterChange('all')">
+      <input class="btn btn-square" type="reset" value="×" :aria-label="t('campaigns.a11y.clear_filters')" />
       <input
         v-for="option in filterOptions"
         :key="option.value"
         class="btn"
         type="radio"
         name="campaign-filter"
-        :aria-label="option.label"
+        :aria-label="t(option.labelKey)"
         :checked="isChecked(option.value)"
         @change="handleFilterChange(option.value)"
       />
-    </div>
+    </form>
   </div>
 </template>

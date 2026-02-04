@@ -22,7 +22,13 @@
     "join": "ÚNETE A WCU",
     "calendar": "Calendario",
     "campaigns": "Campañas",
-    "forum": "Foro"
+    "forum": "Foro",
+    "a11y": {
+      "open_menu": "Abrir menú de navegación",
+      "close_menu": "Cerrar menú de navegación",
+      "select_language": "Seleccionar idioma",
+      "close_language": "Cerrar menú de idiomas"
+    }
   },
   "kyr_nav": {
     "section_label": "Conozca Sus Derechos"
@@ -842,6 +848,14 @@
     "sideQuests": "Proyectos Secundarios",
     "noResults": "Ninguna campaña coincide con tu filtro actual",
     "upcomingEvents": "Próximos Eventos",
+    "filters": {
+      "all": "Todas las campañas"
+    },
+    "a11y": {
+      "filter_group_label": "Filtros de campañas",
+      "clear_filters": "Limpiar filtros",
+      "filter_results": "Filtro {filter}. Mostrando {total} campañas: {focus} principales y {sideQuests} proyectos secundarios."
+    },
     "status": {
       "active": "Activo",
       "paused": "Pausado",
@@ -889,6 +903,9 @@
     },
     "filter_aria_label": "Filtrar eventos por tipo",
     "events_list_aria_label": "Próximos eventos",
+    "a11y": {
+      "filter_results": "Filtro {filter}. Mostrando {count} próximos eventos."
+    },
     "filters": {
       "all": "Todos los Eventos",
       "meeting": "Reuniones",

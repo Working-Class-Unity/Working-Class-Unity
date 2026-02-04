@@ -22,7 +22,13 @@
     "join": "JOIN WCU",
     "calendar": "Calendar",
     "campaigns": "Campaigns",
-    "forum": "Forum"
+    "forum": "Forum",
+    "a11y": {
+      "open_menu": "Open navigation menu",
+      "close_menu": "Close navigation menu",
+      "select_language": "Select language",
+      "close_language": "Close language menu"
+    }
   },
   "kyr_nav": {
     "section_label": "Know Your Rights"
@@ -834,6 +840,14 @@
     "sideQuests": "Side Quests",
     "noResults": "No campaigns match your current filter",
     "upcomingEvents": "Upcoming Events",
+    "filters": {
+      "all": "All campaigns"
+    },
+    "a11y": {
+      "filter_group_label": "Campaign filters",
+      "clear_filters": "Clear filters",
+      "filter_results": "Filter {filter}. Showing {total} campaigns: {focus} focus and {sideQuests} side quests."
+    },
     "status": {
       "active": "Active",
       "paused": "Paused",
@@ -877,6 +891,9 @@
     },
     "filter_aria_label": "Filter events by type",
     "events_list_aria_label": "Upcoming events",
+    "a11y": {
+      "filter_results": "Filter {filter}. Showing {count} upcoming events."
+    },
     "filters": {
       "all": "All Events",
       "meeting": "Meetings",

@@ -119,6 +119,34 @@ const sideQuests = computed<Campaign[]>(() => {
 const noResults = computed(() => {
   return filteredCampaigns.value.length === 0
 })
+
+// Screen reader announcement for filter updates
+const activeFilterLabel = computed(() => {
+  const filter = activeFilter.value
+
+  if (filter === 'all') {
+    return t('campaigns.filters.all')
+  }
+
+  if (filter === 'active' || filter === 'paused' || filter === 'completed') {
+    return t(`campaigns.status.${filter}`)
+  }
+
+  if (filter === 'membership' || filter === 'education' || filter === 'treasurer') {
+    return t(`campaigns.committee.${filter}`)
+  }
+
+  return filter
+})
+
+const filterAnnouncement = computed(() => {
+  return t('campaigns.a11y.filter_results', {
+    filter: activeFilterLabel.value,
+    total: filteredCampaigns.value.length,
+    focus: focusCampaigns.value.length,
+    sideQuests: sideQuests.value.length,
+  })
+})
 </script>
 
 <template>
@@ -137,6 +165,7 @@ const noResults = computed(() => {
         <div class="card bg-base-100 border border-base-300 shadow-sm max-w-2xl mx-auto">
           <div class="card-body p-4">
             <CampaignFilter v-model="activeFilter" />
+            <p class="sr-only" aria-live="polite">{{ filterAnnouncement }}</p>
           </div>
         </div>
       </div>

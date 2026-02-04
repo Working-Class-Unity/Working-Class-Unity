@@ -136,7 +136,7 @@ onUnmounted(() => {
           <button
             ref="mobileMenuButtonRef"
             type="button"
-            aria-label="Open navigation menu"
+            :aria-label="mobileMenuOpen ? $t('nav.a11y.close_menu') : $t('nav.a11y.open_menu')"
             aria-haspopup="true"
             :aria-expanded="mobileMenuOpen"
             aria-controls="mobile-nav-menu"
@@ -213,7 +213,7 @@ onUnmounted(() => {
           <button
             ref="languageMenuButtonRef"
             type="button"
-            aria-label="Select language"
+            :aria-label="languageMenuOpen ? $t('nav.a11y.close_language') : $t('nav.a11y.select_language')"
             aria-haspopup="true"
             :aria-expanded="languageMenuOpen"
             aria-controls="language-menu"

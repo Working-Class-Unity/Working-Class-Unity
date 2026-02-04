@@ -56,6 +56,19 @@ const filteredEvents = computed(() => {
   }
   return upcoming.filter((event) => event.eventType === selectedType.value)
 })
+
+// Screen reader announcement for filter updates
+const selectedTypeLabel = computed(() => {
+  const match = eventTypes.find((t) => t.value === selectedType.value)
+  return match ? t(match.labelKey) : t('calendar.filters.all')
+})
+
+const filterAnnouncement = computed(() => {
+  return t('calendar.a11y.filter_results', {
+    filter: selectedTypeLabel.value,
+    count: filteredEvents.value.length,
+  })
+})
 </script>
 
 <template>
@@ -80,12 +93,16 @@ const filteredEvents = computed(() => {
             v-for="type in eventTypes"
             :key="type.value"
             @click="selectedType = type.value"
+            type="button"
+            :aria-pressed="selectedType === type.value"
             class="btn btn-sm"
             :class="selectedType === type.value ? 'btn-primary' : 'btn-ghost bg-base-200'"
           >
             {{ $t(type.labelKey) }}
           </button>
         </div>
+
+        <p class="sr-only" aria-live="polite">{{ filterAnnouncement }}</p>
       </div>
     </section>
 

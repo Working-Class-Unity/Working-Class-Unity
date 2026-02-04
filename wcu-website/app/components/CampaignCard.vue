@@ -22,7 +22,9 @@ onMounted(() => {
 
 // Computed properties for type badge (ribbon)
 const typeBadgeText = computed(() => {
-  return props.campaign.type === 'focus' ? 'Focus Campaign' : 'Side Quest'
+  return props.campaign.type === 'focus'
+    ? t('campaigns.type.focus')
+    : t('campaigns.type.side-quest')
 })
 
 // Ribbon background/text colors based on campaign type
@@ -56,11 +58,11 @@ const statusBadgeClass = computed(() => {
 const statusText = computed(() => {
   switch (props.campaign.status) {
     case 'active':
-      return 'Active'
+      return t('campaigns.status.active')
     case 'paused':
-      return 'Paused'
+      return t('campaigns.status.paused')
     case 'completed':
-      return 'Completed'
+      return t('campaigns.status.completed')
     default:
       return props.campaign.status
   }
@@ -71,11 +73,11 @@ const committeeText = computed(() => {
   if (!props.campaign.committee) return null
   switch (props.campaign.committee) {
     case 'membership':
-      return 'Membership'
+      return t('campaigns.committee.membership')
     case 'education':
-      return 'Education'
+      return t('campaigns.committee.education')
     case 'treasurer':
-      return 'Treasurer'
+      return t('campaigns.committee.treasurer')
     default:
       return props.campaign.committee
   }
@@ -184,6 +186,8 @@ function formatTimeRange(startDateTime: string, endDateTime: string, allDay: boo
               class="size-[1em] shrink-0"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
+              aria-hidden="true"
+              focusable="false"
             >
               <g fill="currentColor" stroke-linejoin="miter" stroke-linecap="butt">
                 <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-linecap="square" stroke-miterlimit="10" stroke-width="2"></circle>
@@ -201,6 +205,8 @@ function formatTimeRange(startDateTime: string, endDateTime: string, allDay: boo
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
+              aria-hidden="true"
+              focusable="false"
             >
               <circle cx="12" cy="12" r="10"></circle>
               <line x1="10" y1="15" x2="10" y2="9"></line>
@@ -217,6 +223,8 @@ function formatTimeRange(startDateTime: string, endDateTime: string, allDay: boo
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
+              aria-hidden="true"
+              focusable="false"
             >
               <circle cx="12" cy="12" r="10"></circle>
               <polyline points="16 12 12 8 8 12"></polyline>
@@ -241,6 +249,8 @@ function formatTimeRange(startDateTime: string, endDateTime: string, allDay: boo
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
+              aria-hidden="true"
+              focusable="false"
             >
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
               <circle cx="9" cy="7" r="4"></circle>
@@ -258,6 +268,8 @@ function formatTimeRange(startDateTime: string, endDateTime: string, allDay: boo
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
+              aria-hidden="true"
+              focusable="false"
             >
               <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
               <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
@@ -273,6 +285,8 @@ function formatTimeRange(startDateTime: string, endDateTime: string, allDay: boo
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
+              aria-hidden="true"
+              focusable="false"
             >
               <line x1="12" y1="1" x2="12" y2="23"></line>
               <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
@@ -297,7 +311,7 @@ function formatTimeRange(startDateTime: string, endDateTime: string, allDay: boo
           <div class="flex items-center gap-3 mb-4">
             <div class="flex-1 h-px bg-base-300"></div>
             <span class="text-xs font-semibold tracking-wider text-base-content/60 uppercase">
-              Upcoming Events
+              {{ $t('campaigns.upcomingEvents') }}
             </span>
             <div class="flex-1 h-px bg-base-300"></div>
           </div>
@@ -339,7 +353,7 @@ function formatTimeRange(startDateTime: string, endDateTime: string, allDay: boo
                     target="_blank"
                     rel="noopener noreferrer"
                     class="flex-shrink-0 text-primary hover:text-primary-focus transition-colors"
-                    :aria-label="`Open ${$t(event.titleKey)} link`"
+                    :aria-label="`${$t(event.titleKey)} ${$t('common.opens_in_new_tab')}`"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -348,6 +362,8 @@ function formatTimeRange(startDateTime: string, endDateTime: string, allDay: boo
                       viewBox="0 0 24 24"
                       stroke="currentColor"
                       stroke-width="2"
+                      aria-hidden="true"
+                      focusable="false"
                     >
                       <path
                         stroke-linecap="round"
@@ -369,6 +385,8 @@ function formatTimeRange(startDateTime: string, endDateTime: string, allDay: boo
                       viewBox="0 0 24 24"
                       stroke="currentColor"
                       stroke-width="2"
+                      aria-hidden="true"
+                      focusable="false"
                     >
                       <path
                         stroke-linecap="round"
@@ -392,6 +410,8 @@ function formatTimeRange(startDateTime: string, endDateTime: string, allDay: boo
                       viewBox="0 0 24 24"
                       stroke="currentColor"
                       stroke-width="2"
+                      aria-hidden="true"
+                      focusable="false"
                     >
                       <path
                         stroke-linecap="round"

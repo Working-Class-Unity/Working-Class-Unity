@@ -22,7 +22,13 @@
     "join": "WCU ਵਿੱਚ ਸ਼ਾਮਲ ਹੋਵੋ",
     "calendar": "ਕੈਲੰਡਰ",
     "campaigns": "ਮੁਹਿੰਮਾਂ",
-    "forum": "ਫੋਰਮ"
+    "forum": "ਫੋਰਮ",
+    "a11y": {
+      "open_menu": "ਨੇਵੀਗੇਸ਼ਨ ਮੇਨੂ ਖੋਲ੍ਹੋ",
+      "close_menu": "ਨੇਵੀਗੇਸ਼ਨ ਮੇਨੂ ਬੰਦ ਕਰੋ",
+      "select_language": "ਭਾਸ਼ਾ ਚੁਣੋ",
+      "close_language": "ਭਾਸ਼ਾ ਮੇਨੂ ਬੰਦ ਕਰੋ"
+    }
   },
   "kyr_nav": {
     "section_label": "ਆਪਣੇ ਅਧਿਕਾਰ ਜਾਣੋ"
@@ -834,6 +840,14 @@
     "sideQuests": "ਸਹਾਇਕ ਪ੍ਰੋਜੈਕਟ",
     "noResults": "ਕੋਈ ਮੁਹਿੰਮ ਤੁਹਾਡੇ ਮੌਜੂਦਾ ਫਿਲਟਰ ਨਾਲ ਮੇਲ ਨਹੀਂ ਖਾਂਦੀ",
     "upcomingEvents": "ਆਉਣ ਵਾਲੇ ਸਮਾਗਮ",
+    "filters": {
+      "all": "ਸਾਰੀਆਂ ਮੁਹਿੰਮਾਂ"
+    },
+    "a11y": {
+      "filter_group_label": "ਮੁਹਿੰਮ ਫਿਲਟਰ",
+      "clear_filters": "ਫਿਲਟਰ ਸਾਫ਼ ਕਰੋ",
+      "filter_results": "ਫਿਲਟਰ {filter}. {total} ਮੁਹਿੰਮਾਂ ਦਿਖਾਈਆਂ ਜਾ ਰਹੀਆਂ ਹਨ: {focus} ਮੁੱਖ ਅਤੇ {sideQuests} ਸਹਾਇਕ ਪ੍ਰੋਜੈਕਟ।"
+    },
     "status": {
       "active": "ਸਰਗਰਮ",
       "paused": "ਰੁਕਿਆ ਹੋਇਆ",
@@ -881,6 +895,9 @@
     },
     "filter_aria_label": "ਕਿਸਮ ਦੁਆਰਾ ਸਮਾਗਮ ਫਿਲਟਰ ਕਰੋ",
     "events_list_aria_label": "ਆਉਣ ਵਾਲੇ ਸਮਾਗਮ",
+    "a11y": {
+      "filter_results": "ਫਿਲਟਰ {filter}. {count} ਆਉਣ ਵਾਲੇ ਸਮਾਗਮ ਦਿਖਾਏ ਜਾ ਰਹੇ ਹਨ।"
+    },
     "filters": {
       "all": "ਸਾਰੇ ਸਮਾਗਮ",
       "meeting": "ਮੀਟਿੰਗਾਂ",
