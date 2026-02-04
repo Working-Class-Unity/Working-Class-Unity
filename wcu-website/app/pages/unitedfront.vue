@@ -176,24 +176,48 @@
       <!-- Action/Form Section -->
       <section id="solidarity" class="py-20 border-t border-base-content/10 scroll-mt-20">
         <h2 class="text-2xl md:text-3xl font-bold text-base-content mb-3">
-          Add your name in solidarity.
+          {{ $t('unitedfront.solidarity.heading') }}
         </h2>
         <p id="solidarity-form-desc" class="text-base text-base-content/80 mb-8">
           {{ $t('unitedfront.solidarity.formPlaceholder') }}
         </p>
         
-        <!-- Contract-style email input -->
-        <div class="flex flex-col sm:flex-row gap-4 max-w-lg">
-          <label for="solidarity-email" class="sr-only">Email address</label>
-          <input
-            id="solidarity-email"
-            type="email"
-            placeholder="Enter your email..."
-            aria-describedby="solidarity-form-desc"
-            class="input input-lg flex-1 border-0 border-b-2 border-base-content/20 rounded-none bg-transparent focus:border-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
-          />
-          <button class="btn btn-primary btn-lg" type="submit">Sign</button>
-        </div>
+        <form class="max-w-lg" @submit.prevent="submitSolidarity">
+          <div class="flex flex-col sm:flex-row gap-4">
+            <div class="flex-1">
+              <label for="solidarity-email" class="sr-only">{{ $t('unitedfront.solidarity.email_label') }}</label>
+              <input
+                id="solidarity-email"
+                ref="emailInputRef"
+                v-model.trim="email"
+                name="email"
+                type="email"
+                inputmode="email"
+                autocomplete="email"
+                :placeholder="$t('unitedfront.solidarity.email_placeholder')"
+                :aria-describedby="emailDescribedBy"
+                :aria-invalid="emailError ? 'true' : 'false'"
+                :disabled="isSubmitting"
+                required
+                class="input input-lg w-full border-0 border-b-2 border-base-content/20 rounded-none bg-transparent focus:border-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
+              />
+              <p v-if="emailError" id="solidarity-email-error" class="mt-2 text-sm text-error" role="alert">
+                {{ emailError }}
+              </p>
+              <p v-if="formError" id="solidarity-form-error" class="mt-2 text-sm text-error" role="alert">
+                {{ formError }}
+              </p>
+              <p v-if="submitSuccess" id="solidarity-form-success" class="mt-2 text-sm text-success" role="status" aria-live="polite">
+                {{ $t('unitedfront.solidarity.success') }}
+              </p>
+            </div>
+
+            <button class="btn btn-primary btn-lg" type="submit" :disabled="isSubmitting">
+              <span v-if="isSubmitting" class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+              {{ isSubmitting ? $t('unitedfront.solidarity.submitting') : $t('unitedfront.solidarity.submit') }}
+            </button>
+          </div>
+        </form>
       </section>
 
       <!-- Footer - Minimal -->
@@ -212,7 +236,71 @@
 </template>
 
 <script setup lang="ts">
-const { t } = useI18n()
+const { t, locale } = useI18n()
+
+const email = ref('')
+const emailInputRef = ref<HTMLInputElement | null>(null)
+
+const emailError = ref<string | null>(null)
+const formError = ref<string | null>(null)
+const submitSuccess = ref(false)
+const isSubmitting = ref(false)
+
+const emailDescribedBy = computed(() => {
+  const ids = ['solidarity-form-desc']
+  if (emailError.value) ids.push('solidarity-email-error')
+  if (formError.value) ids.push('solidarity-form-error')
+  if (submitSuccess.value) ids.push('solidarity-form-success')
+  return ids.join(' ')
+})
+
+const validateEmail = (value: string): string | null => {
+  const trimmed = value.trim()
+  if (!trimmed) return 'unitedfront.solidarity.errors.email_required'
+
+  // Lightweight email check; browser will also enforce type="email".
+  const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)
+  if (!isValid) return 'unitedfront.solidarity.errors.email_invalid'
+
+  return null
+}
+
+const submitSolidarity = async () => {
+  submitSuccess.value = false
+  formError.value = null
+  emailError.value = null
+
+  const value = email.value.trim()
+  const errorKey = validateEmail(value)
+
+  if (errorKey) {
+    emailError.value = t(errorKey)
+    await nextTick()
+    emailInputRef.value?.focus()
+    return
+  }
+
+  isSubmitting.value = true
+  try {
+    const formbricks = (await import('@formbricks/js')).default
+    await formbricks.setLanguage(locale.value)
+    await formbricks.setEmail(value)
+    await formbricks.setAttribute('pledge', 'unitedfront')
+    await formbricks.track('unitedfront_pledge_signed', {
+      hiddenFields: {
+        source: 'unitedfront',
+        locale: locale.value,
+      },
+    })
+
+    submitSuccess.value = true
+    email.value = ''
+  } catch (error) {
+    formError.value = t('unitedfront.solidarity.errors.submit_failed')
+  } finally {
+    isSubmitting.value = false
+  }
+}
 
 // =============================================================================
 // SEO Meta Tags

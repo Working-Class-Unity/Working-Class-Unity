@@ -845,7 +845,17 @@
     },
     "solidarity": {
       "heading": "Agregue su nombre en solidaridad",
-      "formPlaceholder": "El formulario de FormBuilder aparecerá aquí"
+      "formPlaceholder": "Ingresa tu correo electrónico para firmar el compromiso. Lo usaremos solo para enviarte actualizaciones de organización.",
+      "email_label": "Correo electrónico",
+      "email_placeholder": "Ingresa tu correo...",
+      "submit": "Firmar",
+      "submitting": "Firmando...",
+      "success": "Gracias — tu compromiso fue enviado.",
+      "errors": {
+        "email_required": "Ingresa un correo electrónico.",
+        "email_invalid": "Ingresa un correo electrónico válido.",
+        "submit_failed": "Hubo un problema al enviar tu compromiso. Inténtalo de nuevo."
+      }
     }
   },
   "campaigns": {

@@ -837,7 +837,17 @@
     },
     "solidarity": {
       "heading": "Add Your Name In Solidarity",
-      "formPlaceholder": "Form from FormBuilder will appear here"
+      "formPlaceholder": "ਵਚਨ 'ਤੇ ਦਸਤਖਤ ਕਰਨ ਲਈ ਆਪਣਾ ਈਮੇਲ ਦਰਜ ਕਰੋ। ਅਸੀਂ ਇਸਦਾ ਉਪਯੋਗ ਸਿਰਫ਼ ਸੰਗਠਨਕ ਅਪਡੇਟ ਲਈ ਕਰਾਂਗੇ।",
+      "email_label": "ਈਮੇਲ ਪਤਾ",
+      "email_placeholder": "ਆਪਣਾ ਈਮੇਲ ਦਰਜ ਕਰੋ...",
+      "submit": "ਦਸਤਖਤ ਕਰੋ",
+      "submitting": "ਦਸਤਖਤ ਹੋ ਰਹੇ ਹਨ...",
+      "success": "ਧੰਨਵਾਦ — ਤੁਹਾਡਾ ਵਚਨ ਭੇਜ ਦਿੱਤਾ ਗਿਆ ਹੈ।",
+      "errors": {
+        "email_required": "ਈਮੇਲ ਪਤਾ ਦਰਜ ਕਰੋ।",
+        "email_invalid": "ਵੈਧ ਈਮੇਲ ਪਤਾ ਦਰਜ ਕਰੋ।",
+        "submit_failed": "ਵਚਨ ਭੇਜਣ ਵਿੱਚ ਸਮੱਸਿਆ ਆਈ। ਕਿਰਪਾ ਕਰਕੇ ਮੁੜ ਕੋਸ਼ਿਸ਼ ਕਰੋ।"
+      }
     }
   },
   "campaigns": {

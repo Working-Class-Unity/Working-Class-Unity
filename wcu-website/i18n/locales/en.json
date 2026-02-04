@@ -837,7 +837,17 @@
     },
     "solidarity": {
       "heading": "Add Your Name In Solidarity",
-      "formPlaceholder": "Form from FormBuilder will appear here"
+      "formPlaceholder": "Enter your email to sign the pledge. We'll use it only to follow up with organizing updates.",
+      "email_label": "Email address",
+      "email_placeholder": "Enter your email...",
+      "submit": "Sign",
+      "submitting": "Signing...",
+      "success": "Thanks — your pledge was submitted.",
+      "errors": {
+        "email_required": "Enter an email address.",
+        "email_invalid": "Enter a valid email address.",
+        "submit_failed": "Something went wrong submitting your pledge. Please try again."
+      }
     }
   },
   "campaigns": {
