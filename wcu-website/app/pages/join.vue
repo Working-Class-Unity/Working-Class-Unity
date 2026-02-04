@@ -98,7 +98,7 @@ useSchemaOrg([
           <!-- Rank and File Member ($10 - Orange) -->
           <div class="card h-full bg-base-100 border border-base-300 border-t-4 border-t-primary shadow-md">
             <div class="card-body">
-              <span class="badge badge-primary badge-soft rounded-full self-start">{{ $t('join.membership.rank_and_file.title') }}</span>
+              <span class="badge badge-primary rounded-full self-start">{{ $t('join.membership.rank_and_file.title') }}</span>
               <div class="mt-4 mb-2">
                 <span class="text-5xl font-bold text-primary">{{ $t('join.membership.rank_and_file.price') }}</span>
                 <span class="text-sm text-base-content/80">/month</span>
@@ -209,44 +209,40 @@ useSchemaOrg([
       <!-- FAQ Section -->
       <section class="max-w-2xl mx-auto w-full">
         <h2 class="text-3xl font-bold text-center mb-2">{{ $t('join.faq.title') }}</h2>
-        <p class="text-center mb-8 text-base-content/60">{{ $t('join.faq.subtitle') }}</p>
+        <p class="text-center mb-8 text-base-content/80">{{ $t('join.faq.subtitle') }}</p>
         
         <div class="divide-y divide-base-300">
-          <div class="collapse collapse-plus">
-            <input type="radio" name="faq-accordion" checked="checked" />
-            <div class="collapse-title font-medium py-4">
+          <details class="collapse collapse-plus" name="faq-accordion" open>
+            <summary class="collapse-title font-medium py-4">
               {{ $t('join.faq.items.eligibility.question') }}
-            </div>
+            </summary>
             <div class="collapse-content text-base-content/70">
               <p>{{ $t('join.faq.items.eligibility.answer') }}</p>
             </div>
-          </div>
+          </details>
 
-          <div class="collapse collapse-plus">
-            <input type="radio" name="faq-accordion" />
-            <div class="collapse-title font-medium py-4">
+          <details class="collapse collapse-plus" name="faq-accordion">
+            <summary class="collapse-title font-medium py-4">
               {{ $t('join.faq.items.good_standing.question') }}
-            </div>
+            </summary>
             <div class="collapse-content text-base-content/70">
               <p>{{ $t('join.faq.items.good_standing.answer') }}</p>
             </div>
-          </div>
+          </details>
 
-          <div class="collapse collapse-plus">
-            <input type="radio" name="faq-accordion" />
-            <div class="collapse-title font-medium py-4">
+          <details class="collapse collapse-plus" name="faq-accordion">
+            <summary class="collapse-title font-medium py-4">
               {{ $t('join.faq.items.dues.question') }}
-            </div>
+            </summary>
             <div class="collapse-content text-base-content/70">
               <p>{{ $t('join.faq.items.dues.answer') }}</p>
             </div>
-          </div>
+          </details>
 
-          <div class="collapse collapse-plus">
-            <input type="radio" name="faq-accordion" />
-            <div class="collapse-title font-medium py-4">
+          <details class="collapse collapse-plus" name="faq-accordion">
+            <summary class="collapse-title font-medium py-4">
               {{ $t('join.faq.items.contact.question') }}
-            </div>
+            </summary>
             <div class="collapse-content text-base-content/70">
               <i18n-t keypath="join.faq.items.contact.answer" tag="p">
                 <template #link>
@@ -254,7 +250,7 @@ useSchemaOrg([
                 </template>
               </i18n-t>
             </div>
-          </div>
+          </details>
         </div>
       </section>
     </div>
