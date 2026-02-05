@@ -100,6 +100,24 @@ export const events: Event[] = [
     updatedAt: '2025-12-01T00:00:00.000Z',
     campaignId: 'campaign-3',
     committee: null
+  },
+  {
+    id: 'event-5',
+    titleKey: 'calendar.events.generalMeeting.title',
+    descriptionKey: 'calendar.events.generalMeeting.description',
+    eventType: 'meeting',
+    startDateTime: '2026-02-06T02:00:00.000Z',
+    endDateTime: '2026-02-06T03:30:00.000Z',
+    allDay: false,
+    location: 'OF Hall - 2522 Grand Canal Blvd, Stockton, CA, USA',
+    rsvpLink: 'https://tech.workingclassunity.com/wcu-general-meeting',
+    isVirtual: false,
+    isHybrid: true,
+    isActive: true,
+    createdAt: '2026-02-05T03:26:38.000Z',
+    updatedAt: '2026-02-05T03:26:38.000Z',
+    campaignId: null,
+    committee: null
   }
 ]
 
