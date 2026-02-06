@@ -36,7 +36,7 @@ useSchemaOrg([
   defineBreadcrumb({
     itemListElement: [
       { name: 'Home', item: '/' },
-      { name: t('nav.kyr'), item: '/kyr' },
+      { name: t('nav.kyr'), item: '/know-your-rights' },
       { name: t('kyr.car.title') },
     ],
   }),

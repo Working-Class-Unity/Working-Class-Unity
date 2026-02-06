@@ -157,7 +157,7 @@ onUnmounted(() => {
           >
             <!-- Overview Link -->
             <NuxtLinkLocale 
-              to="/kyr" 
+              to="/know-your-rights" 
               class="group flex items-center justify-between w-full py-2.5 px-4 min-h-11 hover:bg-base-200/50 focus:bg-base-200/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset transition-colors border-b border-base-300/50"
             >
               <span class="text-sm text-base-content font-medium group-hover:text-primary transition-colors">{{ $t('links.kyr_overview') }}</span>

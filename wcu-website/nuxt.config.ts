@@ -101,6 +101,24 @@ export default defineNuxtConfig({
   // Nitro configuration for security headers and CSP
   nitro: {
     routeRules: {
+      '/kyr': {
+        redirect: {
+          to: '/know-your-rights',
+          statusCode: 301,
+        },
+      },
+      '/es/kyr': {
+        redirect: {
+          to: '/es/know-your-rights',
+          statusCode: 301,
+        },
+      },
+      '/pa/kyr': {
+        redirect: {
+          to: '/pa/know-your-rights',
+          statusCode: 301,
+        },
+      },
       '/member/**': {
         headers: {
           'X-Robots-Tag': 'noindex, nofollow, noarchive',

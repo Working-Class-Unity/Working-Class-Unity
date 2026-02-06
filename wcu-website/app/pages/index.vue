@@ -86,7 +86,7 @@ const upcomingEvents = computed(() => getUpcomingEvents(3))
                 {{ $t('calendar.upcoming_events') }}: {{ upcomingEvents.length }}
               </p>
               <div class="mt-6 space-y-3">
-                <NuxtLinkLocale to="/kyr" class="btn btn-primary justify-start w-full">
+                <NuxtLinkLocale to="/know-your-rights" class="btn btn-primary justify-start w-full">
                   {{ $t('nav.kyr') }}
                 </NuxtLinkLocale>
                 <NuxtLinkLocale to="/campaigns" class="btn btn-outline border-primary/70 text-secondary-content hover:text-secondary w-full justify-start">
