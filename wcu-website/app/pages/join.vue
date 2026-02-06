@@ -115,7 +115,7 @@ useSchemaOrg([
             <div class="card-body">
               <div class="flex items-center gap-2 flex-wrap">
                 <span class="badge badge-outline border-accent text-base-content rounded-full">{{ $t('join.membership.solidarity.title') }}</span>
-                <span class="badge badge-warning badge-sm">Recommended</span>
+                <span class="badge badge-sm border border-primary/60 bg-primary/15 text-secondary font-semibold">Recommended</span>
               </div>
               <div class="mt-4 mb-2">
                 <span class="text-5xl font-bold text-accent">{{ $t('join.membership.solidarity.price') }}</span>
