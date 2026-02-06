@@ -28,7 +28,10 @@
     "daisyui": "^5.5.5",
     "nuxt": "^4.2.1",
     "nuxt-schema-org": "^5.0.9",
-    "tailwindcss": "^4.1.17"
+    "pocketbase": "^0.26.8",
+    "resend": "^6.9.1",
+    "tailwindcss": "^4.1.17",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.1",

@@ -63,6 +63,14 @@ export default defineNuxtConfig({
   
   // Runtime configuration for environment variables
   runtimeConfig: {
+    pocketbaseUrl: process.env.POCKETBASE_URL || '',
+    pocketbaseServiceEmail: process.env.POCKETBASE_SERVICE_EMAIL || '',
+    pocketbaseServicePassword: process.env.POCKETBASE_SERVICE_PASSWORD || '',
+    authSessionSecret: process.env.AUTH_SESSION_SECRET || '',
+    authSessionTtlSeconds: Number.parseInt(process.env.AUTH_SESSION_TTL_SECONDS || `${60 * 60 * 24 * 14}`, 10),
+    resendApiKey: process.env.RESEND_API_KEY || '',
+    resendFromEmail: process.env.RESEND_FROM_EMAIL || '',
+    authMagicLinkOrigin: process.env.AUTH_MAGIC_LINK_ORIGIN || 'http://localhost:3000',
     // Public keys (exposed to client) - Formbricks needs client-side access
     public: {
       formbricksEnvironmentId: process.env.NUXT_PUBLIC_FORMBRICKS_ENVIRONMENT_ID || 'cminsehli0009o8015hjuzkuz',
