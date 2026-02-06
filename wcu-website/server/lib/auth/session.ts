@@ -60,8 +60,15 @@ export function decodeSessionToken(token: string, secret: string): SessionUser |
   if (!payloadSegment || !signatureSegment) return null
 
   const expectedSignature = signSegment(payloadSegment, secret)
-  const actualSignature = Buffer.from(signatureSegment)
-  const expectedSignatureBuffer = Buffer.from(expectedSignature)
+  let actualSignature: Buffer
+  let expectedSignatureBuffer: Buffer
+
+  try {
+    actualSignature = fromBase64Url(signatureSegment)
+    expectedSignatureBuffer = fromBase64Url(expectedSignature)
+  } catch {
+    return null
+  }
 
   if (
     actualSignature.length !== expectedSignatureBuffer.length
