@@ -68,7 +68,7 @@ useSchemaOrg([
                   <h3 class="font-semibold text-base-content group-hover:text-primary transition-colors">
                     {{ $t('kyr_home.buttons.emergency.title') }}
                   </h3>
-                  <p class="text-sm text-base-content/70">
+                  <p class="text-sm text-base-content/80">
                     {{ $t('kyr_home.buttons.emergency.subtitle') }}
                   </p>
                 </div>
@@ -94,7 +94,7 @@ useSchemaOrg([
                   <h3 class="font-semibold text-base-content group-hover:text-primary transition-colors">
                     {{ $t('kyr_home.buttons.support.title') }}
                   </h3>
-                  <p class="text-sm text-base-content/70">
+                  <p class="text-sm text-base-content/80">
                     {{ $t('kyr_home.buttons.support.subtitle') }}
                   </p>
                 </div>
@@ -120,7 +120,7 @@ useSchemaOrg([
                   <h3 class="font-semibold text-base-content group-hover:text-primary transition-colors">
                     {{ $t('kyr_home.buttons.involved.title') }}
                   </h3>
-                  <p class="text-sm text-base-content/70">
+                  <p class="text-sm text-base-content/80">
                     {{ $t('kyr_home.buttons.involved.subtitle') }}
                   </p>
                 </div>
@@ -149,21 +149,21 @@ useSchemaOrg([
         </div>
         
         <!-- System Alert Toast -->
-        <div role="alert" class="alert alert-soft alert-error max-w-3xl mx-auto rounded-xl border border-error/30 mb-12">
+        <div role="alert" class="alert alert-soft alert-info max-w-3xl mx-auto rounded-xl border border-secondary/30 mb-12 bg-secondary/10 text-base-content">
           <div class="flex items-center gap-3">
             <!-- Warning triangle icon with subtle pulse animation -->
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-error animate-pulse shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-secondary animate-pulse shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
             <div>
               <i18n-t keypath="kyr_home.sections.emergency_box.text" tag="p" class="font-medium text-sm">
                 <template #link>
-                  <a href="#" class="font-bold underline hover:opacity-80 transition-opacity">
+                  <a href="#" class="font-bold underline text-secondary hover:text-base-content transition-colors">
                     {{ $t('kyr_home.sections.emergency_box.link_text') }}
                   </a>
                 </template>
                 <template #phone>
-                  <a href="tel:5592060151" class="font-bold underline hover:opacity-80 transition-opacity">
+                  <a href="tel:5592060151" class="font-bold underline text-secondary hover:text-base-content transition-colors">
                     {{ $t('kyr_home.sections.emergency_box.phone') }}
                   </a>
                 </template>
@@ -210,7 +210,7 @@ useSchemaOrg([
                     <span class="font-medium text-base-content group-hover:text-primary transition-colors">
                       {{ $t('kyr_home.get_involved_section.subsection_a.button_1.text') }}
                     </span>
-                    <p class="text-sm text-base-content/70">
+                    <p class="text-sm text-base-content/80">
                       {{ $t('kyr_home.get_involved_section.subsection_a.button_1.subtext') }}
                     </p>
                   </div>
@@ -227,7 +227,7 @@ useSchemaOrg([
                     <span class="font-medium text-base-content group-hover:text-primary transition-colors">
                       {{ $t('kyr_home.get_involved_section.subsection_a.button_2.text') }}
                     </span>
-                    <p class="text-sm text-base-content/70">
+                    <p class="text-sm text-base-content/80">
                       {{ $t('kyr_home.get_involved_section.subsection_a.button_2.subtext') }}
                     </p>
                   </div>
@@ -244,7 +244,7 @@ useSchemaOrg([
                     <span class="font-medium text-base-content group-hover:text-primary transition-colors">
                       {{ $t('kyr_home.get_involved_section.subsection_a.button_3.text') }}
                     </span>
-                    <p class="text-sm text-base-content/70">
+                    <p class="text-sm text-base-content/80">
                       {{ $t('kyr_home.get_involved_section.subsection_a.button_3.subtext') }}
                     </p>
                   </div>
@@ -276,7 +276,7 @@ useSchemaOrg([
                     <span class="font-medium text-base-content group-hover:text-primary transition-colors">
                       {{ $t('kyr_home.get_involved_section.subsection_b.button_1.text') }}
                     </span>
-                    <p class="text-sm text-base-content/70">
+                    <p class="text-sm text-base-content/80">
                       {{ $t('kyr_home.get_involved_section.subsection_b.button_1.subtext') }}
                     </p>
                   </div>
@@ -293,7 +293,7 @@ useSchemaOrg([
                     <span class="font-medium text-base-content group-hover:text-primary transition-colors">
                       {{ $t('kyr_home.get_involved_section.subsection_b.button_2.text') }}
                     </span>
-                    <p class="text-sm text-base-content/70">
+                    <p class="text-sm text-base-content/80">
                       {{ $t('kyr_home.get_involved_section.subsection_b.button_2.subtext') }}
                     </p>
                   </div>

@@ -150,30 +150,35 @@ const filterAnnouncement = computed(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-base-100">
+  <div class="pb-12 md:pb-16">
     <!-- Hero Section -->
-    <section class="py-12 md:py-16">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h1 class="text-3xl md:text-4xl font-bold text-base-content mb-4">
-          {{ $t('campaigns.pageTitle') }}
-        </h1>
-        <p class="text-lg text-base-content/70 max-w-3xl mx-auto mb-10">
-          {{ $t('campaigns.pageSubtitle') }}
-        </p>
+    <section class="pt-8 pb-8 md:pt-12 md:pb-10">
+      <div class="wcu-container">
+        <article class="wcu-card overflow-hidden border-secondary/30 text-center">
+          <div class="h-1 solidarity-stripe" aria-hidden="true"></div>
+          <div class="card-body p-6 md:p-10">
+            <h1 class="text-3xl md:text-4xl font-bold text-base-content mb-4">
+              {{ $t('campaigns.pageTitle') }}
+            </h1>
+            <p class="text-lg text-base-content/90 max-w-3xl mx-auto mb-8">
+              {{ $t('campaigns.pageSubtitle') }}
+            </p>
 
-        <!-- Filter Bar Card -->
-        <div class="card bg-base-100 border border-base-300 shadow-sm max-w-2xl mx-auto">
-          <div class="card-body p-4">
-            <CampaignFilter v-model="activeFilter" />
-            <p class="sr-only" aria-live="polite">{{ filterAnnouncement }}</p>
+            <!-- Filter Bar Card -->
+            <div class="wcu-card border-secondary/25 max-w-3xl mx-auto">
+              <div class="card-body p-4">
+                <CampaignFilter v-model="activeFilter" />
+                <p class="sr-only" aria-live="polite">{{ filterAnnouncement }}</p>
+              </div>
+            </div>
           </div>
-        </div>
+        </article>
       </div>
     </section>
 
     <!-- Campaigns Content Section -->
     <section class="py-8 md:py-12 bg-base-200/50">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="wcu-container">
         <!-- Focus Campaigns Section -->
         <div v-if="focusCampaigns.length > 0" class="mb-12">
           <div class="divider divider-primary text-xl font-bold text-primary">
@@ -206,7 +211,7 @@ const filterAnnouncement = computed(() => {
 
         <!-- Empty State -->
         <div v-if="noResults" class="text-center py-16">
-          <div class="text-base-content/50 mb-4">
+          <div class="text-base-content/70 mb-4">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               class="h-16 w-16 mx-auto"
@@ -223,7 +228,7 @@ const filterAnnouncement = computed(() => {
               />
             </svg>
           </div>
-          <p class="text-base-content/70 text-lg">
+          <p class="text-base-content/80 text-lg">
             {{ $t('campaigns.noResults') }}
           </p>
         </div>

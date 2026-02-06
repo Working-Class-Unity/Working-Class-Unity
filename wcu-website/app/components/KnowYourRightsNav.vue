@@ -20,8 +20,8 @@ const otherResources = computed(() =>
 </script>
 
 <template>
-  <nav aria-labelledby="kyr-nav-heading" :class="[seamless ? 'mt-8' : 'card bg-base-200 mt-8']">
-    <div :class="[seamless ? '' : 'card-body']">
+  <nav aria-labelledby="kyr-nav-heading" :class="[seamless ? 'mt-8' : 'wcu-card bg-base-200/70 mt-8']">
+    <div :class="[seamless ? '' : 'card-body p-5 md:p-6']">
       <h3 v-if="showTitle" id="kyr-nav-heading" class="text-xl font-semibold text-base-content mb-6">
         {{ $t('kyr.otherResources') }}
       </h3>
@@ -29,7 +29,7 @@ const otherResources = computed(() =>
         <li v-for="resource in otherResources" :key="resource.slug">
           <NuxtLinkLocale
             :to="`/know-your-rights/${resource.slug}`"
-            class="group card bg-base-100 border border-base-300 shadow-sm hover:shadow-md hover:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.98]"
+            class="group wcu-card focus-visible:ring-2 focus-visible:ring-secondary/30 focus-visible:ring-offset-2 focus-visible:outline-none hover:-translate-y-0.5 active:scale-[0.98]"
           >
             <div class="card-body p-4">
               <div class="flex items-start gap-4">
@@ -40,7 +40,7 @@ const otherResources = computed(() =>
                   <span class="block font-semibold text-base-content group-hover:text-primary transition-colors">
                     {{ $t(resource.titleKey) }}
                   </span>
-                  <span class="block text-sm text-base-content/70 mt-1">
+                  <span class="block text-sm text-base-content/80 mt-1">
                     {{ $t(resource.descriptionKey) }}
                   </span>
                 </div>

@@ -72,43 +72,52 @@ const filterAnnouncement = computed(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-base-100">
+  <div class="pb-12 md:pb-16">
     <!-- Hero Section -->
-    <section class="py-12 md:py-16">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-base-content mb-4">
-          {{ $t('calendar.hero.title') }}
-        </h1>
-        <p class="text-lg text-base-content/70 max-w-2xl mx-auto">
-          {{ $t('calendar.hero.description') }}
-        </p>
+    <section class="pt-8 pb-8 md:pt-12 md:pb-10">
+      <div class="wcu-container">
+        <article class="wcu-card overflow-hidden border-secondary/30 text-center">
+          <div class="h-1 solidarity-stripe" aria-hidden="true"></div>
+          <div class="card-body p-6 md:p-10">
+            <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-base-content mb-4">
+              {{ $t('calendar.hero.title') }}
+            </h1>
+            <p class="text-lg text-base-content/90 max-w-2xl mx-auto">
+              {{ $t('calendar.hero.description') }}
+            </p>
+          </div>
+        </article>
       </div>
     </section>
 
     <!-- Filter Section -->
     <section class="pb-8">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex flex-wrap gap-2 justify-center" role="group" :aria-label="$t('calendar.filter_aria_label')">
-          <button
-            v-for="type in eventTypes"
-            :key="type.value"
-            @click="selectedType = type.value"
-            type="button"
-            :aria-pressed="selectedType === type.value"
-            class="btn btn-sm"
-            :class="selectedType === type.value ? 'btn-primary' : 'btn-ghost bg-base-200'"
-          >
-            {{ $t(type.labelKey) }}
-          </button>
-        </div>
+      <div class="wcu-container">
+        <div class="wcu-card border-secondary/25">
+          <div class="card-body p-4 md:p-5">
+            <div class="flex flex-wrap gap-2 justify-center" role="group" :aria-label="$t('calendar.filter_aria_label')">
+              <button
+                v-for="type in eventTypes"
+                :key="type.value"
+                @click="selectedType = type.value"
+                type="button"
+                :aria-pressed="selectedType === type.value"
+                class="btn btn-sm"
+                :class="selectedType === type.value ? 'btn-primary' : 'btn-ghost bg-base-200 border border-secondary/20'"
+              >
+                {{ $t(type.labelKey) }}
+              </button>
+            </div>
 
-        <p class="sr-only" aria-live="polite">{{ filterAnnouncement }}</p>
+            <p class="sr-only" aria-live="polite">{{ filterAnnouncement }}</p>
+          </div>
+        </div>
       </div>
     </section>
 
     <!-- Events Grid Section -->
     <section class="py-8 md:py-12">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="wcu-container">
         <!-- Section label -->
         <p class="text-xs uppercase tracking-wide text-base-content mb-6">
           {{ $t('calendar.upcoming_events') }} ({{ filteredEvents.length }})

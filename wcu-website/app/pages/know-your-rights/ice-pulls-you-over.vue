@@ -53,7 +53,7 @@ useSchemaOrg([
         <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-base-content mb-4">
           {{ $t('kyr.car.title') }}
         </h1>
-        <p class="text-base text-base-content/70 max-w-2xl mx-auto">
+        <p class="text-base text-base-content/80 max-w-2xl mx-auto">
           {{ $t('kyr_ice_pulls_you_over.hero.description') }}
         </p>
       </header>

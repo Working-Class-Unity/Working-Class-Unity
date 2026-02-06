@@ -212,11 +212,11 @@ const { calKey } = useCalEmbed({
       <div role="alert" class="alert alert-soft alert-error border border-error/30 rounded-xl mb-6 flex flex-col md:flex-row md:items-center gap-4">
         <!-- Content wrapper that takes up available space -->
         <div class="flex items-start gap-3 flex-1">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="text-error w-5 h-5 shrink-0 mt-0.5" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="text-secondary w-5 h-5 shrink-0 mt-0.5" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
           </svg>
           <div class="text-left">
-            <h3 class="font-bold text-error">{{ $t('check_in_coverage.resources.notice.title') }}</h3>
+            <h3 class="font-bold text-base-content">{{ $t('check_in_coverage.resources.notice.title') }}</h3>
             <p class="text-sm text-base-content/80">{{ $t('check_in_coverage.resources.notice.text') }}</p>
           </div>
         </div>
@@ -333,7 +333,7 @@ const { calKey } = useCalEmbed({
             
             <!-- Error-style warning -->
             <div class="mt-3 bg-error/10 border border-error/30 rounded px-3 py-2">
-              <code class="text-error text-sm font-mono">{{ $t('check_in_coverage.end_of_shift.logs.warning') }}</code>
+              <code class="text-base-content text-sm font-mono">{{ $t('check_in_coverage.end_of_shift.logs.warning') }}</code>
             </div>
           </div>
           <hr class="bg-base-300" aria-hidden="true"/>
@@ -349,7 +349,7 @@ const { calKey } = useCalEmbed({
             <h3 class="font-bold text-base">{{ $t('check_in_coverage.end_of_shift.handover.title') }}</h3>
             <p class="text-sm text-base-content mt-1">{{ $t('check_in_coverage.end_of_shift.handover.description') }}</p>
             <p class="text-sm text-base-content mt-2">{{ $t('check_in_coverage.end_of_shift.handover.flyer_note') }}</p>
-            <a href="https://maps.app.goo.gl/feHLNz6zeRdEzhau5" target="_blank" rel="noopener noreferrer" class="link link-primary text-sm mt-2 inline-flex items-center gap-1">
+            <a href="https://maps.app.goo.gl/feHLNz6zeRdEzhau5" target="_blank" rel="noopener noreferrer" class="link text-secondary text-sm mt-2 inline-flex items-center gap-1 hover:text-base-content">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />

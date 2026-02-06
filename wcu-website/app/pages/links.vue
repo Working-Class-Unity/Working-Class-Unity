@@ -108,7 +108,7 @@ onUnmounted(() => {
         <!-- Join WCU - Accent CTA -->
         <NuxtLinkLocale 
           to="/join" 
-          class="flex items-center justify-between w-full p-4 bg-accent text-accent-content rounded-xl hover:opacity-90 focus:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-opacity shadow-sm"
+          class="flex items-center justify-between w-full p-4 bg-secondary text-secondary-content border border-accent/45 rounded-xl hover:opacity-90 focus:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-opacity shadow-sm"
         >
           <div class="flex items-center gap-3">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -270,7 +270,7 @@ onUnmounted(() => {
               href="https://x.com/workclassunity" 
               target="_blank" 
               rel="noopener noreferrer"
-              class="text-base-content/50 hover:text-primary focus:text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 rounded transition-colors"
+              class="text-base-content/80 hover:text-primary focus:text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 rounded transition-colors"
               aria-label="Twitter/X"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -281,7 +281,7 @@ onUnmounted(() => {
               href="https://www.facebook.com/WorkClassUnity/" 
               target="_blank" 
               rel="noopener noreferrer"
-              class="text-base-content/50 hover:text-primary focus:text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 rounded transition-colors"
+              class="text-base-content/80 hover:text-primary focus:text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 rounded transition-colors"
               aria-label="Facebook"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">

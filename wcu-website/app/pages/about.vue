@@ -1,75 +1,72 @@
 <template>
-  <div class="bg-base-100 min-h-screen">
-    <div class="max-w-[700px] mx-auto px-4 sm:px-6">
-      
-      <!-- Hero Section -->
-      <section class="pt-12 pb-16">
-        <span class="text-xs uppercase tracking-[0.15em] text-base-content/80 block mb-3">Our Story</span>
-        <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-base-content mb-6">
-          {{ $t('about_page.title') }}
-        </h1>
-      </section>
+  <div class="pb-12 md:pb-16">
+    <div class="wcu-prose-container pt-8 md:pt-12">
+      <article class="wcu-card overflow-hidden border-secondary/30">
+        <div class="h-1 solidarity-stripe" aria-hidden="true"></div>
+        <div class="card-body p-6 md:p-10">
+          <header class="pb-8">
+            <span class="wcu-eyebrow block mb-3">Our Story</span>
+            <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-base-content">
+              {{ $t('about_page.title') }}
+            </h1>
+          </header>
 
-      <!-- The Problem Section -->
-      <section class="py-16 border-t border-base-content/10">
-        <h2 class="text-xs uppercase tracking-[0.2em] font-medium text-base-content/80 mb-8">
-          The Problem
-        </h2>
-        <div class="space-y-6">
-          <p class="text-lg text-base-content/80 leading-relaxed font-medium">
-            {{ $t('about_page.p1') }}
-          </p>
-          <p class="text-lg text-base-content/80 leading-relaxed">
-            {{ $t('about_page.p2') }}
-          </p>
-          <p class="text-lg text-base-content/80 leading-relaxed">
-            {{ $t('about_page.p3') }}
-          </p>
-        </div>
-      </section>
-
-      <!-- Our Solution Section -->
-      <section class="py-16 border-t border-base-content/10">
-        <h2 class="text-xs uppercase tracking-[0.2em] font-medium text-base-content/80 mb-8">
-          Our Solution
-        </h2>
-        <div class="space-y-6">
-          <p class="text-lg text-base-content/80 leading-relaxed">
-            {{ $t('about_page.p4') }}
-          </p>
-          <div class="border-l-4 border-primary pl-6">
-            <p class="text-lg text-base-content/80 leading-relaxed italic">
-              {{ $t('about_page.p5') }}
-            </p>
-          </div>
-          <p class="text-lg text-base-content/80 leading-relaxed">
-            {{ $t('about_page.p6') }}
-          </p>
-        </div>
-      </section>
-
-      <!-- CTA Section -->
-      <section class="py-20 border-t border-base-content/10">
-        <div class="card bg-secondary text-secondary-content border border-base-content/10">
-          <div class="card-body items-center text-center p-8">
-            <p class="text-lg">{{ $t('about_page.p7') }}</p>
-            <div class="card-actions mt-4">
-              <NuxtLinkLocale to="join" class="btn btn-primary btn-lg">
-                {{ $t('about_page.cta_button') }}
-              </NuxtLinkLocale>
+          <section class="py-8 border-t border-base-content/10" aria-labelledby="about-problem-heading">
+            <h2 id="about-problem-heading" class="text-xs uppercase tracking-[0.2em] font-semibold text-base-content mb-6">
+              The Problem
+            </h2>
+            <div class="space-y-6">
+              <p class="text-lg text-base-content leading-relaxed font-medium">
+                {{ $t('about_page.p1') }}
+              </p>
+              <p class="text-lg text-base-content/90 leading-relaxed">
+                {{ $t('about_page.p2') }}
+              </p>
+              <p class="text-lg text-base-content/90 leading-relaxed">
+                {{ $t('about_page.p3') }}
+              </p>
             </div>
-          </div>
-        </div>
-      </section>
+          </section>
 
-      <!-- Footer Navigation -->
-      <footer class="py-12 border-t border-base-content/10 flex flex-wrap gap-4 justify-between items-center">
+          <section class="py-8 border-t border-base-content/10" aria-labelledby="about-solution-heading">
+            <h2 id="about-solution-heading" class="text-xs uppercase tracking-[0.2em] font-semibold text-base-content mb-6">
+              Our Solution
+            </h2>
+            <div class="space-y-6">
+              <p class="text-lg text-base-content/90 leading-relaxed">
+                {{ $t('about_page.p4') }}
+              </p>
+              <div class="border-l-4 border-primary pl-6">
+                <p class="text-lg text-base-content leading-relaxed italic">
+                  {{ $t('about_page.p5') }}
+                </p>
+              </div>
+              <p class="text-lg text-base-content/90 leading-relaxed">
+                {{ $t('about_page.p6') }}
+              </p>
+            </div>
+          </section>
+
+          <section class="pt-10 border-t border-base-content/10">
+            <div class="wcu-card bg-secondary text-secondary-content border-secondary/45">
+              <div class="card-body items-center text-center p-8">
+                <p class="text-lg">{{ $t('about_page.p7') }}</p>
+                <div class="card-actions mt-4">
+                  <NuxtLinkLocale to="join" class="btn btn-primary btn-lg">
+                    {{ $t('about_page.cta_button') }}
+                  </NuxtLinkLocale>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </article>
+
+      <footer class="pt-8 flex flex-wrap gap-4 justify-between items-center">
         <NuxtLinkLocale to="/" class="text-sm text-base-content/80 hover:text-base-content">
           ← Return Home
         </NuxtLinkLocale>
-        <div class="flex gap-4">
-          <NuxtLinkLocale to="/join" class="btn btn-primary btn-sm">Join Us</NuxtLinkLocale>
-        </div>
+        <NuxtLinkLocale to="/join" class="btn btn-primary btn-sm">Join Us</NuxtLinkLocale>
       </footer>
     </div>
   </div>

@@ -15,7 +15,7 @@
         <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-base-content mb-6">
           {{ $t('unitedfront.title') }}
         </h1>
-        <p class="text-base text-base-content/70">Published by WCU • 3 min read</p>
+        <p class="text-base text-base-content/80">Published by WCU • 3 min read</p>
       </section>
 
       <!-- What We Face -->
@@ -222,7 +222,7 @@
 
       <!-- Footer - Minimal -->
       <footer class="py-12 border-t border-base-content/10 flex flex-wrap gap-4 justify-between items-center">
-        <NuxtLinkLocale to="/" class="text-sm text-base-content/70 hover:text-base-content">
+        <NuxtLinkLocale to="/" class="text-sm text-base-content/80 hover:text-base-content">
           ← Return Home
         </NuxtLinkLocale>
         <div class="flex gap-4">

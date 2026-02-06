@@ -394,7 +394,7 @@ const highlightMatch = (text: string): string => {
               />
               <button
                 v-if="searchQuery"
-                class="absolute right-2 top-1/2 -translate-y-1/2 text-base-content/50 hover:text-base-content"
+                class="absolute right-2 top-1/2 -translate-y-1/2 text-base-content/70 hover:text-base-content"
                 :aria-label="$t('tenant_handbook.a11y.clear_search')"
                 type="button"
                 @click="searchQuery = ''"
@@ -411,7 +411,7 @@ const highlightMatch = (text: string): string => {
             <li v-for="chapter in filteredChapters" :key="chapter.id">
               <button
                 class="flex items-center justify-between w-full p-2 rounded-lg font-medium text-left hover:bg-base-200 transition-colors"
-                :class="{ 'bg-primary/10 text-primary': activeSection === chapter.id }"
+                :class="{ 'bg-primary/10 text-secondary': activeSection === chapter.id }"
                 @click="scrollToSection(chapter.id)"
               >
                 <span v-html="highlightMatch(chapter.title)"></span>
@@ -421,8 +421,8 @@ const highlightMatch = (text: string): string => {
                   <button
                     class="w-full text-left text-sm py-1 px-2 rounded hover:bg-base-200 transition-colors"
                     :class="{ 
-                      'bg-primary/10 text-primary font-medium': activeSection === section.id,
-                      'text-base-content/70': activeSection !== section.id
+                      'bg-primary/10 text-secondary font-medium': activeSection === section.id,
+                      'text-base-content/80': activeSection !== section.id
                     }"
                     @click="scrollToSection(section.id)"
                   >
@@ -480,7 +480,7 @@ const highlightMatch = (text: string): string => {
                   <button
                     class="flex-1 flex items-center gap-2 py-1.5 px-2 rounded-lg text-left font-medium text-sm hover:bg-base-200 transition-colors"
                     :class="{ 
-                      'bg-primary/10 text-primary': activeSection === chapter.id,
+                      'bg-primary/10 text-secondary': activeSection === chapter.id,
                       'text-base-content': activeSection !== chapter.id
                     }"
                     @click="scrollToSection(chapter.id)"
@@ -515,8 +515,8 @@ const highlightMatch = (text: string): string => {
                     <button
                       class="w-full text-left text-sm py-1 px-2 rounded hover:bg-base-200 transition-colors"
                       :class="{ 
-                        'bg-primary/10 text-primary font-medium border-l-2 border-primary -ml-3.5 pl-5': activeSection === section.id,
-                        'text-base-content/70': activeSection !== section.id
+                        'bg-primary/10 text-secondary font-medium border-l-2 border-primary -ml-3.5 pl-5': activeSection === section.id,
+                        'text-base-content/80': activeSection !== section.id
                       }"
                       @click="scrollToSection(section.id)"
                     >
@@ -544,7 +544,7 @@ const highlightMatch = (text: string): string => {
             <!-- Collapse/Expand All -->
             <div class="mt-4 pt-4 border-t border-base-300">
               <button
-                class="text-xs text-base-content/80 hover:text-primary transition-colors"
+                class="text-xs text-base-content/80 hover:text-secondary transition-colors"
                 @click="expandedChapters = expandedChapters.size === chapters.length ? new Set() : new Set(chapters.map(c => c.id))"
               >
                 {{ expandedChapters.size === chapters.length ? 'Collapse all' : 'Expand all' }}
@@ -560,7 +560,7 @@ const highlightMatch = (text: string): string => {
             <!-- ============================================================= -->
             <!-- CHAPTER 1: KNOW YOUR RIGHTS -->
             <!-- ============================================================= -->
-            <h2 id="chapter-1" data-section class="text-2xl md:text-3xl font-bold text-primary border-b-2 border-primary pb-2">
+            <h2 id="chapter-1" data-section class="text-2xl md:text-3xl font-bold text-secondary border-b-2 border-primary pb-2">
               Chapter 1: Know Your Rights
             </h2>
 
@@ -807,7 +807,7 @@ const highlightMatch = (text: string): string => {
                   </ul>
                 </div>
                 <div class="bg-error/10 p-4 rounded-lg">
-                  <p class="font-semibold text-error mb-2">DO NOT:</p>
+                  <p class="font-semibold text-base-content mb-2">DO NOT:</p>
                   <ul class="mb-0">
                     <li>Sign things that are false.</li>
                     <li>If you have a pet, do not sign that you do not own one.</li>
@@ -827,7 +827,7 @@ const highlightMatch = (text: string): string => {
                   </ul>
                 </div>
                 <div class="bg-error/10 p-4 rounded-lg">
-                  <p class="font-semibold text-error mb-2">DO NOT:</p>
+                  <p class="font-semibold text-base-content mb-2">DO NOT:</p>
                   <ul class="mb-0">
                     <li>Pay rent in cash.</li>
                     <li>Accept false or incorrect receipts.</li>
@@ -851,7 +851,7 @@ const highlightMatch = (text: string): string => {
             <!-- ============================================================= -->
             <!-- CHAPTER 2: PAYING RENT -->
             <!-- ============================================================= -->
-            <h2 id="chapter-2" data-section class="text-2xl md:text-3xl font-bold text-primary border-b-2 border-primary pb-2 mt-16">
+            <h2 id="chapter-2" data-section class="text-2xl md:text-3xl font-bold text-secondary border-b-2 border-primary pb-2 mt-16">
               Chapter 2: Paying Rent
             </h2>
 
@@ -918,7 +918,7 @@ const highlightMatch = (text: string): string => {
             <!-- ============================================================= -->
             <!-- CHAPTER 3: REPORTING VIOLATIONS -->
             <!-- ============================================================= -->
-            <h2 id="chapter-3" data-section class="text-2xl md:text-3xl font-bold text-primary border-b-2 border-primary pb-2 mt-16">
+            <h2 id="chapter-3" data-section class="text-2xl md:text-3xl font-bold text-secondary border-b-2 border-primary pb-2 mt-16">
               Chapter 3: Reporting Violations
             </h2>
 
@@ -1008,7 +1008,7 @@ const highlightMatch = (text: string): string => {
             <!-- ============================================================= -->
             <!-- CHAPTER 4: EVICTIONS -->
             <!-- ============================================================= -->
-            <h2 id="chapter-4" data-section class="text-2xl md:text-3xl font-bold text-primary border-b-2 border-primary pb-2 mt-16">
+            <h2 id="chapter-4" data-section class="text-2xl md:text-3xl font-bold text-secondary border-b-2 border-primary pb-2 mt-16">
               Chapter 4: Evictions
             </h2>
 
@@ -1104,7 +1104,7 @@ const highlightMatch = (text: string): string => {
                   <p class="text-sm mb-0">Advance notice that the landlord no longer wants to rent to you.</p>
                 </div>
                 <div class="bg-error/10 p-4 rounded-lg border border-error">
-                  <p class="font-semibold text-error">5-Day Court Summons</p>
+                  <p class="font-semibold text-base-content">5-Day Court Summons</p>
                   <p class="text-sm mb-0">When you receive this it means your landlord has filed an eviction case against you in court. <strong>You have 5 days to reply to this notice.</strong> If you don't, then you can lose your case in court. This is the moment in which you need assistance from a lawyer.</p>
                 </div>
               </div>
@@ -1126,7 +1126,7 @@ const highlightMatch = (text: string): string => {
               </ol>
 
               <h4 class="font-semibold mt-4">Four Possible Outcomes:</h4>
-              <p class="text-sm text-base-content/70">(The parties can negotiate a settlement at any time during the process.)</p>
+              <p class="text-sm text-base-content/80">(The parties can negotiate a settlement at any time during the process.)</p>
               <ol>
                 <li><strong>Tenant wins (legal or technical issue):</strong> Tenant can stay.</li>
                 <li><strong>Conditional judgment (habitability issue):</strong> Tenant wins if they can pay reduced back-rent within 5 days.</li>
@@ -1184,13 +1184,13 @@ const highlightMatch = (text: string): string => {
             <!-- ============================================================= -->
             <!-- CHAPTER 5: LEGAL ENTRY & SECURITY DEPOSIT -->
             <!-- ============================================================= -->
-            <h2 id="chapter-5" data-section class="text-2xl md:text-3xl font-bold text-primary border-b-2 border-primary pb-2 mt-16">
+            <h2 id="chapter-5" data-section class="text-2xl md:text-3xl font-bold text-secondary border-b-2 border-primary pb-2 mt-16">
               Chapter 5: Legal Entry & Security Deposit
             </h2>
 
             <section id="legal-entry" data-section class="mt-8">
               <h3 class="text-xl font-bold text-base-content">Legal Entry</h3>
-              <p class="text-sm text-base-content/70">For ALL tenants (with or without Rent Stabilization)</p>
+              <p class="text-sm text-base-content/80">For ALL tenants (with or without Rent Stabilization)</p>
               
               <h4 class="font-semibold mt-4">When can the landlord enter?</h4>
               <ul>
@@ -1227,7 +1227,7 @@ const highlightMatch = (text: string): string => {
 
             <section id="security-deposits" data-section class="mt-10">
               <h3 class="text-xl font-bold text-base-content">Security Deposits</h3>
-              <p class="text-sm text-base-content/70">For ALL tenants (with or without Rent Stabilization)</p>
+              <p class="text-sm text-base-content/80">For ALL tenants (with or without Rent Stabilization)</p>
               
               <h4 class="font-semibold mt-4">What is a security deposit?</h4>
               <p>
@@ -1274,7 +1274,7 @@ const highlightMatch = (text: string): string => {
                 </div>
               </div>
 
-              <p class="mt-4 text-sm text-base-content/70">
+              <p class="mt-4 text-sm text-base-content/80">
                 It is the tenant's responsibility to provide an address where the security deposit can be mailed.
               </p>
             </section>

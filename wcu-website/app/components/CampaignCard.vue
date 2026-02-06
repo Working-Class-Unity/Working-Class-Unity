@@ -153,7 +153,7 @@ function formatTimeRange(startDateTime: string, endDateTime: string, allDay: boo
 
 <template>
   <!-- Card -->
-  <div class="card bg-base-100 shadow-md hover:shadow-lg transition-shadow w-full relative">
+  <div class="wcu-card w-full relative overflow-hidden">
     <!-- Corner Ribbon Badge -->
     <div class="absolute -top-2 -right-2 z-10 drop-shadow-md filter">
       <!-- Fold Triangle -->
@@ -301,7 +301,7 @@ function formatTimeRange(startDateTime: string, endDateTime: string, allDay: boo
         </h3>
 
         <!-- Description -->
-        <p class="text-base-content/70 text-sm leading-relaxed mt-1">
+        <p class="text-base-content/80 text-sm leading-relaxed mt-1">
           {{ $t(campaign.descriptionKey) }}
         </p>
 
@@ -310,7 +310,7 @@ function formatTimeRange(startDateTime: string, endDateTime: string, allDay: boo
           <!-- Section Header -->
           <div class="flex items-center gap-3 mb-4">
             <div class="flex-1 h-px bg-base-300"></div>
-            <span class="text-xs font-semibold tracking-wider text-base-content/60 uppercase">
+            <span class="text-xs font-semibold tracking-wider text-base-content/70 uppercase">
               {{ $t('campaigns.upcomingEvents') }}
             </span>
             <div class="flex-1 h-px bg-base-300"></div>
@@ -326,14 +326,14 @@ function formatTimeRange(startDateTime: string, endDateTime: string, allDay: boo
               <!-- Date Box - wrapped in ClientOnly to prevent hydration mismatch from locale-dependent formatting -->
               <div class="flex flex-col items-center justify-center bg-base-200 rounded-lg px-3 py-2 min-w-[60px]">
                 <ClientOnly>
-                  <span class="text-xs font-semibold text-base-content/70">
+                  <span class="text-xs font-semibold text-base-content/80">
                     {{ formatEventDateBox(event.startDateTime).month }}
                   </span>
                   <span class="text-2xl font-bold text-base-content leading-none">
                     {{ formatEventDateBox(event.startDateTime).day }}
                   </span>
                   <template #fallback>
-                    <span class="text-xs font-semibold text-base-content/70 opacity-70">---</span>
+                    <span class="text-xs font-semibold text-base-content/80 opacity-70">---</span>
                     <span class="text-2xl font-bold text-base-content leading-none opacity-70">--</span>
                   </template>
                 </ClientOnly>
@@ -352,7 +352,7 @@ function formatTimeRange(startDateTime: string, endDateTime: string, allDay: boo
                     :href="event.rsvpLink"
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="flex-shrink-0 text-primary hover:text-primary-focus transition-colors"
+                    class="flex-shrink-0 text-primary hover:text-secondary transition-colors"
                     :aria-label="`${$t(event.titleKey)} ${$t('common.opens_in_new_tab')}`"
                   >
                     <svg
@@ -375,7 +375,7 @@ function formatTimeRange(startDateTime: string, endDateTime: string, allDay: boo
                 </div>
 
                 <!-- Time and Location -->
-                <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1 text-sm text-base-content/60">
+                <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1 text-sm text-base-content/70">
                   <!-- Time - wrapped in ClientOnly to prevent hydration mismatch from locale-dependent formatting -->
                   <span class="flex items-center gap-1">
                     <svg

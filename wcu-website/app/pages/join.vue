@@ -84,7 +84,7 @@ useSchemaOrg([
                 </div>
               </div>
             </div>
-            <p class="text-base-content/70 text-sm">Join <span class="font-semibold text-base-content">18+ members</span> in San Joaquin County</p>
+            <p class="text-base-content/80 text-sm">Join <span class="font-semibold text-base-content">18+ members</span> in San Joaquin County</p>
           </div>
         </div>
       </div>
@@ -100,7 +100,7 @@ useSchemaOrg([
             <div class="card-body">
               <span class="badge badge-primary rounded-full self-start">{{ $t('join.membership.rank_and_file.title') }}</span>
               <div class="mt-4 mb-2">
-                <span class="text-5xl font-bold text-primary">{{ $t('join.membership.rank_and_file.price') }}</span>
+                <span class="text-5xl font-bold text-secondary">{{ $t('join.membership.rank_and_file.price') }}</span>
                 <span class="text-sm text-base-content/80">/month</span>
               </div>
               <p class="text-base-content/80 mb-6 flex-grow">{{ $t('join.membership.rank_and_file.description') }}</p>
@@ -114,7 +114,7 @@ useSchemaOrg([
           <div class="card h-full bg-base-100 border border-base-300 border-t-4 border-t-accent shadow-lg shadow-accent/20 md:scale-105">
             <div class="card-body">
               <div class="flex items-center gap-2 flex-wrap">
-                <span class="badge badge-accent badge-soft rounded-full">{{ $t('join.membership.solidarity.title') }}</span>
+                <span class="badge badge-outline border-accent text-base-content rounded-full">{{ $t('join.membership.solidarity.title') }}</span>
                 <span class="badge badge-warning badge-sm">Recommended</span>
               </div>
               <div class="mt-4 mb-2">
@@ -186,7 +186,7 @@ useSchemaOrg([
               </svg>
             </div>
             <h3 class="font-bold text-lg mb-2 capitalize">{{ $t('join.benefits.items.campaigns.title') }}</h3>
-            <p class="text-base-content/70">{{ $t('join.benefits.items.campaigns.description') }}</p>
+            <p class="text-base-content/80">{{ $t('join.benefits.items.campaigns.description') }}</p>
           </div>
           
           <!-- Political Education -->
@@ -199,7 +199,7 @@ useSchemaOrg([
               </svg>
             </div>
             <h3 class="font-bold text-lg mb-2 capitalize">{{ $t('join.benefits.items.education.title') }}</h3>
-            <p class="text-base-content/70">{{ $t('join.benefits.items.education.description') }}</p>
+            <p class="text-base-content/80">{{ $t('join.benefits.items.education.description') }}</p>
           </div>
         </div>
       </section>
@@ -216,7 +216,7 @@ useSchemaOrg([
             <summary class="collapse-title font-medium py-4">
               {{ $t('join.faq.items.eligibility.question') }}
             </summary>
-            <div class="collapse-content text-base-content/70">
+            <div class="collapse-content text-base-content/80">
               <p>{{ $t('join.faq.items.eligibility.answer') }}</p>
             </div>
           </details>
@@ -225,7 +225,7 @@ useSchemaOrg([
             <summary class="collapse-title font-medium py-4">
               {{ $t('join.faq.items.good_standing.question') }}
             </summary>
-            <div class="collapse-content text-base-content/70">
+            <div class="collapse-content text-base-content/80">
               <p>{{ $t('join.faq.items.good_standing.answer') }}</p>
             </div>
           </details>
@@ -234,7 +234,7 @@ useSchemaOrg([
             <summary class="collapse-title font-medium py-4">
               {{ $t('join.faq.items.dues.question') }}
             </summary>
-            <div class="collapse-content text-base-content/70">
+            <div class="collapse-content text-base-content/80">
               <p>{{ $t('join.faq.items.dues.answer') }}</p>
             </div>
           </details>
@@ -243,7 +243,7 @@ useSchemaOrg([
             <summary class="collapse-title font-medium py-4">
               {{ $t('join.faq.items.contact.question') }}
             </summary>
-            <div class="collapse-content text-base-content/70">
+            <div class="collapse-content text-base-content/80">
               <i18n-t keypath="join.faq.items.contact.answer" tag="p">
                 <template #link>
                   <a href="https://cal.com/workingclassunity/15min" target="_blank" rel="noopener noreferrer" class="link link-primary">{{ $t('join.faq.items.contact.link_text') }}</a>

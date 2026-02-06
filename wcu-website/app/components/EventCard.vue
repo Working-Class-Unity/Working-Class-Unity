@@ -19,7 +19,7 @@ const { formatDateRange, getBadgeClass } = useEvents()
 const iconContainerClass = computed(() =>
   props.variant === 'compact'
     ? 'w-10 h-10 rounded-lg bg-primary/10'
-    : 'w-12 h-12 rounded-xl bg-primary/20 group-hover:bg-primary/30 transition-colors'
+    : 'w-12 h-12 rounded-xl bg-primary/15 group-hover:bg-primary/25 transition-colors'
 )
 
 const iconClass = computed(() =>
@@ -44,13 +44,13 @@ const dateClass = computed(() =>
 
 const cardClass = computed(() =>
   props.variant === 'compact'
-    ? 'group card bg-base-100 border border-base-300 shadow-sm hover:shadow-md hover:border-primary/50 transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.98] focus-within:shadow-md focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2'
-    : 'group card bg-base-100 border border-base-300 shadow-sm hover:shadow-md hover:border-primary/50 focus-within:shadow-md focus-within:border-primary/50 transition-all duration-300'
+    ? 'group wcu-card hover:-translate-y-0.5 active:scale-[0.98] focus-within:ring-2 focus-within:ring-secondary/30 focus-within:ring-offset-2'
+    : 'group wcu-card focus-within:ring-2 focus-within:ring-secondary/30 focus-within:ring-offset-2'
 )
 
 const rsvpButtonClass = computed(() =>
   props.variant === 'compact'
-    ? 'btn btn-xs btn-primary gap-1 mt-3 focus:outline-none focus:ring-2 focus:ring-primary/20'
+    ? 'btn btn-xs btn-primary gap-1 mt-3'
     : 'btn btn-sm btn-primary gap-2 flex-1'
 )
 </script>
