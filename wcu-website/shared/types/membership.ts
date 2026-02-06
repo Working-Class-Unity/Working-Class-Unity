@@ -17,3 +17,8 @@ export interface DuesRecord {
   source: 'stripe' | 'manual'
   stripeInvoiceId: string | null
 }
+
+export interface MemberOverviewResponse {
+  profile: MemberProfile | null
+  duesRecords: DuesRecord[]
+}

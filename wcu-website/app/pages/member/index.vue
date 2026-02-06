@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { AuthMagicLinkRequestResponse, AuthSessionResponse, Role } from '~~/shared/types/auth'
+import type { MemberOverviewResponse } from '~~/shared/types/membership'
 
 useHead({
   title: 'Member Dashboard',
@@ -22,6 +23,10 @@ const isLoggingOut = ref(false)
 const { data: authState, pending: authPending, refresh: refreshAuth } = await useFetch<AuthSessionResponse>('/api/v1/auth/me', {
   key: 'auth-session',
 })
+const { data: memberOverview, pending: memberOverviewPending, error: memberOverviewError, refresh: refreshMemberOverview } = await useFetch<MemberOverviewResponse>('/api/v1/member/overview', {
+  key: 'member-overview',
+  immediate: false,
+})
 
 const authenticatedSession = computed(() => authState.value?.session ?? null)
 const isAuthenticated = computed(() => authState.value?.authenticated === true)
@@ -40,10 +45,19 @@ const duesCurrentLabel = computed(() => {
   return authenticatedSession.value?.duesCurrent ? 'Current' : 'Needs renewal'
 })
 
+const memberProfile = computed(() => memberOverview.value?.profile ?? null)
+const duesRecords = computed(() => memberOverview.value?.duesRecords ?? [])
+
 const roleLabel = computed(() => {
   const role = authenticatedSession.value?.role ?? 'member'
   return roleLabels[role]
 })
+
+watch(isAuthenticated, async (value) => {
+  if (value) {
+    await refreshMemberOverview()
+  }
+}, { immediate: true })
 
 async function requestMagicLink(): Promise<void> {
   requestError.value = null
@@ -145,6 +159,46 @@ async function logout(): Promise<void> {
                 <dd class="mt-1 text-lg font-semibold text-base-content">{{ duesCurrentLabel }}</dd>
               </div>
             </dl>
+
+            <div class="rounded-box border border-secondary/20 bg-base-100 p-4 space-y-2">
+              <h3 class="text-base font-semibold text-base-content">Member profile</h3>
+              <p v-if="memberOverviewPending" class="text-sm text-base-content/70">Loading profile...</p>
+              <p v-else-if="memberOverviewError" class="text-sm text-error">Unable to load profile details right now.</p>
+              <div v-else-if="memberProfile" class="grid gap-2 sm:grid-cols-2">
+                <p class="text-sm text-base-content/80"><strong>Name:</strong> {{ memberProfile.fullName || 'Not set' }}</p>
+                <p class="text-sm text-base-content/80"><strong>Committee:</strong> {{ memberProfile.committee || 'Not assigned' }}</p>
+                <p class="text-sm text-base-content/80"><strong>Standing:</strong> {{ memberProfile.isInGoodStanding ? 'Good standing' : 'Needs follow-up' }}</p>
+                <p class="text-sm text-base-content/80"><strong>Joined:</strong> {{ memberProfile.joinedAt || 'Unknown' }}</p>
+              </div>
+              <p v-else class="text-sm text-base-content/70">
+                No profile record found yet for this account.
+              </p>
+            </div>
+
+            <div class="rounded-box border border-secondary/20 bg-base-100 p-4 space-y-3">
+              <h3 class="text-base font-semibold text-base-content">Recent dues payments</h3>
+              <p v-if="memberOverviewPending" class="text-sm text-base-content/70">Loading dues history...</p>
+              <p v-else-if="memberOverviewError" class="text-sm text-error">Unable to load dues history right now.</p>
+              <div v-else-if="duesRecords.length > 0" class="overflow-x-auto">
+                <table class="table table-sm">
+                  <thead>
+                    <tr>
+                      <th>Paid at</th>
+                      <th>Amount</th>
+                      <th>Source</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="record in duesRecords" :key="record.id">
+                      <td>{{ record.paidAt }}</td>
+                      <td>{{ (record.amountCents / 100).toFixed(2) }} {{ record.currency }}</td>
+                      <td>{{ record.source }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p v-else class="text-sm text-base-content/70">No dues records found yet.</p>
+            </div>
 
             <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               <NuxtLinkLocale to="/member" class="btn btn-outline justify-start">Membership Home</NuxtLinkLocale>
