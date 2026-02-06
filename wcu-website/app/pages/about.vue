@@ -62,11 +62,10 @@
         </div>
       </article>
 
-      <footer class="pt-8 flex flex-wrap gap-4 justify-between items-center">
+      <footer class="pt-8 flex flex-wrap gap-4 items-center">
         <NuxtLinkLocale to="/" class="text-sm text-base-content/80 hover:text-base-content">
           ← Return Home
         </NuxtLinkLocale>
-        <NuxtLinkLocale to="/join" class="btn btn-primary btn-sm">Join Us</NuxtLinkLocale>
       </footer>
     </div>
   </div>
