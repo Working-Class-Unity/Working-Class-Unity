@@ -67,7 +67,7 @@ const upcomingEvents = computed(() => getUpcomingEvents(3))
                 {{ $t('home_page.hero.description') }}
               </p>
               <div class="flex flex-col sm:flex-row gap-3 mt-8">
-                <NuxtLinkLocale to="/join" class="btn btn-primary btn-lg">
+                <NuxtLinkLocale to="/join" class="btn btn-lg bg-accent border-accent text-base-100 hover:bg-accent/90 hover:border-accent/90">
                   {{ $t('home_page.hero.join_button') }}
                 </NuxtLinkLocale>
                 <NuxtLinkLocale to="/calendar" class="btn btn-secondary btn-lg">
@@ -92,9 +92,15 @@ const upcomingEvents = computed(() => getUpcomingEvents(3))
                 <NuxtLinkLocale to="/campaigns" class="btn btn-outline border-primary/70 text-secondary-content hover:text-secondary w-full justify-start">
                   {{ $t('nav.campaigns') }}
                 </NuxtLinkLocale>
-                <NuxtLinkLocale to="/calendar" class="btn btn-outline border-primary/70 text-secondary-content hover:text-secondary w-full justify-start">
-                  {{ $t('nav.calendar') }}
-                </NuxtLinkLocale>
+                <a
+                  href="https://chat.workingclassunity.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="btn btn-outline border-primary/70 text-secondary-content hover:text-secondary w-full justify-start"
+                >
+                  {{ $t('nav.forum') }}
+                  <span class="sr-only">{{ $t('common.opens_in_new_tab') }}</span>
+                </a>
               </div>
             </div>
           </aside>
