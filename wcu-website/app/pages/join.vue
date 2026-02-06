@@ -246,7 +246,7 @@ useSchemaOrg([
             <div class="collapse-content text-base-content/80">
               <i18n-t keypath="join.faq.items.contact.answer" tag="p">
                 <template #link>
-                  <a href="https://cal.com/workingclassunity/15min" target="_blank" rel="noopener noreferrer" class="link link-primary">{{ $t('join.faq.items.contact.link_text') }}</a>
+                  <a href="https://cal.com/workingclassunity/15min" target="_blank" rel="noopener noreferrer" class="link text-secondary hover:text-base-content inline-flex items-center min-h-8 px-1 -mx-1 rounded">{{ $t('join.faq.items.contact.link_text') }}</a>
                 </template>
               </i18n-t>
             </div>

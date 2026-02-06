@@ -63,7 +63,7 @@
       </article>
 
       <footer class="pt-8 flex flex-wrap gap-4 items-center">
-        <NuxtLinkLocale to="/" class="text-sm text-base-content/80 hover:text-base-content">
+        <NuxtLinkLocale to="/" class="inline-flex items-center min-h-10 px-3 rounded-md border border-base-300 text-sm text-base-content/80 hover:text-base-content hover:bg-base-200/60 transition-colors">
           ← Return Home
         </NuxtLinkLocale>
       </footer>

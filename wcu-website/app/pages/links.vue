@@ -270,7 +270,7 @@ onUnmounted(() => {
               href="https://x.com/workclassunity" 
               target="_blank" 
               rel="noopener noreferrer"
-              class="text-base-content/80 hover:text-primary focus:text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 rounded transition-colors"
+              class="inline-flex size-11 items-center justify-center text-base-content/80 hover:text-primary focus:text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 rounded transition-colors"
               aria-label="Twitter/X"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -281,7 +281,7 @@ onUnmounted(() => {
               href="https://www.facebook.com/WorkClassUnity/" 
               target="_blank" 
               rel="noopener noreferrer"
-              class="text-base-content/80 hover:text-primary focus:text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 rounded transition-colors"
+              class="inline-flex size-11 items-center justify-center text-base-content/80 hover:text-primary focus:text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 rounded transition-colors"
               aria-label="Facebook"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
