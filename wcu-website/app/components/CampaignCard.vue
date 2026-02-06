@@ -153,7 +153,7 @@ function formatTimeRange(startDateTime: string, endDateTime: string, allDay: boo
 
 <template>
   <!-- Card -->
-  <div class="wcu-card w-full relative overflow-hidden">
+  <div class="wcu-card w-full relative overflow-visible">
     <!-- Corner Ribbon Badge -->
     <div class="absolute -top-2 -right-2 z-10 drop-shadow-md filter">
       <!-- Fold Triangle -->
