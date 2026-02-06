@@ -203,4 +203,39 @@ npm run dev
 - `e115441` test(auth): harden session signature validation
 - `6fc15d7` docs(backend): add pocketbase integration and setup guide
 - `ac69dd6` docs(readme): add plain-language summary of architecture update
+- `127decc` docs(handoff): add standalone llm continuation guide
+- `07bfbf6` feat(seo): add locale-aware canonical and hreflang head tags
+- `bd003d8` feat(seo): add localized sitemap and strengthen robots rules
+- `bfa3ca7` feat(seo): prevent indexing of private dashboard routes
+- `e205957` feat(seo): canonicalize KYR route and normalize URLs
+- `052e2f6` feat(seo): add branded social cards and og image defaults
+- `26d065a` feat(seo): enrich schema markup for events and campaigns
+- `8d59308` feat(seo): normalize index-path URLs with permanent redirects
 
+## 12) SEO Rollout Status
+
+### Done in this branch
+
+- Locale-aware SEO head tags are enabled via i18n (`canonical` + alternate locale links).
+- `sitemap.xml` is generated at runtime and includes localized route variants.
+- `robots.txt` now includes sitemap reference and blocks private dashboards.
+- Private dashboard pages (`/member`, `/organizing`, `/finance`) are marked `noindex` in meta and response headers.
+- Legacy `/kyr` route is canonicalized to `/know-your-rights` with permanent redirects.
+- URL normalization middleware now enforces:
+  - no duplicate slashes,
+  - no trailing slash variants (except root),
+  - no `/index` URL variants.
+- Branded Open Graph/Twitter card assets were added under `wcu-website/public/og/`.
+- Public pages now use real social cards instead of logo-only OG images.
+- Structured data was expanded:
+  - Calendar includes `ItemList` with event entries.
+  - Campaigns includes `ItemList` with active campaign entries.
+
+### Still pending / future SEO work
+
+- Campaigns/events are still sourced from local files:
+  - `wcu-website/app/data/campaigns.ts`
+  - `wcu-website/app/data/events.ts`
+- No Search Console automation or validation pipeline yet.
+- No dedicated Lighthouse CI budget checks yet.
+- No OG image generation pipeline (current assets are static SVGs in `public/og/`).
