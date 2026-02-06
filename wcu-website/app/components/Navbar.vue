@@ -42,7 +42,7 @@ const desktopLinkClass = (target: string) => [
 ]
 
 const mobileLinkClass = (target: string) => [
-  'font-semibold rounded-md border transition-colors duration-150',
+  'font-semibold rounded-md border px-3 py-2.5 transition-colors duration-150',
   isRouteMatch(target)
     ? 'border-primary/40 bg-primary/20 text-secondary'
     : 'border-transparent text-base-content hover:text-base-content hover:bg-primary/10',
@@ -192,7 +192,7 @@ onUnmounted(() => {
             <li>
               <details>
                 <summary
-                  class="font-semibold rounded-md border transition-colors duration-150"
+                  class="font-semibold rounded-md border px-3 py-2.5 transition-colors duration-150"
                   :class="isKyrRoute ? 'border-primary/40 bg-primary/20 text-secondary' : 'border-transparent text-base-content hover:text-base-content hover:bg-primary/10'"
                 >
                   {{ $t('nav.kyr') }}
@@ -236,7 +236,7 @@ onUnmounted(() => {
                 href="https://chat.workingclassunity.com/"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="font-semibold rounded-md border border-transparent text-base-content hover:text-base-content hover:bg-primary/10 transition-colors duration-150"
+                class="block font-semibold rounded-md border border-transparent px-3 py-2.5 text-base-content hover:text-base-content hover:bg-primary/10 transition-colors duration-150"
                 @click="mobileMenuOpen = false"
               >
                 {{ $t('nav.forum') }}
@@ -385,7 +385,7 @@ onUnmounted(() => {
           </ul>
         </div>
 
-        <NuxtLinkLocale to="join" class="btn btn-accent btn-sm border border-accent/80 text-sm font-semibold tracking-tight hover:brightness-110 transition-colors duration-150">
+        <NuxtLinkLocale to="join" class="btn btn-accent h-10 min-h-10 px-3 border border-accent/80 text-xs sm:text-sm font-semibold tracking-tight hover:brightness-110 transition-colors duration-150">
           {{ $t('nav.join') }}
         </NuxtLinkLocale>
       </div>
