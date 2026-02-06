@@ -17,3 +17,8 @@ export interface ExpenseRecord {
   description: string
   createdByUserId: string
 }
+
+export interface FinanceSummaryResponse {
+  summary: FinanceSummary
+  recentExpenses: ExpenseRecord[]
+}

@@ -37,8 +37,7 @@ const canAccessOrganizing = computed(() => {
 })
 
 const canAccessFinance = computed(() => {
-  const role = authenticatedSession.value?.role
-  return role === 'treasurer' || role === 'admin'
+  return authenticatedSession.value?.duesCurrent === true
 })
 
 const duesCurrentLabel = computed(() => {

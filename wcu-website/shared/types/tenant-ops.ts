@@ -23,3 +23,10 @@ export interface OutreachInteraction {
   interactionType: 'door-knock' | 'phone' | 'meeting' | 'follow-up'
   notes: string
 }
+
+export interface OrganizingSummaryResponse {
+  totalBuildings: number
+  activeBuildings: number
+  outreachLast30Days: number
+  recentInteractions: OutreachInteraction[]
+}
