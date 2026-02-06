@@ -171,6 +171,36 @@ Reason: urgency + trust for civic action; clear call-to-action without sterile e
 - Always include icon + text + role (`alert` or `status`).
 - Border-left color coding for urgent severity.
 
+### Handbook Quick-Start Panel
+
+- Route: `/tenant-union-handbook`
+- Use the `Solidarity Stripe` at the top edge to signal route identity.
+- Required blocks:
+  - Plain-language legal disclaimer
+  - 2-column quick path buttons (`Urgent`, `Start Here`, `Deep Dive`)
+  - Key reporting contacts with high-contrast linked phone/email values
+- Quick-path buttons navigate directly to section anchors and preserve keyboard focus behavior.
+
+### Chapter Context Panel
+
+- Use at the start of every handbook chapter.
+- Required fields:
+  - Chapter goal
+  - Evidence checklist
+  - Common mistakes
+  - Escalation trigger
+  - Source notes + last-reviewed date
+- Presentation: bordered surface, no heavy shadow, `not-prose` wrapper when used in long-form content.
+
+### Evidence Note
+
+- Replaces ad-hoc alert blocks in handbook content.
+- Tones:
+  - `info`: procedural reminders
+  - `warning`: high-risk legal mistakes
+  - `source`: law/regulation references and deadlines
+- Each note must include a short title and plain-language body text.
+
 ## Decision Log
 
 | Date | Decision | Rationale |
@@ -180,3 +210,4 @@ Reason: urgency + trust for civic action; clear call-to-action without sterile e
 | 2026-02-06 | Keep 4px spacing discipline + low-radius surfaces | Improves consistency and avoids generic rounded SaaS look |
 | 2026-02-06 | Strengthen focus styles and text contrast defaults | WCAG 2.1 AA baseline, AAA where low-cost |
 | 2026-02-06 | Keep semantic-first markup and minimal ARIA | Reduces accessibility regressions and maintenance risk |
+| 2026-02-06 | Restructure handbook around quick-start paths + chapter context panels | Reduces cognitive load under stress and improves scanability without dropping legal detail |

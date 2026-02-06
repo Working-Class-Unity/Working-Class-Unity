@@ -27,6 +27,22 @@
   - Hero and featured cards
   - Content section separators
 
+## Handbook Components
+
+- Route implementation: `app/pages/tenant-union-handbook.vue`
+- Data source: `app/data/tenant-handbook.ts`
+- Reusable components:
+  - `app/components/tenant-handbook/QuickStartPanel.vue`
+  - `app/components/tenant-handbook/ChapterContext.vue`
+  - `app/components/tenant-handbook/EvidenceNote.vue`
+
+### Handbook Usage Rules
+
+- Keep chapter/section IDs stable to avoid breaking anchor links.
+- Add new legal content through `tenant-handbook.ts` metadata first, then body content.
+- Contact links must meet AA contrast (use body text color + underline, not low-contrast accent text).
+- Render chapter context and evidence note components in `not-prose` wrappers where needed.
+
 ## Implementation Constraints
 
 - 4px spacing scale only.

@@ -26,6 +26,7 @@ This project targets WCAG 2.1 Level AA minimum (AAA improvements where low-cost 
 ### Dynamic Announcements
 
 - Calendar and campaign filters expose live result announcements with `aria-live="polite"`.
+- Tenant handbook quick-start and TOC links are keyboard-triggerable buttons that move focus to destination sections.
 
 ### Reduced Motion
 
@@ -62,6 +63,9 @@ Run on at least one of NVDA (Windows) or VoiceOver (macOS):
    - Expected: changing filters announces updated result counts.
 5. Visit `/kyr` and `/check-in-coverage`.
    - Expected: alert blocks are announced clearly and links are understandable out of context.
+6. Visit `/tenant-union-handbook`.
+   - Expected: quick-start cards, TOC controls, and section links are keyboard reachable.
+   - Expected: activating a link scrolls and moves focus to the requested chapter/section heading.
 
 ## Manual Keyboard Checklist
 
