@@ -12,6 +12,12 @@ export default defineEventHandler((event) => {
     normalizedPath = normalizedPath.slice(0, -1)
   }
 
+  if (normalizedPath === '/index') {
+    normalizedPath = '/'
+  } else if (normalizedPath.endsWith('/index')) {
+    normalizedPath = normalizedPath.slice(0, -'/index'.length) || '/'
+  }
+
   if (normalizedPath !== pathname) {
     return sendRedirect(event, `${normalizedPath}${search}`, 301)
   }
