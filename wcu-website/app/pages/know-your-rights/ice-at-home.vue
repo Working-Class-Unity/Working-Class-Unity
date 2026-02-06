@@ -179,7 +179,7 @@ useSchemaOrg([
                     <div class="card card-border border-l-4 border-l-error">
                       <div class="card-body p-4">
                         <h3 class="font-bold text-base flex items-center gap-2">
-                          <span class="status status-error" aria-label="No warrant status"></span>
+                          <span class="status status-error" aria-hidden="true"></span>
                           {{ $t('kyr_ice_at_home.warrant.no_warrant.title') }}
                         </h3>
                         
@@ -198,7 +198,7 @@ useSchemaOrg([
                     <div class="card card-border border-l-4 border-l-success">
                       <div class="card-body p-4">
                         <h3 class="font-bold text-base flex items-center gap-2">
-                          <span class="status status-success" aria-label="Has warrant status"></span>
+                          <span class="status status-success" aria-hidden="true"></span>
                           {{ $t('kyr_ice_at_home.warrant.has_warrant.title') }}
                         </h3>
 

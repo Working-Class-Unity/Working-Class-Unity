@@ -130,9 +130,9 @@ const contacts = [
                 <table class="table table-sm">
                   <thead>
                     <tr>
-                      <th>{{ $t('volunteer_guide.before.materials.document') }}</th>
-                      <th>{{ $t('volunteer_guide.before.materials.copies') }}</th>
-                      <th>{{ $t('volunteer_guide.before.materials.purpose') }}</th>
+                      <th class="text-base-content">{{ $t('volunteer_guide.before.materials.document') }}</th>
+                      <th class="text-base-content">{{ $t('volunteer_guide.before.materials.copies') }}</th>
+                      <th class="text-base-content">{{ $t('volunteer_guide.before.materials.purpose') }}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -142,7 +142,7 @@ const contacts = [
                           :href="material.key === 'tracker_log' ? 'https://files.workingclassunity.com/kyr/Check-In_Tracker_Print.pdf' : 'https://files.workingclassunity.com/kyr/Check-In_Coverage_Print.pdf'"
                           target="_blank"
                           rel="noopener noreferrer"
-                          class="link link-primary"
+                          class="link text-secondary hover:text-secondary/80 font-semibold"
                         >
                           {{ $t(`check_in_coverage.resources.downloads.${material.key}`) }}
                         </a>
@@ -259,7 +259,7 @@ const contacts = [
             </svg>
           </div>
           <h2 id="arrival-heading" class="text-2xl font-bold text-base-content">{{ $t('volunteer_guide.arrival.title') }}</h2>
-          <span class="badge badge-soft badge-primary text-xs" role="status"><span class="sr-only">Duration:</span> {{ $t('volunteer_guide.arrival.badge') }}</span>
+          <span class="badge badge-outline border-secondary text-secondary bg-base-100 text-xs" role="status"><span class="sr-only">Duration:</span> {{ $t('volunteer_guide.arrival.badge') }}</span>
         </div>
 
         <div class="card bg-base-100 border border-base-300 shadow-sm max-w-3xl hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-colors">
@@ -332,8 +332,8 @@ const contacts = [
                 <table class="table table-sm">
                   <thead>
                     <tr>
-                      <th>{{ $t('volunteer_guide.during.do_table.action_header') }}</th>
-                      <th>{{ $t('volunteer_guide.during.do_table.how_header') }}</th>
+                      <th class="text-base-content">{{ $t('volunteer_guide.during.do_table.action_header') }}</th>
+                      <th class="text-base-content">{{ $t('volunteer_guide.during.do_table.how_header') }}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -357,8 +357,8 @@ const contacts = [
                 <table class="table table-sm">
                   <thead>
                     <tr>
-                      <th>{{ $t('volunteer_guide.during.dont_table.dont_header') }}</th>
-                      <th>{{ $t('volunteer_guide.during.dont_table.why_header') }}</th>
+                      <th class="text-base-content">{{ $t('volunteer_guide.during.dont_table.dont_header') }}</th>
+                      <th class="text-base-content">{{ $t('volunteer_guide.during.dont_table.why_header') }}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -566,16 +566,16 @@ const contacts = [
           <table class="table">
             <thead>
               <tr>
-                <th>{{ $t('volunteer_guide.contacts.who_header') }}</th>
-                <th>{{ $t('volunteer_guide.contacts.number_header') }}</th>
-                <th>{{ $t('volunteer_guide.contacts.when_header') }}</th>
+                <th class="text-base-content">{{ $t('volunteer_guide.contacts.who_header') }}</th>
+                <th class="text-base-content">{{ $t('volunteer_guide.contacts.number_header') }}</th>
+                <th class="text-base-content">{{ $t('volunteer_guide.contacts.when_header') }}</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="contact in contacts" :key="contact.number">
                 <td class="font-medium">{{ $t(contact.whoKey) }}</td>
                 <td>
-                  <a :href="`tel:${contact.number.replace(/[^0-9]/g, '')}`" class="link link-primary font-mono">
+                  <a :href="`tel:${contact.number.replace(/[^0-9]/g, '')}`" class="link text-secondary hover:text-secondary/80 font-mono font-semibold">
                     {{ contact.number }}
                   </a>
                 </td>
