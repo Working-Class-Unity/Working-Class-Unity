@@ -56,7 +56,7 @@ const upcomingEvents = computed(() => getUpcomingEvents(3))
     <section class="pt-6 pb-8 md:pt-12 md:pb-14" aria-labelledby="hero-heading">
       <div class="wcu-container">
         <div class="grid gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,0.9fr)]">
-          <article class="wcu-card overflow-hidden border-secondary/30">
+          <article class="wcu-card overflow-hidden border-secondary/30 hover:border-secondary/30 hover:shadow-sm hover:translate-y-0 active:translate-y-0">
             <div class="h-1 solidarity-stripe" aria-hidden="true"></div>
             <div class="card-body p-6 md:p-10">
               <p class="wcu-eyebrow mb-4">{{ $t('home_page.problem.label') }}</p>
@@ -77,7 +77,7 @@ const upcomingEvents = computed(() => getUpcomingEvents(3))
             </div>
           </article>
 
-          <aside class="wcu-card bg-secondary text-secondary-content border-secondary/45">
+          <aside class="wcu-card bg-secondary text-secondary-content border-secondary/45 hover:border-secondary/45 hover:shadow-sm hover:translate-y-0 active:translate-y-0">
             <div class="card-body p-5 md:p-7">
               <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-secondary-content">
                 {{ $t('home_page.events.heading') }}
