@@ -74,15 +74,15 @@ const filterAnnouncement = computed(() => {
 <template>
   <div class="pb-12 md:pb-16">
     <!-- Hero Section -->
-    <section class="pt-8 pb-8 md:pt-12 md:pb-10">
+    <section class="pt-6 pb-7 md:pt-12 md:pb-10">
       <div class="wcu-container">
         <article class="wcu-card overflow-hidden border-secondary/30 text-center">
           <div class="h-1 solidarity-stripe" aria-hidden="true"></div>
-          <div class="card-body p-6 md:p-10">
-            <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-base-content mb-4">
+          <div class="card-body p-5 sm:p-6 md:p-10">
+            <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-base-content mb-4 leading-tight">
               {{ $t('calendar.hero.title') }}
             </h1>
-            <p class="text-lg text-base-content/90 max-w-2xl mx-auto">
+            <p class="text-base sm:text-lg text-base-content/90 max-w-2xl mx-auto">
               {{ $t('calendar.hero.description') }}
             </p>
           </div>
@@ -91,10 +91,10 @@ const filterAnnouncement = computed(() => {
     </section>
 
     <!-- Filter Section -->
-    <section class="pb-8">
+    <section class="pb-7 md:pb-8">
       <div class="wcu-container">
         <div class="wcu-card border-secondary/25">
-          <div class="card-body p-4 md:p-5">
+          <div class="card-body p-3 sm:p-4 md:p-5">
             <div class="flex flex-wrap gap-2 justify-center" role="group" :aria-label="$t('calendar.filter_aria_label')">
               <button
                 v-for="type in eventTypes"
@@ -102,7 +102,7 @@ const filterAnnouncement = computed(() => {
                 @click="selectedType = type.value"
                 type="button"
                 :aria-pressed="selectedType === type.value"
-                class="btn btn-sm"
+                class="btn h-10 min-h-10 px-3 text-sm"
                 :class="selectedType === type.value ? 'btn-primary' : 'btn-ghost bg-base-200 border border-secondary/20'"
               >
                 {{ $t(type.labelKey) }}
@@ -116,7 +116,7 @@ const filterAnnouncement = computed(() => {
     </section>
 
     <!-- Events Grid Section -->
-    <section class="py-8 md:py-12">
+    <section class="py-7 md:py-12">
       <div class="wcu-container">
         <!-- Section label -->
         <p class="text-xs uppercase tracking-wide text-base-content mb-6">
@@ -141,7 +141,7 @@ const filterAnnouncement = computed(() => {
           v-else
           role="list"
           :aria-label="$t('calendar.events_list_aria_label')"
-          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 list-none"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6 list-none"
         >
           <li v-for="event in filteredEvents" :key="event.id">
             <EventCard :event="event" />

@@ -38,18 +38,18 @@ useSchemaOrg([
 <template>
   <div class="min-h-screen bg-base-100">
     <!-- Hero Section -->
-    <section class="py-16 md:py-20">
+    <section class="py-12 md:py-16">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-base-content mb-6">
+        <h1 class="text-2xl sm:text-3xl md:text-5xl font-bold text-base-content mb-5 md:mb-6 leading-tight">
           {{ $t('kyr_home.hero.title') }}
         </h1>
         
-        <p class="text-base sm:text-lg md:text-xl text-base-content/80 max-w-3xl mx-auto mb-10 md:mb-12">
+        <p class="text-base sm:text-lg md:text-xl text-base-content/80 max-w-3xl mx-auto mb-8 md:mb-10">
           {{ $t('kyr_home.hero.description') }}
         </p>
         
         <!-- Quick Action Cards (3-column grid) -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 md:gap-6 mt-8 md:mt-12">
           <!-- Card 1: Emergency & Preparation -->
           <a
             href="#rights-and-prep"
@@ -78,7 +78,7 @@ useSchemaOrg([
           
           <!-- Card 2: Request Support -->
           <NuxtLinkLocale
-            to="checkinsupport"
+            to="/checkinsupport"
             class="group card bg-base-100 border border-base-300 shadow-sm hover:shadow-md hover:border-primary/50 transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.98] focus:shadow-md focus:border-primary/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             aria-label="Request Support - Get help and connect with our support network"
           >
@@ -136,20 +136,20 @@ useSchemaOrg([
     </section>
 
     <!-- Rights & Preparation Section -->
-    <section id="rights-and-prep" class="py-16 scroll-mt-20">
+    <section id="rights-and-prep" class="py-12 md:py-16 scroll-mt-20">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Section header -->
-        <div class="text-center mb-12">
-          <h2 class="text-3xl font-bold text-base-content mb-4">
+        <div class="text-center mb-8 md:mb-12">
+          <h2 class="text-2xl sm:text-3xl font-bold text-base-content mb-3 sm:mb-4">
             {{ $t('kyr_home.sections.rights_prep_title') }}
           </h2>
-          <p class="text-lg text-base-content/80 max-w-2xl mx-auto">
+          <p class="text-base sm:text-lg text-base-content/80 max-w-2xl mx-auto">
             {{ $t('kyr_home.sections.rights_prep_intro') }}
           </p>
         </div>
         
         <!-- System Alert Toast -->
-        <div role="alert" class="alert alert-soft alert-info max-w-3xl mx-auto rounded-xl border border-secondary/30 mb-12 bg-secondary/10 text-base-content">
+        <div role="alert" class="alert alert-soft alert-info max-w-3xl mx-auto rounded-xl border border-secondary/30 mb-8 md:mb-12 bg-secondary/10 text-base-content">
           <div class="flex items-center gap-3">
             <!-- Warning triangle icon with subtle pulse animation -->
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-secondary animate-pulse shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -158,9 +158,9 @@ useSchemaOrg([
             <div>
               <i18n-t keypath="kyr_home.sections.emergency_box.text" tag="p" class="font-medium text-sm">
                 <template #link>
-                  <a href="#" class="font-bold underline text-secondary hover:text-base-content transition-colors inline-flex items-center min-h-10 px-1 -mx-1 rounded">
+                  <NuxtLinkLocale to="/checkinsupport" class="font-bold underline text-secondary hover:text-base-content transition-colors inline-flex items-center min-h-10 px-1 -mx-1 rounded">
                     {{ $t('kyr_home.sections.emergency_box.link_text') }}
-                  </a>
+                  </NuxtLinkLocale>
                 </template>
                 <template #phone>
                   <a href="tel:5592060151" class="font-bold underline text-secondary hover:text-base-content transition-colors inline-flex items-center min-h-10 px-1 -mx-1 rounded">
@@ -178,18 +178,18 @@ useSchemaOrg([
     </section>
 
     <!-- Get Involved Section -->
-    <section id="get-involved" class="py-16 bg-base-200/50 scroll-mt-20">
+    <section id="get-involved" class="py-12 md:py-16 bg-base-200/50 scroll-mt-20">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-12">
-          <h2 class="text-3xl font-bold text-base-content">
+        <div class="text-center mb-8 md:mb-12">
+          <h2 class="text-2xl sm:text-3xl font-bold text-base-content">
             {{ $t('kyr_home.get_involved_section.title') }}
           </h2>
-          <p class="text-lg text-base-content/80 mt-4 max-w-2xl mx-auto">
+          <p class="text-base sm:text-lg text-base-content/80 mt-3 sm:mt-4 max-w-2xl mx-auto">
             {{ $t('kyr_home.get_involved_section.intro') }}
           </p>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 md:gap-8">
           <!-- Card A: Direct Support -->
           <div class="card bg-base-100 border border-base-300 shadow-sm">
             <div class="card-body">
@@ -203,7 +203,7 @@ useSchemaOrg([
               <!-- Clickable rows instead of buttons -->
               <div class="divide-y divide-base-300">
                 <NuxtLinkLocale
-                  to="check-in-coverage"
+                  to="/check-in-coverage"
                   class="flex items-center justify-between py-4 group hover:bg-base-200/50 -mx-4 px-4 transition-colors first:rounded-t-lg focus:bg-base-200/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
                 >
                   <div>
@@ -269,7 +269,7 @@ useSchemaOrg([
               <!-- Clickable rows instead of buttons -->
               <div class="divide-y divide-base-300">
                 <NuxtLinkLocale
-                  to="unitedfront"
+                  to="/unitedfront"
                   class="flex items-center justify-between py-4 group hover:bg-base-200/50 -mx-4 px-4 transition-colors first:rounded-t-lg focus:bg-base-200/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
                 >
                   <div>
@@ -286,7 +286,7 @@ useSchemaOrg([
                 </NuxtLinkLocale>
                 
                 <NuxtLinkLocale
-                  to="join"
+                  to="/join"
                   class="flex items-center justify-between py-4 group hover:bg-base-200/50 -mx-4 px-4 transition-colors last:rounded-b-lg focus:bg-base-200/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
                 >
                   <div>

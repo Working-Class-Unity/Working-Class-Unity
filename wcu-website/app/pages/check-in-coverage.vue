@@ -79,27 +79,27 @@ const { calKey } = useCalEmbed({
 
 <template>
   <!-- Section A: Mission Status -->
-  <section class="bg-base-100 py-8 md:py-12">
+  <section class="bg-base-100 py-6 md:py-12">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6 items-center">
         <!-- Left: Context -->
-        <div class="space-y-3">
-          <h1 class="text-3xl md:text-4xl font-semibold text-base-content">
+        <div class="space-y-2 sm:space-y-3">
+          <h1 class="text-2xl sm:text-3xl md:text-4xl font-semibold leading-tight text-base-content">
             {{ $t('check_in_coverage.hero.title') }}
           </h1>
-          <p class="text-base text-base-content max-w-md">
+          <p class="text-sm sm:text-base text-base-content max-w-md">
             {{ $t('check_in_coverage.hero.description') }}
           </p>
         </div>
         <!-- Right: Actions -->
         <div class="flex flex-wrap gap-3 justify-start md:justify-end">
-          <a href="#schedule" class="btn btn-primary">
+          <a href="#schedule" class="btn btn-primary min-h-11 h-11 px-4">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
             </svg>
             {{ $t('check_in_coverage.hero.schedule_button') }}
           </a>
-          <NuxtLinkLocale to="/checkinsupport" class="btn btn-outline">
+          <NuxtLinkLocale to="/checkinsupport" class="btn btn-outline min-h-11 h-11 px-4">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
             </svg>
@@ -111,9 +111,9 @@ const { calKey } = useCalEmbed({
   </section>
 
   <!-- Section B: Progress Tracker -->
-  <section id="orientation" class="bg-base-100 py-6">
+  <section id="orientation" class="bg-base-100 py-5 md:py-6">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="card card-border bg-base-200 flex flex-col sm:flex-row items-center p-4 gap-4">
+      <div class="card card-border bg-base-200 flex flex-col sm:flex-row items-center p-3 sm:p-4 gap-3 sm:gap-4">
         <!-- Left: Status + Info -->
         <div class="flex items-center gap-3 flex-1">
           <span class="text-success" role="img" :aria-label="$t('check_in_coverage.orientation.completed_label')">
@@ -127,7 +127,7 @@ const { calKey } = useCalEmbed({
           </div>
         </div>
         <!-- Right: Action -->
-        <button disabled class="btn btn-sm btn-primary btn-disabled">
+        <button disabled class="btn h-10 min-h-10 px-3 text-sm btn-primary btn-disabled">
           {{ $t('check_in_coverage.orientation.coming_soon_button') }}
         </button>
       </div>
@@ -147,13 +147,13 @@ const { calKey } = useCalEmbed({
   </dialog>
 
   <!-- Section C: The Briefing -->
-  <section id="schedule" class="bg-base-100 py-8">
+  <section id="schedule" class="bg-base-100 py-7 md:py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <!-- Calendar - Full Width -->
-      <h2 class="text-2xl font-bold mb-2">{{ $t('check_in_coverage.schedule.heading') }}</h2>
+      <h2 class="text-xl sm:text-2xl font-bold mb-2">{{ $t('check_in_coverage.schedule.heading') }}</h2>
       <p class="text-sm text-base-content mb-4">{{ $t('check_in_coverage.schedule.calendar_refresh_note') }}</p>
       <div
-        class="card card-border bg-base-200 overflow-hidden mb-6"
+        class="card card-border bg-base-200 overflow-hidden mb-5 md:mb-6"
         role="region"
         :aria-label="$t('check_in_coverage.schedule.calendar_label')"
       >
@@ -168,9 +168,9 @@ const { calKey } = useCalEmbed({
       </div>
       
       <!-- Info Cards - Below Calendar -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
         <!-- Arrival Time Spec -->
-        <div class="card card-border bg-base-200 p-4 focus-within:ring-2 focus-within:ring-primary/20">
+        <div class="card card-border bg-base-200 p-3 sm:p-4 focus-within:ring-2 focus-within:ring-primary/20">
           <div class="flex items-start gap-3">
             <div class="text-primary">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5" aria-hidden="true">
@@ -185,7 +185,7 @@ const { calKey } = useCalEmbed({
         </div>
         
         <!-- Your Role Spec -->
-        <div class="card card-border bg-base-200 p-4 focus-within:ring-2 focus-within:ring-primary/20">
+        <div class="card card-border bg-base-200 p-3 sm:p-4 focus-within:ring-2 focus-within:ring-primary/20">
           <div class="flex items-start gap-3">
             <div class="text-primary">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5" aria-hidden="true">
@@ -204,9 +204,9 @@ const { calKey } = useCalEmbed({
   </section>
 
   <!-- Section D: Resource Repository -->
-  <section id="shift-materials" class="bg-base-100 py-8">
+  <section id="shift-materials" class="bg-base-100 py-7 md:py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <h2 class="text-2xl font-bold mb-6">{{ $t('check_in_coverage.resources.heading') }}</h2>
+      <h2 class="text-xl sm:text-2xl font-bold mb-5 md:mb-6">{{ $t('check_in_coverage.resources.heading') }}</h2>
       
       <!-- Detained Alert - Refined Style -->
       <div role="alert" class="alert alert-soft alert-error border border-error/30 rounded-xl mb-6 flex flex-col md:flex-row md:items-center gap-4">
@@ -221,7 +221,7 @@ const { calKey } = useCalEmbed({
           </div>
         </div>
         <!-- Button: full width on mobile, auto on desktop, always at bottom on mobile -->
-        <NuxtLinkLocale to="/check-in-coverage-volunteer-guide#detained-heading" class="btn btn-error gap-2 whitespace-nowrap w-full md:w-auto shrink-0">
+        <NuxtLinkLocale to="/check-in-coverage-volunteer-guide#detained-heading" class="btn btn-error h-10 min-h-10 px-3 text-sm gap-2 whitespace-nowrap w-full md:w-auto shrink-0">
           {{ $t('check_in_coverage.resources.notice.button') }}
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
@@ -230,7 +230,7 @@ const { calKey } = useCalEmbed({
       </div>
       
       <!-- 2x2 File Grid with new card design -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         <div
           v-for="material in shiftMaterials"
           :key="material.key"
@@ -272,7 +272,7 @@ const { calKey } = useCalEmbed({
             <!-- Actions row -->
             <div class="flex gap-2 mt-4 pt-3 border-t border-base-300">
               <!-- Single PDF button for pdfOnly items -->
-              <a v-if="material.pdfOnly" :href="material.pdfUrl" class="btn btn-sm btn-primary gap-2 flex-1">
+              <a v-if="material.pdfOnly" :href="material.pdfUrl" class="btn btn-primary h-10 min-h-10 px-3 text-sm gap-2 flex-1">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
                 </svg>
@@ -281,13 +281,13 @@ const { calKey } = useCalEmbed({
               
               <!-- Dual buttons for items with page + PDF, or page only if PDF URL is not valid -->
               <template v-else>
-                <NuxtLinkLocale :to="material.pageUrl" class="btn btn-sm btn-outline gap-2 flex-1">
+                <NuxtLinkLocale :to="material.pageUrl" class="btn btn-outline h-10 min-h-10 px-3 text-sm gap-2 flex-1">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
                   </svg>
                   {{ $t('check_in_coverage.resources.view_page') }}
                 </NuxtLinkLocale>
-                <a v-if="material.pdfUrl && material.pdfUrl !== '#'" :href="material.pdfUrl" class="btn btn-sm btn-primary gap-2 flex-1">
+                <a v-if="material.pdfUrl && material.pdfUrl !== '#'" :href="material.pdfUrl" class="btn btn-primary h-10 min-h-10 px-3 text-sm gap-2 flex-1">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
                   </svg>
@@ -302,10 +302,10 @@ const { calKey } = useCalEmbed({
   </section>
 
   <!-- Section E: Workflow Timeline -->
-  <section class="bg-base-100 py-8">
+  <section class="bg-base-100 py-7 md:py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <h2 class="text-2xl font-bold mb-2">{{ $t('check_in_coverage.end_of_shift.heading') }}</h2>
-      <p class="text-base-content mb-6">{{ $t('check_in_coverage.end_of_shift.copy') }}</p>
+      <h2 class="text-xl sm:text-2xl font-bold mb-2">{{ $t('check_in_coverage.end_of_shift.heading') }}</h2>
+      <p class="text-sm sm:text-base text-base-content mb-5 md:mb-6">{{ $t('check_in_coverage.end_of_shift.copy') }}</p>
       
       <!-- Git-style Vertical Timeline -->
       <ul class="timeline timeline-vertical timeline-compact" :aria-label="$t('check_in_coverage.end_of_shift.checklist_label')">
@@ -363,19 +363,19 @@ const { calKey } = useCalEmbed({
   </section>
 
   <!-- Section F: Contact Footer -->
-  <section class="bg-base-100 py-8">
+  <section class="bg-base-100 py-7 md:py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="card border border-base-300 bg-base-200 p-5 max-w-2xl">
+      <div class="card border border-base-300 bg-base-200 p-4 sm:p-5 max-w-2xl">
         <h3 class="font-bold text-sm uppercase tracking-wide text-base-content mb-2">{{ $t('check_in_coverage.contact.heading') }}</h3>
         <p class="text-base-content mb-4">{{ $t('check_in_coverage.contact.description') }}</p>
         <div class="flex flex-wrap gap-3">
-          <a href="tel:+12098423232" class="btn btn-ghost bg-base-300 gap-2">
+          <a href="tel:+12098423232" class="btn btn-ghost bg-base-300 h-10 min-h-10 px-3 text-sm gap-2">
             {{ $t('check_in_coverage.contact.phone') }}
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9.75a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184" />
             </svg>
           </a>
-          <a href="https://cal.com/workingclassunity/ice-check-in-coverage-briefing" target="_blank" rel="noopener noreferrer" class="btn btn-outline gap-2">
+          <a href="https://cal.com/workingclassunity/ice-check-in-coverage-briefing" target="_blank" rel="noopener noreferrer" class="btn btn-outline h-10 min-h-10 px-3 text-sm gap-2">
             {{ $t('check_in_coverage.contact.book_button') }}
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25" />
