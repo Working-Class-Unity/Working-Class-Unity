@@ -11,3 +11,9 @@ export interface AuthSessionResponse {
   authenticated: boolean
   session: (SessionUser & { duesCurrent: boolean }) | null
 }
+
+export interface AuthMagicLinkRequestResponse {
+  success: boolean
+  message: string
+  debugMagicLink?: string
+}
