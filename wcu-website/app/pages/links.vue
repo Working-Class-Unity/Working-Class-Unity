@@ -79,9 +79,9 @@ onUnmounted(() => {
 
 <template>
   <div class="min-h-screen bg-base-100">
-    <div class="max-w-lg mx-auto px-4 py-12">
+    <div class="max-w-lg mx-auto px-4 py-8 md:py-12">
       <!-- Logo & Org Info -->
-      <div class="text-center mb-10">
+      <div class="text-center mb-8 md:mb-10">
         <ClientOnly>
           <NuxtLinkLocale to="/" class="inline-block mb-6">
             <img 
@@ -108,7 +108,7 @@ onUnmounted(() => {
         <!-- Join WCU - Accent CTA -->
         <NuxtLinkLocale 
           to="/join" 
-          class="flex items-center justify-between w-full p-4 bg-secondary text-secondary-content border border-accent/45 rounded-xl hover:opacity-90 focus:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-opacity shadow-sm"
+          class="flex items-center justify-between w-full p-4 min-h-12 bg-secondary text-secondary-content border border-accent/45 rounded-xl hover:opacity-90 focus:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-opacity shadow-sm"
         >
           <div class="flex items-center gap-3">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -125,7 +125,7 @@ onUnmounted(() => {
         <div class="border border-base-300 rounded-xl overflow-hidden shadow-sm">
           <button 
             @click="kyrGuidesExpanded = !kyrGuidesExpanded"
-            class="flex items-center justify-between w-full p-4 bg-base-100 hover:bg-base-200/50 focus:bg-base-200/50 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors"
+            class="flex items-center justify-between w-full p-4 min-h-12 bg-base-100 hover:bg-base-200/50 focus:bg-base-200/50 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors"
             :aria-expanded="kyrGuidesExpanded"
             aria-controls="kyr-guides-panel"
           >
@@ -158,7 +158,7 @@ onUnmounted(() => {
             <!-- Overview Link -->
             <NuxtLinkLocale 
               to="/kyr" 
-              class="group flex items-center justify-between w-full p-3 px-4 hover:bg-base-200/50 focus:bg-base-200/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset transition-colors border-b border-base-300/50"
+              class="group flex items-center justify-between w-full py-2.5 px-4 min-h-11 hover:bg-base-200/50 focus:bg-base-200/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset transition-colors border-b border-base-300/50"
             >
               <span class="text-sm text-base-content font-medium group-hover:text-primary transition-colors">{{ $t('links.kyr_overview') }}</span>
               <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-base-content/40 group-hover:text-primary group-hover:translate-x-1 transition-all shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -176,7 +176,7 @@ onUnmounted(() => {
               v-for="resource in knowYourRightsResources"
               :key="resource.slug"
               :to="`/know-your-rights/${resource.slug}`"
-              class="group flex items-center justify-between w-full p-3 px-4 hover:bg-base-200/50 focus:bg-base-200/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset transition-colors border-b border-base-300/50"
+              class="group flex items-center justify-between w-full py-2.5 px-4 min-h-11 hover:bg-base-200/50 focus:bg-base-200/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset transition-colors border-b border-base-300/50"
             >
               <div class="flex items-center gap-2">
                 <span class="text-base" aria-hidden="true">{{ resource.icon }}</span>
@@ -195,7 +195,7 @@ onUnmounted(() => {
             <!-- Support Links -->
             <NuxtLinkLocale 
               to="/checkinsupport" 
-              class="group flex items-center justify-between w-full p-3 px-4 hover:bg-base-200/50 focus:bg-base-200/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset transition-colors border-b border-base-300/50"
+              class="group flex items-center justify-between w-full py-2.5 px-4 min-h-11 hover:bg-base-200/50 focus:bg-base-200/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset transition-colors border-b border-base-300/50"
             >
               <span class="text-sm text-base-content group-hover:text-primary transition-colors">{{ $t('links.check_in_support') }}</span>
               <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-base-content/40 group-hover:text-primary group-hover:translate-x-1 transition-all shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -205,7 +205,7 @@ onUnmounted(() => {
             
             <NuxtLinkLocale 
               to="/check-in-coverage" 
-              class="group flex items-center justify-between w-full p-3 px-4 hover:bg-base-200/50 focus:bg-base-200/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset transition-colors border-b border-base-300/50"
+              class="group flex items-center justify-between w-full py-2.5 px-4 min-h-11 hover:bg-base-200/50 focus:bg-base-200/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset transition-colors border-b border-base-300/50"
             >
               <span class="text-sm text-base-content group-hover:text-primary transition-colors">{{ $t('nav.coverage') }}</span>
               <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-base-content/40 group-hover:text-primary group-hover:translate-x-1 transition-all shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -215,7 +215,7 @@ onUnmounted(() => {
             
             <NuxtLinkLocale 
               to="/check-in-coverage-volunteer-guide" 
-              class="group flex items-center justify-between w-full p-3 px-4 hover:bg-base-200/50 focus:bg-base-200/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset transition-colors"
+              class="group flex items-center justify-between w-full py-2.5 px-4 min-h-11 hover:bg-base-200/50 focus:bg-base-200/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset transition-colors"
             >
               <span class="text-sm text-base-content group-hover:text-primary transition-colors">{{ $t('links.volunteer_guide') }}</span>
               <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-base-content/40 group-hover:text-primary group-hover:translate-x-1 transition-all shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -226,7 +226,7 @@ onUnmounted(() => {
         </div>
 
         <!-- Get Involved Section -->
-        <div class="pt-6">
+        <div class="pt-5 md:pt-6">
           <h2 class="text-xs uppercase tracking-wide text-base-content mb-3 px-1">
             {{ $t('links.get_involved_heading') }}
           </h2>
@@ -234,7 +234,7 @@ onUnmounted(() => {
           <!-- Calendar Link - Primary CTA -->
           <NuxtLinkLocale 
             to="/calendar" 
-            class="flex items-center justify-between w-full p-4 bg-primary text-primary-content rounded-xl hover:opacity-90 focus:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-opacity shadow-sm mb-3"
+            class="flex items-center justify-between w-full p-4 min-h-12 bg-primary text-primary-content rounded-xl hover:opacity-90 focus:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-opacity shadow-sm mb-3"
           >
             <div class="flex items-center gap-3">
               <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -261,7 +261,7 @@ onUnmounted(() => {
         </div>
 
         <!-- Social Links / Footer -->
-        <div class="pt-8 text-center">
+        <div class="pt-7 md:pt-8 text-center">
           <p class="text-xs text-base-content">
             {{ $t('links.footer_text') }}
           </p>

@@ -318,13 +318,13 @@ const highlightMatch = (text: string): string => {
 <template>
   <div class="min-h-screen bg-base-100">
     <!-- Hero Section -->
-    <section class="py-12 md:py-16 bg-base-200">
+    <section class="py-8 md:py-14 bg-base-200">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="max-w-4xl">
-          <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-base-content mb-4">
+          <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-base-content mb-4 leading-tight">
             Working Class Unity Tenant Union Handbook
           </h1>
-          <p class="text-lg text-base-content/80">
+          <p class="text-base sm:text-lg text-base-content/80">
             This material is not a replacement for legal assistance or an attorney.
           </p>
         </div>
@@ -372,7 +372,7 @@ const highlightMatch = (text: string): string => {
             <h2 id="toc-title" class="text-lg font-semibold text-base-content">Contents</h2>
             <button 
               ref="mobileDrawerCloseButtonRef"
-              class="btn btn-sm btn-ghost btn-circle"
+              class="btn btn-ghost btn-circle h-10 min-h-10 w-10"
               :aria-label="$t('common.close')"
               type="button"
               @click="closeMobileDrawer"
@@ -390,11 +390,11 @@ const highlightMatch = (text: string): string => {
                 v-model="searchQuery"
                 type="text"
                 :placeholder="$t('tenant_handbook.a11y.search_placeholder')"
-                class="input input-bordered input-sm w-full pr-8"
+                class="input input-bordered h-10 min-h-10 w-full pr-8 text-sm"
               />
               <button
                 v-if="searchQuery"
-                class="absolute right-2 top-1/2 -translate-y-1/2 text-base-content/70 hover:text-base-content"
+                class="absolute right-2 top-1/2 -translate-y-1/2 inline-flex h-8 w-8 items-center justify-center text-base-content/70 hover:text-base-content"
                 :aria-label="$t('tenant_handbook.a11y.clear_search')"
                 type="button"
                 @click="searchQuery = ''"
@@ -410,7 +410,7 @@ const highlightMatch = (text: string): string => {
           <ul class="space-y-1">
             <li v-for="chapter in filteredChapters" :key="chapter.id">
               <button
-                class="flex items-center justify-between w-full p-2 rounded-lg font-medium text-left hover:bg-base-200 transition-colors"
+                class="flex items-center justify-between w-full p-2.5 rounded-lg font-medium text-left text-sm hover:bg-base-200 transition-colors"
                 :class="{ 'bg-primary/10 text-secondary': activeSection === chapter.id }"
                 @click="scrollToSection(chapter.id)"
               >
@@ -419,7 +419,7 @@ const highlightMatch = (text: string): string => {
               <ul class="ml-4 mt-1 space-y-0.5 border-l-2 border-base-300 pl-3">
                 <li v-for="section in chapter.sections" :key="section.id">
                   <button
-                    class="w-full text-left text-sm py-1 px-2 rounded hover:bg-base-200 transition-colors"
+                    class="w-full text-left text-sm py-2 px-2.5 min-h-10 rounded hover:bg-base-200 transition-colors"
                     :class="{ 
                       'bg-primary/10 text-secondary font-medium': activeSection === section.id,
                       'text-base-content/80': activeSection !== section.id
@@ -1282,7 +1282,7 @@ const highlightMatch = (text: string): string => {
             <!-- Back to Top -->
             <div class="mt-16 pt-8 border-t border-base-300 text-center">
               <button 
-                class="btn btn-ghost btn-sm gap-2"
+                class="btn btn-ghost h-10 min-h-10 px-3 text-sm gap-2"
                 @click="scrollToSection('chapter-1')"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">

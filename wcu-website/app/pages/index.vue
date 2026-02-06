@@ -114,7 +114,7 @@ const upcomingEvents = computed(() => getUpcomingEvents(3))
           <h2 id="events-heading" class="text-xl sm:text-2xl md:text-3xl font-bold text-base-content">
             {{ $t('home_page.events.heading') }}
           </h2>
-          <NuxtLinkLocale to="/calendar" class="btn btn-ghost btn-sm border border-secondary/25 hover:bg-primary/10">
+          <NuxtLinkLocale to="/calendar" class="btn btn-ghost h-10 min-h-10 px-3 text-sm border border-secondary/25 hover:bg-primary/10">
             {{ $t('home_page.events.view_all') }}
           </NuxtLinkLocale>
         </div>
