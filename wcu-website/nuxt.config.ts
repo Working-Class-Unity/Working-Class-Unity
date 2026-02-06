@@ -43,6 +43,7 @@ export default defineNuxtConfig({
     },
   },
   i18n: {
+    baseUrl: 'https://workingclassunity.com',
     langDir: 'locales',
     defaultLocale: 'en',
     strategy: 'prefix_except_default',

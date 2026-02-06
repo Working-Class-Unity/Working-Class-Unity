@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const { locale } = useI18n()
+const localeHead = useLocaleHead({ seo: true })
 
 // Global SEO configuration with title template.
 // Individual pages set their own title, which gets appended with " | Working Class Unity".
@@ -7,6 +8,8 @@ useHead(() => ({
   htmlAttrs: {
     lang: locale.value,
   },
+  link: localeHead.value.link || [],
+  meta: localeHead.value.meta || [],
   titleTemplate: (titleChunk) => {
     return titleChunk ? `${titleChunk} | Working Class Unity` : 'Working Class Unity'
   },
