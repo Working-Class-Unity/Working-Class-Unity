@@ -2,6 +2,8 @@
 import { getUpcomingEvents, type EventType } from '~/data/events'
 
 const { t } = useI18n()
+const localePath = useLocalePath()
+const upcomingEventsForSeo = computed(() => getUpcomingEvents(12))
 
 // =============================================================================
 // SEO Meta Tags
@@ -29,6 +31,41 @@ useSchemaOrg([
     name: t('calendar.hero.title'),
     description: t('calendar.hero.description'),
     url: 'https://workingclassunity.com/calendar',
+  }),
+  defineItemList({
+    name: `${t('calendar.hero.title')} - Upcoming`,
+    itemListElement: upcomingEventsForSeo.value.map((event, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      item: {
+        '@type': 'Event',
+        name: t(event.titleKey),
+        description: t(event.descriptionKey),
+        startDate: event.startDateTime,
+        endDate: event.endDateTime,
+        eventStatus: 'https://schema.org/EventScheduled',
+        eventAttendanceMode: event.isVirtual
+          ? 'https://schema.org/OnlineEventAttendanceMode'
+          : event.isHybrid
+            ? 'https://schema.org/MixedEventAttendanceMode'
+            : 'https://schema.org/OfflineEventAttendanceMode',
+        location: event.isVirtual
+          ? {
+              '@type': 'VirtualLocation',
+              url: event.rsvpLink || 'https://workingclassunity.com/calendar',
+            }
+          : {
+              '@type': 'Place',
+              name: event.location || 'San Joaquin County, CA',
+            },
+        organizer: {
+          '@type': 'Organization',
+          name: 'Working Class Unity',
+          url: 'https://workingclassunity.com',
+        },
+        url: event.rsvpLink || `https://workingclassunity.com${localePath('/calendar')}`,
+      },
+    })),
   }),
 ])
 

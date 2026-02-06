@@ -4,6 +4,10 @@ import { campaigns } from '~/data/campaigns'
 import type { Campaign } from '~/data/campaigns'
 
 const { t } = useI18n()
+const localePath = useLocalePath()
+const activeCampaignsForSeo = computed(() => {
+  return campaigns.filter((campaign) => campaign.status === 'active')
+})
 
 // =============================================================================
 // SEO Meta Tags
@@ -34,6 +38,21 @@ useSchemaOrg([
     name: t('campaigns.pageTitle'),
     description: t('campaigns.pageSubtitle'),
     url: 'https://workingclassunity.com/campaigns',
+  }),
+  defineItemList({
+    name: `${t('campaigns.pageTitle')} - Active`,
+    itemListElement: activeCampaignsForSeo.value.map((campaign, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      item: {
+        '@type': 'CreativeWork',
+        name: t(campaign.titleKey),
+        description: t(campaign.descriptionKey),
+        url: `https://workingclassunity.com${localePath('/campaigns')}`,
+        image: `https://workingclassunity.com${campaign.image}`,
+        keywords: [campaign.type, campaign.status].join(','),
+      },
+    })),
   }),
   defineBreadcrumb({
     itemListElement: [
