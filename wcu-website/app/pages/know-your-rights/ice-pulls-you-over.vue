@@ -45,12 +45,12 @@ useSchemaOrg([
 
 <template>
   <div class="min-h-screen bg-base-100">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
       
       <!-- A. Header Section -->
-      <header class="text-center mb-12">
+      <header class="text-center mb-8 md:mb-12">
         <span class="text-xs uppercase tracking-wide text-base-content block mb-3">{{ $t('nav.kyr') }}</span>
-        <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-base-content mb-4">
+        <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-base-content mb-4 leading-tight">
           {{ $t('kyr.car.title') }}
         </h1>
         <p class="text-base text-base-content/80 max-w-2xl mx-auto">
@@ -69,14 +69,14 @@ useSchemaOrg([
           <div class="timeline-end py-4 pl-4 w-full">
             
             <!-- Step Header -->
-            <div class="flex items-center gap-3 mb-4">
+            <div class="flex flex-wrap items-center gap-2 sm:gap-3 mb-4">
               <span class="text-xs uppercase tracking-wide text-base-content" :aria-label="$t('kyr_ice_pulls_you_over.labels.step_1_of_4')">{{ $t('kyr_ice_pulls_you_over.labels.step_01') }}</span>
-              <h2 class="text-xl font-bold tracking-tight">{{ $t('kyr_ice_pulls_you_over.always_pull_over.title') }}</h2>
+              <h2 class="text-lg sm:text-xl font-bold tracking-tight">{{ $t('kyr_ice_pulls_you_over.always_pull_over.title') }}</h2>
             </div>
             
             <!-- Step Content Card -->
             <div class="card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-colors">
-              <div class="card-body p-5">
+              <div class="card-body p-4 sm:p-5">
                 <p class="text-sm text-base-content mb-4">{{ $t('kyr_ice_pulls_you_over.always_pull_over.content') }}</p>
                 
                 <!-- Recording Tip - Script Callout Style -->
@@ -105,14 +105,14 @@ useSchemaOrg([
           <div class="timeline-end py-4 pl-4 w-full">
             
             <!-- Step Header -->
-            <div class="flex items-center gap-3 mb-4">
+            <div class="flex flex-wrap items-center gap-2 sm:gap-3 mb-4">
               <span class="text-xs uppercase tracking-wide text-base-content" :aria-label="$t('kyr_ice_pulls_you_over.labels.step_2_of_4')">{{ $t('kyr_ice_pulls_you_over.labels.step_02') }}</span>
-              <h2 class="text-xl font-bold tracking-tight">{{ $t('kyr_ice_pulls_you_over.identify_officers.title') }}</h2>
+              <h2 class="text-lg sm:text-xl font-bold tracking-tight">{{ $t('kyr_ice_pulls_you_over.identify_officers.title') }}</h2>
             </div>
             
             <!-- Step Content Card -->
             <div class="card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-colors">
-              <div class="card-body p-5">
+              <div class="card-body p-4 sm:p-5">
                 
                 <div class="grid md:grid-cols-2 gap-6">
                   <!-- Questions to Ask -->
@@ -156,9 +156,9 @@ useSchemaOrg([
           <div class="timeline-end py-4 pl-4 w-full">
             
             <!-- Step Header -->
-            <div class="flex items-center gap-3 mb-4">
+            <div class="flex flex-wrap items-center gap-2 sm:gap-3 mb-4">
               <span class="text-xs uppercase tracking-wide text-base-content" :aria-label="$t('kyr_ice_pulls_you_over.labels.step_3_of_4')">{{ $t('kyr_ice_pulls_you_over.labels.step_03') }}</span>
-              <h2 class="text-xl font-bold tracking-tight">{{ $t('kyr_ice_pulls_you_over.during_stop.title') }}</h2>
+              <h2 class="text-lg sm:text-xl font-bold tracking-tight">{{ $t('kyr_ice_pulls_you_over.during_stop.title') }}</h2>
               <span class="badge badge-soft badge-warning text-xs" role="status">{{ $t('kyr_ice_pulls_you_over.warnings.caution') }}</span>
             </div>
             
@@ -167,7 +167,7 @@ useSchemaOrg([
               
               <!-- Top Left: Your Window -->
               <div class="card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-colors">
-                <div class="card-body p-5">
+                <div class="card-body p-4 sm:p-5">
                   <div class="flex items-start gap-3 mb-3">
                     <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                       <!-- Window icon -->
@@ -193,7 +193,7 @@ useSchemaOrg([
 
               <!-- Top Right: Driver Requirements -->
               <div class="card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-colors">
-                <div class="card-body p-5">
+                <div class="card-body p-4 sm:p-5">
                   <div class="flex items-start gap-3 mb-3">
                     <div class="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center shrink-0">
                       <!-- Car icon -->
@@ -219,7 +219,7 @@ useSchemaOrg([
 
               <!-- Bottom Left: Passenger Rights -->
               <div class="card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-colors">
-                <div class="card-body p-5">
+                <div class="card-body p-4 sm:p-5">
                   <div class="flex items-start gap-3 mb-3">
                     <div class="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
                       <!-- Users icon -->
@@ -245,7 +245,7 @@ useSchemaOrg([
 
               <!-- Bottom Right: Critical Advice -->
               <div class="card card-border border-l-4 border-l-error focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20">
-                <div class="card-body p-5">
+                <div class="card-body p-4 sm:p-5">
                   <div class="flex items-start gap-3 mb-3">
                     <span class="badge badge-soft badge-error text-xs" aria-hidden="true">{{ $t('kyr_ice_pulls_you_over.warnings.critical') }}</span>
                   </div>
@@ -263,7 +263,7 @@ useSchemaOrg([
 
             <!-- All Occupants Info + Script Callout -->
             <div class="mt-6 card card-border bg-base-200 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20">
-              <div class="card-body p-5">
+              <div class="card-body p-4 sm:p-5">
                 <h4 class="font-bold text-sm mb-3">{{ $t('kyr_ice_pulls_you_over.during_stop.providing_info.all_occupants.title') }}</h4>
                 <ul class="space-y-2 text-sm text-base-content mb-4">
                   <li v-for="(item, index) in getList('kyr_ice_pulls_you_over.during_stop.providing_info.all_occupants.list')" :key="index" class="flex items-start gap-2">
@@ -298,15 +298,15 @@ useSchemaOrg([
           <div class="timeline-end py-4 pl-4 w-full">
             
             <!-- Step Header -->
-            <div class="flex items-center gap-3 mb-4">
+            <div class="flex flex-wrap items-center gap-2 sm:gap-3 mb-4">
               <span class="text-xs uppercase tracking-wide text-base-content" :aria-label="$t('kyr_ice_pulls_you_over.labels.step_4_of_4')">{{ $t('kyr_ice_pulls_you_over.labels.step_04') }}</span>
-              <h2 class="text-xl font-bold tracking-tight">{{ $t('kyr_ice_pulls_you_over.compliance_searches.title') }}</h2>
+              <h2 class="text-lg sm:text-xl font-bold tracking-tight">{{ $t('kyr_ice_pulls_you_over.compliance_searches.title') }}</h2>
               <span class="badge badge-soft badge-error text-xs" role="status">{{ $t('kyr_ice_pulls_you_over.warnings.critical') }}</span>
             </div>
             
             <!-- Sub-section A: Exiting Vehicle -->
             <div class="card card-border bg-base-100 mb-4 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20">
-              <div class="card-body p-5">
+              <div class="card-body p-4 sm:p-5">
                 <div class="flex items-center gap-3 mb-4">
                   <div class="w-8 h-8 rounded-full bg-base-200 flex items-center justify-center text-xs font-mono text-base-content shrink-0" aria-hidden="true">A</div>
                   <h3 class="font-bold text-base">{{ $t('kyr_ice_pulls_you_over.compliance_searches.exiting.title') }}</h3>
@@ -336,7 +336,7 @@ useSchemaOrg([
 
             <!-- Sub-section B: Search Limitations -->
             <div class="card card-border bg-base-100 mb-4 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20">
-              <div class="card-body p-5">
+              <div class="card-body p-4 sm:p-5">
                 <div class="flex items-center gap-3 mb-4">
                   <div class="w-8 h-8 rounded-full bg-base-200 flex items-center justify-center text-xs font-mono text-base-content shrink-0" aria-hidden="true">B</div>
                   <h3 class="font-bold text-base">{{ $t('kyr_ice_pulls_you_over.compliance_searches.search_limitations.title') }}</h3>
@@ -367,7 +367,7 @@ useSchemaOrg([
 
             <!-- Sub-section C: Fingerprints -->
             <div class="card card-border bg-base-100 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20">
-              <div class="card-body p-5">
+              <div class="card-body p-4 sm:p-5">
                 <div class="flex items-center gap-3 mb-4">
                   <div class="w-8 h-8 rounded-full bg-base-200 flex items-center justify-center text-xs font-mono text-base-content shrink-0" aria-hidden="true">C</div>
                   <h3 class="font-bold text-base">{{ $t('kyr_ice_pulls_you_over.compliance_searches.fingerprints.title') }}</h3>
@@ -410,7 +410,7 @@ useSchemaOrg([
       </ul>
       
       <!-- D. Navigation -->
-      <div class="mt-12 max-w-4xl mx-auto">
+      <div class="mt-8 md:mt-12 max-w-4xl mx-auto">
         <LazyKnowYourRightsNav hydrate-on-visible />
       </div>
       

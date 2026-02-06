@@ -45,17 +45,17 @@ useSchemaOrg([
 
 <template>
   <div class="min-h-screen bg-base-100">
-    <section class="py-12 md:py-16">
+    <section class="py-8 md:py-12">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <!-- Hero Section -->
-        <header class="text-center mb-12">
+        <header class="text-center mb-8 md:mb-12">
           <span class="text-xs uppercase tracking-wide text-base-content block mb-3">{{ $t('kyr_nav.section_label') }}</span>
-          <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-base-content mb-4 flex items-center justify-center gap-3 flex-wrap">
+          <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-base-content mb-4 leading-tight flex items-center justify-center gap-3 flex-wrap">
             {{ $t('kyr.work.title') }}
             <span class="badge badge-soft badge-warning">{{ $t('kyr_ice_at_work.hero.subtitle') }}</span>
           </h1>
-          <p class="text-lg text-base-content/80 max-w-2xl mx-auto">
+          <p class="text-base sm:text-lg text-base-content/80 max-w-2xl mx-auto">
             {{ $t('kyr_ice_at_work.hero.description') }}
           </p>
         </header>
@@ -71,14 +71,14 @@ useSchemaOrg([
             <div class="timeline-end py-4 pl-4 w-full">
               
               <!-- Step Header -->
-              <div class="flex items-center gap-3 mb-4">
+              <div class="flex flex-wrap items-center gap-2 sm:gap-3 mb-4">
                 <span class="text-xs uppercase tracking-wide text-base-content" :aria-label="$t('common.step_label', { number: 1, total: 4 })">{{ $t('common.step_format', { number: '01' }) }}</span>
-                <h2 class="text-xl font-bold tracking-tight">{{ $t('kyr_ice_at_work.where_ice_can_go.title') }}</h2>
+                <h2 class="text-lg sm:text-xl font-bold tracking-tight">{{ $t('kyr_ice_at_work.where_ice_can_go.title') }}</h2>
               </div>
               
               <!-- Step Content Card -->
               <div class="card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-colors">
-                <div class="card-body p-5">
+                <div class="card-body p-4 sm:p-5">
                   
                   <div class="grid md:grid-cols-2 gap-6">
                     
@@ -86,7 +86,7 @@ useSchemaOrg([
                     <div class="card card-border border-l-4 border-l-success">
                       <div class="card-body p-4">
                         <h3 class="font-bold text-base flex items-center gap-2">
-                          <span class="status status-success" aria-hidden="true"></span>
+                          <span class="inline-block w-2.5 h-2.5 rounded-full bg-success" aria-hidden="true"></span>
                           {{ $t('kyr_ice_at_work.where_ice_can_go.public_areas.title') }}
                         </h3>
                         <p class="text-sm text-base-content mt-2">{{ $t('kyr_ice_at_work.where_ice_can_go.public_areas.description') }}</p>
@@ -104,7 +104,7 @@ useSchemaOrg([
                     <div class="card card-border border-l-4 border-l-error">
                       <div class="card-body p-4">
                         <h3 class="font-bold text-base flex items-center gap-2">
-                          <span class="status status-error" aria-hidden="true"></span>
+                          <span class="inline-block w-2.5 h-2.5 rounded-full bg-error" aria-hidden="true"></span>
                           {{ $t('kyr_ice_at_work.where_ice_can_go.private_areas.title') }}
                         </h3>
                         <p class="text-sm text-base-content mt-2">{{ $t('kyr_ice_at_work.where_ice_can_go.private_areas.description') }}</p>
@@ -147,14 +147,14 @@ useSchemaOrg([
             <div class="timeline-end py-4 pl-4 w-full">
               
               <!-- Step Header -->
-              <div class="flex items-center gap-3 mb-4">
+              <div class="flex flex-wrap items-center gap-2 sm:gap-3 mb-4">
                 <span class="text-xs uppercase tracking-wide text-base-content" :aria-label="$t('common.step_label', { number: 2, total: 4 })">{{ $t('common.step_format', { number: '02' }) }}</span>
-                <h2 class="text-xl font-bold tracking-tight">{{ $t('kyr_ice_at_work.rights_at_work.title') }}</h2>
+                <h2 class="text-lg sm:text-xl font-bold tracking-tight">{{ $t('kyr_ice_at_work.rights_at_work.title') }}</h2>
               </div>
               
               <!-- Step Content Card -->
               <div class="card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-colors">
-                <div class="card-body p-5">
+                <div class="card-body p-4 sm:p-5">
                   
                   <p class="text-sm text-base-content mb-4">{{ $t('kyr_ice_at_work.rights_at_work.intro') }}</p>
                   
@@ -183,15 +183,15 @@ useSchemaOrg([
             <div class="timeline-end py-4 pl-4 w-full">
               
               <!-- Step Header -->
-              <div class="flex items-center gap-3 mb-4">
+              <div class="flex flex-wrap items-center gap-2 sm:gap-3 mb-4">
                 <span class="text-xs uppercase tracking-wide text-base-content" :aria-label="$t('common.step_label', { number: 3, total: 4 })">{{ $t('common.step_format', { number: '03' }) }}</span>
-                <h2 class="text-xl font-bold tracking-tight">{{ $t('kyr_ice_at_work.approaches.title') }}</h2>
+                <h2 class="text-lg sm:text-xl font-bold tracking-tight">{{ $t('kyr_ice_at_work.approaches.title') }}</h2>
                 <span class="badge badge-soft badge-error text-xs">{{ $t('common.critical') }}</span>
               </div>
               
               <!-- Step Content Card -->
               <div class="card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-colors">
-                <div class="card-body p-5">
+                <div class="card-body p-4 sm:p-5">
                   
                   <!-- DO NOT / DO Section -->
                   <div class="space-y-4">
@@ -232,14 +232,14 @@ useSchemaOrg([
             <div class="timeline-end py-4 pl-4 w-full">
               
               <!-- Step Header -->
-              <div class="flex items-center gap-3 mb-4">
+              <div class="flex flex-wrap items-center gap-2 sm:gap-3 mb-4">
                 <span class="text-xs uppercase tracking-wide text-base-content" :aria-label="$t('common.step_label', { number: 4, total: 4 })">{{ $t('common.step_format', { number: '04' }) }}</span>
-                <h2 class="text-xl font-bold tracking-tight">{{ $t('kyr_ice_at_work.employer.title') }}</h2>
+                <h2 class="text-lg sm:text-xl font-bold tracking-tight">{{ $t('kyr_ice_at_work.employer.title') }}</h2>
               </div>
               
               <!-- Step Content Card -->
               <div class="card card-border bg-base-100 hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-colors">
-                <div class="card-body p-5">
+                <div class="card-body p-4 sm:p-5">
                   
                   <p class="text-sm text-base-content mb-4">{{ $t('kyr_ice_at_work.employer.intro') }}</p>
                   
@@ -302,7 +302,7 @@ useSchemaOrg([
         </ul>
 
         <!-- Navigation -->
-        <div class="mt-12 max-w-4xl mx-auto">
+        <div class="mt-8 md:mt-12 max-w-4xl mx-auto">
           <LazyKnowYourRightsNav hydrate-on-visible />
         </div>
         

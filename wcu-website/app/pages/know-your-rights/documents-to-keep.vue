@@ -45,12 +45,12 @@ useSchemaOrg([
 
 <template>
   <div class="min-h-screen bg-base-100">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
       
       <!-- A. Header Section -->
-      <header class="text-center mb-12">
+      <header class="text-center mb-8 md:mb-12">
         <span class="text-xs uppercase tracking-wide text-base-content block mb-3">{{ $t('kyr_nav.section_label') }}</span>
-        <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-base-content mb-4">
+        <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-base-content mb-4 leading-tight">
           {{ $t('kyr_documents_to_keep.header.title') }}
         </h1>
         <p class="text-base text-base-content max-w-2xl mx-auto">
@@ -59,7 +59,7 @@ useSchemaOrg([
       </header>
 
       <!-- B. Document Safety Warning Section -->
-      <section class="mb-12">
+      <section class="mb-8 md:mb-12">
         <div class="alert alert-soft alert-warning border border-warning/30 rounded-xl" role="alert">
           <div class="flex items-start gap-3">
             <!-- Warning Triangle Icon -->
@@ -80,10 +80,10 @@ useSchemaOrg([
       </section>
 
       <!-- C. Three Status Categories - Bento Grid -->
-      <section class="mb-12">
+      <section class="mb-8 md:mb-12">
         <h2 class="text-xs uppercase tracking-wide text-base-content mb-6">{{ $t('kyr.documents.title') }}</h2>
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
           
           <!-- Card 1: Legal Status (Success/Green theme) -->
           <div class="card card-border border-l-4 border-l-success transition-colors">
@@ -245,11 +245,11 @@ useSchemaOrg([
       </section>
 
       <!-- D. Quick Reference Summary -->
-      <section class="mb-12">
+      <section class="mb-8 md:mb-12">
         <h2 class="text-xs uppercase tracking-wide text-base-content mb-6">{{ $t('kyr_documents_to_keep.quick_ref.title') }}</h2>
         
         <div class="card card-border bg-base-100">
-          <div class="card-body p-6">
+          <div class="card-body p-4 sm:p-6">
             <div class="overflow-x-auto">
               <table class="table table-zebra w-full text-sm" aria-label="Document requirements by immigration status">
                 <thead>
@@ -289,7 +289,7 @@ useSchemaOrg([
       </section>
 
       <!-- E. Script Callout -->
-      <section class="mb-12">
+      <section class="mb-8 md:mb-12">
         <div class="alert alert-soft alert-info border border-info/30 rounded-xl" role="alert">
           <div class="flex items-start gap-3">
             <!-- Speech bubble icon -->
@@ -305,7 +305,7 @@ useSchemaOrg([
       </section>
       
       <!-- F. Navigation -->
-      <div class="mt-12">
+      <div class="mt-8 md:mt-12">
         <LazyKnowYourRightsNav hydrate-on-visible />
       </div>
       

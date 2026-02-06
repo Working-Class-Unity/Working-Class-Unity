@@ -45,12 +45,12 @@ useSchemaOrg([
 
 <template>
   <div class="min-h-screen bg-base-100">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
       
       <!-- A. Header Section -->
-      <header class="text-center mb-12">
+      <header class="text-center mb-8 md:mb-12">
         <span class="text-xs uppercase tracking-wide text-base-content block mb-3">{{ $t('nav.kyr') }}</span>
-        <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-base-content mb-4">
+        <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-base-content mb-4 leading-tight">
           {{ $t('kyr.public.title') }}
         </h1>
         <p class="text-base text-base-content/80 max-w-2xl mx-auto">
@@ -59,7 +59,7 @@ useSchemaOrg([
       </header>
 
       <!-- Section 1: ICE Tactics - Feature Grid -->
-      <section class="mb-12" aria-labelledby="tactics-heading">
+      <section class="mb-8 md:mb-12" aria-labelledby="tactics-heading">
         <h2 id="tactics-heading" class="text-xs uppercase tracking-wide text-base-content mb-6">{{ $t('kyr_ice_in_public.tactics.title') }}</h2>
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -121,9 +121,9 @@ useSchemaOrg([
       </section>
 
       <!-- Section 2: If Stopped by ICE -->
-      <section class="mb-12" aria-labelledby="stopped-heading">
-        <div class="flex items-center gap-3 mb-6">
-          <h2 id="stopped-heading" class="text-xl font-bold tracking-tight">{{ $t('kyr_ice_in_public.stopped.title') }}</h2>
+      <section class="mb-8 md:mb-12" aria-labelledby="stopped-heading">
+        <div class="flex flex-wrap items-center gap-2 sm:gap-3 mb-6">
+          <h2 id="stopped-heading" class="text-lg sm:text-xl font-bold tracking-tight">{{ $t('kyr_ice_in_public.stopped.title') }}</h2>
           <span class="badge badge-soft badge-warning" role="status" :aria-label="$t('kyr_ice_in_public.stopped.caution_aria')">{{ $t('kyr_ice_in_public.stopped.caution_badge') }}</span>
         </div>
 
@@ -160,7 +160,7 @@ useSchemaOrg([
           <div class="card card-border border-l-4 border-l-success focus-within:ring-2 focus-within:ring-success/20">
             <div class="card-body p-5">
               <h3 class="font-bold text-base flex items-center gap-2">
-                <span class="status status-success" aria-hidden="true"></span>
+                <span class="inline-block w-2.5 h-2.5 rounded-full bg-success" aria-hidden="true"></span>
                 {{ $t('kyr_ice_in_public.stopped.ask_free.if_yes.title') }}
               </h3>
               <ul class="mt-3 space-y-2 text-sm text-base-content/80" role="list">
@@ -178,7 +178,7 @@ useSchemaOrg([
           <div class="card card-border border-l-4 border-l-error focus-within:ring-2 focus-within:ring-error/20">
             <div class="card-body p-5">
               <h3 class="font-bold text-base flex items-center gap-2">
-                <span class="status status-error" aria-hidden="true"></span>
+                <span class="inline-block w-2.5 h-2.5 rounded-full bg-error" aria-hidden="true"></span>
                 {{ $t('kyr_ice_in_public.stopped.ask_free.if_no.title') }}
               </h3>
               <ul class="mt-3 space-y-2 text-sm text-base-content/80" role="list">
@@ -195,7 +195,7 @@ useSchemaOrg([
       </section>
 
       <!-- Section 3: Protect Yourself - Bento Grid -->
-      <section class="mb-12" aria-labelledby="protect-heading">
+      <section class="mb-8 md:mb-12" aria-labelledby="protect-heading">
         <h2 id="protect-heading" class="text-xs uppercase tracking-wide text-base-content mb-6">{{ $t('kyr_ice_in_public.protect.title') }}</h2>
         
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -288,7 +288,7 @@ useSchemaOrg([
       </section>
       
       <!-- D. Navigation -->
-      <div class="mt-12">
+      <div class="mt-8 md:mt-12">
         <LazyKnowYourRightsNav hydrate-on-visible />
       </div>
       
