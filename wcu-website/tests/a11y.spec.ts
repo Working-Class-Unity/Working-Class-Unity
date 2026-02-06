@@ -8,10 +8,12 @@ const routes = [
   '/campaigns',
   '/join',
   '/kyr',
+  '/know-your-rights/ice-at-home',
   '/links',
   '/tenant-union-handbook',
   '/unitedfront',
   '/check-in-coverage',
+  '/check-in-coverage-volunteer-guide',
 ]
 
 test.describe('WCAG 2.1 AA', () => {

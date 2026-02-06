@@ -122,14 +122,21 @@ Themes are configured in `main.css` using the new DaisyUI 5 syntax:
 
 We use semantic color names provided by DaisyUI. When developing, **always use these semantic classes** instead of hardcoded hex values to ensure dark mode compatibility.
 
-| Class | Use Case |
-| :--- | :--- |
-| `primary` | Main brand color (Orange Yellow) |
-| `secondary` | Secondary brand color (Navy/Sky Blue) |
-| `accent` | Accent highlights (Red/Coral) |
-| `neutral` | Dark/Desaturated UI elements |
-| `base-100` | Page background |
-| `base-content` | Default text color |
+| Class | Hex | Use Case |
+| :--- | :--- | :--- |
+| `primary` | `#ff9f48` | Main brand color (Orange Yellow) |
+| `secondary` | `#04334f` | Secondary brand color (Navy/Sky Blue) |
+| `accent` | `#ef2525` | Accent highlights (Red/Coral) |
+| `neutral` | `#232323` | Dark/Desaturated UI elements |
+| `base-100` | `#f7f9fc` | Page background |
+| `base-content` | `#232323` | Default text color |
+
+**Contrast note:** avoid using `text-primary` (orange text) for body copy on `base-100`; reserve it for decorative/icon usage or large/high-emphasis contexts only.
+
+### Design System Memory
+
+- Authoritative system file: `wcu-website/.interface-design/system.md`
+- Implementation handoff guide: `wcu-website/docs/design-handoff.md`
 
 ### Typography
 
