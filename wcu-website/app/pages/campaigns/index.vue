@@ -58,7 +58,7 @@ const statusOrder: Record<string, number> = {
 const sortCampaigns = (campaignList: Campaign[]): Campaign[] => {
   return [...campaignList].sort((a, b) => {
     // First, sort by status order
-    const statusDiff = statusOrder[a.status] - statusOrder[b.status]
+    const statusDiff = (statusOrder[a.status] ?? Number.MAX_SAFE_INTEGER) - (statusOrder[b.status] ?? Number.MAX_SAFE_INTEGER)
     if (statusDiff !== 0) return statusDiff
 
     // Then, sort by createdAt (newest first)

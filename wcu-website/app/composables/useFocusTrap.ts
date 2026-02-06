@@ -65,6 +65,7 @@ export function useFocusTrap(options: UseFocusTrapOptions) {
 
     const first = focusable[0]
     const last = focusable[focusable.length - 1]
+    if (!first || !last) return
     const active = document.activeElement
 
     if (!(active instanceof HTMLElement) || !container.contains(active)) {
@@ -90,7 +91,7 @@ export function useFocusTrap(options: UseFocusTrapOptions) {
   const stop = watch(
     () => options.active.value,
     async (active) => {
-      if (!process.client) return
+      if (!import.meta.client) return
 
       if (active) {
         previousActiveElement = document.activeElement instanceof HTMLElement ? document.activeElement : null

@@ -28,7 +28,7 @@ export default defineNuxtConfig({
     },
   },
   css: ['~/assets/css/main.css'],
-  modules: ['@nuxtjs/i18n', '@nuxt/image', '@nuxt/fonts', '@nuxt/scripts', 'nuxt-schema-org'],
+  modules: ['@nuxtjs/i18n', '@nuxt/image', '@nuxt/fonts', '@nuxt/scripts', 'nuxt-schema-org', '@nuxt/eslint'],
 
   // Schema.org configuration
   schemaOrg: {
@@ -43,7 +43,6 @@ export default defineNuxtConfig({
     },
   },
   i18n: {
-    lazy: true,
     langDir: 'locales',
     defaultLocale: 'en',
     strategy: 'prefix_except_default',
