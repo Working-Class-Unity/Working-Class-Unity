@@ -1,4 +1,12 @@
 <script setup lang="ts">
+import {
+  handbookChapterMap,
+  handbookChapters,
+  handbookContacts,
+  handbookQuickPaths,
+  type HandbookChapterMeta,
+} from '~/data/tenant-handbook'
+
 const { t } = useI18n()
 
 // =============================================================================
@@ -37,73 +45,11 @@ useSchemaOrg([
   }),
 ])
 
-// =============================================================================
-// Table of Contents Data
-// =============================================================================
-interface Section {
-  id: string
-  title: string
-}
-
-interface Chapter {
-  id: string
-  title: string
-  sections: Section[]
-}
-
-const chapters: Chapter[] = [
-  {
-    id: 'chapter-1',
-    title: 'Chapter 1: Know Your Rights',
-    sections: [
-      { id: 'tenant-protections', title: 'Tenant Protections & Rent Increases' },
-      { id: 'know-your-rights', title: 'Know Your Rights' },
-      { id: 'repairs', title: 'Repairs, Damage, or Infestation' },
-      { id: 'harassment', title: 'Harassment' },
-      { id: 'utilities', title: 'Utilities' },
-      { id: 'dos-donts', title: "Dos and Don'ts" },
-    ],
-  },
-  {
-    id: 'chapter-2',
-    title: 'Chapter 2: Paying Rent',
-    sections: [
-      { id: 'paying-rent', title: 'Easy Steps to Protect Yourself' },
-      { id: 'notice-to-pay', title: 'Notice to Pay Rent' },
-    ],
-  },
-  {
-    id: 'chapter-3',
-    title: 'Chapter 3: Reporting Violations',
-    sections: [
-      { id: 'code-enforcement', title: 'Stockton Code Enforcement' },
-      { id: 'filing-tips', title: 'Tips for Filing Complaints' },
-      { id: 'health-violations', title: 'Health Code Violations' },
-      { id: 'building-violations', title: 'Building Code Violations' },
-    ],
-  },
-  {
-    id: 'chapter-4',
-    title: 'Chapter 4: Evictions',
-    sections: [
-      { id: 'legal-reasons', title: 'Legal Reasons for Evictions' },
-      { id: 'at-fault', title: 'At-Fault Evictions' },
-      { id: 'no-fault', title: 'No-Fault Evictions' },
-      { id: 'no-rent-stabilization', title: 'If You DO NOT Live in Rent Stabilization' },
-      { id: 'eviction-process', title: 'Eviction Process' },
-      { id: 'voluntary-vacate', title: 'Voluntary Vacate Agreements' },
-      { id: 'estoppel', title: 'Estoppel Certificate' },
-    ],
-  },
-  {
-    id: 'chapter-5',
-    title: 'Chapter 5: Legal Entry & Security Deposit',
-    sections: [
-      { id: 'legal-entry', title: 'Legal Entry' },
-      { id: 'security-deposits', title: 'Security Deposits' },
-    ],
-  },
-]
+const chapters = handbookChapters
+const chapterIds = chapters.map((chapter) => chapter.id)
+const chapterContextById = handbookChapterMap
+const quickPaths = handbookQuickPaths
+const contactCards = handbookContacts
 
 // =============================================================================
 // Search & Filtering
@@ -133,35 +79,50 @@ const closeMobileDrawer = () => {
 }
 
 // Filter chapters and sections based on search query
-const filteredChapters = computed(() => {
+const chapterMatchesQuery = (chapter: HandbookChapterMeta, query: string): boolean => {
+  const chapterTokens = [
+    chapter.title,
+    chapter.summary,
+    chapter.goal,
+    chapter.escalateWhen,
+    ...chapter.evidenceChecklist,
+    ...chapter.commonMistakes,
+    ...chapter.sourceNotes,
+  ]
+
+  return chapterTokens.some((token) => token.toLowerCase().includes(query))
+}
+
+const sectionMatchesQuery = (
+  section: HandbookChapterMeta['sections'][number],
+  query: string
+): boolean => {
+  const sectionTokens = [section.title, section.summary, ...section.keywords]
+  return sectionTokens.some((token) => token.toLowerCase().includes(query))
+}
+
+const filteredChapters = computed<HandbookChapterMeta[]>(() => {
   const query = searchQuery.value.toLowerCase().trim()
   if (!query) return chapters
 
   return chapters
     .map((chapter) => {
-      // Check if chapter title matches
-      const chapterMatches = chapter.title.toLowerCase().includes(query)
-      
-      // Filter sections that match
-      const matchingSections = chapter.sections.filter((section) =>
-        section.title.toLowerCase().includes(query)
-      )
+      const chapterMatches = chapterMatchesQuery(chapter, query)
+      const matchingSections = chapter.sections.filter((section) => sectionMatchesQuery(section, query))
 
-      // Include chapter if title matches or has matching sections
       if (chapterMatches || matchingSections.length > 0) {
         return {
           ...chapter,
-          // If chapter matches, show all sections; otherwise show only matching
           sections: chapterMatches ? chapter.sections : matchingSections,
         }
       }
       return null
     })
-    .filter((chapter): chapter is Chapter => chapter !== null)
+    .filter((chapter): chapter is HandbookChapterMeta => chapter !== null)
 })
 
 // Track which chapters are expanded (all expanded by default, or when searching)
-const expandedChapters = ref<Set<string>>(new Set(chapters.map((c) => c.id)))
+const expandedChapters = ref<Set<string>>(new Set(chapterIds))
 
 const toggleChapter = (chapterId: string) => {
   if (expandedChapters.value.has(chapterId)) {
@@ -171,10 +132,16 @@ const toggleChapter = (chapterId: string) => {
   }
 }
 
+const toggleAllChapters = () => {
+  expandedChapters.value = expandedChapters.value.size === chapterIds.length
+    ? new Set()
+    : new Set(chapterIds)
+}
+
 // Expand all chapters when searching
 watch(searchQuery, (query) => {
   if (query) {
-    expandedChapters.value = new Set(chapters.map((c) => c.id))
+    expandedChapters.value = new Set(chapterIds)
   }
 })
 
@@ -309,25 +276,22 @@ watch(mobileDrawerOpen, async (open) => {
 const highlightMatch = (text: string): string => {
   const query = searchQuery.value.trim()
   if (!query) return text
-  
-  const regex = new RegExp(`(${query})`, 'gi')
+
+  const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const regex = new RegExp(`(${escapedQuery})`, 'gi')
   return text.replace(regex, '<mark class="bg-primary/30 text-base-content rounded px-0.5">$1</mark>')
 }
 </script>
 
 <template>
-  <div class="min-h-screen bg-base-100">
-    <!-- Hero Section -->
-    <section class="py-8 md:py-14 bg-base-200">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="max-w-4xl">
-          <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-base-content mb-4 leading-tight">
-            Working Class Unity Tenant Union Handbook
-          </h1>
-          <p class="text-base sm:text-lg text-base-content/80">
-            This material is not a replacement for legal assistance or an attorney.
-          </p>
-        </div>
+  <div class="min-h-screen wcu-shell">
+    <section class="py-6 md:py-10">
+      <div class="wcu-container">
+        <TenantHandbookQuickStartPanel
+          :quick-paths="quickPaths"
+          :contacts="contactCards"
+          @jump="scrollToSection"
+        />
       </div>
     </section>
 
@@ -445,11 +409,11 @@ const highlightMatch = (text: string): string => {
     </div>
 
     <!-- Main Content with Sidebar TOC -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="wcu-container pb-12">
       <div class="lg:grid lg:grid-cols-4 lg:gap-8">
         <!-- Desktop Sidebar TOC -->
         <aside class="hidden lg:block lg:col-span-1">
-          <nav class="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto pb-8">
+          <nav class="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto rounded-xl border border-secondary/20 bg-base-100/90 p-4 pb-8 shadow-sm backdrop-blur-sm">
             <!-- Search Input -->
             <div class="mb-4">
               <label class="input input-bordered input-sm flex items-center gap-2 bg-base-200/50">
@@ -460,7 +424,7 @@ const highlightMatch = (text: string): string => {
                   ref="searchInputRef"
                   v-model="searchQuery"
                   type="text"
-                  placeholder="Search..."
+                  placeholder="Search chapter, section, keyword..."
                   class="grow bg-transparent text-sm"
                 />
                 <kbd class="kbd kbd-xs opacity-80">⌘K</kbd>
@@ -485,7 +449,10 @@ const highlightMatch = (text: string): string => {
                     }"
                     @click="scrollToSection(chapter.id)"
                   >
-                    <span v-html="highlightMatch(chapter.title)"></span>
+                    <span class="block">
+                      <span class="block" v-html="highlightMatch(chapter.title)"></span>
+                      <span class="mt-0.5 block text-xs font-normal text-base-content/70">{{ chapter.summary }}</span>
+                    </span>
                   </button>
                   <button
                     class="p-1 hover:bg-base-200 rounded transition-colors"
@@ -545,7 +512,7 @@ const highlightMatch = (text: string): string => {
             <div class="mt-4 pt-4 border-t border-base-300">
               <button
                 class="text-xs text-base-content/80 hover:text-secondary transition-colors"
-                @click="expandedChapters = expandedChapters.size === chapters.length ? new Set() : new Set(chapters.map(c => c.id))"
+                @click="toggleAllChapters"
               >
                 {{ expandedChapters.size === chapters.length ? 'Collapse all' : 'Expand all' }}
               </button>
@@ -555,7 +522,7 @@ const highlightMatch = (text: string): string => {
 
         <!-- Main Content -->
         <div class="lg:col-span-3">
-          <article class="prose prose-lg max-w-none prose-headings:scroll-mt-24">
+          <article class="prose prose-base md:prose-lg max-w-none prose-headings:scroll-mt-24 prose-p:text-base-content/90 prose-li:text-base-content/90 prose-strong:text-base-content">
             
             <!-- ============================================================= -->
             <!-- CHAPTER 1: KNOW YOUR RIGHTS -->
@@ -563,6 +530,9 @@ const highlightMatch = (text: string): string => {
             <h2 id="chapter-1" data-section class="text-2xl md:text-3xl font-bold text-secondary border-b-2 border-primary pb-2">
               Chapter 1: Know Your Rights
             </h2>
+            <div class="not-prose mt-5">
+              <TenantHandbookChapterContext :chapter="chapterContextById['chapter-1']" />
+            </div>
 
             <!-- Tenant Protections -->
             <section id="tenant-protections" data-section class="mt-8">
@@ -739,10 +709,10 @@ const highlightMatch = (text: string): string => {
                 </table>
               </div>
 
-              <div class="alert alert-info mt-4">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                <span><strong>Remember:</strong> For ALL tenants, landlords must provide at least a 24-hour advance written notice to enter the unit to do repairs and they can enter even when you are not home.</span>
-              </div>
+              <TenantHandbookEvidenceNote title="Remember" tone="info">
+                For ALL tenants, landlords must provide at least a 24-hour advance written notice to enter
+                the unit to do repairs and they can enter even when you are not home.
+              </TenantHandbookEvidenceNote>
             </section>
 
             <!-- Harassment -->
@@ -854,6 +824,9 @@ const highlightMatch = (text: string): string => {
             <h2 id="chapter-2" data-section class="text-2xl md:text-3xl font-bold text-secondary border-b-2 border-primary pb-2 mt-16">
               Chapter 2: Paying Rent
             </h2>
+            <div class="not-prose mt-5">
+              <TenantHandbookChapterContext :chapter="chapterContextById['chapter-2']" />
+            </div>
 
             <section id="paying-rent" data-section class="mt-8">
               <h3 class="text-xl font-bold text-base-content">Easy Steps to Protect Yourself and Your Rent Money</h3>
@@ -921,16 +894,20 @@ const highlightMatch = (text: string): string => {
             <h2 id="chapter-3" data-section class="text-2xl md:text-3xl font-bold text-secondary border-b-2 border-primary pb-2 mt-16">
               Chapter 3: Reporting Violations
             </h2>
+            <div class="not-prose mt-5">
+              <TenantHandbookChapterContext :chapter="chapterContextById['chapter-3']" />
+            </div>
 
             <p class="mt-4">
               The most important part of reporting code violations is to remember that bad appearances are not necessarily a code violation. 
               <strong>It is a code violation if it should work and does not.</strong>
             </p>
 
-            <div class="alert alert-warning mt-4">
-              <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-              <span>If you are going to file ANY official complaints, you MUST follow all of the Rent Paying tips in Chapter 2. Hostile landlords will try to claim nonpayment of rent as one of their first methods for retaliation. <strong>DO NOT ATTEMPT TO WITHHOLD RENT WITHOUT LEGAL CONSULTATION.</strong></span>
-            </div>
+            <TenantHandbookEvidenceNote title="Critical caution" tone="warning">
+              If you are going to file ANY official complaints, you MUST follow all of the Rent Paying tips
+              in Chapter 2. Hostile landlords will try to claim nonpayment of rent as one of their first
+              methods for retaliation. <strong>DO NOT ATTEMPT TO WITHHOLD RENT WITHOUT LEGAL CONSULTATION.</strong>
+            </TenantHandbookEvidenceNote>
 
             <section id="code-enforcement" data-section class="mt-8">
               <h3 class="text-xl font-bold text-base-content">Stockton Code Enforcement</h3>
@@ -1011,6 +988,9 @@ const highlightMatch = (text: string): string => {
             <h2 id="chapter-4" data-section class="text-2xl md:text-3xl font-bold text-secondary border-b-2 border-primary pb-2 mt-16">
               Chapter 4: Evictions
             </h2>
+            <div class="not-prose mt-5">
+              <TenantHandbookChapterContext :chapter="chapterContextById['chapter-4']" />
+            </div>
 
             <section id="legal-reasons" data-section class="mt-8">
               <h3 class="text-xl font-bold text-base-content">Legal Reasons for Evictions</h3>
@@ -1036,10 +1016,9 @@ const highlightMatch = (text: string): string => {
             <section id="no-fault" data-section class="mt-10">
               <h3 class="text-xl font-bold text-base-content">No-Fault Evictions</h3>
               
-              <div class="alert alert-info mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                <span>The landlord is required by law to compensate a tenant for relocation costs for the reasons below.</span>
-              </div>
+              <TenantHandbookEvidenceNote title="Compensation rule" tone="source">
+                The landlord is required by law to compensate a tenant for relocation costs for the reasons below.
+              </TenantHandbookEvidenceNote>
 
               <ol>
                 <li>If the landlord needs the apartment to move in their child, spouse, parent, manager, and/or themselves.</li>
@@ -1076,16 +1055,12 @@ const highlightMatch = (text: string): string => {
 
               <p>The tenant has 3 days to correct the violation. If corrected within 3 days, they will not have to move out.</p>
 
-              <div class="alert mt-4">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-info shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                <div>
-                  <p class="font-semibold">California Civil Code 1942.4</p>
-                  <p class="text-sm">
-                    If the landlord has failed to adequately respond to official instructions for over 35 days, the "landlord of a dwelling may not demand rent, collect rent, issue a notice of a rent increase, or issue a 3-day notice to pay rent or quit." 
-                    <strong>DO NOT ATTEMPT TO WITHHOLD RENT WITHOUT LEGAL CONSULTATION.</strong>
-                  </p>
-                </div>
-              </div>
+              <TenantHandbookEvidenceNote title="California Civil Code 1942.4" tone="source">
+                If the landlord has failed to adequately respond to official instructions for over 35 days,
+                the landlord of a dwelling may not demand rent, collect rent, issue a notice of a rent increase,
+                or issue a 3-day notice to pay rent or quit.
+                <strong>DO NOT ATTEMPT TO WITHHOLD RENT WITHOUT LEGAL CONSULTATION.</strong>
+              </TenantHandbookEvidenceNote>
             </section>
 
             <section id="eviction-process" data-section class="mt-10">
@@ -1144,13 +1119,13 @@ const highlightMatch = (text: string): string => {
                 without informing the tenants of their legal rights regarding eviction.
               </p>
 
-              <div class="alert alert-warning mt-4">
-                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                <div>
-                  <p class="font-bold">Tenants have NO legal obligation to sign a voluntary vacate agreement or to accept cash-for-keys under any circumstances.</p>
-                  <p class="text-sm mb-0">Never relinquish your rights without consulting with an attorney.</p>
-                </div>
-              </div>
+              <TenantHandbookEvidenceNote title="Do not sign under pressure" tone="warning">
+                <strong>
+                  Tenants have NO legal obligation to sign a voluntary vacate agreement or to accept
+                  cash-for-keys under any circumstances.
+                </strong>
+                Never relinquish your rights without consulting with an attorney.
+              </TenantHandbookEvidenceNote>
 
               <h4 class="font-semibold mt-6">Some things to consider about buyout offers:</h4>
               <ul>
@@ -1187,6 +1162,9 @@ const highlightMatch = (text: string): string => {
             <h2 id="chapter-5" data-section class="text-2xl md:text-3xl font-bold text-secondary border-b-2 border-primary pb-2 mt-16">
               Chapter 5: Legal Entry & Security Deposit
             </h2>
+            <div class="not-prose mt-5">
+              <TenantHandbookChapterContext :chapter="chapterContextById['chapter-5']" />
+            </div>
 
             <section id="legal-entry" data-section class="mt-8">
               <h3 class="text-xl font-bold text-base-content">Legal Entry</h3>
@@ -1263,16 +1241,13 @@ const highlightMatch = (text: string): string => {
                 The new amount cannot exceed the legal limit.
               </p>
 
-              <div class="alert alert-success mt-4">
-                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                <div>
-                  <p class="font-bold">After moving out, the landlord has 21 DAYS to:</p>
-                  <ul class="mb-0 text-sm">
-                    <li>Send a full refund of the security deposit, OR</li>
-                    <li>Mail or personally deliver an itemized statement that lists the amounts and reasons for any deductions, together with a refund of any amounts not deducted.</li>
-                  </ul>
-                </div>
-              </div>
+              <TenantHandbookEvidenceNote title="21-day deadline" tone="source">
+                <p>After moving out, the landlord has 21 days to:</p>
+                <ul class="mb-0">
+                  <li>Send a full refund of the security deposit, or</li>
+                  <li>Deliver an itemized statement with reasons for deductions and any remaining refund.</li>
+                </ul>
+              </TenantHandbookEvidenceNote>
 
               <p class="mt-4 text-sm text-base-content/80">
                 It is the tenant's responsibility to provide an address where the security deposit can be mailed.
@@ -1304,9 +1279,28 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Custom prose overrides for better readability */
-.prose h3 {
-  margin-top: 2rem;
+article section[data-section] {
+  margin-top: 2.5rem;
+  border: 1px solid rgba(4, 51, 79, 0.18);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  background-color: rgba(247, 249, 252, 0.92);
+  box-shadow: 0 8px 18px rgba(4, 51, 79, 0.06);
+}
+
+@media (min-width: 768px) {
+  article section[data-section] {
+    padding: 1.5rem;
+  }
+}
+
+.prose section[data-section] > h3 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+.prose section[data-section] > h4:first-of-type {
+  margin-top: 1rem;
 }
 
 .prose h4 {
@@ -1314,7 +1308,8 @@ html {
   margin-bottom: 0.5rem;
 }
 
-.prose ul, .prose ol {
+.prose ul,
+.prose ol {
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
 }
@@ -1328,9 +1323,11 @@ html {
 .prose table {
   margin-top: 1rem;
   margin-bottom: 1rem;
+  width: 100%;
 }
 
-.prose th, .prose td {
+.prose th,
+.prose td {
   font-size: 0.875rem;
   line-height: 1.25rem;
 }

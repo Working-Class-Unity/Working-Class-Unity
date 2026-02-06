@@ -70,11 +70,21 @@ const priorityLabel = (priority: HandbookQuickPath['priority']) => {
           <p class="text-sm font-semibold text-base-content">{{ contact.label }}</p>
           <p class="mt-2 text-sm text-base-content">
             <span class="font-semibold">Phone:</span>
-            <a class="link link-primary" :href="`tel:${contact.phone.replace(/[^\d+]/g, '')}`">{{ contact.phone }}</a>
+            <a
+              class="font-semibold text-base-content underline decoration-secondary/70 underline-offset-2 hover:text-secondary focus-visible:text-secondary"
+              :href="`tel:${contact.phone.replace(/[^\d+]/g, '')}`"
+            >
+              {{ contact.phone }}
+            </a>
           </p>
           <p v-if="contact.email" class="mt-1 text-sm text-base-content">
             <span class="font-semibold">Email:</span>
-            <a class="link link-primary" :href="`mailto:${contact.email}`">{{ contact.email }}</a>
+            <a
+              class="font-semibold break-all text-base-content underline decoration-secondary/70 underline-offset-2 hover:text-secondary focus-visible:text-secondary"
+              :href="`mailto:${contact.email}`"
+            >
+              {{ contact.email }}
+            </a>
           </p>
           <p v-if="contact.note" class="mt-2 text-xs text-base-content/80">{{ contact.note }}</p>
         </li>
