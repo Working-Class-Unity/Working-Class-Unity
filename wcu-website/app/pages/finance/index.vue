@@ -5,6 +5,10 @@ useHead({
   title: 'Finance Dashboard',
 })
 
+useSeoMeta({
+  robots: 'noindex, nofollow, noarchive',
+})
+
 const formatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: 'USD',

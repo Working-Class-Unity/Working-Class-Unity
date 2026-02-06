@@ -5,6 +5,10 @@ useHead({
   title: 'Organizing Dashboard',
 })
 
+useSeoMeta({
+  robots: 'noindex, nofollow, noarchive',
+})
+
 const { data, pending, error, refresh } = await useFetch<OrganizingSummaryResponse>('/api/v1/organizing/summary', {
   key: 'organizing-summary',
 })

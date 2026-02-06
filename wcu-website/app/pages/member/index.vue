@@ -6,6 +6,10 @@ useHead({
   title: 'Member Dashboard',
 })
 
+useSeoMeta({
+  robots: 'noindex, nofollow, noarchive',
+})
+
 const roleLabels: Record<Role, string> = {
   member: 'Member',
   organizer: 'Organizer',

@@ -101,6 +101,51 @@ export default defineNuxtConfig({
   // Nitro configuration for security headers and CSP
   nitro: {
     routeRules: {
+      '/member/**': {
+        headers: {
+          'X-Robots-Tag': 'noindex, nofollow, noarchive',
+        },
+      },
+      '/organizing/**': {
+        headers: {
+          'X-Robots-Tag': 'noindex, nofollow, noarchive',
+        },
+      },
+      '/finance/**': {
+        headers: {
+          'X-Robots-Tag': 'noindex, nofollow, noarchive',
+        },
+      },
+      '/es/member/**': {
+        headers: {
+          'X-Robots-Tag': 'noindex, nofollow, noarchive',
+        },
+      },
+      '/es/organizing/**': {
+        headers: {
+          'X-Robots-Tag': 'noindex, nofollow, noarchive',
+        },
+      },
+      '/es/finance/**': {
+        headers: {
+          'X-Robots-Tag': 'noindex, nofollow, noarchive',
+        },
+      },
+      '/pa/member/**': {
+        headers: {
+          'X-Robots-Tag': 'noindex, nofollow, noarchive',
+        },
+      },
+      '/pa/organizing/**': {
+        headers: {
+          'X-Robots-Tag': 'noindex, nofollow, noarchive',
+        },
+      },
+      '/pa/finance/**': {
+        headers: {
+          'X-Robots-Tag': 'noindex, nofollow, noarchive',
+        },
+      },
       '/**': {
         headers: {
           'X-Frame-Options': 'SAMEORIGIN',
