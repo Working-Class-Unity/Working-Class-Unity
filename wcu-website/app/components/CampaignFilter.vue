@@ -54,13 +54,13 @@ const handleFilterChange = (value: string) => {
 </script>
 
 <template>
-  <div class="flex justify-center overflow-x-auto py-2">
+  <div class="flex justify-start sm:justify-center overflow-x-auto py-2 px-1">
     <form class="filter" role="group" :aria-label="t('campaigns.a11y.filter_group_label')" @reset.prevent="handleFilterChange('all')">
-      <input class="btn btn-square btn-sm border border-secondary/25" type="reset" value="×" :aria-label="t('campaigns.a11y.clear_filters')" />
+      <input class="btn btn-square h-10 min-h-10 w-10 border border-secondary/25 text-sm font-semibold" type="reset" value="×" :aria-label="t('campaigns.a11y.clear_filters')" />
       <input
         v-for="option in filterOptions"
         :key="option.value"
-        class="btn btn-sm border border-secondary/25"
+        class="btn h-10 min-h-10 px-3 border border-secondary/25 text-sm font-semibold"
         type="radio"
         name="campaign-filter"
         :value="t(option.labelKey)"

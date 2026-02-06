@@ -152,21 +152,21 @@ const filterAnnouncement = computed(() => {
 <template>
   <div class="pb-12 md:pb-16">
     <!-- Hero Section -->
-    <section class="pt-8 pb-8 md:pt-12 md:pb-10">
+    <section class="pt-6 pb-7 md:pt-12 md:pb-10">
       <div class="wcu-container">
         <article class="wcu-card overflow-hidden border-secondary/30 text-center">
           <div class="h-1 solidarity-stripe" aria-hidden="true"></div>
-          <div class="card-body p-6 md:p-10">
-            <h1 class="text-3xl md:text-4xl font-bold text-base-content mb-4">
+          <div class="card-body p-5 sm:p-6 md:p-10">
+            <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-base-content mb-4 leading-tight">
               {{ $t('campaigns.pageTitle') }}
             </h1>
-            <p class="text-lg text-base-content/90 max-w-3xl mx-auto mb-8">
+            <p class="text-base sm:text-lg text-base-content/90 max-w-3xl mx-auto mb-6 md:mb-8">
               {{ $t('campaigns.pageSubtitle') }}
             </p>
 
             <!-- Filter Bar Card -->
             <div class="wcu-card border-secondary/25 max-w-3xl mx-auto">
-              <div class="card-body p-4">
+              <div class="card-body p-3 sm:p-4">
                 <CampaignFilter v-model="activeFilter" />
                 <p class="sr-only" aria-live="polite">{{ filterAnnouncement }}</p>
               </div>
@@ -177,14 +177,14 @@ const filterAnnouncement = computed(() => {
     </section>
 
     <!-- Campaigns Content Section -->
-    <section class="py-8 md:py-12 bg-base-200/50">
+    <section class="py-7 md:py-12 bg-base-200/50">
       <div class="wcu-container">
         <!-- Focus Campaigns Section -->
-        <div v-if="focusCampaigns.length > 0" class="mb-12">
-          <div class="divider divider-primary text-xl font-bold text-primary">
+        <div v-if="focusCampaigns.length > 0" class="mb-10 md:mb-12">
+          <div class="divider divider-primary text-lg sm:text-xl font-bold text-primary">
             {{ $t('campaigns.focusCampaigns') }}
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 md:gap-6 mt-5 md:mt-6">
             <LazyCampaignCard
               v-for="campaign in focusCampaigns"
               :key="campaign.id"
@@ -195,11 +195,11 @@ const filterAnnouncement = computed(() => {
         </div>
 
         <!-- Side Quests Section -->
-        <div v-if="sideQuests.length > 0" class="mb-12">
-          <div class="divider divider-primary text-xl font-bold text-primary">
+        <div v-if="sideQuests.length > 0" class="mb-10 md:mb-12">
+          <div class="divider divider-primary text-lg sm:text-xl font-bold text-primary">
             {{ $t('campaigns.sideQuests') }}
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 md:gap-6 mt-5 md:mt-6">
             <LazyCampaignCard
               v-for="campaign in sideQuests"
               :key="campaign.id"
