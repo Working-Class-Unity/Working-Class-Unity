@@ -60,6 +60,20 @@ npm run test:a11y
 
 CI runs the accessibility suite on pushes/PRs that touch `wcu-website/**` (see `.github/workflows/a11y.yml`).
 
+## PocketBase Backend Integration
+
+Architecture and setup notes for the new authenticated member/organizing/finance backend are documented in:
+
+- `wcu-website/docs/pocketbase-backend-integration.md`
+
+Quick start:
+
+```bash
+cd wcu-website
+cp .env.example .env
+npm run dev
+```
+
 ## Project Structure
 
 This project follows the **Nuxt 4** directory structure, where the application source code resides in the `app/` directory.
