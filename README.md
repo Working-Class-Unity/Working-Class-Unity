@@ -112,6 +112,34 @@ This architecture update moves us from a mostly static website toward a member w
 - Until those environment variables and collections are wired, dashboards may show empty states or access warnings.
 - Detailed setup is documented in `wcu-website/docs/pocketbase-backend-integration.md`.
 
+## SEO Update Summary (Feb 2026)
+
+This branch also shipped a major SEO cleanup for public pages.
+
+### What improved
+
+- Added locale-aware canonical and alternate language SEO tags.
+- Added localized sitemap generation (`/sitemap.xml`).
+- Updated `robots.txt` with sitemap reference and private-route crawl blocks.
+- Marked private dashboards (`/member`, `/organizing`, `/finance`) as `noindex`.
+- Canonicalized `/kyr` to `/know-your-rights` with permanent redirects.
+- Added URL normalization redirects for duplicate slash/trailing slash/index variants.
+- Replaced logo-only social previews with branded OG/Twitter cards in `wcu-website/public/og/`.
+- Expanded structured data for calendar events and campaigns.
+
+### Why this matters
+
+- Search engines get cleaner, non-duplicate URLs to index.
+- Public pages are easier to discover and rank.
+- Private member pages are less likely to appear in search results.
+- Shared links now have stronger social previews.
+
+### Still to do later
+
+- Campaigns/events are still local data files (not PocketBase-backed yet).
+- No Lighthouse CI or Search Console automation is configured yet.
+- OG cards are static files today (no dynamic generator pipeline yet).
+
 ## Project Structure
 
 This project follows the **Nuxt 4** directory structure, where the application source code resides in the `app/` directory.
