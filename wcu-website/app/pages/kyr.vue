@@ -158,12 +158,12 @@ useSchemaOrg([
             <div>
               <i18n-t keypath="kyr_home.sections.emergency_box.text" tag="p" class="font-medium text-sm">
                 <template #link>
-                  <a href="#" class="font-bold underline text-secondary hover:text-base-content transition-colors inline-flex items-center min-h-8 px-1 -mx-1 rounded">
+                  <a href="#" class="font-bold underline text-secondary hover:text-base-content transition-colors inline-flex items-center min-h-10 px-1 -mx-1 rounded">
                     {{ $t('kyr_home.sections.emergency_box.link_text') }}
                   </a>
                 </template>
                 <template #phone>
-                  <a href="tel:5592060151" class="font-bold underline text-secondary hover:text-base-content transition-colors inline-flex items-center min-h-8 px-1 -mx-1 rounded">
+                  <a href="tel:5592060151" class="font-bold underline text-secondary hover:text-base-content transition-colors inline-flex items-center min-h-10 px-1 -mx-1 rounded">
                     {{ $t('kyr_home.sections.emergency_box.phone') }}
                   </a>
                 </template>
