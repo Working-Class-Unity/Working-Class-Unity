@@ -53,17 +53,17 @@ const upcomingEvents = computed(() => getUpcomingEvents(3))
 
 <template>
   <div class="pb-12 md:pb-16">
-    <section class="pt-8 pb-10 md:pt-12 md:pb-14" aria-labelledby="hero-heading">
+    <section class="pt-6 pb-8 md:pt-12 md:pb-14" aria-labelledby="hero-heading">
       <div class="wcu-container">
         <div class="grid gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,0.9fr)]">
           <article class="wcu-card overflow-hidden border-secondary/30">
             <div class="h-1 solidarity-stripe" aria-hidden="true"></div>
             <div class="card-body p-6 md:p-10">
               <p class="wcu-eyebrow mb-4">{{ $t('home_page.problem.label') }}</p>
-              <h1 id="hero-heading" class="text-4xl md:text-5xl xl:text-6xl font-bold tracking-tight text-base-content">
+              <h1 id="hero-heading" class="text-3xl sm:text-4xl md:text-5xl xl:text-6xl font-bold tracking-tight text-base-content">
                 {{ $t('home_page.hero.title') }}
               </h1>
-              <p class="text-lg md:text-xl wcu-muted mt-6 max-w-4xl">
+              <p class="text-base sm:text-lg md:text-xl wcu-muted mt-5 md:mt-6 max-w-4xl">
                 {{ $t('home_page.hero.description') }}
               </p>
               <div class="flex flex-col sm:flex-row gap-3 mt-8">
@@ -78,8 +78,8 @@ const upcomingEvents = computed(() => getUpcomingEvents(3))
           </article>
 
           <aside class="wcu-card bg-secondary text-secondary-content border-secondary/45">
-            <div class="card-body p-6 md:p-7">
-              <h2 class="text-2xl font-bold tracking-tight text-secondary-content">
+            <div class="card-body p-5 md:p-7">
+              <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-secondary-content">
                 {{ $t('home_page.events.heading') }}
               </h2>
               <p class="text-secondary-content/90 mt-2">
@@ -111,7 +111,7 @@ const upcomingEvents = computed(() => getUpcomingEvents(3))
     <section class="py-10 md:py-12" aria-labelledby="events-heading">
       <div class="wcu-container">
         <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
-          <h2 id="events-heading" class="text-2xl md:text-3xl font-bold text-base-content">
+          <h2 id="events-heading" class="text-xl sm:text-2xl md:text-3xl font-bold text-base-content">
             {{ $t('home_page.events.heading') }}
           </h2>
           <NuxtLinkLocale to="/calendar" class="btn btn-ghost btn-sm border border-secondary/25 hover:bg-primary/10">
@@ -146,7 +146,7 @@ const upcomingEvents = computed(() => getUpcomingEvents(3))
             <p class="wcu-eyebrow mb-3">
               {{ $t('home_page.problem.label') }}
             </p>
-            <h2 id="problem-heading" class="text-3xl md:text-4xl font-bold tracking-tight text-base-content mb-5">
+            <h2 id="problem-heading" class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-base-content mb-5">
               {{ $t('home_page.problem.title') }}
             </h2>
             <div class="prose prose-lg max-w-none text-base-content">

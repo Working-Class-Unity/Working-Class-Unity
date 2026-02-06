@@ -3,10 +3,10 @@
     <div class="wcu-prose-container pt-8 md:pt-12">
       <article class="wcu-card overflow-hidden border-secondary/30">
         <div class="h-1 solidarity-stripe" aria-hidden="true"></div>
-        <div class="card-body p-6 md:p-10">
+        <div class="card-body p-5 md:p-10">
           <header class="pb-8">
             <span class="wcu-eyebrow block mb-3">Our Story</span>
-            <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-base-content">
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-base-content">
               {{ $t('about_page.title') }}
             </h1>
           </header>
@@ -16,13 +16,13 @@
               The Problem
             </h2>
             <div class="space-y-6">
-              <p class="text-lg text-base-content leading-relaxed font-medium">
+              <p class="text-base md:text-lg text-base-content leading-relaxed font-medium">
                 {{ $t('about_page.p1') }}
               </p>
-              <p class="text-lg text-base-content/90 leading-relaxed">
+              <p class="text-base md:text-lg text-base-content/90 leading-relaxed">
                 {{ $t('about_page.p2') }}
               </p>
-              <p class="text-lg text-base-content/90 leading-relaxed">
+              <p class="text-base md:text-lg text-base-content/90 leading-relaxed">
                 {{ $t('about_page.p3') }}
               </p>
             </div>
@@ -33,15 +33,15 @@
               Our Solution
             </h2>
             <div class="space-y-6">
-              <p class="text-lg text-base-content/90 leading-relaxed">
+              <p class="text-base md:text-lg text-base-content/90 leading-relaxed">
                 {{ $t('about_page.p4') }}
               </p>
               <div class="border-l-4 border-primary pl-6">
-                <p class="text-lg text-base-content leading-relaxed italic">
+                <p class="text-base md:text-lg text-base-content leading-relaxed italic">
                   {{ $t('about_page.p5') }}
                 </p>
               </div>
-              <p class="text-lg text-base-content/90 leading-relaxed">
+              <p class="text-base md:text-lg text-base-content/90 leading-relaxed">
                 {{ $t('about_page.p6') }}
               </p>
             </div>
@@ -50,7 +50,7 @@
           <section class="pt-10 border-t border-base-content/10">
             <div class="wcu-card bg-secondary text-secondary-content border-secondary/45">
               <div class="card-body items-center text-center p-8">
-                <p class="text-lg">{{ $t('about_page.p7') }}</p>
+                <p class="text-base sm:text-lg">{{ $t('about_page.p7') }}</p>
                 <div class="card-actions mt-4">
                   <NuxtLinkLocale to="join" class="btn btn-primary btn-lg">
                     {{ $t('about_page.cta_button') }}

@@ -38,13 +38,13 @@ useSchemaOrg([
 <template>
   <div class="min-h-screen bg-base-100">
     <!-- Hero Section -->
-    <section class="py-20">
+    <section class="py-16 md:py-20">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h1 class="text-4xl md:text-5xl font-bold text-base-content mb-6">
+        <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-base-content mb-6">
           {{ $t('kyr_home.hero.title') }}
         </h1>
         
-        <p class="text-lg md:text-xl text-base-content/80 max-w-3xl mx-auto mb-12">
+        <p class="text-base sm:text-lg md:text-xl text-base-content/80 max-w-3xl mx-auto mb-10 md:mb-12">
           {{ $t('kyr_home.hero.description') }}
         </p>
         
