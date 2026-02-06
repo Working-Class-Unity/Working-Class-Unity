@@ -74,6 +74,44 @@ cp .env.example .env
 npm run dev
 ```
 
+## What This Update Adds (Plain Language)
+
+This architecture update moves us from a mostly static website toward a member web app connected to our database.
+
+### What members can now do (once PocketBase is configured)
+
+- Sign in without a password using a secure email link.
+- Land on a real member dashboard instead of a placeholder page.
+- See basic membership details and dues history from the database.
+- Access organizing and finance dashboards based on permissions.
+
+### What organizers/treasurers/admins can now do
+
+- Open an organizing dashboard that shows:
+  - how many buildings are tracked,
+  - how many are active targets,
+  - recent outreach interactions.
+- Open a finance dashboard that shows year-to-date:
+  - dues revenue,
+  - donation revenue,
+  - expenses,
+  - net balance.
+
+### What changed behind the scenes
+
+- Added secure login/session system for member accounts.
+- Added server API routes so the frontend can safely read protected data.
+- Added role and dues access rules:
+  - organizing tools require organizer-level role,
+  - finance tools require dues-current status.
+- Added tests and quality checks to reduce regressions.
+
+### Important: current status
+
+- The framework is in place, but PocketBase collections/fields still need to be populated with real data and credentials.
+- Until those environment variables and collections are wired, dashboards may show empty states or access warnings.
+- Detailed setup is documented in `wcu-website/docs/pocketbase-backend-integration.md`.
+
 ## Project Structure
 
 This project follows the **Nuxt 4** directory structure, where the application source code resides in the `app/` directory.
