@@ -17,7 +17,7 @@ useSeoMeta({
   ogType: 'article',
   ogTitle: `${t('kyr.work.title')} | Working Class Unity`,
   ogDescription: t('kyr.work.description'),
-  ogImage: 'https://workingclassunity.com/logo_dark.svg',
+  ogImage: 'https://workingclassunity.com/og/wcu-default.svg',
   ogUrl: 'https://workingclassunity.com/know-your-rights/ice-at-work',
   twitterCard: 'summary_large_image',
   twitterTitle: `${t('kyr.work.title')} | Working Class Unity`,

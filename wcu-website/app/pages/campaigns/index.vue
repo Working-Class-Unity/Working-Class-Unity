@@ -17,11 +17,12 @@ useSeoMeta({
   ogType: 'website',
   ogTitle: `${t('campaigns.pageTitle')} | Working Class Unity`,
   ogDescription: t('campaigns.pageSubtitle'),
-  ogImage: 'https://workingclassunity.com/logo_dark.svg',
+  ogImage: 'https://workingclassunity.com/og/campaigns.svg',
   ogUrl: 'https://workingclassunity.com/campaigns',
   twitterCard: 'summary_large_image',
   twitterTitle: `${t('campaigns.pageTitle')} | Working Class Unity`,
   twitterDescription: t('campaigns.pageSubtitle'),
+  twitterImage: 'https://workingclassunity.com/og/campaigns.svg',
 })
 
 // =============================================================================

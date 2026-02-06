@@ -13,11 +13,12 @@ useSeoMeta({
   ogType: 'website',
   ogTitle: `${t('kyr.overview.title')} | Working Class Unity`,
   ogDescription: t('kyr.overview.description'),
-  ogImage: 'https://workingclassunity.com/logo_dark.svg',
+  ogImage: 'https://workingclassunity.com/og/kyr.svg',
   ogUrl: 'https://workingclassunity.com/know-your-rights',
   twitterCard: 'summary_large_image',
   twitterTitle: `${t('kyr.overview.title')} | Working Class Unity`,
   twitterDescription: t('kyr.overview.description'),
+  twitterImage: 'https://workingclassunity.com/og/kyr.svg',
 })
 
 // =============================================================================

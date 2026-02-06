@@ -15,6 +15,15 @@ useHead(() => ({
   },
 }))
 
+useServerSeoMeta({
+  ogSiteName: 'Working Class Unity',
+  ogImage: 'https://workingclassunity.com/og/wcu-default.svg',
+  ogImageWidth: '1200',
+  ogImageHeight: '630',
+  twitterCard: 'summary_large_image',
+  twitterImage: 'https://workingclassunity.com/og/wcu-default.svg',
+})
+
 // Global Schema.org - defines the Organization and WebSite for the entire app
 // The nuxt-schema-org module handles deduplication, so this runs once at the app level
 useSchemaOrg([

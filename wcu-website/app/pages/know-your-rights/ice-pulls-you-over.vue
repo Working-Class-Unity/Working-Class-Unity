@@ -17,7 +17,7 @@ useSeoMeta({
   ogType: 'article',
   ogTitle: `${t('kyr.car.title')} | Working Class Unity`,
   ogDescription: t('kyr.car.description'),
-  ogImage: 'https://workingclassunity.com/logo_dark.svg',
+  ogImage: 'https://workingclassunity.com/og/wcu-default.svg',
   ogUrl: 'https://workingclassunity.com/know-your-rights/ice-pulls-you-over',
   twitterCard: 'summary_large_image',
   twitterTitle: `${t('kyr.car.title')} | Working Class Unity`,

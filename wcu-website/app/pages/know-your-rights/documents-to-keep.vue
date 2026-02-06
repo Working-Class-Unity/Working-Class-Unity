@@ -17,7 +17,7 @@ useSeoMeta({
   ogType: 'article',
   ogTitle: `${t('kyr.documents.title')} | Working Class Unity`,
   ogDescription: t('kyr.documents.description'),
-  ogImage: 'https://workingclassunity.com/logo_dark.svg',
+  ogImage: 'https://workingclassunity.com/og/wcu-default.svg',
   ogUrl: 'https://workingclassunity.com/know-your-rights/documents-to-keep',
   twitterCard: 'summary_large_image',
   twitterTitle: `${t('kyr.documents.title')} | Working Class Unity`,

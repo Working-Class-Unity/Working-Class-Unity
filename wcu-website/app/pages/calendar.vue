@@ -15,11 +15,12 @@ useSeoMeta({
   ogType: 'website',
   ogTitle: `${t('calendar.hero.title')} | Working Class Unity`,
   ogDescription: t('calendar.hero.description'),
-  ogImage: 'https://workingclassunity.com/logo_dark.svg',
+  ogImage: 'https://workingclassunity.com/og/calendar.svg',
   ogUrl: 'https://workingclassunity.com/calendar',
   twitterCard: 'summary_large_image',
   twitterTitle: `${t('calendar.hero.title')} | Working Class Unity`,
   twitterDescription: t('calendar.hero.description'),
+  twitterImage: 'https://workingclassunity.com/og/calendar.svg',
 })
 
 useSchemaOrg([

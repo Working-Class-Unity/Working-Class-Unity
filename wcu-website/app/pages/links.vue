@@ -16,7 +16,7 @@ useSeoMeta({
   ogType: 'website',
   ogTitle: `${t('links.page_title')} | Working Class Unity`,
   ogDescription: t('links.description'),
-  ogImage: 'https://workingclassunity.com/logo_dark.svg',
+  ogImage: 'https://workingclassunity.com/og/wcu-default.svg',
   ogUrl: 'https://workingclassunity.com/links',
   twitterCard: 'summary_large_image',
   twitterTitle: `${t('links.page_title')} | Working Class Unity`,

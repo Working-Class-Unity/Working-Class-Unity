@@ -19,11 +19,12 @@ useSeoMeta({
   ogType: 'website',
   ogTitle: 'Tenant Union Handbook | Working Class Unity',
   ogDescription: 'Complete guide for tenants in San Joaquin County covering your rights, paying rent, reporting violations, evictions, and more.',
-  ogImage: 'https://workingclassunity.com/logo_dark.svg',
+  ogImage: 'https://workingclassunity.com/og/tenant-handbook.svg',
   ogUrl: 'https://workingclassunity.com/tenant-union-handbook',
   twitterCard: 'summary_large_image',
   twitterTitle: 'Tenant Union Handbook | Working Class Unity',
   twitterDescription: 'Complete guide for tenants in San Joaquin County covering your rights, paying rent, reporting violations, evictions, and more.',
+  twitterImage: 'https://workingclassunity.com/og/tenant-handbook.svg',
 })
 
 // =============================================================================

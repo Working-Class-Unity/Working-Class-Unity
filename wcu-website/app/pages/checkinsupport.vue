@@ -13,7 +13,7 @@ useSeoMeta({
   ogType: 'website',
   ogTitle: `${t('request_support.title')} | Working Class Unity`,
   ogDescription: t('request_support.intro'),
-  ogImage: 'https://workingclassunity.com/logo_dark.svg',
+  ogImage: 'https://workingclassunity.com/og/wcu-default.svg',
   ogUrl: 'https://workingclassunity.com/checkinsupport',
   twitterCard: 'summary_large_image',
   twitterTitle: `${t('request_support.title')} | Working Class Unity`,

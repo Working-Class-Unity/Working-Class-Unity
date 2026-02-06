@@ -13,7 +13,7 @@ useSeoMeta({
   ogType: 'website',
   ogTitle: `${t('check_in_coverage.page_title')} | Working Class Unity`,
   ogDescription: t('check_in_coverage.hero.description'),
-  ogImage: 'https://workingclassunity.com/logo_dark.svg',
+  ogImage: 'https://workingclassunity.com/og/wcu-default.svg',
   ogUrl: 'https://workingclassunity.com/check-in-coverage',
   twitterCard: 'summary_large_image',
   twitterTitle: `${t('check_in_coverage.page_title')} | Working Class Unity`,
