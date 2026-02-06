@@ -52,21 +52,21 @@ useSchemaOrg([
 </script>
 
 <template>
-  <div class="flex flex-col gap-12 pb-12">
+  <div class="flex flex-col gap-10 md:gap-12 pb-10 md:pb-12">
     <!-- Hero Section -->
-    <div class="hero min-h-[54vh] md:min-h-[60vh] bg-base-200 relative overflow-hidden">
+    <div class="hero min-h-[52vh] md:min-h-[60vh] bg-base-200 relative overflow-hidden">
       <!-- Subtle dot grid background pattern -->
       <div
         class="absolute inset-0 opacity-[0.04]"
         style="background-image: radial-gradient(circle, currentColor 1px, transparent 1px); background-size: 20px 20px;"
       ></div>
-      <div class="hero-content text-center relative z-10">
+      <div class="hero-content text-center relative z-10 px-4 py-8 md:py-10">
         <div class="max-w-2xl">
-          <h1 class="text-4xl sm:text-5xl font-bold mb-5 md:mb-6 capitalize tracking-tight">{{ $t('join.hero.title') }}</h1>
-          <p class="py-4 md:py-6 text-lg md:text-xl">{{ $t('join.hero.description') }}</p>
+          <h1 class="text-4xl sm:text-5xl font-bold mb-4 md:mb-6 capitalize tracking-tight leading-[1.05]">{{ $t('join.hero.title') }}</h1>
+          <p class="py-3 md:py-6 text-base sm:text-lg md:text-xl max-w-xl mx-auto">{{ $t('join.hero.description') }}</p>
           
           <!-- Social Proof -->
-          <div class="flex items-center justify-center gap-3 mt-4">
+          <div class="flex items-center justify-center gap-3 mt-3">
             <div class="avatar-group -space-x-4" aria-hidden="true">
               <div class="avatar placeholder">
                 <div class="bg-primary text-primary-content w-10 rounded-full">
@@ -90,54 +90,52 @@ useSchemaOrg([
       </div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col gap-12 md:gap-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col gap-10 md:gap-16">
       <!-- Membership/Pricing Cards -->
       <section aria-labelledby="membership-heading">
         <h2 id="membership-heading" class="sr-only">{{ $t('join.membership.title') }}</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
           <!-- Rank and File Member ($10 - Orange) -->
           <div class="card h-full bg-base-100 border border-base-300 border-t-4 border-t-primary shadow-md">
-            <div class="card-body">
+            <div class="card-body p-4 sm:p-6">
               <span class="badge badge-primary rounded-full self-start">{{ $t('join.membership.rank_and_file.title') }}</span>
-              <div class="mt-4 mb-2">
+              <div class="mt-3 mb-2">
                 <span class="text-4xl sm:text-5xl font-bold text-secondary">{{ $t('join.membership.rank_and_file.price') }}</span>
-                <span class="text-sm text-base-content/80">/month</span>
               </div>
-              <p class="text-base-content/80 mb-6 flex-grow">{{ $t('join.membership.rank_and_file.description') }}</p>
+              <p class="text-base-content/80 mb-5 flex-grow">{{ $t('join.membership.rank_and_file.description') }}</p>
               <div class="card-actions mt-auto">
-                <a href="https://pay.workingclassunity.com/b/7sI4hF1hc9IIepq4gh" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-primary w-full">{{ $t('join.membership.rank_and_file.button') }}<span class="sr-only">(opens in new tab)</span></a>
+                <a href="https://pay.workingclassunity.com/b/7sI4hF1hc9IIepq4gh" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-primary w-full min-h-11">{{ $t('join.membership.rank_and_file.button') }}<span class="sr-only">(opens in new tab)</span></a>
               </div>
             </div>
           </div>
 
           <!-- Solidarity Member ($27 - Red/Accent) - Recommended -->
           <div class="card h-full bg-base-100 border border-base-300 border-t-4 border-t-accent shadow-lg shadow-accent/20 md:scale-105">
-            <div class="card-body">
+            <div class="card-body p-4 sm:p-6">
               <div class="flex items-center gap-2 flex-wrap">
                 <span class="badge badge-outline border-accent text-base-content rounded-full">{{ $t('join.membership.solidarity.title') }}</span>
                 <span class="badge badge-sm border border-primary/60 bg-primary/15 text-secondary font-semibold">Recommended</span>
               </div>
-              <div class="mt-4 mb-2">
+              <div class="mt-3 mb-2">
                 <span class="text-4xl sm:text-5xl font-bold text-accent">{{ $t('join.membership.solidarity.price') }}</span>
-                <span class="text-sm text-base-content/80">/month</span>
               </div>
-              <p class="text-base-content/80 mb-6 flex-grow">{{ $t('join.membership.solidarity.description') }}</p>
+              <p class="text-base-content/80 mb-5 flex-grow">{{ $t('join.membership.solidarity.description') }}</p>
               <div class="card-actions mt-auto">
-                <a href="https://pay.workingclassunity.com/b/bIY4hF4tof325SUaEE" target="_blank" rel="noopener noreferrer" class="btn btn-accent w-full">{{ $t('join.membership.solidarity.button') }}<span class="sr-only">(opens in new tab)</span></a>
+                <a href="https://pay.workingclassunity.com/b/bIY4hF4tof325SUaEE" target="_blank" rel="noopener noreferrer" class="btn btn-accent w-full min-h-11">{{ $t('join.membership.solidarity.button') }}<span class="sr-only">(opens in new tab)</span></a>
               </div>
             </div>
           </div>
 
           <!-- One Time Donation (Donate - Blue) -->
           <div class="card h-full bg-base-100 border border-base-300 border-t-4 border-t-secondary shadow-md">
-            <div class="card-body">
+            <div class="card-body p-4 sm:p-6">
               <span class="badge badge-secondary badge-soft rounded-full self-start">{{ $t('join.membership.donate.title') }}</span>
-              <div class="mt-4 mb-2">
+              <div class="mt-3 mb-2">
                 <span class="text-4xl sm:text-5xl font-bold text-secondary">{{ $t('join.membership.donate.price') }}</span>
               </div>
-              <p class="text-base-content/80 mb-6 flex-grow">{{ $t('join.membership.donate.description') }}</p>
+              <p class="text-base-content/80 mb-5 flex-grow">{{ $t('join.membership.donate.description') }}</p>
               <div class="card-actions mt-auto">
-                <a href="https://pay.workingclassunity.com/b/aEU5lJbVQ2gg1CE002" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-secondary w-full">{{ $t('join.membership.donate.button') }}<span class="sr-only">(opens in new tab)</span></a>
+                <a href="https://pay.workingclassunity.com/b/aEU5lJbVQ2gg1CE002" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-secondary w-full min-h-11">{{ $t('join.membership.donate.button') }}<span class="sr-only">(opens in new tab)</span></a>
               </div>
             </div>
           </div>
@@ -148,9 +146,9 @@ useSchemaOrg([
 
       <!-- Membership Benefits -->
       <section aria-labelledby="benefits-heading">
-        <div class="text-center mb-10">
+        <div class="text-center mb-8 md:mb-10">
           <h2 id="benefits-heading" class="text-3xl sm:text-4xl font-bold mb-4 capitalize">{{ $t('join.benefits.title') }}</h2>
-          <p class="text-lg sm:text-xl max-w-3xl mx-auto">{{ $t('join.benefits.description') }}</p>
+          <p class="text-base sm:text-lg md:text-xl max-w-3xl mx-auto">{{ $t('join.benefits.description') }}</p>
         </div>
         
         <!-- Bento Grid: uses gap-px with bg-base-300 to create 1px border lines between cells -->
@@ -208,8 +206,8 @@ useSchemaOrg([
 
       <!-- FAQ Section -->
       <section class="max-w-2xl mx-auto w-full">
-        <h2 class="text-3xl font-bold text-center mb-2">{{ $t('join.faq.title') }}</h2>
-        <p class="text-center mb-8 text-base-content/80">{{ $t('join.faq.subtitle') }}</p>
+        <h2 class="text-2xl sm:text-3xl font-bold text-center mb-2">{{ $t('join.faq.title') }}</h2>
+        <p class="text-center mb-6 md:mb-8 text-sm sm:text-base text-base-content/80">{{ $t('join.faq.subtitle') }}</p>
         
         <div class="divide-y divide-base-300">
           <details class="collapse collapse-plus" name="faq-accordion" open>
