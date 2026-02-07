@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Tenant Union Handbook</title>
+  <desc id="desc">Tenant rights and organizing guide for San Joaquin County.</desc>
+  <rect width="1200" height="630" fill="#f7f9fc" />
+  <rect x="0" y="0" width="1200" height="16" fill="#04334f" />
+  <rect x="0" y="16" width="1200" height="8" fill="#ff9f48" />
+  <rect x="0" y="24" width="1200" height="8" fill="#ef2525" />
+  <rect x="72" y="76" width="1056" height="478" rx="24" fill="#ffffff" stroke="#04334f" stroke-opacity="0.2" />
+  <text x="116" y="176" fill="#232323" font-size="66" font-weight="900" font-family="Arial, sans-serif">Tenant Union Handbook</text>
+  <text x="116" y="236" fill="#232323" font-size="32" font-weight="500" font-family="Arial, sans-serif">Rights, notices, evictions, and organizing steps.</text>
+  <rect x="116" y="286" width="968" height="196" rx="16" fill="#04334f" fill-opacity="0.06" stroke="#04334f" stroke-opacity="0.3" />
+  <text x="148" y="342" fill="#232323" font-size="30" font-weight="700" font-family="Arial, sans-serif">1. Know the notice type</text>
+  <text x="148" y="390" fill="#232323" font-size="30" font-weight="700" font-family="Arial, sans-serif">2. Document every communication</text>
+  <text x="148" y="438" fill="#232323" font-size="30" font-weight="700" font-family="Arial, sans-serif">3. Escalate with your tenant union</text>
+  <text x="116" y="524" fill="#04334f" font-size="30" font-weight="700" font-family="Arial, sans-serif">workingclassunity.com/tenant-union-handbook</text>
+</svg>

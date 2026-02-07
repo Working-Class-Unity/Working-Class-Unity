@@ -314,7 +314,7 @@ useSeoMeta({
   ogType: 'article',
   ogTitle: `${t('unitedfront.title')} | Working Class Unity`,
   ogDescription: t('unitedfront.pledge.content'),
-  ogImage: 'https://workingclassunity.com/logo_dark.svg',
+  ogImage: 'https://workingclassunity.com/og/wcu-default.svg',
   ogUrl: 'https://workingclassunity.com/unitedfront',
   twitterCard: 'summary_large_image',
   twitterTitle: `${t('unitedfront.title')} | Working Class Unity`,

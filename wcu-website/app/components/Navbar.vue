@@ -28,7 +28,6 @@ const isRouteMatch = (target: string) => {
 }
 
 const isKyrRoute = computed(() => (
-  route.path.includes('/kyr') ||
   route.path.includes('/know-your-rights') ||
   route.path.includes('/check-in-coverage') ||
   route.path.endsWith('/checkinsupport')
@@ -200,9 +199,9 @@ onUnmounted(() => {
                 <ul class="p-2">
                   <li>
                     <NuxtLinkLocale
-                      to="kyr"
-                      :class="mobileLinkClass('/kyr')"
-                      :aria-current="isRouteMatch('/kyr') ? 'page' : undefined"
+                      to="know-your-rights"
+                      :class="mobileLinkClass('/know-your-rights')"
+                      :aria-current="isRouteMatch('/know-your-rights') ? 'page' : undefined"
                       @click="mobileMenuOpen = false"
                     >
                       {{ $t('nav.resources') }}
@@ -295,9 +294,9 @@ onUnmounted(() => {
               <ul id="kyr-nav-menu" class="dropdown-content menu bg-base-100 text-base-content rounded-box z-50 w-60 p-2 shadow-lg border border-secondary/25">
                 <li>
                   <NuxtLinkLocale
-                    to="kyr"
-                    :class="mobileLinkClass('/kyr')"
-                    :aria-current="isRouteMatch('/kyr') ? 'page' : undefined"
+                    to="know-your-rights"
+                    :class="mobileLinkClass('/know-your-rights')"
+                    :aria-current="isRouteMatch('/know-your-rights') ? 'page' : undefined"
                     @click="kyrMenuOpen = false"
                   >
                     {{ $t('nav.resources') }}

@@ -1,2 +1,15 @@
-User-Agent: *
-Disallow:
+User-agent: *
+Allow: /
+
+# Private member dashboards
+Disallow: /member
+Disallow: /organizing
+Disallow: /finance
+Disallow: /es/member
+Disallow: /es/organizing
+Disallow: /es/finance
+Disallow: /pa/member
+Disallow: /pa/organizing
+Disallow: /pa/finance
+
+Sitemap: https://workingclassunity.com/sitemap.xml

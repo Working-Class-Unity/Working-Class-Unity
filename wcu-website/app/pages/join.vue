@@ -13,11 +13,12 @@ useSeoMeta({
   ogType: 'website',
   ogTitle: `${t('join.hero.title')} | Working Class Unity`,
   ogDescription: t('join.hero.description'),
-  ogImage: 'https://workingclassunity.com/logo_dark.svg',
+  ogImage: 'https://workingclassunity.com/og/join.svg',
   ogUrl: 'https://workingclassunity.com/join',
   twitterCard: 'summary_large_image',
   twitterTitle: `${t('join.hero.title')} | Working Class Unity`,
   twitterDescription: t('join.hero.description'),
+  twitterImage: 'https://workingclassunity.com/og/join.svg',
 })
 
 // =============================================================================

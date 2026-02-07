@@ -17,7 +17,7 @@ useSeoMeta({
   ogType: 'article',
   ogTitle: `${t('kyr.public.title')} | Working Class Unity`,
   ogDescription: t('kyr.public.description'),
-  ogImage: 'https://workingclassunity.com/logo_dark.svg',
+  ogImage: 'https://workingclassunity.com/og/wcu-default.svg',
   ogUrl: 'https://workingclassunity.com/know-your-rights/ice-in-public',
   twitterCard: 'summary_large_image',
   twitterTitle: `${t('kyr.public.title')} | Working Class Unity`,
@@ -36,7 +36,7 @@ useSchemaOrg([
   defineBreadcrumb({
     itemListElement: [
       { name: 'Home', item: '/' },
-      { name: t('nav.kyr'), item: '/kyr' },
+      { name: t('nav.kyr'), item: '/know-your-rights' },
       { name: t('kyr.public.title') },
     ],
   }),

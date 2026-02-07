@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Join Working Class Unity</title>
+  <desc id="desc">Collective, class-conscious power.</desc>
+  <rect width="1200" height="630" fill="#f7f9fc" />
+  <rect x="0" y="0" width="1200" height="14" fill="#ff9f48" />
+  <rect x="0" y="616" width="1200" height="14" fill="#ef2525" />
+  <rect x="86" y="82" width="1028" height="466" rx="26" fill="#ffffff" stroke="#04334f" stroke-opacity="0.2" />
+  <text x="130" y="176" fill="#232323" font-size="68" font-weight="900" font-family="Arial, sans-serif">Collective, Class-Conscious Power</text>
+  <text x="130" y="250" fill="#232323" font-size="34" font-weight="500" font-family="Arial, sans-serif">Become a member and build rank-and-file power.</text>
+  <rect x="130" y="300" width="290" height="74" rx="12" fill="#ff9f48" />
+  <text x="192" y="346" fill="#232323" font-size="34" font-weight="800" font-family="Arial, sans-serif">$10 / month</text>
+  <rect x="442" y="300" width="290" height="74" rx="12" fill="#ef2525" />
+  <text x="500" y="346" fill="#f7f9fc" font-size="34" font-weight="800" font-family="Arial, sans-serif">$27 / month</text>
+  <rect x="754" y="300" width="290" height="74" rx="12" fill="#04334f" />
+  <text x="804" y="346" fill="#f7f9fc" font-size="34" font-weight="800" font-family="Arial, sans-serif">Custom dues</text>
+  <text x="130" y="454" fill="#04334f" font-size="32" font-weight="700" font-family="Arial, sans-serif">Join today at workingclassunity.com/join</text>
+</svg>

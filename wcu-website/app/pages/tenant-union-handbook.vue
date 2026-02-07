@@ -7,8 +7,6 @@ import {
   type HandbookChapterMeta,
 } from '~/data/tenant-handbook'
 
-const { t } = useI18n()
-
 // =============================================================================
 // SEO Meta Tags
 // =============================================================================
@@ -21,11 +19,12 @@ useSeoMeta({
   ogType: 'website',
   ogTitle: 'Tenant Union Handbook | Working Class Unity',
   ogDescription: 'Complete guide for tenants in San Joaquin County covering your rights, paying rent, reporting violations, evictions, and more.',
-  ogImage: 'https://workingclassunity.com/logo_dark.svg',
+  ogImage: 'https://workingclassunity.com/og/tenant-handbook.svg',
   ogUrl: 'https://workingclassunity.com/tenant-union-handbook',
   twitterCard: 'summary_large_image',
   twitterTitle: 'Tenant Union Handbook | Working Class Unity',
   twitterDescription: 'Complete guide for tenants in San Joaquin County covering your rights, paying rent, reporting violations, evictions, and more.',
+  twitterImage: 'https://workingclassunity.com/og/tenant-handbook.svg',
 })
 
 // =============================================================================
@@ -51,6 +50,14 @@ const chapterContextById = handbookChapterMap
 const quickPaths = handbookQuickPaths
 const contactCards = handbookContacts
 
+const getChapterContext = (chapterId: string): HandbookChapterMeta => {
+  const chapter = chapterContextById[chapterId]
+  if (!chapter) {
+    throw new Error(`Missing handbook chapter context for ${chapterId}`)
+  }
+  return chapter
+}
+
 // =============================================================================
 // Search & Filtering
 // =============================================================================
@@ -67,7 +74,7 @@ const drawerReturnFocusEl = ref<HTMLElement | null>(null)
 const drawerPendingSectionId = ref<string | null>(null)
 
 const openMobileDrawer = () => {
-  if (process.client) {
+  if (import.meta.client) {
     drawerReturnFocusEl.value = document.activeElement instanceof HTMLElement ? document.activeElement : null
   }
   drawerPendingSectionId.value = null
@@ -531,7 +538,7 @@ const highlightMatch = (text: string): string => {
               Chapter 1: Know Your Rights
             </h2>
             <div class="not-prose mt-5">
-              <TenantHandbookChapterContext :chapter="chapterContextById['chapter-1']" />
+              <TenantHandbookChapterContext :chapter="getChapterContext('chapter-1')" />
             </div>
 
             <!-- Tenant Protections -->
@@ -825,7 +832,7 @@ const highlightMatch = (text: string): string => {
               Chapter 2: Paying Rent
             </h2>
             <div class="not-prose mt-5">
-              <TenantHandbookChapterContext :chapter="chapterContextById['chapter-2']" />
+              <TenantHandbookChapterContext :chapter="getChapterContext('chapter-2')" />
             </div>
 
             <section id="paying-rent" data-section class="mt-8">
@@ -895,7 +902,7 @@ const highlightMatch = (text: string): string => {
               Chapter 3: Reporting Violations
             </h2>
             <div class="not-prose mt-5">
-              <TenantHandbookChapterContext :chapter="chapterContextById['chapter-3']" />
+              <TenantHandbookChapterContext :chapter="getChapterContext('chapter-3')" />
             </div>
 
             <p class="mt-4">
@@ -989,7 +996,7 @@ const highlightMatch = (text: string): string => {
               Chapter 4: Evictions
             </h2>
             <div class="not-prose mt-5">
-              <TenantHandbookChapterContext :chapter="chapterContextById['chapter-4']" />
+              <TenantHandbookChapterContext :chapter="getChapterContext('chapter-4')" />
             </div>
 
             <section id="legal-reasons" data-section class="mt-8">
@@ -1163,7 +1170,7 @@ const highlightMatch = (text: string): string => {
               Chapter 5: Legal Entry & Security Deposit
             </h2>
             <div class="not-prose mt-5">
-              <TenantHandbookChapterContext :chapter="chapterContextById['chapter-5']" />
+              <TenantHandbookChapterContext :chapter="getChapterContext('chapter-5')" />
             </div>
 
             <section id="legal-entry" data-section class="mt-8">

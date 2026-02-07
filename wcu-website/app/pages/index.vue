@@ -19,7 +19,7 @@ useSeoMeta({
   ogType: 'website',
   ogTitle: `${t('home_page.hero.title')} | Working Class Unity`,
   ogDescription: t('home_page.hero.description'),
-  ogImage: 'https://workingclassunity.com/logo_dark.svg',
+  ogImage: 'https://workingclassunity.com/og/home.svg',
   ogUrl: 'https://workingclassunity.com',
   ogSiteName: 'Working Class Unity',
   ogLocale: locale.value,
@@ -28,7 +28,7 @@ useSeoMeta({
   twitterCard: 'summary_large_image',
   twitterTitle: `${t('home_page.hero.title')} | Working Class Unity`,
   twitterDescription: t('home_page.hero.description'),
-  twitterImage: 'https://workingclassunity.com/logo_dark.svg',
+  twitterImage: 'https://workingclassunity.com/og/home.svg',
 })
 
 // =============================================================================
@@ -86,7 +86,7 @@ const upcomingEvents = computed(() => getUpcomingEvents(3))
                 {{ $t('calendar.upcoming_events') }}: {{ upcomingEvents.length }}
               </p>
               <div class="mt-6 space-y-3">
-                <NuxtLinkLocale to="/kyr" class="btn btn-primary justify-start w-full">
+                <NuxtLinkLocale to="/know-your-rights" class="btn btn-primary justify-start w-full">
                   {{ $t('nav.kyr') }}
                 </NuxtLinkLocale>
                 <NuxtLinkLocale to="/campaigns" class="btn btn-outline border-primary/70 text-secondary-content hover:text-secondary w-full justify-start">

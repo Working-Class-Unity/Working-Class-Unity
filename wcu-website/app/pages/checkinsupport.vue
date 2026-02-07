@@ -13,7 +13,7 @@ useSeoMeta({
   ogType: 'website',
   ogTitle: `${t('request_support.title')} | Working Class Unity`,
   ogDescription: t('request_support.intro'),
-  ogImage: 'https://workingclassunity.com/logo_dark.svg',
+  ogImage: 'https://workingclassunity.com/og/wcu-default.svg',
   ogUrl: 'https://workingclassunity.com/checkinsupport',
   twitterCard: 'summary_large_image',
   twitterTitle: `${t('request_support.title')} | Working Class Unity`,
@@ -134,7 +134,7 @@ const handleSupportButtonClick = async () => {
             <div>
               <i18n-t keypath="request_support.emergency.text" tag="p" class="font-medium text-base-content">
                 <template #link>
-                  <NuxtLinkLocale to="/kyr" class="font-bold underline hover:opacity-80 inline-flex items-center min-h-10 px-1 -mx-1 rounded">
+                  <NuxtLinkLocale to="/know-your-rights" class="font-bold underline hover:opacity-80 inline-flex items-center min-h-10 px-1 -mx-1 rounded">
                     {{ $t('request_support.emergency.link_text') }}
                   </NuxtLinkLocale>
                 </template>

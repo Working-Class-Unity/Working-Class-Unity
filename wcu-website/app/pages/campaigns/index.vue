@@ -4,6 +4,10 @@ import { campaigns } from '~/data/campaigns'
 import type { Campaign } from '~/data/campaigns'
 
 const { t } = useI18n()
+const localePath = useLocalePath()
+const activeCampaignsForSeo = computed(() => {
+  return campaigns.filter((campaign) => campaign.status === 'active')
+})
 
 // =============================================================================
 // SEO Meta Tags
@@ -17,11 +21,12 @@ useSeoMeta({
   ogType: 'website',
   ogTitle: `${t('campaigns.pageTitle')} | Working Class Unity`,
   ogDescription: t('campaigns.pageSubtitle'),
-  ogImage: 'https://workingclassunity.com/logo_dark.svg',
+  ogImage: 'https://workingclassunity.com/og/campaigns.svg',
   ogUrl: 'https://workingclassunity.com/campaigns',
   twitterCard: 'summary_large_image',
   twitterTitle: `${t('campaigns.pageTitle')} | Working Class Unity`,
   twitterDescription: t('campaigns.pageSubtitle'),
+  twitterImage: 'https://workingclassunity.com/og/campaigns.svg',
 })
 
 // =============================================================================
@@ -33,6 +38,21 @@ useSchemaOrg([
     name: t('campaigns.pageTitle'),
     description: t('campaigns.pageSubtitle'),
     url: 'https://workingclassunity.com/campaigns',
+  }),
+  defineItemList({
+    name: `${t('campaigns.pageTitle')} - Active`,
+    itemListElement: activeCampaignsForSeo.value.map((campaign, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      item: {
+        '@type': 'CreativeWork',
+        name: t(campaign.titleKey),
+        description: t(campaign.descriptionKey),
+        url: `https://workingclassunity.com${localePath('/campaigns')}`,
+        image: `https://workingclassunity.com${campaign.image}`,
+        keywords: [campaign.type, campaign.status].join(','),
+      },
+    })),
   }),
   defineBreadcrumb({
     itemListElement: [
@@ -58,7 +78,7 @@ const statusOrder: Record<string, number> = {
 const sortCampaigns = (campaignList: Campaign[]): Campaign[] => {
   return [...campaignList].sort((a, b) => {
     // First, sort by status order
-    const statusDiff = statusOrder[a.status] - statusOrder[b.status]
+    const statusDiff = (statusOrder[a.status] ?? Number.MAX_SAFE_INTEGER) - (statusOrder[b.status] ?? Number.MAX_SAFE_INTEGER)
     if (statusDiff !== 0) return statusDiff
 
     // Then, sort by createdAt (newest first)
