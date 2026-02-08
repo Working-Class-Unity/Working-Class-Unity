@@ -8,13 +8,13 @@ export function useEvents() {
 
   // Badge color mapping for event types
   const badgeClasses: Record<EventType, string> = {
-    meeting: 'badge-soft badge-primary',
-    action: 'badge-soft badge-error',
-    training: 'badge-soft badge-info',
-    social: 'badge-soft badge-success',
-    canvass: 'badge-soft badge-warning',
-    forum: 'badge-soft badge-secondary',
-    other: 'badge-soft'
+    meeting: 'badge-primary',
+    action: 'badge-error',
+    training: 'badge-info',
+    social: 'badge-success',
+    canvass: 'badge-warning',
+    forum: 'badge-secondary',
+    other: 'badge-neutral'
   }
 
   /**
@@ -56,7 +56,7 @@ export function useEvents() {
    * Get the badge class for an event type
    */
   function getBadgeClass(eventType: EventType): string {
-    return badgeClasses[eventType] || 'badge-soft'
+    return badgeClasses[eventType] || 'badge-neutral'
   }
 
   return {
@@ -67,5 +67,4 @@ export function useEvents() {
     getBadgeClass
   }
 }
-
 

@@ -103,13 +103,13 @@ const rsvpButtonClass = computed(() =>
             <span class="badge" :class="[badgeSizeClass, getBadgeClass(event.eventType)]">
               {{ $t(`calendar.event_types.${event.eventType}`) }}
             </span>
-            <span v-if="event.isVirtual" class="badge badge-soft badge-info" :class="badgeSizeClass">
+            <span v-if="event.isVirtual" class="badge badge-info" :class="badgeSizeClass">
               {{ $t('calendar.badges.virtual') }}
             </span>
-            <span v-if="event.isHybrid" class="badge badge-soft badge-secondary" :class="badgeSizeClass">
+            <span v-if="event.isHybrid" class="badge badge-secondary" :class="badgeSizeClass">
               {{ $t('calendar.badges.hybrid') }}
             </span>
-            <span v-if="event.allDay && variant !== 'compact'" class="badge badge-soft" :class="badgeSizeClass">
+            <span v-if="event.allDay && variant !== 'compact'" class="badge badge-neutral" :class="badgeSizeClass">
               {{ $t('calendar.badges.all_day') }}
             </span>
           </div>
