@@ -940,6 +940,7 @@
     "virtual_event": "Virtual Event",
     "join_virtual": "Join Virtual Event",
     "rsvp_here": "RSVP Here",
+    "zoom": "Zoom",
     "events": {
       "generalMeeting": {
         "title": "WCU General Meeting",

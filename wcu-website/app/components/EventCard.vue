@@ -53,6 +53,16 @@ const rsvpButtonClass = computed(() =>
     ? 'btn btn-xs btn-primary gap-1 mt-3'
     : 'btn btn-sm btn-primary gap-2 flex-1'
 )
+
+const linkLabelKey = computed(() => {
+  const link = props.event.rsvpLink
+  if (props.event.isVirtual && typeof link === 'string' && link.includes('zoom.us')) {
+    return 'calendar.zoom'
+  }
+  return 'calendar.rsvp_here'
+})
+
+const linkLabel = computed(() => t(linkLabelKey.value))
 </script>
 
 <template>
@@ -141,9 +151,9 @@ const rsvpButtonClass = computed(() =>
           target="_blank"
           rel="noopener noreferrer"
           :class="rsvpButtonClass"
-          :aria-label="`${$t('calendar.rsvp_here')} - ${$t(event.titleKey)}`"
+          :aria-label="`${linkLabel} - ${$t(event.titleKey)}`"
         >
-          {{ $t('calendar.rsvp_here') }}
+          {{ linkLabel }}
           <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-3 w-3">
             <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
           </svg>
@@ -161,7 +171,7 @@ const rsvpButtonClass = computed(() =>
             <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
               <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
             </svg>
-            {{ $t('calendar.rsvp_here') }}
+            {{ linkLabel }}
             <span class="sr-only">{{ $t('common.opens_in_new_tab') }}</span>
           </a>
         </div>
