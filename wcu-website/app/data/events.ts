@@ -138,6 +138,24 @@ export const events: Event[] = [
     committee: null
   },
   {
+    id: 'event-10',
+    titleKey: 'calendar.events.annualBylawReviewFeb11.title',
+    descriptionKey: 'calendar.events.annualBylawReviewFeb11.description',
+    eventType: 'meeting',
+    startDateTime: '2026-02-12T04:00:00.000Z',
+    endDateTime: '2026-02-12T05:00:00.000Z',
+    allDay: false,
+    location: 'Virtual (Zoom)',
+    rsvpLink: 'https://us06web.zoom.us/j/5652383072?pwd=gU8B9xXHTxuRapRkX6vpxBTVLGLzfi.1',
+    isVirtual: true,
+    isHybrid: false,
+    isActive: true,
+    createdAt: '2026-02-11T21:33:05.000Z',
+    updatedAt: '2026-02-11T21:33:05.000Z',
+    campaignId: null,
+    committee: null
+  },
+  {
     id: 'event-7',
     titleKey: 'calendar.events.coffeeWithWcu.title',
     descriptionKey: 'calendar.events.coffeeWithWcu.description',
