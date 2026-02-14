@@ -1163,45 +1163,35 @@ const highlightMatch = (text: string): string => {
             <!-- CHAPTER 5: LEGAL ENTRY & SECURITY DEPOSIT -->
             <!-- ============================================================= -->
             <h2 id="chapter-5" data-section class="text-2xl md:text-3xl font-bold text-secondary border-b-2 border-primary pb-2 mt-16">
-              Chapter 5: Legal Entry & Security Deposit
+              {{ $t('tenant_handbook.chapters.chapter-5.title') }}
             </h2>
             <div class="not-prose mt-5">
               <TenantHandbookChapterContext :chapter="getChapterContext('chapter-5')" />
             </div>
 
             <section id="legal-entry" data-section class="mt-8">
-              <h3 class="text-xl font-bold text-base-content">Legal Entry</h3>
-              <p class="text-sm text-base-content/80">For ALL tenants (with or without Rent Stabilization)</p>
+              <h3 class="text-xl font-bold text-base-content">{{ $t('tenant_handbook.chapters.chapter-5.sections.legal-entry.title') }}</h3>
+              <p class="text-sm text-base-content/80">{{ $t('tenant_handbook.body.chapter-5.applies_to_all') }}</p>
               
-              <h4 class="font-semibold mt-4">When can the landlord enter?</h4>
+              <h4 class="font-semibold mt-4">{{ $t('tenant_handbook.body.chapter-5.legal-entry.when_can_enter.heading') }}</h4>
               <ul>
-                <li>California law states that a landlord can enter a unit with reasonable advance written notice (24 hours or 6 days by mail).</li>
-                <li>A landlord can enter only during normal business hours (generally, weekdays 8:00 AM-5:00 PM).</li>
-                <li>The notice must state the date, approximate time, and purpose of entry.</li>
-                <li>A landlord cannot issue a 24-hour notice that covers multiple days.</li>
+                <li v-for="(item, index) in getStringList('tenant_handbook.body.chapter-5.legal-entry.when_can_enter.items')" :key="index">{{ item }}</li>
               </ul>
 
-              <h4 class="font-semibold mt-4">Reasonable advance written notice IS required for:</h4>
+              <h4 class="font-semibold mt-4">{{ $t('tenant_handbook.body.chapter-5.legal-entry.notice_required.heading') }}</h4>
               <ul>
-                <li>To make necessary or agreed-upon repairs, decorations, alterations, or improvements</li>
-                <li>To show the unit to prospective tenants, purchasers, or lenders</li>
-                <li>To provide entry to contractors or workers</li>
-                <li>When a court order permits the landlord to enter</li>
+                <li v-for="(item, index) in getStringList('tenant_handbook.body.chapter-5.legal-entry.notice_required.items')" :key="index">{{ item }}</li>
               </ul>
 
-              <h4 class="font-semibold mt-4">Advance written notice is NOT required for:</h4>
+              <h4 class="font-semibold mt-4">{{ $t('tenant_handbook.body.chapter-5.legal-entry.notice_not_required.heading') }}</h4>
               <ul>
-                <li>An emergency that constitutes a negative impact to property, health, or safety</li>
-                <li>When a tenant has moved out or abandoned the unit</li>
-                <li>When a tenant is present and consents to entry</li>
-                <li>When the tenant and landlord have already agreed on entry for repairs</li>
+                <li v-for="(item, index) in getStringList('tenant_handbook.body.chapter-5.legal-entry.notice_not_required.items')" :key="index">{{ item }}</li>
               </ul>
 
               <div class="bg-base-200 p-4 rounded-lg mt-4">
-                <h4 class="font-semibold">Special rules for showing to prospective buyer:</h4>
+                <h4 class="font-semibold">{{ $t('tenant_handbook.body.chapter-5.legal-entry.special_rules.heading') }}</h4>
                 <p class="mb-0">
-                  A landlord must give 24-hour advance written notice to show the unit to a prospective buyer. 
-                  Alternatively, they can post a 120-day advance written notice one time, but must still give 24-hour advance verbal notice each time.
+                  {{ $t('tenant_handbook.body.chapter-5.legal-entry.special_rules.p1') }}
                 </p>
               </div>
             </section>

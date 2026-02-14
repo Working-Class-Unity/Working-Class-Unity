@@ -898,6 +898,42 @@
             ]
           }
         }
+      },
+      "chapter-5": {
+        "applies_to_all": "For ALL tenants (with or without Rent Stabilization)",
+        "legal-entry": {
+          "when_can_enter": {
+            "heading": "When can the landlord enter?",
+            "items": [
+              "California law states that a landlord can enter a unit with reasonable advance written notice (24 hours or 6 days by mail).",
+              "A landlord can enter only during normal business hours (generally, weekdays 8:00 AM-5:00 PM).",
+              "The notice must state the date, approximate time, and purpose of entry.",
+              "A landlord cannot issue a 24-hour notice that covers multiple days."
+            ]
+          },
+          "notice_required": {
+            "heading": "Reasonable advance written notice IS required for:",
+            "items": [
+              "To make necessary or agreed-upon repairs, decorations, alterations, or improvements",
+              "To show the unit to prospective tenants, purchasers, or lenders",
+              "To provide entry to contractors or workers",
+              "When a court order permits the landlord to enter"
+            ]
+          },
+          "notice_not_required": {
+            "heading": "Advance written notice is NOT required for:",
+            "items": [
+              "An emergency that constitutes a negative impact to property, health, or safety",
+              "When a tenant has moved out or abandoned the unit",
+              "When a tenant is present and consents to entry",
+              "When the tenant and landlord have already agreed on entry for repairs"
+            ]
+          },
+          "special_rules": {
+            "heading": "Special rules for showing to prospective buyer:",
+            "p1": "A landlord must give 24-hour advance written notice to show the unit to a prospective buyer. Alternatively, they can post a 120-day advance written notice one time, but must still give 24-hour advance verbal notice each time."
+          }
+        }
       }
     }
   },

@@ -898,6 +898,42 @@
             ]
           }
         }
+      },
+      "chapter-5": {
+        "applies_to_all": "Para TODOS los inquilinos (con o sin estabilización de alquiler)",
+        "legal-entry": {
+          "when_can_enter": {
+            "heading": "¿Cuándo puede entrar el propietario?",
+            "items": [
+              "La ley de California establece que un propietario puede entrar a una unidad con un aviso razonable por escrito con anticipación (24 horas o 6 días por correo).",
+              "El propietario solo puede entrar durante horas normales de negocio (generalmente, días laborables de 8:00 a. m. a 5:00 p. m.).",
+              "El aviso debe indicar la fecha, la hora aproximada y el propósito de la entrada.",
+              "El propietario no puede emitir un aviso de 24 horas que cubra varios días."
+            ]
+          },
+          "notice_required": {
+            "heading": "Se requiere aviso razonable por escrito con anticipación para:",
+            "items": [
+              "Hacer reparaciones necesarias o acordadas, decoraciones, alteraciones o mejoras",
+              "Mostrar la unidad a posibles inquilinos, compradores o prestamistas",
+              "Permitir la entrada a contratistas o trabajadores",
+              "Cuando una orden judicial permite que el propietario entre"
+            ]
+          },
+          "notice_not_required": {
+            "heading": "NO se requiere aviso por escrito con anticipación para:",
+            "items": [
+              "Una emergencia que constituya un impacto negativo a la propiedad, la salud o la seguridad",
+              "Cuando un inquilino se ha mudado o ha abandonado la unidad",
+              "Cuando un inquilino está presente y consiente la entrada",
+              "Cuando el inquilino y el propietario ya han acordado la entrada para reparaciones"
+            ]
+          },
+          "special_rules": {
+            "heading": "Reglas especiales para mostrar a un comprador potencial:",
+            "p1": "El propietario debe dar un aviso por escrito con 24 horas de anticipación para mostrar la unidad a un comprador potencial. Alternativamente, puede publicar un aviso por escrito con 120 días de anticipación una sola vez, pero aun así debe dar un aviso verbal con 24 horas de anticipación cada vez."
+          }
+        }
       }
     }
   },
