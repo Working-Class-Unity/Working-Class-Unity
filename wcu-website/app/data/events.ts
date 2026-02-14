@@ -192,6 +192,24 @@ export const events: Event[] = [
     committee: null
   },
   {
+    id: 'event-11',
+    titleKey: 'calendar.events.newMemberOpenHouse.title',
+    descriptionKey: 'calendar.events.newMemberOpenHouse.description',
+    eventType: 'social',
+    startDateTime: '2026-02-22T20:00:00.000Z',
+    endDateTime: '2026-02-22T21:00:00.000Z',
+    allDay: false,
+    location: 'OF Hall - 2522 Grand Canal Blvd, Stockton, CA, USA',
+    rsvpLink: 'https://tech.workingclassunity.com/new-member-open-house',
+    isVirtual: false,
+    isHybrid: false,
+    isActive: true,
+    createdAt: '2026-02-14T08:47:31.456Z',
+    updatedAt: '2026-02-14T08:47:31.456Z',
+    campaignId: null,
+    committee: 'membership'
+  },
+  {
     id: 'event-9',
     titleKey: 'calendar.events.socialism101ReadingGroup.title',
     descriptionKey: 'calendar.events.socialism101ReadingGroup.description',
