@@ -639,6 +639,54 @@
             ]
           }
         }
+      },
+      "chapter-2": {
+        "paying-rent": {
+          "title": "Pasos sencillos para protegerte y tu dinero del alquiler",
+          "forms_heading": "Formas de pago",
+          "forms_list": [
+            "Pagar en persona siempre es preferible.",
+            "Nunca pagues en efectivo ni con cheque personal.",
+            "Siempre compra un giro postal (money order) o cheque de caja con la fecha de compra claramente sellada."
+          ],
+          "personal_heading": "Entrega personal o recogida",
+          "personal_list": [
+            "Si le pagas directamente a alguien, lleva un testigo contigo (de preferencia que no sea un familiar).",
+            "Pide un recibo o un papel firmado como comprobante de pago que indique claramente el nombre del propietario, el período que cubre el alquiler y el monto pagado.",
+            "Para mayor seguridad, toma una foto del recibo junto con tu método de pago."
+          ],
+          "mail_heading": "Por correo",
+          "mail_list": [
+            "Pagar en persona siempre es preferible.",
+            "Nunca pagues tu alquiler por correo regular.",
+            "Asegúrate de enviarlo con comprobante de envío (correo certificado sin firma requerida, o correo con confirmación de entrega, como USPS Priority Mail).",
+            "Si envías el alquiler por correo y se pierde, tú eres responsable del dinero perdido. Debes tener prueba de que lo enviaste (tu testimonio no es suficiente)."
+          ],
+          "when_heading": "Cuándo pagar el alquiler",
+          "when_p": "El alquiler vence el día 1 del mes, a menos que tu contrato indique otra fecha. La ley no reconoce un período de gracia a menos que tu contrato diga que lo tienes. Por ejemplo, una cláusula que diga que se aplicará una multa por pago tardío si pagas después del día 3 o 5 del mes no es un período de gracia."
+        },
+        "notice-to-pay": {
+          "intro": "Si te entregan un Aviso de pagar el alquiler, pon atención. Revisa cómo el Aviso exige el pago y haz exactamente lo que exige.",
+          "mail_heading": "Pago por correo",
+          "mail_p": "Si el Aviso dice que debes pagar por correo O si la dirección proporcionada solo permite pagar por correo:",
+          "mail_list": [
+            "Envía el alquiler a la dirección indicada en el Aviso.",
+            "Envíalo con comprobante de envío."
+          ],
+          "in_person_heading": "Pago en persona",
+          "in_person_p": "Si el Aviso no te indica pagar por correo y te da la opción de pagar en persona O si te indica pagar en persona:",
+          "in_person_list": [
+            "Entrégalo durante las horas indicadas en el Aviso.",
+            "Lleva un testigo contigo (de preferencia que no sea un familiar).",
+            "Pide un recibo o un papel firmado como comprobante de pago."
+          ],
+          "pickup_heading": "Recogida del pago",
+          "pickup_p": "Si el Aviso dice que el propietario/administrador recogerá el alquiler:",
+          "pickup_list": [
+            "Compra los giros postales (money orders) de inmediato y tenlos listos para cuando los recojan. Esto significa que todos los adultos del hogar sepan dónde están y puedan pagar al propietario/administrador cuando llegue.",
+            "Si nadie viene a recogerlo antes de las 2:00 PM en el último día para hacer el pago, entonces envía tu alquiler de inmediato por correo con comprobante de envío y guarda el recibo de la oficina de correos que muestre la hora en que lo enviaste."
+          ]
+        }
       }
     }
   },

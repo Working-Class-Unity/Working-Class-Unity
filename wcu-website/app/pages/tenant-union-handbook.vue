@@ -851,69 +851,57 @@ const highlightMatch = (text: string): string => {
             <!-- CHAPTER 2: PAYING RENT -->
             <!-- ============================================================= -->
             <h2 id="chapter-2" data-section class="text-2xl md:text-3xl font-bold text-secondary border-b-2 border-primary pb-2 mt-16">
-              Chapter 2: Paying Rent
+              {{ $t('tenant_handbook.chapters.chapter-2.title') }}
             </h2>
             <div class="not-prose mt-5">
               <TenantHandbookChapterContext :chapter="getChapterContext('chapter-2')" />
             </div>
 
             <section id="paying-rent" data-section class="mt-8">
-              <h3 class="text-xl font-bold text-base-content">Easy Steps to Protect Yourself and Your Rent Money</h3>
+              <h3 class="text-xl font-bold text-base-content">{{ $t('tenant_handbook.body.chapter-2.paying-rent.title') }}</h3>
 
-              <h4 class="font-semibold mt-4">Forms of Payment</h4>
+              <h4 class="font-semibold mt-4">{{ $t('tenant_handbook.body.chapter-2.paying-rent.forms_heading') }}</h4>
               <ol>
-                <li>Payment in person is always preferable.</li>
-                <li>Never pay with cash or a personal check.</li>
-                <li>Always buy a money order or cashier's check with the date of purchase clearly stamped on it.</li>
+                <li v-for="(item, index) in getStringList('tenant_handbook.body.chapter-2.paying-rent.forms_list')" :key="index">{{ item }}</li>
               </ol>
 
-              <h4 class="font-semibold mt-4">Personal Delivery or Pick-up</h4>
+              <h4 class="font-semibold mt-4">{{ $t('tenant_handbook.body.chapter-2.paying-rent.personal_heading') }}</h4>
               <ul>
-                <li>If you pay someone directly, take a witness with you (preferably not a family member).</li>
-                <li>Ask for a receipt or a signed paper to show proof of payment that clearly states the landlord's name, date covered by the rent, and the amount paid.</li>
-                <li>To be safe, take a photo of the receipt together with your payment method.</li>
+                <li v-for="(item, index) in getStringList('tenant_handbook.body.chapter-2.paying-rent.personal_list')" :key="index">{{ item }}</li>
               </ul>
 
-              <h4 class="font-semibold mt-4">By Mail</h4>
+              <h4 class="font-semibold mt-4">{{ $t('tenant_handbook.body.chapter-2.paying-rent.mail_heading') }}</h4>
               <ul>
-                <li>Payment in person is always preferable.</li>
-                <li>Never pay your rent via regular mail.</li>
-                <li>Make sure you mail it with proof of mailing (certified mail with no signature required, or mail with a delivery confirmation receipt, such as USPS Priority Mail).</li>
-                <li>If you mail the rent and it is lost, you are responsible for the lost money. You must have proof that you mailed it (your testimony is not sufficient).</li>
+                <li v-for="(item, index) in getStringList('tenant_handbook.body.chapter-2.paying-rent.mail_list')" :key="index">{{ item }}</li>
               </ul>
 
-              <h4 class="font-semibold mt-4">When to Pay Rent</h4>
+              <h4 class="font-semibold mt-4">{{ $t('tenant_handbook.body.chapter-2.paying-rent.when_heading') }}</h4>
               <p>
-                Rent is due on the 1st of the month—unless your contract states a different date. The law does not recognize a grace period unless your contract states that you have one. 
-                A term in your lease stating that a late fee will apply if you pay after the 3rd or the 5th of the month, for example, is not a grace period.
+                {{ $t('tenant_handbook.body.chapter-2.paying-rent.when_p') }}
               </p>
             </section>
 
             <section id="notice-to-pay" data-section class="mt-10">
-              <h3 class="text-xl font-bold text-base-content">Notice to Pay Rent</h3>
+              <h3 class="text-xl font-bold text-base-content">{{ $t('tenant_handbook.chapters.chapter-2.sections.notice-to-pay.title') }}</h3>
               
-              <p>If you are served a Notice to Pay Rent, pay attention. Check how the Notice requires payment, and do exactly as it requires.</p>
+              <p>{{ $t('tenant_handbook.body.chapter-2.notice-to-pay.intro') }}</p>
 
-              <h4 class="font-semibold mt-4">Payment by Mail</h4>
-              <p>If the Notice states you must pay by mail OR if the address provided only allows you to pay by mail:</p>
+              <h4 class="font-semibold mt-4">{{ $t('tenant_handbook.body.chapter-2.notice-to-pay.mail_heading') }}</h4>
+              <p>{{ $t('tenant_handbook.body.chapter-2.notice-to-pay.mail_p') }}</p>
               <ul>
-                <li>Mail the rent to the address stated in the Notice.</li>
-                <li>Mail it with proof of mailing.</li>
+                <li v-for="(item, index) in getStringList('tenant_handbook.body.chapter-2.notice-to-pay.mail_list')" :key="index">{{ item }}</li>
               </ul>
 
-              <h4 class="font-semibold mt-4">Payment in Person</h4>
-              <p>If the Notice does not direct you to pay by mail and allows you the option to pay in person OR if it directs you to pay in person:</p>
+              <h4 class="font-semibold mt-4">{{ $t('tenant_handbook.body.chapter-2.notice-to-pay.in_person_heading') }}</h4>
+              <p>{{ $t('tenant_handbook.body.chapter-2.notice-to-pay.in_person_p') }}</p>
               <ul>
-                <li>Deliver during the hours indicated in the Notice.</li>
-                <li>Take a witness with you (preferably not a family member).</li>
-                <li>Ask for a receipt or a signed paper to show proof of payment.</li>
+                <li v-for="(item, index) in getStringList('tenant_handbook.body.chapter-2.notice-to-pay.in_person_list')" :key="index">{{ item }}</li>
               </ul>
 
-              <h4 class="font-semibold mt-4">Payment Pick-up</h4>
-              <p>If the Notice states that the landlord/manager will pick up the rent:</p>
+              <h4 class="font-semibold mt-4">{{ $t('tenant_handbook.body.chapter-2.notice-to-pay.pickup_heading') }}</h4>
+              <p>{{ $t('tenant_handbook.body.chapter-2.notice-to-pay.pickup_p') }}</p>
               <ul>
-                <li>Buy the money order(s) right away and have them ready for pick up. This means that all adults in the household know where they are and can pay the landlord/manager when they come.</li>
-                <li>If no one comes to pick it up by 2:00 PM on the final day given to make payment, then mail your rent immediately with proof of mailing, and keep the receipt from the Post Office that shows the time you mailed the rent.</li>
+                <li v-for="(item, index) in getStringList('tenant_handbook.body.chapter-2.notice-to-pay.pickup_list')" :key="index">{{ item }}</li>
               </ul>
             </section>
 

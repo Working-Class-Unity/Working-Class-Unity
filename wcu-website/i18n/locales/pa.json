@@ -639,6 +639,54 @@
             ]
           }
         }
+      },
+      "chapter-2": {
+        "paying-rent": {
+          "title": "Easy Steps to Protect Yourself and Your Rent Money",
+          "forms_heading": "Forms of Payment",
+          "forms_list": [
+            "Payment in person is always preferable.",
+            "Never pay with cash or a personal check.",
+            "Always buy a money order or cashier's check with the date of purchase clearly stamped on it."
+          ],
+          "personal_heading": "Personal Delivery or Pick-up",
+          "personal_list": [
+            "If you pay someone directly, take a witness with you (preferably not a family member).",
+            "Ask for a receipt or a signed paper to show proof of payment that clearly states the landlord's name, date covered by the rent, and the amount paid.",
+            "To be safe, take a photo of the receipt together with your payment method."
+          ],
+          "mail_heading": "By Mail",
+          "mail_list": [
+            "Payment in person is always preferable.",
+            "Never pay your rent via regular mail.",
+            "Make sure you mail it with proof of mailing (certified mail with no signature required, or mail with a delivery confirmation receipt, such as USPS Priority Mail).",
+            "If you mail the rent and it is lost, you are responsible for the lost money. You must have proof that you mailed it (your testimony is not sufficient)."
+          ],
+          "when_heading": "When to Pay Rent",
+          "when_p": "Rent is due on the 1st of the month—unless your contract states a different date. The law does not recognize a grace period unless your contract states that you have one. A term in your lease stating that a late fee will apply if you pay after the 3rd or the 5th of the month, for example, is not a grace period."
+        },
+        "notice-to-pay": {
+          "intro": "If you are served a Notice to Pay Rent, pay attention. Check how the Notice requires payment, and do exactly as it requires.",
+          "mail_heading": "Payment by Mail",
+          "mail_p": "If the Notice states you must pay by mail OR if the address provided only allows you to pay by mail:",
+          "mail_list": [
+            "Mail the rent to the address stated in the Notice.",
+            "Mail it with proof of mailing."
+          ],
+          "in_person_heading": "Payment in Person",
+          "in_person_p": "If the Notice does not direct you to pay by mail and allows you the option to pay in person OR if it directs you to pay in person:",
+          "in_person_list": [
+            "Deliver during the hours indicated in the Notice.",
+            "Take a witness with you (preferably not a family member).",
+            "Ask for a receipt or a signed paper to show proof of payment."
+          ],
+          "pickup_heading": "Payment Pick-up",
+          "pickup_p": "If the Notice states that the landlord/manager will pick up the rent:",
+          "pickup_list": [
+            "Buy the money order(s) right away and have them ready for pick up. This means that all adults in the household know where they are and can pay the landlord/manager when they come.",
+            "If no one comes to pick it up by 2:00 PM on the final day given to make payment, then mail your rent immediately with proof of mailing, and keep the receipt from the Post Office that shows the time you mailed the rent."
+          ]
+        }
       }
     }
   },
