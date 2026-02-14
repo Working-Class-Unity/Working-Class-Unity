@@ -5,17 +5,17 @@
       
       <!-- Doc Header -->
       <header class="pt-6 pb-3 md:pt-8 md:pb-4 flex justify-between items-center border-b border-base-content/10">
-        <span class="text-sm font-semibold text-base-content">Working Class Unity</span>
-        <a href="#solidarity" class="btn btn-outline h-10 min-h-10 px-4 text-sm rounded-full focus-visible:ring-2 focus-visible:ring-primary/50">Sign the Pledge</a>
+        <span class="text-sm font-semibold text-base-content">{{ $t('unitedfront.ui.org_name') }}</span>
+        <a href="#solidarity" class="btn btn-outline h-10 min-h-10 px-4 text-sm rounded-full focus-visible:ring-2 focus-visible:ring-primary/50">{{ $t('unitedfront.ui.sign_pledge') }}</a>
       </header>
 
       <!-- Hero Text (LEFT ALIGNED) -->
       <section class="pt-8 pb-10 md:pt-12 md:pb-16">
-        <span class="text-xs uppercase tracking-[0.15em] text-base-content/80 block mb-3">San Joaquin County</span>
+        <span class="text-xs uppercase tracking-[0.15em] text-base-content/80 block mb-3">{{ $t('unitedfront.ui.region_label') }}</span>
         <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-base-content mb-6 leading-tight">
           {{ $t('unitedfront.title') }}
         </h1>
-        <p class="text-base text-base-content/80">Published by WCU • 3 min read</p>
+        <p class="text-base text-base-content/80">{{ $t('unitedfront.ui.published_read_time') }}</p>
       </section>
 
       <!-- What We Face -->
@@ -90,21 +90,21 @@
         <div class="grid md:grid-cols-2 gap-6 md:gap-0">
           <!-- Left Column: Democrats -->
           <div class="pr-0 md:pr-8 md:border-r border-base-content/10">
-            <h3 class="text-lg font-semibold text-base-content mb-4">Democrats</h3>
+            <h3 class="text-lg font-semibold text-base-content mb-4">{{ $t('unitedfront.ui.whyNeitherParty.democrats.title') }}</h3>
             <p class="text-base text-base-content/80 leading-relaxed">
-              Democrats offer kinder words but have presided over mass deportations and expanded enforcement, while leaving working-class cities to shoulder costs of migration without support.
+              {{ $t('unitedfront.ui.whyNeitherParty.democrats.text') }}
             </p>
           </div>
           <!-- Right Column: Republicans -->
           <div class="pl-0 md:pl-8 mt-8 md:mt-0">
-            <h3 class="text-lg font-semibold text-base-content mb-4">Republicans</h3>
+            <h3 class="text-lg font-semibold text-base-content mb-4">{{ $t('unitedfront.ui.whyNeitherParty.republicans.title') }}</h3>
             <p class="text-base text-base-content/80 leading-relaxed">
-              Republicans campaign on open attacks against immigrants and unions. Both parties answer to big money.
+              {{ $t('unitedfront.ui.whyNeitherParty.republicans.text') }}
             </p>
           </div>
         </div>
         <p class="text-base sm:text-lg text-base-content/80 leading-relaxed mt-8">
-          The result is predictable: people already struggling with housing and services are pitted against new arrivals for resources neither group should have to fight over. We reject the propaganda that our only choices are one party's cruelty or the other's empty promises. We build independent, organized working-class power.
+          {{ $t('unitedfront.ui.whyNeitherParty.closing') }}
         </p>
       </section>
 
@@ -223,11 +223,11 @@
       <!-- Footer - Minimal -->
       <footer class="py-12 border-t border-base-content/10 flex flex-wrap gap-4 justify-between items-center">
         <NuxtLinkLocale to="/" class="text-sm text-base-content/80 hover:text-base-content">
-          ← Return Home
+          ← {{ $t('common.return_home') }}
         </NuxtLinkLocale>
         <div class="flex gap-4">
-          <button class="btn btn-ghost h-10 min-h-10 px-3 text-sm">Share</button>
-          <NuxtLinkLocale to="/join" class="btn btn-primary h-10 min-h-10 px-3 text-sm">Join Us</NuxtLinkLocale>
+          <button class="btn btn-ghost h-10 min-h-10 px-3 text-sm">{{ $t('unitedfront.ui.footer.share') }}</button>
+          <NuxtLinkLocale to="/join" class="btn btn-primary h-10 min-h-10 px-3 text-sm">{{ $t('unitedfront.ui.footer.join') }}</NuxtLinkLocale>
         </div>
       </footer>
     </div>

@@ -805,6 +805,27 @@
     "pageTitle": "United Front",
     "title": "A United Front of the Working Class: San Joaquin County Stands Together Against the Persecution of Immigrants and the Intimidation of Workers",
     "subtitle": "They want us to be afraid and divided.",
+    "ui": {
+      "org_name": "Working Class Unity",
+      "sign_pledge": "Sign the Pledge",
+      "region_label": "San Joaquin County",
+      "published_read_time": "Published by WCU • 3 min read",
+      "whyNeitherParty": {
+        "democrats": {
+          "title": "Democrats",
+          "text": "Democrats offer kinder words but have presided over mass deportations and expanded enforcement, while leaving working-class cities to shoulder costs of migration without support."
+        },
+        "republicans": {
+          "title": "Republicans",
+          "text": "Republicans campaign on open attacks against immigrants and unions. Both parties answer to big money."
+        },
+        "closing": "The result is predictable: people already struggling with housing and services are pitted against new arrivals for resources neither group should have to fight over. We reject the propaganda that our only choices are one party's cruelty or the other's empty promises. We build independent, organized working-class power."
+      },
+      "footer": {
+        "share": "Share",
+        "join": "Join Us"
+      }
+    },
     "whatWeFace": {
       "heading": "WHAT WE FACE",
       "content": "Across the country, immigration enforcement and police surveillance disrupt daily life in neighborhoods, schools, workplaces, and churches. Our coworkers and our neighbors are questioned and detained with little regard for fairness or due process. Though we are not seeing the same level of activity as Chicago and Los Angeles, we must not let that make us complacent."

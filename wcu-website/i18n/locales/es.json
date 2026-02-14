@@ -813,6 +813,27 @@
     "pageTitle": "Frente Unido",
     "title": "Un Frente Unido de la Clase Obrera: El Condado de San Joaquín se une en contra de la Persecución de Inmigrantes y la Intimidación contra los Trabajadores",
     "subtitle": "Quieren que tengamos miedo y que estemos divididos.",
+    "ui": {
+      "org_name": "Working Class Unity",
+      "sign_pledge": "Firma el compromiso",
+      "region_label": "Condado de San Joaquín",
+      "published_read_time": "Publicado por WCU • 3 min de lectura",
+      "whyNeitherParty": {
+        "democrats": {
+          "title": "Demócratas",
+          "text": "Los demócratas ofrecen palabras más amables, pero han presidido deportaciones masivas y aumentado el control migratorio, mientras dejan que las ciudades de clase obrera carguen con los costos de la migración sin ningún apoyo."
+        },
+        "republicans": {
+          "title": "Republicanos",
+          "text": "Los republicanos hacen campaña con ataques abiertos contra los inmigrantes y los sindicatos. Ambos partidos responden al gran capital."
+        },
+        "closing": "El resultado es predecible: la gente que ya tiene dificultades con la vivienda y los servicios es puesta a competir contra los recién llegados por recursos por los que ningún grupo debería tener que pelear. Rechazamos la propaganda de que nuestras únicas opciones son la crueldad de un partido o las promesas vacías del otro. Construimos un poder independiente y organizado por la clase obrera."
+      },
+      "footer": {
+        "share": "Compartir",
+        "join": "Únete a WCU"
+      }
+    },
     "whatWeFace": {
       "heading": "A QUÉ NOS ENFRENTAMOS",
       "content": "En todo el país, la vigilancia policial y de inmigración alteran la vida cotidiana en nuestros barrios, escuelas, centros de trabajo e iglesias. Nuestros compañeros de trabajo y vecinos están siendo interrogados y detenidos sin consideración por la justicia o el proceso debido. Aunque no estamos presenciando el mismo nivel de actividad que en Chicago y Los Ángeles, no debemos permitir que eso nos haga sentir confiados."
