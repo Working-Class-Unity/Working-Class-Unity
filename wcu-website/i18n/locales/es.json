@@ -180,6 +180,25 @@
       "open_toc": "Abrir tabla de contenidos",
       "search_placeholder": "Buscar secciones...",
       "clear_search": "Limpiar búsqueda"
+    },
+    "hero": {
+      "eyebrow": "Manual de defensa de inquilinos",
+      "title": "Manual del sindicato de inquilinos",
+      "subtitle": "Una guía práctica para organizarnos, defendernos entre nosotros y ganar en el condado de San Joaquín.",
+      "disclaimer": "No es asesoría legal. Si estás en peligro inmediato, llama al 911."
+    },
+    "quick_paths": {
+      "title": "Empieza en el capítulo correcto",
+      "priority": {
+        "urgent": "Urgente",
+        "next": "Empieza aquí",
+        "learn": "Profundiza"
+      }
+    },
+    "contacts": {
+      "title": "Contactos clave para reportar",
+      "phone_label": "Teléfono:",
+      "email_label": "Correo:"
     }
   },
   "about_page": {

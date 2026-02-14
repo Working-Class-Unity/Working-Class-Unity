@@ -10,6 +10,8 @@ const emit = defineEmits<{
   jump: [sectionId: string]
 }>()
 
+const { t } = useI18n()
+
 const priorityBadgeClass = (priority: HandbookQuickPath['priority']) => {
   if (priority === 'urgent') return 'bg-accent/15 text-base-content border-accent/45'
   if (priority === 'next') return 'bg-primary/20 text-base-content border-primary/55'
@@ -17,9 +19,9 @@ const priorityBadgeClass = (priority: HandbookQuickPath['priority']) => {
 }
 
 const priorityLabel = (priority: HandbookQuickPath['priority']) => {
-  if (priority === 'urgent') return 'Urgent'
-  if (priority === 'next') return 'Start Here'
-  return 'Deep Dive'
+  if (priority === 'urgent') return t('tenant_handbook.quick_paths.priority.urgent')
+  if (priority === 'next') return t('tenant_handbook.quick_paths.priority.next')
+  return t('tenant_handbook.quick_paths.priority.learn')
 }
 </script>
 
@@ -28,20 +30,20 @@ const priorityLabel = (priority: HandbookQuickPath['priority']) => {
     <div class="solidarity-stripe h-1.5 -mx-6 md:-mx-8 -mt-6 md:-mt-8 mb-6" aria-hidden="true"></div>
 
     <header class="max-w-3xl">
-      <p class="wcu-eyebrow mb-2">Tenant Defense Manual</p>
+      <p class="wcu-eyebrow mb-2">{{ $t('tenant_handbook.hero.eyebrow') }}</p>
       <h1 id="handbook-quickstart-title" class="text-3xl sm:text-4xl md:text-5xl font-bold text-base-content leading-tight">
-        Tenant Union Handbook
+        {{ $t('tenant_handbook.hero.title') }}
       </h1>
       <p class="mt-3 text-base sm:text-lg text-base-content/85">
-        Built for fast decisions during rent disputes, repair delays, and eviction threats in San Joaquin County.
+        {{ $t('tenant_handbook.hero.subtitle') }}
       </p>
       <p class="mt-3 inline-flex items-center rounded-md border border-secondary/30 bg-secondary/10 px-3 py-1.5 text-sm text-base-content">
-        This handbook does not replace legal counsel. Use it to organize evidence and next actions.
+        {{ $t('tenant_handbook.hero.disclaimer') }}
       </p>
     </header>
 
     <section class="mt-8" aria-labelledby="quick-paths-title">
-      <h2 id="quick-paths-title" class="text-lg font-semibold text-secondary">Start in the right chapter</h2>
+      <h2 id="quick-paths-title" class="text-lg font-semibold text-secondary">{{ $t('tenant_handbook.quick_paths.title') }}</h2>
       <div class="mt-4 grid gap-3 md:grid-cols-2">
         <button
           v-for="path in props.quickPaths"
@@ -60,7 +62,7 @@ const priorityLabel = (priority: HandbookQuickPath['priority']) => {
     </section>
 
     <section class="mt-8 border-t border-base-300 pt-6" aria-labelledby="contacts-title">
-      <h2 id="contacts-title" class="text-lg font-semibold text-secondary">Key reporting contacts</h2>
+      <h2 id="contacts-title" class="text-lg font-semibold text-secondary">{{ $t('tenant_handbook.contacts.title') }}</h2>
       <ul class="mt-4 grid gap-3 md:grid-cols-3" role="list">
         <li
           v-for="contact in props.contacts"
@@ -69,7 +71,7 @@ const priorityLabel = (priority: HandbookQuickPath['priority']) => {
         >
           <p class="text-sm font-semibold text-base-content">{{ contact.label }}</p>
           <p class="mt-2 text-sm text-base-content">
-            <span class="font-semibold">Phone:</span>
+            <span class="font-semibold">{{ $t('tenant_handbook.contacts.phone_label') }}</span>
             <a
               class="font-semibold text-base-content underline decoration-secondary/70 underline-offset-2 hover:text-secondary focus-visible:text-secondary"
               :href="`tel:${contact.phone.replace(/[^\d+]/g, '')}`"
@@ -78,7 +80,7 @@ const priorityLabel = (priority: HandbookQuickPath['priority']) => {
             </a>
           </p>
           <p v-if="contact.email" class="mt-1 text-sm text-base-content">
-            <span class="font-semibold">Email:</span>
+            <span class="font-semibold">{{ $t('tenant_handbook.contacts.email_label') }}</span>
             <a
               class="font-semibold break-all text-base-content underline decoration-secondary/70 underline-offset-2 hover:text-secondary focus-visible:text-secondary"
               :href="`mailto:${contact.email}`"

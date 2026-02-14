@@ -180,6 +180,25 @@
       "open_toc": "Open table of contents",
       "search_placeholder": "Search sections...",
       "clear_search": "Clear search"
+    },
+    "hero": {
+      "eyebrow": "Tenant Defense Manual",
+      "title": "Tenant Union Handbook",
+      "subtitle": "A practical guide to organizing, defending each other, and winning in San Joaquin County.",
+      "disclaimer": "Not legal advice. If you are in immediate danger, call 911."
+    },
+    "quick_paths": {
+      "title": "Start in the right chapter",
+      "priority": {
+        "urgent": "Urgent",
+        "next": "Start Here",
+        "learn": "Deep Dive"
+      }
+    },
+    "contacts": {
+      "title": "Key reporting contacts",
+      "phone_label": "Phone:",
+      "email_label": "Email:"
     }
   },
   "about_page": {
