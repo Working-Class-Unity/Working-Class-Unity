@@ -909,93 +909,79 @@ const highlightMatch = (text: string): string => {
             <!-- CHAPTER 3: REPORTING VIOLATIONS -->
             <!-- ============================================================= -->
             <h2 id="chapter-3" data-section class="text-2xl md:text-3xl font-bold text-secondary border-b-2 border-primary pb-2 mt-16">
-              Chapter 3: Reporting Violations
+              {{ $t('tenant_handbook.chapters.chapter-3.title') }}
             </h2>
             <div class="not-prose mt-5">
               <TenantHandbookChapterContext :chapter="getChapterContext('chapter-3')" />
             </div>
 
             <p class="mt-4">
-              The most important part of reporting code violations is to remember that bad appearances are not necessarily a code violation. 
-              <strong>It is a code violation if it should work and does not.</strong>
+              {{ $t('tenant_handbook.body.chapter-3.intro.p1') }}
+              <strong>{{ $t('tenant_handbook.body.chapter-3.intro.emphasis') }}</strong>
             </p>
 
-            <TenantHandbookEvidenceNote title="Critical caution" tone="warning">
-              If you are going to file ANY official complaints, you MUST follow all of the Rent Paying tips
-              in Chapter 2. Hostile landlords will try to claim nonpayment of rent as one of their first
-              methods for retaliation. <strong>DO NOT ATTEMPT TO WITHHOLD RENT WITHOUT LEGAL CONSULTATION.</strong>
+            <TenantHandbookEvidenceNote :title="$t('tenant_handbook.body.chapter-3.evidence_notes.critical_caution.title')" tone="warning">
+              {{ $t('tenant_handbook.body.chapter-3.evidence_notes.critical_caution.text') }}
+              <strong>{{ $t('tenant_handbook.body.chapter-3.evidence_notes.critical_caution.strong') }}</strong>
             </TenantHandbookEvidenceNote>
 
             <section id="code-enforcement" data-section class="mt-8">
-              <h3 class="text-xl font-bold text-base-content">Stockton Code Enforcement</h3>
+              <h3 class="text-xl font-bold text-base-content">{{ $t('tenant_handbook.chapters.chapter-3.sections.code-enforcement.title') }}</h3>
               
               <div class="bg-base-200 p-4 rounded-lg">
-                <p><strong>Phone:</strong> 209-468-3141</p>
-                <p><strong>Email:</strong> <a href="mailto:NSS@Stocktonca.gov" class="link link-primary">NSS@Stocktonca.gov</a></p>
+                <p><strong>{{ $t('tenant_handbook.contacts.phone_label') }}</strong> 209-468-3141</p>
+                <p><strong>{{ $t('tenant_handbook.contacts.email_label') }}</strong> <a href="mailto:NSS@Stocktonca.gov" class="link link-primary">NSS@Stocktonca.gov</a></p>
               </div>
 
               <p class="mt-4">
-                This email address is for submitting information requests, reporting code violations, and requesting payoff demands to remove recorded notices/liens from properties. 
-                You can also contact Neighborhood Services at (209) 937-8813 or fax a demand request to (209) 937-7264.
+                {{ $t('tenant_handbook.body.chapter-3.code-enforcement.p1') }}
               </p>
             </section>
 
             <section id="filing-tips" data-section class="mt-10">
-              <h3 class="text-xl font-bold text-base-content">Tips for Filing Complaints with Code Enforcement</h3>
+              <h3 class="text-xl font-bold text-base-content">{{ $t('tenant_handbook.body.chapter-3.filing-tips.heading') }}</h3>
               
               <ul>
-                <li>Code Enforcement inspectors will ONLY write a report of what they see. They will not go under buildings, on roofs, or pull open walls to look for mold.</li>
-                <li>You can book an inspection based on one complaint and have them look at any other potential issues while they are in your unit.</li>
-                <li>Each separate unit has to place its own complaint(s). You cannot make a complaint for other apartments.</li>
-                <li>Overall building inspection can be requested for common areas.</li>
-                <li>After filing a complaint, make sure to get the inspector's card with your case number on it. Call and follow up OFTEN to check the status of the case.</li>
-                <li>Sometimes they will close the case without notifying you. You can contest the closing of a case and ask that it be reopened if the repairs have not been completed.</li>
-                <li>Take photos and videos and either text them to someone or email them to someone to have a time-coded record of the issue.</li>
-                <li>Keep copies of all communications with the landlord and with code enforcement.</li>
-                <li>Be there for the inspection because sometimes the landlord will be there instead and they will attempt to minimize any issues.</li>
-                <li>Ask for copies of any inspection reports.</li>
+                <li v-for="(item, index) in getStringList('tenant_handbook.body.chapter-3.filing-tips.tips')" :key="index">{{ item }}</li>
               </ul>
             </section>
 
             <section id="health-violations" data-section class="mt-10">
-              <h3 class="text-xl font-bold text-base-content">Health Code Violations</h3>
+              <h3 class="text-xl font-bold text-base-content">{{ $t('tenant_handbook.chapters.chapter-3.sections.health-violations.title') }}</h3>
               
               <p>
-                Health code violations include cockroaches (but not water bugs), rat or mice infestation, visible mold or mildew, and sewage in the bathtub. 
-                Contact the Health and Human Services Department for your city of residence.
+                {{ $t('tenant_handbook.body.chapter-3.health-violations.p1') }}
               </p>
 
               <div class="bg-base-200 p-4 rounded-lg mt-4">
-                <h4 class="font-semibold">San Joaquin County Public Health Services</h4>
+                <h4 class="font-semibold">{{ $t('tenant_handbook.contacts.items.contact-county-health.label') }}</h4>
                 <ul class="mb-0">
-                  <li><strong>General Information:</strong> (209) 468-3400</li>
-                  <li><strong>Email:</strong> phs-info@sjcphs.org</li>
-                  <li><strong>Administration:</strong> 209-468-3411</li>
-                  <li><strong>Public Info and Communication:</strong> 209-468-3859</li>
+                  <li><strong>{{ $t('tenant_handbook.body.chapter-3.health-violations.contact.general_info_label') }}</strong> (209) 468-3400</li>
+                  <li><strong>{{ $t('tenant_handbook.contacts.email_label') }}</strong> phs-info@sjcphs.org</li>
+                  <li><strong>{{ $t('tenant_handbook.body.chapter-3.health-violations.contact.administration_label') }}</strong> 209-468-3411</li>
+                  <li><strong>{{ $t('tenant_handbook.body.chapter-3.health-violations.contact.public_info_label') }}</strong> 209-468-3859</li>
                 </ul>
               </div>
 
               <p class="mt-4">
-                Depending on where you live, lodge a complaint with both the city and county. They will ONLY create a report based on what they can see, 
-                and only create a file based on health code violations (e.g. rats), not building code violations (e.g. a faulty water faucet).
+                {{ $t('tenant_handbook.body.chapter-3.health-violations.p2') }}
               </p>
             </section>
 
             <section id="building-violations" data-section class="mt-10">
-              <h3 class="text-xl font-bold text-base-content">Building Code Violations</h3>
+              <h3 class="text-xl font-bold text-base-content">{{ $t('tenant_handbook.chapters.chapter-3.sections.building-violations.title') }}</h3>
               
               <div class="bg-base-200 p-4 rounded-lg">
-                <h4 class="font-semibold">Stockton Code Enforcement Building Inspections</h4>
-                <p class="mb-0"><strong>Phone:</strong> 209-468-3141</p>
+                <h4 class="font-semibold">{{ $t('tenant_handbook.body.chapter-3.building-violations.contact_heading') }}</h4>
+                <p class="mb-0"><strong>{{ $t('tenant_handbook.contacts.phone_label') }}</strong> 209-468-3141</p>
               </div>
 
               <p class="mt-4">
-                File complaints with Stockton Code Enforcement regarding issues with the structure of your unit, such as termites or roof damage.
+                {{ $t('tenant_handbook.body.chapter-3.building-violations.p1') }}
               </p>
 
               <p>
-                Whenever you file a complaint with Stockton Code Enforcement, you can also ask that they inspect all the smoke and carbon monoxide detectors in the building. 
-                They can also write up the landlord for any other violations seen on the property.
+                {{ $t('tenant_handbook.body.chapter-3.building-violations.p2') }}
               </p>
             </section>
 

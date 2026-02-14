@@ -687,6 +687,51 @@
             "If no one comes to pick it up by 2:00 PM on the final day given to make payment, then mail your rent immediately with proof of mailing, and keep the receipt from the Post Office that shows the time you mailed the rent."
           ]
         }
+      },
+      "chapter-3": {
+        "intro": {
+          "p1": "The most important part of reporting code violations is to remember that bad appearances are not necessarily a code violation.",
+          "emphasis": "It is a code violation if it should work and does not."
+        },
+        "evidence_notes": {
+          "critical_caution": {
+            "title": "Critical caution",
+            "text": "If you are going to file ANY official complaints, you MUST follow all of the Rent Paying tips in Chapter 2. Hostile landlords will try to claim nonpayment of rent as one of their first methods for retaliation.",
+            "strong": "DO NOT ATTEMPT TO WITHHOLD RENT WITHOUT LEGAL CONSULTATION."
+          }
+        },
+        "code-enforcement": {
+          "p1": "This email address is for submitting information requests, reporting code violations, and requesting payoff demands to remove recorded notices/liens from properties. You can also contact Neighborhood Services at (209) 937-8813 or fax a demand request to (209) 937-7264."
+        },
+        "filing-tips": {
+          "heading": "Tips for Filing Complaints with Code Enforcement",
+          "tips": [
+            "Code Enforcement inspectors will ONLY write a report of what they see. They will not go under buildings, on roofs, or pull open walls to look for mold.",
+            "You can book an inspection based on one complaint and have them look at any other potential issues while they are in your unit.",
+            "Each separate unit has to place its own complaint(s). You cannot make a complaint for other apartments.",
+            "Overall building inspection can be requested for common areas.",
+            "After filing a complaint, make sure to get the inspector's card with your case number on it. Call and follow up OFTEN to check the status of the case.",
+            "Sometimes they will close the case without notifying you. You can contest the closing of a case and ask that it be reopened if the repairs have not been completed.",
+            "Take photos and videos and either text them to someone or email them to someone to have a time-coded record of the issue.",
+            "Keep copies of all communications with the landlord and with code enforcement.",
+            "Be there for the inspection because sometimes the landlord will be there instead and they will attempt to minimize any issues.",
+            "Ask for copies of any inspection reports."
+          ]
+        },
+        "health-violations": {
+          "p1": "Health code violations include cockroaches (but not water bugs), rat or mice infestation, visible mold or mildew, and sewage in the bathtub. Contact the Health and Human Services Department for your city of residence.",
+          "contact": {
+            "general_info_label": "General Information:",
+            "administration_label": "Administration:",
+            "public_info_label": "Public Info and Communication:"
+          },
+          "p2": "Depending on where you live, lodge a complaint with both the city and county. They will ONLY create a report based on what they can see, and only create a file based on health code violations (e.g. rats), not building code violations (e.g. a faulty water faucet)."
+        },
+        "building-violations": {
+          "contact_heading": "Stockton Code Enforcement Building Inspections",
+          "p1": "File complaints with Stockton Code Enforcement regarding issues with the structure of your unit, such as termites or roof damage.",
+          "p2": "Whenever you file a complaint with Stockton Code Enforcement, you can also ask that they inspect all the smoke and carbon monoxide detectors in the building. They can also write up the landlord for any other violations seen on the property."
+        }
       }
     }
   },

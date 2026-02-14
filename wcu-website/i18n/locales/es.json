@@ -687,6 +687,51 @@
             "Si nadie viene a recogerlo antes de las 2:00 PM en el último día para hacer el pago, entonces envía tu alquiler de inmediato por correo con comprobante de envío y guarda el recibo de la oficina de correos que muestre la hora en que lo enviaste."
           ]
         }
+      },
+      "chapter-3": {
+        "intro": {
+          "p1": "La parte más importante de reportar violaciones de código es recordar que una mala apariencia no necesariamente es una violación de código.",
+          "emphasis": "Es una violación de código si debería funcionar y no funciona."
+        },
+        "evidence_notes": {
+          "critical_caution": {
+            "title": "Advertencia crítica",
+            "text": "Si vas a presentar CUALQUIER queja oficial, DEBES seguir todos los consejos para pagar el alquiler del Capítulo 2. Los propietarios hostiles tratarán de alegar falta de pago del alquiler como uno de sus primeros métodos de represalia.",
+            "strong": "NO INTENTES RETENER EL ALQUILER SIN CONSULTA LEGAL."
+          }
+        },
+        "code-enforcement": {
+          "p1": "Esta dirección de correo es para enviar solicitudes de información, reportar violaciones de código y solicitar demandas de pago para eliminar avisos/gravámenes registrados en propiedades. También puedes comunicarte con Neighborhood Services al (209) 937-8813 o enviar por fax una solicitud de demanda al (209) 937-7264."
+        },
+        "filing-tips": {
+          "heading": "Consejos para presentar quejas con Cumplimiento de Códigos",
+          "tips": [
+            "Los inspectores de Cumplimiento de Códigos SOLO escribirán un reporte de lo que ven. No se meterán debajo de edificios, en techos ni abrirán paredes para buscar moho.",
+            "Puedes solicitar una inspección basada en una sola queja y pedir que revisen otros posibles problemas mientras estén en tu unidad.",
+            "Cada unidad por separado tiene que presentar sus propias quejas. No puedes presentar una queja por otros apartamentos.",
+            "Se puede solicitar una inspección general del edificio para áreas comunes.",
+            "Después de presentar una queja, asegúrate de obtener la tarjeta del inspector con tu número de caso. Llama y da seguimiento CON FRECUENCIA para revisar el estado del caso.",
+            "A veces cerrarán el caso sin avisarte. Puedes impugnar el cierre de un caso y pedir que lo reabran si las reparaciones no se han completado.",
+            "Toma fotos y videos y envíaselos por mensaje o correo electrónico a alguien para tener un registro con fecha y hora del problema.",
+            "Guarda copias de toda comunicación con el propietario y con Cumplimiento de Códigos.",
+            "Estate presente durante la inspección porque a veces el propietario estará en tu lugar e intentará minimizar los problemas.",
+            "Pide copias de cualquier reporte de inspección."
+          ]
+        },
+        "health-violations": {
+          "p1": "Las violaciones al código de salud incluyen cucarachas (pero no water bugs), infestación de ratas o ratones, moho visible y aguas residuales en la bañera. Contacta al Departamento de Salud y Servicios Humanos de tu ciudad de residencia.",
+          "contact": {
+            "general_info_label": "Información general:",
+            "administration_label": "Administración:",
+            "public_info_label": "Información pública y comunicación:"
+          },
+          "p2": "Dependiendo de dónde vivas, presenta una queja tanto con la ciudad como con el condado. SOLO crearán un reporte basado en lo que puedan ver, y solo abrirán un expediente por violaciones al código de salud (por ejemplo: ratas), no por violaciones al código de construcción (por ejemplo: una llave de agua defectuosa)."
+        },
+        "building-violations": {
+          "contact_heading": "Inspecciones de edificios de Cumplimiento de Códigos de Stockton",
+          "p1": "Presenta quejas con Cumplimiento de Códigos de Stockton sobre problemas estructurales en tu unidad, como termitas o daño en el techo.",
+          "p2": "Cada vez que presentes una queja con Cumplimiento de Códigos de Stockton, también puedes pedir que inspeccionen todos los detectores de humo y monóxido de carbono del edificio. También pueden citar al propietario por cualquier otra violación que vean en la propiedad."
+        }
       }
     }
   },
