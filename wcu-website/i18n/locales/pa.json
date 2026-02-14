@@ -161,6 +161,7 @@
   "common": {
     "close": "ਬੰਦ ਕਰੋ",
     "skip_to_main": "ਮੁੱਖ ਸਮੱਗਰੀ 'ਤੇ ਜਾਓ",
+    "return_home": "ਮੁੱਖ ਪੰਨੇ ਤੇ ਵਾਪਸ",
     "critical": "ਨਾਜ਼ੁਕ",
     "required": "ਲੋੜੀਂਦਾ",
     "important": "ਮਹੱਤਵਪੂਰਨ",
@@ -182,33 +183,36 @@
     }
   },
   "about_page": {
-    "title": "They Have Their Parties. We Need Our Own Organization",
-    "p1": "The bosses and landlords have two political parties. The working class needs a fighting organization of its own.",
-    "p2": "Across San Joaquin, rents rise while our wages stall. Bosses demand more while giving less. Both the Democratic and Republican parties answer to their donors, not to us.",
-    "p3": "Our political and economic system is not broken; it is working exactly as designed to protect the profits of the wealthy by keeping the rest of us divided and powerless. It makes us too poor to live in and own the homes we've built, too poor to eat the food we've grown and served, too poor to benefit from the fruits of our labor.",
-    "p4": "We refuse to accept this. We are organizing a mass working-class movement to build the genuine democracy we deserve – one where working people have real control over our lives, our communities, and our economy. We are not a political party. We organize collectively through mass membership. We do not have to continue relying on politicians, lobbying them, and hoping that they side with us over their donors.",
-    "p5": "Working Class Unity is just as the name suggests, an organization fighting to unite the working class, to give individuals in San Joaquin control over their lives. We demand truly affordable and safe housing, workplace autonomy, protection of our communities from police oppression, and accountability from our elected officials. Our mission is to strengthen working class power by forging alliances between labor and tenant unions and social movements through education, advocacy, and direct action.",
-    "p6": "We fight for our families. For the future prosperity of our children. Whatever your race, your creed, your birthplace - don't stand by and let the wealthy tear down this country that each one of us has helped build.",
-    "p7": "Together, we can build a member-run movement in San Joaquin County that wins concrete victories, without the compromises and betrayals of politicians and their wealthy donors.",
-    "cta_button": "Join us"
+    "title": "ਉਹਨਾਂ ਦੀਆਂ ਪਾਰਟੀਆਂ ਹਨ। ਸਾਨੂੰ ਆਪਣਾ ਸੰਗਠਨ ਚਾਹੀਦਾ ਹੈ",
+    "eyebrow": "ਸਾਡੀ ਕਹਾਣੀ",
+    "problem_heading": "ਸਮੱਸਿਆ",
+    "solution_heading": "ਸਾਡਾ ਹੱਲ",
+    "p1": "ਮਾਲਕਾਂ ਅਤੇ ਮਕਾਨ ਮਾਲਕਾਂ ਕੋਲ ਦੋ ਰਾਜਨੀਤਿਕ ਪਾਰਟੀਆਂ ਹਨ। ਮਜ਼ਦੂਰ ਜਮਾਤ ਨੂੰ ਆਪਣਾ ਲੜਾਕੂ ਸੰਗਠਨ ਚਾਹੀਦਾ ਹੈ।",
+    "p2": "ਸੈਨ ਜੋਆਕਿਨ ਭਰ ਵਿੱਚ ਕਿਰਾਏ ਚੜ੍ਹਦੇ ਜਾਂਦੇ ਹਨ, ਪਰ ਸਾਡੀਆਂ ਤਨਖਾਹਾਂ ਥਾਂ ਦੀ ਥਾਂ ਹਨ। ਮਾਲਕ ਵਧੇਰੇ ਮੰਗਦੇ ਹਨ ਪਰ ਘੱਟ ਦਿੰਦੇ ਹਨ। ਡੈਮੋਕ੍ਰੈਟ ਅਤੇ ਰਿਪਬਲਿਕਨ ਦੋਵੇਂ ਆਪਣੇ ਦਾਨਦਾਤਿਆਂ ਨੂੰ ਜਵਾਬਦੇਹ ਹਨ, ਸਾਨੂੰ ਨਹੀਂ।",
+    "p3": "ਸਾਡਾ ਰਾਜਨੀਤਿਕ ਅਤੇ ਆਰਥਿਕ ਪ੍ਰਣਾਲੀ ਟੁੱਟੀ ਹੋਈ ਨਹੀਂ; ਇਹ ਓਹੀ ਕਰ ਰਹੀ ਹੈ ਜਿਸ ਲਈ ਇਹ ਬਣੀ ਹੈ: ਅਮੀਰਾਂ ਦੇ ਮੁਨਾਫੇ ਦੀ ਰੱਖਿਆ, ਬਾਕੀਆਂ ਨੂੰ ਵੰਡ ਕੇ ਅਤੇ ਬੇਬਸ ਰੱਖ ਕੇ। ਇਹ ਸਾਨੂੰ ਇੰਨਾ ਗਰੀਬ ਰੱਖਦੀ ਹੈ ਕਿ ਅਸੀਂ ਉਹ ਘਰਾਂ ਵਿੱਚ ਰਹਿ ਨਹੀਂ ਸਕਦੇ ਜਾਂ ਮਾਲਕ ਨਹੀਂ ਬਣ ਸਕਦੇ ਜੋ ਅਸੀਂ ਬਣਾਏ; ਉਹ ਖਾਣਾ ਖਾ ਨਹੀਂ ਸਕਦੇ ਜੋ ਅਸੀਂ ਉਗਾਇਆ ਤੇ ਪਰੋਸਿਆ; ਆਪਣੇ ਮਿਹਨਤ ਦੇ ਫਲਾਂ ਤੋਂ ਲਾਭ ਨਹੀਂ ਲੈ ਸਕਦੇ।",
+    "p4": "ਅਸੀਂ ਇਹ ਮੰਨਣ ਤੋਂ ਇਨਕਾਰ ਕਰਦੇ ਹਾਂ। ਅਸੀਂ ਇੱਕ ਵੱਡਾ ਮਜ਼ਦੂਰ-ਜਮਾਤੀ ਅੰਦੋਲਨ ਸੰਗਠਿਤ ਕਰ ਰਹੇ ਹਾਂ ਤਾਂ ਜੋ ਉਹ ਅਸਲ ਲੋਕਤੰਤਰ ਬਣਾਇਆ ਜਾ ਸਕੇ ਜਿਸ ਦੇ ਅਸੀਂ ਹੱਕਦਾਰ ਹਾਂ — ਜਿੱਥੇ ਮਿਹਨਤੀ ਲੋਕਾਂ ਕੋਲ ਆਪਣੀਆਂ ਜਿੰਦਗੀਆਂ, ਆਪਣੇ ਭਾਈਚਾਰਿਆਂ ਅਤੇ ਆਪਣੀ ਅਰਥਵਿਵਸਥਾ ਉੱਤੇ ਅਸਲ ਕਾਬੂ ਹੋਵੇ। ਅਸੀਂ ਕੋਈ ਰਾਜਨੀਤਿਕ ਪਾਰਟੀ ਨਹੀਂ ਹਾਂ। ਅਸੀਂ ਭਾਰੀ ਮੈਂਬਰਸ਼ਿਪ ਰਾਹੀਂ ਇਕੱਠੇ ਸੰਗਠਿਤ ਹੁੰਦੇ ਹਾਂ। ਅਸੀਂ ਸਿਆਸਤਦਾਨਾਂ ਉੱਤੇ ਨਿਰਭਰ ਰਹਿ ਕੇ, ਲੋਬੀਇੰਗ ਕਰ ਕੇ ਅਤੇ ਇਹ ਉਮੀਦ ਕਰ ਕੇ ਕਿ ਉਹ ਆਪਣੇ ਦਾਨਦਾਤਿਆਂ ਦੀ ਥਾਂ ਸਾਡਾ ਪੱਖ ਲੈਣਗੇ, ਅੱਗੇ ਨਹੀਂ ਵੱਧਣਾ।",
+    "p5": "Working Class Unity, ਨਾਮ ਵਾਂਗ ਹੀ, ਇੱਕ ਸੰਗਠਨ ਹੈ ਜੋ ਮਜ਼ਦੂਰ ਜਮਾਤ ਨੂੰ ਇਕੱਠਾ ਕਰਨ ਲਈ ਲੜਦਾ ਹੈ, ਤਾਂ ਜੋ ਸੈਨ ਜੋਆਕਿਨ ਦੇ ਲੋਕ ਆਪਣੀਆਂ ਜਿੰਦਗੀਆਂ ਉੱਤੇ ਕਾਬੂ ਕਰ ਸਕਣ। ਅਸੀਂ ਸੱਚਮੁੱਚ ਸਸਤੀ ਅਤੇ ਸੁਰੱਖਿਅਤ ਰਹਾਇਸ਼, ਕੰਮ ਵਾਲੀ ਥਾਂ 'ਤੇ ਆਤਮਨਿਰਭਰਤਾ, ਪੁਲਿਸੀ ਜ਼ਬਰ ਤੋਂ ਆਪਣੇ ਭਾਈਚਾਰਿਆਂ ਦੀ ਰੱਖਿਆ, ਅਤੇ ਆਪਣੇ ਚੁਣੇ ਹੋਏ ਅਧਿਕਾਰੀਆਂ ਤੋਂ ਜਵਾਬਦੇਹੀ ਦੀ ਮੰਗ ਕਰਦੇ ਹਾਂ। ਸਾਡਾ ਮਿਸ਼ਨ ਮਜ਼ਦੂਰ ਤਾਕਤ ਨੂੰ ਮਜ਼ਬੂਤ ਕਰਨਾ ਹੈ—ਮਜ਼ਦੂਰ ਯੂਨੀਅਨਾਂ, ਕਿਰਾਏਦਾਰ ਯੂਨੀਅਨਾਂ ਅਤੇ ਸਮਾਜਿਕ ਅੰਦੋਲਨਾਂ ਵਿਚਕਾਰ ਸਿੱਖਿਆ, ਵਕਾਲਤ ਅਤੇ ਸਿੱਧੀ ਕਾਰਵਾਈ ਰਾਹੀਂ ਗਠਜੋੜ ਬਣਾਕੇ।",
+    "p6": "ਅਸੀਂ ਆਪਣੇ ਪਰਿਵਾਰਾਂ ਲਈ ਲੜਦੇ ਹਾਂ। ਆਪਣੇ ਬੱਚਿਆਂ ਦੇ ਭਵਿੱਖੀ ਸੁਖ-ਸਮ੍ਰਿੱਧੀ ਲਈ। ਤੁਹਾਡੀ ਨਸਲ, ਤੁਹਾਡਾ ਧਰਮ, ਜਾਂ ਤੁਹਾਡਾ ਜਨਮਸਥਾਨ ਜੋ ਮਰਜ਼ੀ ਹੋਵੇ—ਚੁੱਪਚਾਪ ਖੜ੍ਹੇ ਨਾ ਰਹੋ ਅਤੇ ਅਮੀਰਾਂ ਨੂੰ ਇਸ ਦੇਸ਼ ਨੂੰ ਢਾਹਣ ਨਾ ਦਿਓ, ਜਿਸਨੂੰ ਅਸੀਂ ਹਰ ਇੱਕ ਨੇ ਆਪਣੇ ਹੱਥਾਂ ਨਾਲ ਬਣਾਇਆ ਹੈ।",
+    "p7": "ਇਕੱਠੇ ਹੋ ਕੇ, ਅਸੀਂ ਸੈਨ ਜੋਆਕਿਨ ਕਾਊਂਟੀ ਵਿੱਚ ਮੈਂਬਰਾਂ ਦੁਆਰਾ ਚਲਾਇਆ ਗਿਆ ਅੰਦੋਲਨ ਖੜ੍ਹਾ ਕਰ ਸਕਦੇ ਹਾਂ ਜੋ ਠੋਸ ਜਿੱਤਾਂ ਹਾਸਲ ਕਰੇ—ਸਿਆਸਤਦਾਨਾਂ ਅਤੇ ਉਨ੍ਹਾਂ ਦੇ ਅਮੀਰ ਦਾਨਦਾਤਿਆਂ ਦੇ ਸਮਝੌਤਿਆਂ ਤੇ ਧੋਖਿਆਂ ਤੋਂ ਬਿਨਾਂ।",
+    "cta_button": "ਸਾਡੇ ਨਾਲ ਸ਼ਾਮਲ ਹੋਵੋ"
   },
   "home_page": {
     "hero": {
-      "title": "They Have Their Parties. We Need Our Own Organization.",
-      "description": "The bosses and landlords have two political parties. The working class needs a fighting organization of its own. Join us to build a member-run movement in San Joaquin County that wins concrete victories, without the compromises and betrayals of politicians and their wealthy donors.",
-      "join_button": "Join WCU",
-      "events_button": "See Upcoming Events"
+      "title": "ਉਹਨਾਂ ਦੀਆਂ ਪਾਰਟੀਆਂ ਹਨ। ਸਾਨੂੰ ਆਪਣਾ ਸੰਗਠਨ ਚਾਹੀਦਾ ਹੈ।",
+      "description": "ਮਾਲਕਾਂ ਅਤੇ ਮਕਾਨ ਮਾਲਕਾਂ ਕੋਲ ਦੋ ਰਾਜਨੀਤਿਕ ਪਾਰਟੀਆਂ ਹਨ। ਮਜ਼ਦੂਰ ਜਮਾਤ ਨੂੰ ਆਪਣਾ ਲੜਾਕੂ ਸੰਗਠਨ ਚਾਹੀਦਾ ਹੈ। ਸੈਨ ਜੋਆਕਿਨ ਕਾਊਂਟੀ ਵਿੱਚ ਮੈਂਬਰਾਂ ਦੁਆਰਾ ਚਲਾਇਆ ਗਿਆ ਅੰਦੋਲਨ ਬਣਾਉਣ ਲਈ ਸਾਡੇ ਨਾਲ ਸ਼ਾਮਲ ਹੋਵੋ ਜੋ ਠੋਸ ਜਿੱਤਾਂ ਹਾਸਲ ਕਰੇ—ਸਿਆਸਤਦਾਨਾਂ ਅਤੇ ਉਨ੍ਹਾਂ ਦੇ ਅਮੀਰ ਦਾਨਦਾਤਿਆਂ ਦੇ ਸਮਝੌਤਿਆਂ ਤੇ ਧੋਖਿਆਂ ਤੋਂ ਬਿਨਾਂ।",
+      "join_button": "WCU ਵਿੱਚ ਸ਼ਾਮਲ ਹੋਵੋ",
+      "events_button": "ਆਉਣ ਵਾਲੇ ਸਮਾਗਮ ਵੇਖੋ"
     },
     "events": {
-      "heading": "Upcoming Events",
-      "view_all": "View All Events"
+      "heading": "ਆਉਣ ਵਾਲੇ ਸਮਾਗਮ",
+      "view_all": "ਸਾਰੇ ਸਮਾਗਮ ਵੇਖੋ"
     },
     "problem": {
-      "label": "The Problem",
-      "title": "The Dictatorship of the Wealthy",
-      "p1": "Across San Joaquin, rents rise while our wages stall. Bosses demand more while giving less. Both the Democratic and Republican parties answer to their donors, not to us.",
-      "p2": "Our political and economic system is not broken; it is working exactly as designed to protect the profits of the wealthy by keeping the rest of us divided and powerless.",
-      "p3": "We refuse to accept this. We are organizing a mass working-class movement to build the genuine democracy we deserve – one where working people have real control over our lives, our communities, and our economy."
+      "label": "ਸਮੱਸਿਆ",
+      "title": "ਅਮੀਰਾਂ ਦੀ ਤਾਨਾਸ਼ਾਹੀ",
+      "p1": "ਸੈਨ ਜੋਆਕਿਨ ਭਰ ਵਿੱਚ ਕਿਰਾਏ ਚੜ੍ਹਦੇ ਜਾਂਦੇ ਹਨ, ਪਰ ਸਾਡੀਆਂ ਤਨਖਾਹਾਂ ਥਾਂ ਦੀ ਥਾਂ ਹਨ। ਮਾਲਕ ਵਧੇਰੇ ਮੰਗਦੇ ਹਨ ਪਰ ਘੱਟ ਦਿੰਦੇ ਹਨ। ਡੈਮੋਕ੍ਰੈਟ ਅਤੇ ਰਿਪਬਲਿਕਨ ਦੋਵੇਂ ਆਪਣੇ ਦਾਨਦਾਤਿਆਂ ਨੂੰ ਜਵਾਬਦੇਹ ਹਨ, ਸਾਨੂੰ ਨਹੀਂ।",
+      "p2": "ਸਾਡਾ ਰਾਜਨੀਤਿਕ ਅਤੇ ਆਰਥਿਕ ਪ੍ਰਣਾਲੀ ਟੁੱਟੀ ਹੋਈ ਨਹੀਂ; ਇਹ ਅਮੀਰਾਂ ਦੇ ਮੁਨਾਫੇ ਦੀ ਰੱਖਿਆ ਲਈ ਬਾਕੀਆਂ ਨੂੰ ਵੰਡ ਕੇ ਅਤੇ ਬੇਬਸ ਰੱਖ ਕੇ ਓਹੀ ਕੰਮ ਕਰ ਰਹੀ ਹੈ ਜਿਸ ਲਈ ਇਹ ਬਣੀ ਹੈ।",
+      "p3": "ਅਸੀਂ ਇਹ ਮੰਨਣ ਤੋਂ ਇਨਕਾਰ ਕਰਦੇ ਹਾਂ। ਅਸੀਂ ਇੱਕ ਵੱਡਾ ਮਜ਼ਦੂਰ-ਜਮਾਤੀ ਅੰਦੋਲਨ ਸੰਗਠਿਤ ਕਰ ਰਹੇ ਹਾਂ ਤਾਂ ਜੋ ਉਹ ਅਸਲ ਲੋਕਤੰਤਰ ਬਣਾਇਆ ਜਾ ਸਕੇ ਜਿਸ ਦੇ ਅਸੀਂ ਹੱਕਦਾਰ ਹਾਂ — ਜਿੱਥੇ ਮਿਹਨਤੀ ਲੋਕਾਂ ਕੋਲ ਆਪਣੀਆਂ ਜਿੰਦਗੀਆਂ, ਆਪਣੇ ਭਾਈਚਾਰਿਆਂ ਅਤੇ ਆਪਣੀ ਅਰਥਵਿਵਸਥਾ ਉੱਤੇ ਅਸਲ ਕਾਬੂ ਹੋਵੇ।"
     }
   },
   "join": {

@@ -161,6 +161,7 @@
   "common": {
     "close": "close",
     "skip_to_main": "Skip to main content",
+    "return_home": "Return Home",
     "critical": "Critical",
     "required": "Required",
     "important": "Important",
@@ -183,6 +184,9 @@
   },
   "about_page": {
     "title": "They Have Their Parties. We Need Our Own Organization",
+    "eyebrow": "Our Story",
+    "problem_heading": "The Problem",
+    "solution_heading": "Our Solution",
     "p1": "The bosses and landlords have two political parties. The working class needs a fighting organization of its own.",
     "p2": "Across San Joaquin, rents rise while our wages stall. Bosses demand more while giving less. Both the Democratic and Republican parties answer to their donors, not to us.",
     "p3": "Our political and economic system is not broken; it is working exactly as designed to protect the profits of the wealthy by keeping the rest of us divided and powerless. It makes us too poor to live in and own the homes we've built, too poor to eat the food we've grown and served, too poor to benefit from the fruits of our labor.",

@@ -161,6 +161,7 @@
   "common": {
     "close": "cerrar",
     "skip_to_main": "Saltar al contenido principal",
+    "return_home": "Volver al inicio",
     "critical": "Crítico",
     "required": "Requerido",
     "important": "Importante",
@@ -183,6 +184,9 @@
   },
   "about_page": {
     "title": "Ellos tienen sus partidos. Nosotros necesitamos nuestra propia organización",
+    "eyebrow": "Nuestra historia",
+    "problem_heading": "El problema",
+    "solution_heading": "Nuestra solución",
     "p1": "Los patrones y propietarios tienen dos partidos políticos. La clase trabajadora necesita una organización de lucha propia.",
     "p2": "En todo San Joaquín, los alquileres suben mientras nuestros salarios se estancan. Los patrones exigen más mientras dan menos. Ambos partidos, Demócrata y Republicano, responden a sus donantes, no a nosotros.",
     "p3": "Nuestro sistema político y económico no está roto; funciona exactamente como fue diseñado para proteger las ganancias de los ricos manteniéndonos divididos e impotentes. Nos hace demasiado pobres para vivir y ser dueños de las casas que construimos, demasiado pobres para comer la comida que cultivamos y servimos, demasiado pobres para beneficiarnos de los frutos de nuestro trabajo.",

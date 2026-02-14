@@ -5,7 +5,7 @@
         <div class="h-1 solidarity-stripe" aria-hidden="true"></div>
         <div class="card-body p-5 md:p-10">
           <header class="pb-6 md:pb-8">
-            <span class="wcu-eyebrow block mb-3">Our Story</span>
+            <span class="wcu-eyebrow block mb-3">{{ $t('about_page.eyebrow') }}</span>
             <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-base-content">
               {{ $t('about_page.title') }}
             </h1>
@@ -13,7 +13,7 @@
 
           <section class="py-6 md:py-8 border-t border-base-content/10" aria-labelledby="about-problem-heading">
             <h2 id="about-problem-heading" class="text-xs uppercase tracking-[0.2em] font-semibold text-base-content mb-6">
-              The Problem
+              {{ $t('about_page.problem_heading') }}
             </h2>
             <div class="space-y-6">
               <p class="text-base md:text-lg text-base-content leading-relaxed font-medium">
@@ -30,7 +30,7 @@
 
           <section class="py-6 md:py-8 border-t border-base-content/10" aria-labelledby="about-solution-heading">
             <h2 id="about-solution-heading" class="text-xs uppercase tracking-[0.2em] font-semibold text-base-content mb-6">
-              Our Solution
+              {{ $t('about_page.solution_heading') }}
             </h2>
             <div class="space-y-6">
               <p class="text-base md:text-lg text-base-content/90 leading-relaxed">
@@ -64,7 +64,7 @@
 
       <footer class="pt-6 md:pt-8 flex flex-wrap gap-4 items-center">
         <NuxtLinkLocale to="/" class="inline-flex items-center min-h-10 px-3 rounded-md border border-base-300 text-sm text-base-content/80 hover:text-base-content hover:bg-base-200/60 transition-colors">
-          ← Return Home
+          ← {{ $t('common.return_home') }}
         </NuxtLinkLocale>
       </footer>
     </div>
