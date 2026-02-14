@@ -1071,6 +1071,10 @@
   },
   "volunteer_guide": {
     "page_title": "Guía Rápida para Voluntarios",
+    "a11y": {
+      "timing_label": "Horario:",
+      "priority_label": "Prioridad:"
+    },
     "hero": {
       "title": "Cobertura de Citas de ICE: Guía Rápida para Voluntarios",
       "subtitle": "Todo lo que necesitas saber para tu turno en las instalaciones de ICE.",

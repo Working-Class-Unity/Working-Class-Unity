@@ -259,7 +259,7 @@ const contacts = [
             </svg>
           </div>
           <h2 id="arrival-heading" class="text-xl sm:text-2xl font-bold text-base-content">{{ $t('volunteer_guide.arrival.title') }}</h2>
-          <span class="badge badge-outline border-secondary text-secondary bg-base-100 text-xs" role="status"><span class="sr-only">Duration:</span> {{ $t('volunteer_guide.arrival.badge') }}</span>
+          <span class="badge badge-outline border-secondary text-secondary bg-base-100 text-xs" role="status"><span class="sr-only">{{ $t('volunteer_guide.a11y.timing_label') }}</span> {{ $t('volunteer_guide.arrival.badge') }}</span>
         </div>
 
         <div class="card bg-base-100 border border-base-300 shadow-sm max-w-3xl hover:border-primary/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-colors">
@@ -383,7 +383,7 @@ const contacts = [
             </svg>
           </div>
           <h2 id="detained-heading" class="text-xl sm:text-2xl font-bold text-base-content">{{ $t('volunteer_guide.detained.title') }}</h2>
-          <span class="badge badge-soft badge-error text-xs" role="status"><span class="sr-only">Priority:</span> {{ $t('volunteer_guide.detained.badge') }}</span>
+          <span class="badge badge-soft badge-error text-xs" role="status"><span class="sr-only">{{ $t('volunteer_guide.a11y.priority_label') }}</span> {{ $t('volunteer_guide.detained.badge') }}</span>
         </div>
 
         <div class="card bg-error/5 border-2 border-error/30 shadow-sm max-w-4xl focus-within:ring-2 focus-within:ring-error/20 transition-colors">

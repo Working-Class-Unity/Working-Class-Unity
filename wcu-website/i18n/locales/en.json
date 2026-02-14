@@ -1039,6 +1039,10 @@
   },
   "volunteer_guide": {
     "page_title": "Volunteer Quick Guide",
+    "a11y": {
+      "timing_label": "Timing:",
+      "priority_label": "Priority:"
+    },
     "hero": {
       "title": "ICE Check-In Coverage: Volunteer Quick Guide",
       "subtitle": "Everything you need to know for your shift at the ICE facility.",
