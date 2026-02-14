@@ -1122,28 +1122,23 @@ const highlightMatch = (text: string): string => {
             </section>
 
             <section id="voluntary-vacate" data-section class="mt-10">
-              <h3 class="text-xl font-bold text-base-content">Voluntary Vacate Agreements</h3>
+              <h3 class="text-xl font-bold text-base-content">{{ $t('tenant_handbook.chapters.chapter-4.sections.voluntary-vacate.title') }}</h3>
               
-              <h4 class="font-semibold mt-4">What is a Voluntary Vacate Agreement or Cash-for-Keys?</h4>
+              <h4 class="font-semibold mt-4">{{ $t('tenant_handbook.body.chapter-4.voluntary-vacate.what_is.heading') }}</h4>
               <p>
-                Cash-for-keys is an illegal buyout that happens when a landlord offers money for a tenant to voluntarily end a lease and leave an apartment 
-                without informing the tenants of their legal rights regarding eviction.
+                {{ $t('tenant_handbook.body.chapter-4.voluntary-vacate.what_is.p1') }}
               </p>
 
-              <TenantHandbookEvidenceNote title="Do not sign under pressure" tone="warning">
+              <TenantHandbookEvidenceNote :title="$t('tenant_handbook.body.chapter-4.voluntary-vacate.warning_note.title')" tone="warning">
                 <strong>
-                  Tenants have NO legal obligation to sign a voluntary vacate agreement or to accept
-                  cash-for-keys under any circumstances.
+                  {{ $t('tenant_handbook.body.chapter-4.voluntary-vacate.warning_note.strong') }}
                 </strong>
-                Never relinquish your rights without consulting with an attorney.
+                {{ $t('tenant_handbook.body.chapter-4.voluntary-vacate.warning_note.after') }}
               </TenantHandbookEvidenceNote>
 
-              <h4 class="font-semibold mt-6">Some things to consider about buyout offers:</h4>
+              <h4 class="font-semibold mt-6">{{ $t('tenant_handbook.body.chapter-4.voluntary-vacate.considerations.heading') }}</h4>
               <ul>
-                <li>30% of the buyout offer will be paid to the federal government and still more to the state.</li>
-                <li>10-30% of the amount will be used for legal fees.</li>
-                <li>The requirements to rent have become more intense. Many landlords require you to earn twice the rental amount in order to qualify.</li>
-                <li>When calculating the financial impact of accepting a buyout offer, consider: How much money will you need to move out without hurting financially? How far will you have to move to find a place you can afford?</li>
+                <li v-for="(item, index) in getStringList('tenant_handbook.body.chapter-4.voluntary-vacate.considerations.items')" :key="index">{{ item }}</li>
               </ul>
             </section>
 

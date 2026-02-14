@@ -861,6 +861,26 @@
               }
             }
           }
+        },
+        "voluntary-vacate": {
+          "what_is": {
+            "heading": "¿Qué es un acuerdo de salida voluntaria o cash-for-keys?",
+            "p1": "Cash-for-keys es una compra ilegal que ocurre cuando un propietario ofrece dinero para que un inquilino termine voluntariamente un contrato y deje un apartamento sin informar a los inquilinos sobre sus derechos legales respecto al desalojo."
+          },
+          "warning_note": {
+            "title": "No firmes bajo presión",
+            "strong": "Los inquilinos NO tienen ninguna obligación legal de firmar un acuerdo de salida voluntaria ni de aceptar cash-for-keys bajo ninguna circunstancia.",
+            "after": "Nunca renuncies a tus derechos sin consultar con un abogado."
+          },
+          "considerations": {
+            "heading": "Algunas cosas que considerar sobre ofertas de compra:",
+            "items": [
+              "El 30% de la oferta de compra se pagará al gobierno federal y aún más al estado.",
+              "El 10-30% del monto se usará para honorarios legales.",
+              "Los requisitos para rentar se han vuelto más estrictos. Muchos propietarios requieren que ganes el doble del monto del alquiler para calificar.",
+              "Al calcular el impacto financiero de aceptar una oferta de compra, considera: ¿Cuánto dinero necesitarás para mudarte sin dañarte financieramente? ¿Qué tan lejos tendrás que mudarte para encontrar un lugar que puedas pagar?"
+            ]
+          }
         }
       }
     }

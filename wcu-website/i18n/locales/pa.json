@@ -861,6 +861,26 @@
               }
             }
           }
+        },
+        "voluntary-vacate": {
+          "what_is": {
+            "heading": "What is a voluntary vacate agreement or cash-for-keys?",
+            "p1": "Cash-for-keys is an illegal buyout that happens when a landlord offers money for a tenant to voluntarily end a lease and leave an apartment without informing the tenants of their legal rights regarding eviction."
+          },
+          "warning_note": {
+            "title": "Do not sign under pressure",
+            "strong": "Tenants have NO legal obligation to sign a voluntary vacate agreement or to accept cash-for-keys under any circumstances.",
+            "after": "Never relinquish your rights without consulting with an attorney."
+          },
+          "considerations": {
+            "heading": "Some things to consider about buyout offers:",
+            "items": [
+              "30% of the buyout offer will be paid to the federal government and still more to the state.",
+              "10-30% of the amount will be used for legal fees.",
+              "The requirements to rent have become more intense. Many landlords require you to earn twice the rental amount in order to qualify.",
+              "When calculating the financial impact of accepting a buyout offer, consider: How much money will you need to move out without hurting financially? How far will you have to move to find a place you can afford?"
+            ]
+          }
         }
       }
     }
