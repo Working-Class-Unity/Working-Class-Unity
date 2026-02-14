@@ -1,29 +1,30 @@
 <script setup lang="ts">
 import {
-  handbookChapterMap,
   handbookChapters,
   handbookContacts,
   handbookQuickPaths,
   type HandbookChapterMeta,
 } from '~/data/tenant-handbook'
 
+const { t, tm, rt } = useI18n()
+
 // =============================================================================
 // SEO Meta Tags
 // =============================================================================
 useHead({
-  title: 'Tenant Union Handbook',
+  title: t('tenant_handbook.page_title'),
 })
 
 useSeoMeta({
-  description: 'Complete guide for tenants in San Joaquin County covering your rights, paying rent, reporting violations, evictions, and more.',
+  description: t('tenant_handbook.seo.description'),
   ogType: 'website',
-  ogTitle: 'Tenant Union Handbook | Working Class Unity',
-  ogDescription: 'Complete guide for tenants in San Joaquin County covering your rights, paying rent, reporting violations, evictions, and more.',
+  ogTitle: `${t('tenant_handbook.page_title')} | Working Class Unity`,
+  ogDescription: t('tenant_handbook.seo.description'),
   ogImage: 'https://workingclassunity.com/og/tenant-handbook.svg',
   ogUrl: 'https://workingclassunity.com/tenant-union-handbook',
   twitterCard: 'summary_large_image',
-  twitterTitle: 'Tenant Union Handbook | Working Class Unity',
-  twitterDescription: 'Complete guide for tenants in San Joaquin County covering your rights, paying rent, reporting violations, evictions, and more.',
+  twitterTitle: `${t('tenant_handbook.page_title')} | Working Class Unity`,
+  twitterDescription: t('tenant_handbook.seo.description'),
   twitterImage: 'https://workingclassunity.com/og/tenant-handbook.svg',
 })
 
@@ -32,26 +33,82 @@ useSeoMeta({
 // =============================================================================
 useSchemaOrg([
   defineWebPage({
-    name: 'Tenant Union Handbook',
-    description: 'Complete guide for tenants in San Joaquin County covering your rights, paying rent, reporting violations, evictions, and more.',
+    name: t('tenant_handbook.page_title'),
+    description: t('tenant_handbook.seo.description'),
     url: 'https://workingclassunity.com/tenant-union-handbook',
   }),
   defineBreadcrumb({
     itemListElement: [
-      { name: 'Home', item: '/' },
-      { name: 'Tenant Union Handbook' },
+      { name: t('common.home'), item: '/' },
+      { name: t('tenant_handbook.page_title') },
     ],
   }),
 ])
 
-const chapters = handbookChapters
-const chapterIds = chapters.map((chapter) => chapter.id)
-const chapterContextById = handbookChapterMap
-const quickPaths = handbookQuickPaths
-const contactCards = handbookContacts
+const getList = (key: string) => {
+  return tm(key) as string[]
+}
+
+const getStringList = (key: string) => {
+  return getList(key).map((item) => rt(item))
+}
+
+const chapters = computed<HandbookChapterMeta[]>(() => {
+  return handbookChapters.map((chapter) => {
+    const chapterKey = `tenant_handbook.chapters.${chapter.id}`
+    return {
+      ...chapter,
+      title: t(`${chapterKey}.title`),
+      summary: t(`${chapterKey}.summary`),
+      goal: t(`${chapterKey}.goal`),
+      evidenceChecklist: getStringList(`${chapterKey}.evidence_checklist`),
+      commonMistakes: getStringList(`${chapterKey}.common_mistakes`),
+      escalateWhen: t(`${chapterKey}.escalate_when`),
+      sourceNotes: getStringList(`${chapterKey}.source_notes`),
+      lastReviewed: t(`${chapterKey}.last_reviewed`),
+      sections: chapter.sections.map((section) => {
+        const sectionKey = `${chapterKey}.sections.${section.id}`
+        return {
+          ...section,
+          title: t(`${sectionKey}.title`),
+          summary: t(`${sectionKey}.summary`),
+          keywords: getStringList(`${sectionKey}.keywords`),
+        }
+      }),
+    }
+  })
+})
+
+const chapterIds = handbookChapters.map((chapter) => chapter.id)
+
+const chapterContextById = computed(() => {
+  return Object.fromEntries(chapters.value.map((chapter) => [chapter.id, chapter])) as Record<string, HandbookChapterMeta>
+})
+
+const quickPaths = computed(() => {
+  return handbookQuickPaths.map((path) => {
+    const pathKey = `tenant_handbook.quick_paths.items.${path.id}`
+    return {
+      ...path,
+      title: t(`${pathKey}.title`),
+      description: t(`${pathKey}.description`),
+    }
+  })
+})
+
+const contactCards = computed(() => {
+  return handbookContacts.map((contact) => {
+    const contactKey = `tenant_handbook.contacts.items.${contact.id}`
+    return {
+      ...contact,
+      label: t(`${contactKey}.label`),
+      note: contact.note ? t(`${contactKey}.note`) : undefined,
+    }
+  })
+})
 
 const getChapterContext = (chapterId: string): HandbookChapterMeta => {
-  const chapter = chapterContextById[chapterId]
+  const chapter = chapterContextById.value[chapterId]
   if (!chapter) {
     throw new Error(`Missing handbook chapter context for ${chapterId}`)
   }
@@ -110,9 +167,9 @@ const sectionMatchesQuery = (
 
 const filteredChapters = computed<HandbookChapterMeta[]>(() => {
   const query = searchQuery.value.toLowerCase().trim()
-  if (!query) return chapters
+  if (!query) return chapters.value
 
-  return chapters
+  return chapters.value
     .map((chapter) => {
       const chapterMatches = chapterMatchesQuery(chapter, query)
       const matchingSections = chapter.sections.filter((section) => sectionMatchesQuery(section, query))

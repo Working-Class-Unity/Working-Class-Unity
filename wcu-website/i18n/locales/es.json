@@ -161,6 +161,7 @@
   "common": {
     "close": "cerrar",
     "skip_to_main": "Saltar al contenido principal",
+    "home": "Inicio",
     "return_home": "Volver al inicio",
     "critical": "Crítico",
     "required": "Requerido",
@@ -183,6 +184,10 @@
       "collapse_chapter": "Contraer capítulo",
       "expand_chapter": "Expandir capítulo"
     },
+    "page_title": "Manual del sindicato de inquilinos",
+    "seo": {
+      "description": "Guía completa para inquilinos en el condado de San Joaquín sobre tus derechos, cómo pagar el alquiler, cómo reportar violaciones, desalojos y más."
+    },
     "hero": {
       "eyebrow": "Manual de defensa de inquilinos",
       "title": "Manual del sindicato de inquilinos",
@@ -195,12 +200,44 @@
         "urgent": "Urgente",
         "next": "Empieza aquí",
         "learn": "Profundiza"
+      },
+      "items": {
+        "quick-eviction": {
+          "title": "Recibí un aviso o una citación de la corte",
+          "description": "Empieza con los plazos, las fechas límite para responder y qué documentar antes de la corte."
+        },
+        "quick-repairs": {
+          "title": "Mi vivienda tiene condiciones inseguras",
+          "description": "Sigue el plan de reparaciones, la lista de evidencia y los contactos de agencias."
+        },
+        "quick-rent": {
+          "title": "Mi alquiler cambió o me amenazaron",
+          "description": "Revisa protecciones, plazos de aviso legal y señales de represalia."
+        },
+        "quick-file": {
+          "title": "Necesito presentar una queja",
+          "description": "Lee los consejos para reportar antes de contactar a Cumplimiento de Códigos o Salud del Condado."
+        }
       }
     },
     "contacts": {
       "title": "Contactos clave para reportar",
       "phone_label": "Teléfono:",
-      "email_label": "Correo:"
+      "email_label": "Correo:",
+      "items": {
+        "contact-stockton-code": {
+          "label": "Cumplimiento de Códigos de Stockton",
+          "note": "Úsalo para quejas de vivienda/construcción y para dar seguimiento a inspecciones."
+        },
+        "contact-county-health": {
+          "label": "Servicios de Salud Pública del Condado de San Joaquín",
+          "note": "Úsalo para violaciones al código de salud como plagas, aguas residuales y moho visible."
+        },
+        "contact-housing-authority": {
+          "label": "Autoridad de Vivienda Justa de San Joaquín",
+          "note": "Úsalo para programas de asistencia a inquilinos y apoyo por discriminación de vivienda."
+        }
+      }
     },
     "toc": {
       "contents_title": "Índice",
@@ -220,6 +257,230 @@
       "escalate_prefix": "Escala de inmediato si:",
       "sources_summary": "Notas de fuentes y estado de revisión",
       "last_reviewed": "Última revisión:"
+    },
+    "chapters": {
+      "chapter-1": {
+        "title": "Capítulo 1: Conoce tus derechos",
+        "summary": "Usa este capítulo para confirmar tus protecciones legales antes de negociar con tu propietario.",
+        "goal": "Documenta las condiciones, haz valer tus derechos de aviso legal y evita trampas de represalia.",
+        "evidence_checklist": [
+          "Fotos/videos con fecha de las condiciones",
+          "Solicitudes de reparación por escrito y respuestas del propietario",
+          "Recibos de alquiler, cláusulas del contrato y avisos"
+        ],
+        "common_mistakes": [
+          "Confiar solo en solicitudes verbales",
+          "Pagar el alquiler en efectivo sin comprobantes",
+          "Firmar documentos que no has revisado"
+        ],
+        "escalate_when": "El propietario ignora reparaciones, te amenaza con que te vayas después de quejas o sube el alquiler sin el aviso adecuado.",
+        "source_notes": [
+          "Ley de Protección de Inquilinos de California (AB 1482)",
+          "Límites locales de aumento de alquiler para el condado de San Joaquín",
+          "Reglas del Código Civil de California sobre reparaciones y entrada"
+        ],
+        "last_reviewed": "6 de febrero de 2026",
+        "sections": {
+          "tenant-protections": {
+            "title": "Protecciones para inquilinos y aumentos de alquiler",
+            "summary": "Cómo los límites de aumento, los plazos de aviso y las reglas contra represalias protegen a quienes ya ocupan una vivienda.",
+            "keywords": ["aumento de alquiler", "AB 1482", "aviso", "represalias", "contrato de arrendamiento"]
+          },
+          "know-your-rights": {
+            "title": "Conoce tus derechos",
+            "summary": "Estándares de habitabilidad y derechos que toda persona inquilina conserva con o sin estabilización.",
+            "keywords": ["habitabilidad", "vivienda segura", "obligaciones del propietario", "salud", "entrada"]
+          },
+          "repairs": {
+            "title": "Reparaciones, daños o infestación",
+            "summary": "Pasos para solicitar reparaciones y conservar evidencia.",
+            "keywords": ["solicitud de reparación", "correo certificado", "fotos", "inspección", "infestación"]
+          },
+          "harassment": {
+            "title": "Acoso",
+            "summary": "Cómo documentar el acoso y construir un registro que puedas usar después.",
+            "keywords": ["acoso", "documentación", "testigo", "sindicato de inquilinos"]
+          },
+          "utilities": {
+            "title": "Servicios públicos",
+            "summary": "Quién paga, qué avisos se requieren y qué cortes de servicios son ilegales.",
+            "keywords": ["servicios públicos", "aviso", "facturación", "responsabilidades del propietario"]
+          },
+          "dos-donts": {
+            "title": "Qué hacer y qué no hacer",
+            "summary": "Acciones prácticas que protegen tu posición legal antes, durante y después del alquiler.",
+            "keywords": ["buenas prácticas", "mudanza", "salida", "recibos"]
+          }
+        }
+      },
+      "chapter-2": {
+        "title": "Capítulo 2: Pagar el alquiler",
+        "summary": "Este capítulo te ayuda a pagar el alquiler de formas que dejan comprobantes y reducen el riesgo legal.",
+        "goal": "Protege la evidencia de pago y sigue al pie de la letra las instrucciones de los avisos.",
+        "evidence_checklist": [
+          "Talones de giro postal (money order) o de cheque de caja",
+          "Recibos con fecha que muestren monto y período cubierto",
+          "Comprobantes de envío con confirmación de entrega"
+        ],
+        "common_mistakes": [
+          "Usar correo regular sin rastreo",
+          "Pasar por alto instrucciones sobre el método de pago en los avisos",
+          "Asumir que las multas por atraso crean un período de gracia legal"
+        ],
+        "escalate_when": "El propietario rechaza un pago que cumple o afirma que no pagaste después de una entrega documentada.",
+        "source_notes": [
+          "Reglas de avisos del proceso de desalojo (unlawful detainer) en California",
+          "Requisitos del contrato sobre método de pago y fecha límite"
+        ],
+        "last_reviewed": "6 de febrero de 2026",
+        "sections": {
+          "paying-rent": {
+            "title": "Pasos sencillos para protegerte",
+            "summary": "Métodos de pago, testigos y reglas de recibos que ayudan a comprobar el pago.",
+            "keywords": ["alquiler", "giro postal", "recibo", "comprobante de envío", "fecha límite"]
+          },
+          "notice-to-pay": {
+            "title": "Aviso de pagar el alquiler",
+            "summary": "Cómo responder a un aviso preservando defensas legales y comprobantes de fechas.",
+            "keywords": ["aviso de pago", "aviso de 3 días", "entrega", "testigo", "fecha límite"]
+          }
+        }
+      },
+      "chapter-3": {
+        "title": "Capítulo 3: Reportar violaciones",
+        "summary": "Usa este capítulo para reportar problemas de códigos con evidencia que las agencias puedan usar.",
+        "goal": "Presenta quejas por el canal correcto y da seguimiento hasta el cierre del caso.",
+        "evidence_checklist": [
+          "Número de caso y contacto del inspector",
+          "Fotos/videos con fecha y hora",
+          "Copias de comunicaciones con el propietario y la agencia"
+        ],
+        "common_mistakes": [
+          "Presentar quejas vagas sin evidencia visible",
+          "Asumir que una queja cubre otras unidades",
+          "Dejar de dar seguimiento después de la inspección inicial"
+        ],
+        "escalate_when": "El caso se cierra sin reparaciones o los peligros continúan después de los plazos de inspección.",
+        "source_notes": [
+          "Proceso de atención de Stockton Neighborhood Services",
+          "Canales para reportar salud pública del condado de San Joaquín"
+        ],
+        "last_reviewed": "6 de febrero de 2026",
+        "sections": {
+          "code-enforcement": {
+            "title": "Cumplimiento de códigos de Stockton",
+            "summary": "Dónde y cómo presentar quejas de código municipal en Stockton.",
+            "keywords": ["cumplimiento de códigos", "inspección", "correo", "teléfono", "Stockton"]
+          },
+          "filing-tips": {
+            "title": "Consejos para presentar quejas",
+            "summary": "Tácticas que mejoran la inspección y reducen el riesgo de que cierren el caso.",
+            "keywords": ["consejos", "número de caso", "reporte de inspección", "seguimiento"]
+          },
+          "health-violations": {
+            "title": "Violaciones al código de salud",
+            "summary": "Cuándo involucrar salud del condado por plagas, moho, aguas residuales y saneamiento.",
+            "keywords": ["código de salud", "moho", "ratas", "cucarachas", "salud pública"]
+          },
+          "building-violations": {
+            "title": "Violaciones al código de construcción",
+            "summary": "Problemas estructurales o de sistemas que deben reportarse a cumplimiento de códigos.",
+            "keywords": ["código de construcción", "termitas", "techo", "detector de humo"]
+          }
+        }
+      },
+      "chapter-4": {
+        "title": "Capítulo 4: Desalojos",
+        "summary": "Usa este capítulo para identificar causales legales, plazos y posibles resultados del caso.",
+        "goal": "Responde rápido a los avisos, preserva defensas y evita desplazamientos evitables.",
+        "evidence_checklist": [
+          "Todos los avisos con fecha y método de entrega",
+          "Contrato y registros de pago",
+          "Documentación de reparaciones/represalias si aplica"
+        ],
+        "common_mistakes": [
+          "Perder la fecha límite para responder a la corte",
+          "Firmar acuerdos de salida voluntaria sin asesoría",
+          "Retener el alquiler sin consultar legalmente"
+        ],
+        "escalate_when": "Recibes una citación, una orden de posesión (writ), una amenaza de desalojo o de cambio de cerraduras, o términos de reubicación que no entiendes.",
+        "source_notes": [
+          "Marco de causa justa de AB 1482",
+          "Proceso de desalojo (unlawful detainer) en California y plazos de la corte",
+          "Límites del Código Civil de California 1942.4 sobre exigir alquiler"
+        ],
+        "last_reviewed": "6 de febrero de 2026",
+        "sections": {
+          "legal-reasons": {
+            "title": "Causales legales de desalojo",
+            "summary": "Qué califica como causa justa bajo las protecciones actuales de California.",
+            "keywords": ["causa legal", "causa justa", "AB 1482"]
+          },
+          "at-fault": {
+            "title": "Desalojos por culpa",
+            "summary": "Actos o violaciones del contrato que el propietario puede usar para desalojar.",
+            "keywords": ["por culpa", "incumplimiento de contrato", "molestias", "negar entrada"]
+          },
+          "no-fault": {
+            "title": "Desalojos sin culpa",
+            "summary": "Causales sin culpa que por lo general requieren compensación por reubicación.",
+            "keywords": ["sin culpa", "Ley Ellis", "reubicación", "mudanza del dueño"]
+          },
+          "no-rent-stabilization": {
+            "title": "Si NO vives con estabilización de alquiler",
+            "summary": "Plazos de aviso y detonantes de 3 días fuera de la cobertura de estabilización.",
+            "keywords": ["aviso de 60 días", "aviso de 30 días", "aviso de 3 días"]
+          },
+          "eviction-process": {
+            "title": "Proceso de desalojo",
+            "summary": "Cronología desde el aviso hasta resultados en la corte y ejecución del sheriff.",
+            "keywords": ["citación", "juicio", "orden de posesión", "fecha límite"]
+          },
+          "voluntary-vacate": {
+            "title": "Acuerdos de salida voluntaria",
+            "summary": "Riesgos de cash for keys y por qué buscar asesoría antes de firmar.",
+            "keywords": ["cash for keys", "compra de salida", "salida voluntaria"]
+          },
+          "estoppel": {
+            "title": "Certificado de estoppel",
+            "summary": "Cómo los certificados de estoppel pueden documentar términos cuando cambia el propietario.",
+            "keywords": ["estoppel", "cambio de propietario", "términos de ocupación"]
+          }
+        }
+      },
+      "chapter-5": {
+        "title": "Capítulo 5: Entrada legal y depósito de seguridad",
+        "summary": "Este capítulo cubre límites de entrada legal y el plazo para devolver el depósito.",
+        "goal": "Evita entradas ilegales y protege tu derecho a una contabilidad completa del depósito.",
+        "evidence_checklist": [
+          "Avisos de entrada con fecha/hora/motivo",
+          "Fotos al entrar y al salir",
+          "Dirección de reenvío y correspondencia sobre el depósito"
+        ],
+        "common_mistakes": [
+          "Aceptar avisos de 24 horas que cubren varios días",
+          "No solicitar o documentar la inspección de salida",
+          "No proporcionar una dirección postal para la devolución del depósito"
+        ],
+        "escalate_when": "El propietario entra sin el aviso adecuado o no cumple el plazo de 21 días para el depósito.",
+        "source_notes": [
+          "Requisitos del Código Civil de California sobre avisos de entrada",
+          "Reglas del Código Civil de California 1950.5 sobre depósito de seguridad"
+        ],
+        "last_reviewed": "6 de febrero de 2026",
+        "sections": {
+          "legal-entry": {
+            "title": "Entrada legal",
+            "summary": "Cuándo se requiere aviso, qué cuenta como entrada de emergencia y reglas para mostrar la vivienda a compradores.",
+            "keywords": ["aviso de 24 horas", "entrada", "horas hábiles", "mostrar a compradores"]
+          },
+          "security-deposits": {
+            "title": "Depósitos de seguridad",
+            "summary": "Límites del depósito, deducciones legales y requisitos de devolución en 21 días.",
+            "keywords": ["depósito de seguridad", "21 días", "deducciones", "reembolso"]
+          }
+        }
+      }
     }
   },
   "about_page": {
