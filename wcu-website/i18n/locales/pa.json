@@ -481,6 +481,165 @@
           }
         }
       }
+    },
+    "body": {
+      "chapter-1": {
+        "tenant-protections": {
+          "heading_tenant_protection": "Tenant Protection",
+          "intro": "The California Tenant Protection Act restricts how much a landlord can increase your rent. Everyone in San Joaquin County is protected by this Act.",
+          "protects_heading": "What does this act protect?",
+          "protects": {
+            "cap": "Through January 1, 2030, landlords cannot raise rent more than 8.8% total or 5% plus the Consumer Price Index (CPI)—depending on whichever is lower.",
+            "cap_local": "Between 8/1/24 and 7/31/25 in San Joaquin County the maximum for rent increase is 8.8%",
+            "frequency": "Increases can only occur no more than two times every 12 months.",
+            "initial_rent": "Does not limit how much money a landlord can charge at the start of a rental agreement, only how much the rent can increase once the unit is occupied by the same tenant.",
+            "eviction_reasons": "Limits the legal reasons for eviction. You can only be evicted for the reasons listed in the SJCOG, and in some cases you MUST be compensated. (See Chapter 4)",
+            "no_retaliation": "Rent increases cannot be retaliatory."
+          },
+          "increase_heading": "When can a Landlord increase your rent?",
+          "increase": {
+            "lease_term_label": "Lease of more than month-to-month:",
+            "lease_term_items": {
+              "no_increase_during_term": "Landlords CANNOT increase rent during the term of the lease, unless the lease explicitly allows for rent increases.",
+              "not_in_first_year": "Rent increases cannot be considered within the first year of occupancy."
+            },
+            "periodic_label": "Periodic lease agreement (a month-to-month or shorter):",
+            "periodic_items": {
+              "notice_required": "Landlords can increase your rent as often as they like, but must provide a written notice"
+            }
+          },
+          "notice_box": {
+            "title": "Landlords MUST provide a formal written notice for rent increases at least:",
+            "items": {
+              "week_to_week_30": "30-day notice for all week-to-week leases",
+              "month_to_month_under_year_30": "30-day notice for all month-to-month leases for tenants who have lived there for less than one year",
+              "month_to_month_over_year_60": "60-day notice for all month-to-month or yearly leases with tenants who have lived there for more than one year",
+              "over_cap_90": "90-day advance notice if the rent increase is greater than 8.8%"
+            }
+          }
+        },
+        "know-your-rights": {
+          "p1": "The WCU Tenants Union knows that many landlords use their failure to make repairs as a way to evict tenants. When tenants complain to their landlords about the lack of repairs, or about the quality of repair, many landlords tell tenants to move out if they are unhappy.",
+          "illegal": "That is illegal.",
+          "p2": "Under California law, ALL Tenants (with or without Rent Stabilization) have the right to live in a unit that is both safe and sanitary.",
+          "required_heading": "This means that your landlord is legally required to repair or address:",
+          "repairs_required": [
+            "Water dripping from ceilings and walls (from leaking pipes, bathtubs, or sinks)",
+            "Holes in walls or floors (or missing thresholds at the base of doorways)",
+            "Plaster/paint shedding",
+            "Visible mildew or mold from not having enough air circulation",
+            "Damaged heater",
+            "Bad plumbing (or sewage back up)",
+            "Broken windows",
+            "Missing window screens",
+            "Broken smoke detectors or carbon monoxide detectors",
+            "Large gaps behind kitchen drawers or cupboards where insects can enter",
+            "Inadequate garbage collection",
+            "Unsafe stairs/handrails",
+            "Unsecure/improper doorknobs",
+            "Faulty electrical wiring",
+            "Vermin infestations that violate the Health Code: cockroaches (the small ones), rats, mice, and raccoons (See Chapter 3)",
+            "Infestations that violate the Building Code: termites (See Chapter 3)"
+          ],
+          "rights_heading": "Also, tenants have the right to:",
+          "rights_list": [
+            "Receive 24-hour advance written notice before the landlord enters your home",
+            "Submit a written list of repairs that you need in your home",
+            "Impartial inspections by a third party",
+            "Pay rent with money order",
+            "Receive a receipt that clearly states the landlord's name, date covered by the rent, and the amount paid",
+            "Organize themselves to fight against bad conditions, harassment, or illegal evictions"
+          ]
+        },
+        "repairs": {
+          "lead": "If you have repairs, damage, or infestation:",
+          "steps": {
+            "1": "Make a list of the damaged or infested areas (if your landlord has provided you with a repairs sheet, fill it out thoroughly).",
+            "2": "Take photographs of the damaged or infested areas, and include the day's newspaper to show the date the photograph was taken.",
+            "3": "Write a letter to the landlord, attach the photos and list (or repairs sheet), and send it by mail with a delivery confirmation receipt, such as certified mail or USPS Priority Mail.",
+            "3_note": "Email and text are also options.",
+            "4": "Keep dated documentation (e.g. receipt from post office, texts, emails, letters, etc.), and copies of all correspondence and photographs sent to the landlord.",
+            "5": "If the landlord does not repair the unit in a timely manner, you can file a complaint."
+          },
+          "inspection_timeline": "Depending on the specific city or problem, you can request an inspection, and the landlord will be REQUIRED to repair the problem. In some cases, landlords have up to 30 days to start the repair work, and then another 60 days to finish it.",
+          "table": {
+            "headers": {
+              "department": "Department/Service",
+              "agency": "Agency/Office",
+              "phone": "Phone Number"
+            }
+          },
+          "remember_note": "For ALL tenants, landlords must provide at least a 24-hour advance written notice to enter the unit to do repairs and they can enter even when you are not home."
+        },
+        "harassment": {
+          "lead": "To fight back against harassment, you must:",
+          "steps": [
+            "Document the events. Keep a notebook where you write the date, time, and a detailed description of what happened.",
+            "Send the landlord a letter documenting the harassment and asking for it to stop. Keep a copy of this dated documentation.",
+            "Do not suffer harassment in silence or fear. Come to a Working Class Unity Tenant Union meeting and share your experience."
+          ]
+        },
+        "utilities": {
+          "responsible_heading": "Who is responsible?",
+          "responsible_list": [
+            "California landlord-tenant laws do not mandate landlords to cover utility costs but require clarity in lease agreements.",
+            "Unpaid utility bills are the responsibility of whoever's name is on the bills."
+          ],
+          "landlord_name_heading": "If the utilities are under your Landlord's name:",
+          "landlord_name_list": [
+            "Landlords must ensure tenants can access utilities and cannot charge more than the actual utility cost.",
+            "Tenants have a right to get utilities even if their landlord doesn't pay the bills on time.",
+            "Tenants with medical conditions that require at-home medical equipment have a right to a reduced utility cost."
+          ],
+          "cannot_heading": "By Law your Landlord cannot:",
+          "cannot": {
+            "items": {
+              "shutoff": "Turn off your utilities just because you are late on rent.",
+              "increase_without_notice": "Increase the price of your utilities (e.g. gas, electricity, trash, etc.) without a 30-day advance notice before the next rent due date",
+              "increase_note_1": "If they do NOT give you advanced written notice of the utilities price increase you should pay the increase AND file a complaint for further investigation. (See Chapter 3)",
+              "increase_note_2": "Note: This is only if the utility costs are included in your rent"
+            }
+          },
+          "additional_info": "Additional information:",
+          "link_text": "California Landlord Tenant Law - Utilities"
+        },
+        "dos-donts": {
+          "before_heading": "Before You Move In:",
+          "before": {
+            "do": [
+              "Read and understand what you sign.",
+              "Take pictures to document the condition, especially of things that are already wrong or damaged."
+            ],
+            "do_not": [
+              "Sign things that are false.",
+              "If you have a pet, do not sign that you do not own one.",
+              "If there are bad conditions, do not sign that the place is in good condition."
+            ]
+          },
+          "during_heading": "During the Rental:",
+          "during": {
+            "do": [
+              "Pay rent on time.",
+              "Ask for receipts for rent payments, which clearly state the landlord's name, date covered, and amount paid.",
+              "Talk to a lawyer or housing advocate at the first sign of trouble."
+            ],
+            "do_not": [
+              "Pay rent in cash.",
+              "Accept false or incorrect receipts.",
+              "Violate the lease agreement.",
+              "Sign anything you do not understand."
+            ]
+          },
+          "move_out_heading": "When You Move Out:",
+          "move_out": {
+            "do": [
+              "Give more than 30 days written notice. Mail it with proof of mailing (certified mail or USPS Priority Mail).",
+              "Ask for a move out inspection, and take pictures of how you left the apartment.",
+              "Talk to a lawyer or housing advocate at the first sign of trouble."
+            ]
+          }
+        }
+      }
     }
   },
   "about_page": {

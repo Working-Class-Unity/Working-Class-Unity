@@ -592,7 +592,7 @@ const highlightMatch = (text: string): string => {
             <!-- CHAPTER 1: KNOW YOUR RIGHTS -->
             <!-- ============================================================= -->
             <h2 id="chapter-1" data-section class="text-2xl md:text-3xl font-bold text-secondary border-b-2 border-primary pb-2">
-              Chapter 1: Know Your Rights
+              {{ $t('tenant_handbook.chapters.chapter-1.title') }}
             </h2>
             <div class="not-prose mt-5">
               <TenantHandbookChapterContext :chapter="getChapterContext('chapter-1')" />
@@ -600,127 +600,107 @@ const highlightMatch = (text: string): string => {
 
             <!-- Tenant Protections -->
             <section id="tenant-protections" data-section class="mt-8">
-              <h3 class="text-xl font-bold text-base-content">Tenant Protections & Rent Increases</h3>
+              <h3 class="text-xl font-bold text-base-content">{{ $t('tenant_handbook.chapters.chapter-1.sections.tenant-protections.title') }}</h3>
               
-              <h4 class="font-semibold mt-4">Tenant Protection</h4>
+              <h4 class="font-semibold mt-4">{{ $t('tenant_handbook.body.chapter-1.tenant-protections.heading_tenant_protection') }}</h4>
               <p>
-                The California Tenant Protection Act restricts how much a landlord can increase your rent. 
-                Everyone in the San Joaquin County is Protected by this Act.
+                {{ $t('tenant_handbook.body.chapter-1.tenant-protections.intro') }}
               </p>
               
-              <p class="font-semibold">What does this act protect?</p>
+              <p class="font-semibold">{{ $t('tenant_handbook.body.chapter-1.tenant-protections.protects_heading') }}</p>
               <ul>
-                <li>Through January 1, 2030, landlords cannot raise rent more than 8.8% total or 5% plus the Consumer Price Index (CPI)—depending on whichever is lower.
+                <li>
+                  {{ $t('tenant_handbook.body.chapter-1.tenant-protections.protects.cap') }}
                   <ul>
-                    <li>Between 8/1/24 and 7/31/25 in San Joaquin County the maximum for rent increase is 8.8%</li>
+                    <li>{{ $t('tenant_handbook.body.chapter-1.tenant-protections.protects.cap_local') }}</li>
                   </ul>
                 </li>
-                <li>Increases can only occur no more than two times every 12 months.</li>
-                <li>Does not limit how much money a landlord can charge at the start of a rental agreement, only how much the rent can increase once the unit is occupied by the same tenant.</li>
-                <li>Limits the legal reasons for eviction. You can only be evicted for the reasons listed in the SJCOG, and in some cases you MUST be compensated. (See Chapter 4)</li>
-                <li>Rent increases cannot be retaliatory.</li>
+                <li>{{ $t('tenant_handbook.body.chapter-1.tenant-protections.protects.frequency') }}</li>
+                <li>{{ $t('tenant_handbook.body.chapter-1.tenant-protections.protects.initial_rent') }}</li>
+                <li>{{ $t('tenant_handbook.body.chapter-1.tenant-protections.protects.eviction_reasons') }}</li>
+                <li>{{ $t('tenant_handbook.body.chapter-1.tenant-protections.protects.no_retaliation') }}</li>
               </ul>
 
-              <h4 class="font-semibold mt-6">When can a Landlord increase your rent?</h4>
+              <h4 class="font-semibold mt-6">{{ $t('tenant_handbook.body.chapter-1.tenant-protections.increase_heading') }}</h4>
               <ul>
-                <li><strong>Lease of more than month-to-month:</strong>
+                <li>
+                  <strong>{{ $t('tenant_handbook.body.chapter-1.tenant-protections.increase.lease_term_label') }}</strong>
                   <ul>
-                    <li>Landlords CANNOT increase rent during the term of the lease, unless the lease explicitly allows for rent increases.</li>
-                    <li>Rent increases cannot be considered within the first year of occupancy.</li>
+                    <li>{{ $t('tenant_handbook.body.chapter-1.tenant-protections.increase.lease_term_items.no_increase_during_term') }}</li>
+                    <li>{{ $t('tenant_handbook.body.chapter-1.tenant-protections.increase.lease_term_items.not_in_first_year') }}</li>
                   </ul>
                 </li>
-                <li><strong>Periodic lease agreement (a month-to-month or shorter):</strong>
+                <li>
+                  <strong>{{ $t('tenant_handbook.body.chapter-1.tenant-protections.increase.periodic_label') }}</strong>
                   <ul>
-                    <li>Landlords can increase your rent as often as they like, but must provide a written notice</li>
+                    <li>{{ $t('tenant_handbook.body.chapter-1.tenant-protections.increase.periodic_items.notice_required') }}</li>
                   </ul>
                 </li>
               </ul>
 
               <div class="bg-base-200 p-4 rounded-lg mt-4">
-                <p class="font-semibold mb-2">Landlords MUST provide a formal written notice for rent increases at least:</p>
+                <p class="font-semibold mb-2">{{ $t('tenant_handbook.body.chapter-1.tenant-protections.notice_box.title') }}</p>
                 <ul class="mb-0">
-                  <li>30-day notice for all week-to-week leases</li>
-                  <li>30-day notice for all month-to-month leases for tenants who have lived there for less than one year</li>
-                  <li>60-day notice for all month-to-month or yearly leases with tenants who have lived there for more than one year</li>
-                  <li>90-day advance notice if the rent increase is greater than 8.8%</li>
+                  <li>{{ $t('tenant_handbook.body.chapter-1.tenant-protections.notice_box.items.week_to_week_30') }}</li>
+                  <li>{{ $t('tenant_handbook.body.chapter-1.tenant-protections.notice_box.items.month_to_month_under_year_30') }}</li>
+                  <li>{{ $t('tenant_handbook.body.chapter-1.tenant-protections.notice_box.items.month_to_month_over_year_60') }}</li>
+                  <li>{{ $t('tenant_handbook.body.chapter-1.tenant-protections.notice_box.items.over_cap_90') }}</li>
                 </ul>
               </div>
             </section>
 
             <!-- Know Your Rights -->
             <section id="know-your-rights" data-section class="mt-10">
-              <h3 class="text-xl font-bold text-base-content">Know Your Rights</h3>
+              <h3 class="text-xl font-bold text-base-content">{{ $t('tenant_handbook.chapters.chapter-1.sections.know-your-rights.title') }}</h3>
               
               <p>
-                The WCU Tenants Union knows that many landlords use their failure to make repairs as a way to evict tenants. 
-                When tenants complain to their landlords about the lack of repairs, or about the quality of repair, many landlords 
-                tell tenants to move out if they are unhappy. <strong>That is illegal.</strong>
+                {{ $t('tenant_handbook.body.chapter-1.know-your-rights.p1') }} <strong>{{ $t('tenant_handbook.body.chapter-1.know-your-rights.illegal') }}</strong>
               </p>
 
               <p>
-                Under California law, ALL Tenants (with or without Rent Stabilization) have the right to live in a unit that is both safe and sanitary.
+                {{ $t('tenant_handbook.body.chapter-1.know-your-rights.p2') }}
               </p>
 
-              <p class="font-semibold">This means that your landlord is legally required to repair or address:</p>
+              <p class="font-semibold">{{ $t('tenant_handbook.body.chapter-1.know-your-rights.required_heading') }}</p>
               <ul>
-                <li>Water dripping from ceilings and walls (from leaking pipes, bathtubs, or sinks)</li>
-                <li>Holes in walls or floors (or missing thresholds at the base of doorways)</li>
-                <li>Plaster/paint shedding</li>
-                <li>Visible mildew or mold from not having enough air circulation</li>
-                <li>Damaged heater</li>
-                <li>Bad plumbing (or sewage back up)</li>
-                <li>Broken windows</li>
-                <li>Missing window screens</li>
-                <li>Broken smoke detectors or carbon monoxide detectors</li>
-                <li>Large gaps behind kitchen drawers or cupboards where insects can enter</li>
-                <li>Inadequate garbage collection</li>
-                <li>Unsafe stairs/handrails</li>
-                <li>Unsecure/improper doorknobs</li>
-                <li>Faulty electrical wiring</li>
-                <li>Vermin infestations that violate the Health Code: cockroaches (the small ones), rats, mice, and raccoons (See Chapter 3)</li>
-                <li>Infestations that violate the Building Code: termites (See Chapter 3)</li>
+                <li v-for="(item, index) in getStringList('tenant_handbook.body.chapter-1.know-your-rights.repairs_required')" :key="index">{{ item }}</li>
               </ul>
 
-              <p class="font-semibold mt-4">Also, tenants have the right to:</p>
+              <p class="font-semibold mt-4">{{ $t('tenant_handbook.body.chapter-1.know-your-rights.rights_heading') }}</p>
               <ul>
-                <li>Receive 24-hour advance written notice before the landlord enters your home</li>
-                <li>Submit a written list of repairs that you need in your home</li>
-                <li>Impartial inspections by a third party</li>
-                <li>Pay rent with money order</li>
-                <li>Receive a receipt that clearly states the landlord's name, date covered by the rent, and the amount paid</li>
-                <li>Organize themselves to fight against bad conditions, harassment, or illegal evictions</li>
+                <li v-for="(item, index) in getStringList('tenant_handbook.body.chapter-1.know-your-rights.rights_list')" :key="index">{{ item }}</li>
               </ul>
             </section>
 
             <!-- Repairs -->
             <section id="repairs" data-section class="mt-10">
-              <h3 class="text-xl font-bold text-base-content">Repairs, Damage, or Infestation</h3>
+              <h3 class="text-xl font-bold text-base-content">{{ $t('tenant_handbook.chapters.chapter-1.sections.repairs.title') }}</h3>
               
-              <p>If you have repairs, damage, or infestation:</p>
+              <p>{{ $t('tenant_handbook.body.chapter-1.repairs.lead') }}</p>
               <ol>
-                <li>Make a list of the damaged or infested areas (if your landlord has provided you with a repairs sheet, fill it out thoroughly).</li>
-                <li>Take photographs of the damaged or infested areas, and include the day's newspaper to show the date the photograph was taken.</li>
-                <li>Write a letter to the landlord, attach the photos and list (or repairs sheet), and send it by mail with a delivery confirmation receipt, such as certified mail or USPS Priority Mail.
+                <li>{{ $t('tenant_handbook.body.chapter-1.repairs.steps.1') }}</li>
+                <li>{{ $t('tenant_handbook.body.chapter-1.repairs.steps.2') }}</li>
+                <li>
+                  {{ $t('tenant_handbook.body.chapter-1.repairs.steps.3') }}
                   <ul>
-                    <li>Email and text are also options.</li>
+                    <li>{{ $t('tenant_handbook.body.chapter-1.repairs.steps.3_note') }}</li>
                   </ul>
                 </li>
-                <li>Keep dated documentation (e.g. receipt from post office, texts, emails, letters, etc.), and copies of all correspondence and photographs sent to the landlord.</li>
-                <li>If the landlord does not repair the unit in a timely manner, you can file a complaint.</li>
+                <li>{{ $t('tenant_handbook.body.chapter-1.repairs.steps.4') }}</li>
+                <li>{{ $t('tenant_handbook.body.chapter-1.repairs.steps.5') }}</li>
               </ol>
 
               <p>
-                Depending on the specific city or problem, you can request an inspection, and the landlord will be REQUIRED to repair the problem. 
-                In some cases, landlords have up to 30 days to start the repair work, and then another 60 days to finish it.
+                {{ $t('tenant_handbook.body.chapter-1.repairs.inspection_timeline') }}
               </p>
 
               <div class="overflow-x-auto mt-4">
                 <table class="table table-zebra w-full">
                   <thead>
                     <tr>
-                      <th>Department/Service</th>
-                      <th>Agency/Office</th>
-                      <th>Phone Number</th>
+                      <th>{{ $t('tenant_handbook.body.chapter-1.repairs.table.headers.department') }}</th>
+                      <th>{{ $t('tenant_handbook.body.chapter-1.repairs.table.headers.agency') }}</th>
+                      <th>{{ $t('tenant_handbook.body.chapter-1.repairs.table.headers.phone') }}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -773,111 +753,96 @@ const highlightMatch = (text: string): string => {
                 </table>
               </div>
 
-              <TenantHandbookEvidenceNote title="Remember" tone="info">
-                For ALL tenants, landlords must provide at least a 24-hour advance written notice to enter
-                the unit to do repairs and they can enter even when you are not home.
+              <TenantHandbookEvidenceNote :title="$t('common.remember')" tone="info">
+                {{ $t('tenant_handbook.body.chapter-1.repairs.remember_note') }}
               </TenantHandbookEvidenceNote>
             </section>
 
             <!-- Harassment -->
             <section id="harassment" data-section class="mt-10">
-              <h3 class="text-xl font-bold text-base-content">Harassment</h3>
+              <h3 class="text-xl font-bold text-base-content">{{ $t('tenant_handbook.chapters.chapter-1.sections.harassment.title') }}</h3>
               
-              <p>To fight back against harassment, you must:</p>
+              <p>{{ $t('tenant_handbook.body.chapter-1.harassment.lead') }}</p>
               <ul>
-                <li>Document the events. Keep a notebook where you write the date, time, and a detailed description of what happened.</li>
-                <li>Send the landlord a letter documenting the harassment and asking for it to stop. Keep a copy of this dated documentation.</li>
-                <li>Do not suffer harassment in silence or fear. Come to a Working Class Unity Tenant Union meeting and share your experience.</li>
+                <li v-for="(item, index) in getStringList('tenant_handbook.body.chapter-1.harassment.steps')" :key="index">{{ item }}</li>
               </ul>
             </section>
 
             <!-- Utilities -->
             <section id="utilities" data-section class="mt-10">
-              <h3 class="text-xl font-bold text-base-content">Utilities</h3>
+              <h3 class="text-xl font-bold text-base-content">{{ $t('tenant_handbook.chapters.chapter-1.sections.utilities.title') }}</h3>
               
-              <h4 class="font-semibold mt-4">Who is responsible?</h4>
+              <h4 class="font-semibold mt-4">{{ $t('tenant_handbook.body.chapter-1.utilities.responsible_heading') }}</h4>
               <ul>
-                <li>California landlord-tenant laws do not mandate landlords to cover utility costs but require clarity in lease agreements.</li>
-                <li>Unpaid utility bills are the responsibility of whoever's name is on the bills.</li>
+                <li v-for="(item, index) in getStringList('tenant_handbook.body.chapter-1.utilities.responsible_list')" :key="index">{{ item }}</li>
               </ul>
 
-              <h4 class="font-semibold mt-4">If the utilities are under your Landlord's name:</h4>
+              <h4 class="font-semibold mt-4">{{ $t('tenant_handbook.body.chapter-1.utilities.landlord_name_heading') }}</h4>
               <ul>
-                <li>Landlords must ensure tenants can access utilities and cannot charge more than the actual utility cost.</li>
-                <li>Tenants have a right to get utilities even if their landlord doesn't pay the bills on time.</li>
-                <li>Tenants with medical conditions that require at-home medical equipment have a right to a reduced utility cost.</li>
+                <li v-for="(item, index) in getStringList('tenant_handbook.body.chapter-1.utilities.landlord_name_list')" :key="index">{{ item }}</li>
               </ul>
 
-              <h4 class="font-semibold mt-4">By Law your Landlord cannot:</h4>
+              <h4 class="font-semibold mt-4">{{ $t('tenant_handbook.body.chapter-1.utilities.cannot_heading') }}</h4>
               <ul>
-                <li>Turn off your utilities just because you are late on rent.</li>
-                <li>Increase the price of your utilities (e.g. gas, electricity, trash, etc.) without a 30-day advance notice before the next rent due date
+                <li>{{ $t('tenant_handbook.body.chapter-1.utilities.cannot.items.shutoff') }}</li>
+                <li>
+                  {{ $t('tenant_handbook.body.chapter-1.utilities.cannot.items.increase_without_notice') }}
                   <ul>
-                    <li>If they do NOT give you advanced written notice of the utilities price increase you should pay the increase AND file a complaint for further investigation. (See Chapter 3)</li>
-                    <li>Note: This is only if the utility costs are included in your rent</li>
+                    <li>{{ $t('tenant_handbook.body.chapter-1.utilities.cannot.items.increase_note_1') }}</li>
+                    <li>{{ $t('tenant_handbook.body.chapter-1.utilities.cannot.items.increase_note_2') }}</li>
                   </ul>
                 </li>
               </ul>
               
               <p>
-                Additional information: 
+                {{ $t('tenant_handbook.body.chapter-1.utilities.additional_info') }}
                 <a href="https://rentprep.com/blog/legal/california-landlord-tenant-law-utilities/" target="_blank" rel="noopener noreferrer" class="link link-primary">
-                  California Landlord Tenant Law - Utilities
+                  {{ $t('tenant_handbook.body.chapter-1.utilities.link_text') }}
                 </a>
               </p>
             </section>
 
             <!-- Dos and Don'ts -->
             <section id="dos-donts" data-section class="mt-10">
-              <h3 class="text-xl font-bold text-base-content">Dos and Don'ts</h3>
+              <h3 class="text-xl font-bold text-base-content">{{ $t('tenant_handbook.chapters.chapter-1.sections.dos-donts.title') }}</h3>
               
-              <h4 class="font-semibold mt-4">Before You Move In:</h4>
+              <h4 class="font-semibold mt-4">{{ $t('tenant_handbook.body.chapter-1.dos-donts.before_heading') }}</h4>
               <div class="grid md:grid-cols-2 gap-4 mt-2">
                 <div class="bg-success/10 p-4 rounded-lg">
-                  <p class="font-semibold text-success mb-2">DO:</p>
+                  <p class="font-semibold text-success mb-2">{{ $t('common.do_label') }}:</p>
                   <ul class="mb-0">
-                    <li>Read and understand what you sign.</li>
-                    <li>Take pictures to document the condition, especially of things that are already wrong or damaged.</li>
+                    <li v-for="(item, index) in getStringList('tenant_handbook.body.chapter-1.dos-donts.before.do')" :key="index">{{ item }}</li>
                   </ul>
                 </div>
                 <div class="bg-error/10 p-4 rounded-lg">
-                  <p class="font-semibold text-base-content mb-2">DO NOT:</p>
+                  <p class="font-semibold text-base-content mb-2">{{ $t('common.do_not_label') }}:</p>
                   <ul class="mb-0">
-                    <li>Sign things that are false.</li>
-                    <li>If you have a pet, do not sign that you do not own one.</li>
-                    <li>If there are bad conditions, do not sign that the place is in good condition.</li>
+                    <li v-for="(item, index) in getStringList('tenant_handbook.body.chapter-1.dos-donts.before.do_not')" :key="index">{{ item }}</li>
                   </ul>
                 </div>
               </div>
 
-              <h4 class="font-semibold mt-6">During the Rental:</h4>
+              <h4 class="font-semibold mt-6">{{ $t('tenant_handbook.body.chapter-1.dos-donts.during_heading') }}</h4>
               <div class="grid md:grid-cols-2 gap-4 mt-2">
                 <div class="bg-success/10 p-4 rounded-lg">
-                  <p class="font-semibold text-success mb-2">DO:</p>
+                  <p class="font-semibold text-success mb-2">{{ $t('common.do_label') }}:</p>
                   <ul class="mb-0">
-                    <li>Pay rent on time.</li>
-                    <li>Ask for receipts for rent payments, which clearly state the landlord's name, date covered, and amount paid.</li>
-                    <li>Talk to a lawyer or housing advocate at the first sign of trouble.</li>
+                    <li v-for="(item, index) in getStringList('tenant_handbook.body.chapter-1.dos-donts.during.do')" :key="index">{{ item }}</li>
                   </ul>
                 </div>
                 <div class="bg-error/10 p-4 rounded-lg">
-                  <p class="font-semibold text-base-content mb-2">DO NOT:</p>
+                  <p class="font-semibold text-base-content mb-2">{{ $t('common.do_not_label') }}:</p>
                   <ul class="mb-0">
-                    <li>Pay rent in cash.</li>
-                    <li>Accept false or incorrect receipts.</li>
-                    <li>Violate the lease agreement.</li>
-                    <li>Sign anything you do not understand.</li>
+                    <li v-for="(item, index) in getStringList('tenant_handbook.body.chapter-1.dos-donts.during.do_not')" :key="index">{{ item }}</li>
                   </ul>
                 </div>
               </div>
 
-              <h4 class="font-semibold mt-6">When You Move Out:</h4>
+              <h4 class="font-semibold mt-6">{{ $t('tenant_handbook.body.chapter-1.dos-donts.move_out_heading') }}</h4>
               <div class="bg-success/10 p-4 rounded-lg mt-2">
-                <p class="font-semibold text-success mb-2">DO:</p>
+                <p class="font-semibold text-success mb-2">{{ $t('common.do_label') }}:</p>
                 <ul class="mb-0">
-                  <li>Give more than 30 days written notice. Mail it with proof of mailing (certified mail or USPS Priority Mail).</li>
-                  <li>Ask for a move out inspection, and take pictures of how you left the apartment.</li>
-                  <li>Talk to a lawyer or housing advocate at the first sign of trouble.</li>
+                  <li v-for="(item, index) in getStringList('tenant_handbook.body.chapter-1.dos-donts.move_out.do')" :key="index">{{ item }}</li>
                 </ul>
               </div>
             </section>

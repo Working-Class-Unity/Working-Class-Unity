@@ -481,6 +481,165 @@
           }
         }
       }
+    },
+    "body": {
+      "chapter-1": {
+        "tenant-protections": {
+          "heading_tenant_protection": "Protección del inquilino",
+          "intro": "La Ley de Protección de Inquilinos de California limita cuánto puede aumentar tu alquiler un propietario. Todas las personas inquilinas en el condado de San Joaquín están protegidas por esta ley.",
+          "protects_heading": "¿Qué protege esta ley?",
+          "protects": {
+            "cap": "Hasta el 1 de enero de 2030, los propietarios no pueden aumentar el alquiler más de 8.8% en total o 5% más el Índice de Precios al Consumidor (CPI), según cuál sea menor.",
+            "cap_local": "Entre el 8/1/24 y el 7/31/25 en el condado de San Joaquín, el máximo aumento de alquiler es 8.8%",
+            "frequency": "Los aumentos pueden ocurrir como máximo dos veces cada 12 meses.",
+            "initial_rent": "No limita cuánto dinero puede cobrar un propietario al inicio de un contrato de alquiler; solo limita cuánto puede aumentar el alquiler una vez que la vivienda está ocupada por el mismo inquilino.",
+            "eviction_reasons": "Limita las razones legales de desalojo. Solo te pueden desalojar por las razones listadas en la SJCOG, y en algunos casos te DEBEN compensar. (Ver Capítulo 4)",
+            "no_retaliation": "Los aumentos de alquiler no pueden ser por represalia."
+          },
+          "increase_heading": "¿Cuándo puede un propietario aumentar tu alquiler?",
+          "increase": {
+            "lease_term_label": "Contrato de más de mes a mes:",
+            "lease_term_items": {
+              "no_increase_during_term": "Los propietarios NO pueden aumentar el alquiler durante el término del contrato, a menos que el contrato lo permita explícitamente.",
+              "not_in_first_year": "No se pueden considerar aumentos de alquiler durante el primer año de ocupación."
+            },
+            "periodic_label": "Contrato periódico (mes a mes o más corto):",
+            "periodic_items": {
+              "notice_required": "Los propietarios pueden aumentar tu alquiler tan seguido como quieran, pero deben dar un aviso por escrito"
+            }
+          },
+          "notice_box": {
+            "title": "Los propietarios DEBEN dar un aviso formal por escrito para aumentos de alquiler, al menos:",
+            "items": {
+              "week_to_week_30": "Aviso de 30 días para todos los contratos semana a semana",
+              "month_to_month_under_year_30": "Aviso de 30 días para todos los contratos mes a mes si has vivido allí menos de un año",
+              "month_to_month_over_year_60": "Aviso de 60 días para contratos mes a mes o anuales si has vivido allí más de un año",
+              "over_cap_90": "Aviso con 90 días de anticipación si el aumento de alquiler es mayor a 8.8%"
+            }
+          }
+        },
+        "know-your-rights": {
+          "p1": "El Sindicato de Inquilinos de WCU sabe que muchos propietarios usan su falta de reparaciones como una forma de desalojar a los inquilinos. Cuando los inquilinos se quejan con sus propietarios por la falta de reparaciones, o por la calidad de las reparaciones, muchos propietarios les dicen que se muden si no están contentos.",
+          "illegal": "Eso es ilegal.",
+          "p2": "Bajo la ley de California, TODOS los inquilinos (con o sin estabilización de alquiler) tienen el derecho de vivir en una vivienda que sea segura y sanitaria.",
+          "required_heading": "Esto significa que tu propietario está legalmente obligado a reparar o atender:",
+          "repairs_required": [
+            "Agua goteando de techos y paredes (por tuberías, bañeras o lavabos que gotean)",
+            "Agujeros en paredes o pisos (o umbrales faltantes en la base de las puertas)",
+            "Yeso/pintura descascarándose",
+            "Moho visible por falta de circulación de aire",
+            "Calefactor dañado",
+            "Plomería en mal estado (o respaldo de aguas residuales)",
+            "Ventanas rotas",
+            "Faltan mosquiteros en las ventanas",
+            "Detectores de humo o monóxido de carbono rotos",
+            "Grandes espacios detrás de cajones o gabinetes de cocina por donde pueden entrar insectos",
+            "Recolección de basura inadecuada",
+            "Escaleras/pasamanos inseguros",
+            "Perillas de puerta inseguras o inadecuadas",
+            "Cableado eléctrico defectuoso",
+            "Infestaciones de plagas que violan el código de salud: cucarachas (las pequeñas), ratas, ratones y mapaches (ver Capítulo 3)",
+            "Infestaciones que violan el código de construcción: termitas (ver Capítulo 3)"
+          ],
+          "rights_heading": "Además, los inquilinos tienen derecho a:",
+          "rights_list": [
+            "Recibir un aviso por escrito con 24 horas de anticipación antes de que el propietario entre a tu casa",
+            "Entregar una lista por escrito de reparaciones que necesitas en tu vivienda",
+            "Inspecciones imparciales por un tercero",
+            "Pagar el alquiler con giro postal (money order)",
+            "Recibir un recibo que indique claramente el nombre del propietario, el período que cubre el alquiler y el monto pagado",
+            "Organizarse para luchar contra malas condiciones, acoso o desalojos ilegales"
+          ]
+        },
+        "repairs": {
+          "lead": "Si tienes reparaciones, daños o infestación:",
+          "steps": {
+            "1": "Haz una lista de las áreas dañadas o infestadas (si tu propietario te dio una hoja de reparaciones, complétala a fondo).",
+            "2": "Toma fotos de las áreas dañadas o infestadas e incluye el periódico del día para mostrar la fecha en que se tomó la foto.",
+            "3": "Escribe una carta al propietario, adjunta las fotos y la lista (o la hoja de reparaciones) y envíala por correo con comprobante de entrega, como correo certificado o USPS Priority Mail.",
+            "3_note": "El correo electrónico y los mensajes de texto también son opciones.",
+            "4": "Guarda documentación con fecha (por ejemplo: recibo del correo, mensajes de texto, correos electrónicos, cartas, etc.) y copias de toda correspondencia y fotos enviadas al propietario.",
+            "5": "Si el propietario no repara la vivienda en un tiempo razonable, puedes presentar una queja."
+          },
+          "inspection_timeline": "Dependiendo de la ciudad o del problema, puedes solicitar una inspección y el propietario estará OBLIGADO a reparar el problema. En algunos casos, los propietarios tienen hasta 30 días para comenzar las reparaciones y luego otros 60 días para terminarlas.",
+          "table": {
+            "headers": {
+              "department": "Departamento/Servicio",
+              "agency": "Agencia/Oficina",
+              "phone": "Número de teléfono"
+            }
+          },
+          "remember_note": "Para TODOS los inquilinos, los propietarios deben dar al menos un aviso por escrito con 24 horas de anticipación para entrar a la vivienda a hacer reparaciones, y pueden entrar incluso si no estás en casa."
+        },
+        "harassment": {
+          "lead": "Para enfrentarte al acoso, debes:",
+          "steps": [
+            "Documenta los hechos. Lleva una libreta donde anotes la fecha, la hora y una descripción detallada de lo que pasó.",
+            "Envía al propietario una carta documentando el acoso y pidiendo que pare. Guarda una copia de esta documentación con fecha.",
+            "No sufras el acoso en silencio o con miedo. Ven a una reunión del Sindicato de Inquilinos de Working Class Unity y comparte tu experiencia."
+          ]
+        },
+        "utilities": {
+          "responsible_heading": "¿Quién es responsable?",
+          "responsible_list": [
+            "Las leyes de arrendador-inquilino de California no obligan a los propietarios a cubrir los costos de servicios públicos, pero sí requieren claridad en los contratos.",
+            "Las facturas de servicios públicos no pagadas son responsabilidad de la persona cuyo nombre está en la factura."
+          ],
+          "landlord_name_heading": "Si los servicios públicos están a nombre de tu propietario:",
+          "landlord_name_list": [
+            "Los propietarios deben asegurar que los inquilinos puedan acceder a los servicios públicos y no pueden cobrar más que el costo real.",
+            "Los inquilinos tienen derecho a tener servicios públicos aunque su propietario no pague las facturas a tiempo.",
+            "Los inquilinos con condiciones médicas que requieren equipo médico en casa tienen derecho a un costo reducido de servicios públicos."
+          ],
+          "cannot_heading": "Por ley, tu propietario no puede:",
+          "cannot": {
+            "items": {
+              "shutoff": "Cortar tus servicios públicos solo porque te atrasaste con el alquiler.",
+              "increase_without_notice": "Aumentar el precio de tus servicios públicos (por ejemplo: gas, electricidad, basura, etc.) sin un aviso con 30 días de anticipación antes de la próxima fecha de pago del alquiler",
+              "increase_note_1": "Si NO te dan un aviso por escrito con anticipación sobre el aumento, debes pagar el aumento Y presentar una queja para una investigación adicional. (Ver Capítulo 3)",
+              "increase_note_2": "Nota: Esto solo aplica si los costos de servicios públicos están incluidos en tu alquiler"
+            }
+          },
+          "additional_info": "Información adicional:",
+          "link_text": "Ley de arrendador-inquilino de California - servicios públicos"
+        },
+        "dos-donts": {
+          "before_heading": "Antes de mudarte:",
+          "before": {
+            "do": [
+              "Lee y entiende lo que firmas.",
+              "Toma fotos para documentar la condición, especialmente de cosas que ya están mal o dañadas."
+            ],
+            "do_not": [
+              "Firmes cosas que son falsas.",
+              "Si tienes una mascota, no firmes que no tienes una.",
+              "Si hay malas condiciones, no firmes que el lugar está en buenas condiciones."
+            ]
+          },
+          "during_heading": "Durante el alquiler:",
+          "during": {
+            "do": [
+              "Paga el alquiler a tiempo.",
+              "Pide recibos de pagos de alquiler que indiquen claramente el nombre del propietario, el período cubierto y el monto pagado.",
+              "Habla con un abogado o defensor de vivienda ante la primera señal de problemas."
+            ],
+            "do_not": [
+              "Pagues el alquiler en efectivo.",
+              "Aceptes recibos falsos o incorrectos.",
+              "Violes el contrato de arrendamiento.",
+              "Firmes algo que no entiendes."
+            ]
+          },
+          "move_out_heading": "Cuando te mudes:",
+          "move_out": {
+            "do": [
+              "Da más de 30 días de aviso por escrito. Envíalo por correo con comprobante de envío (correo certificado o USPS Priority Mail).",
+              "Pide una inspección de salida y toma fotos de cómo dejaste el apartamento.",
+              "Habla con un abogado o defensor de vivienda ante la primera señal de problemas."
+            ]
+          }
+        }
+      }
     }
   },
   "about_page": {
