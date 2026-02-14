@@ -1023,35 +1023,44 @@ const highlightMatch = (text: string): string => {
             </section>
 
             <section id="no-rent-stabilization" data-section class="mt-10">
-              <h3 class="text-xl font-bold text-base-content">If You DO NOT Live in a Building Under Rent Stabilization</h3>
+              <h3 class="text-xl font-bold text-base-content">{{ $t('tenant_handbook.chapters.chapter-4.sections.no-rent-stabilization.title') }}</h3>
               
-              <p>The landlord may evict you for any reason.</p>
+              <p>{{ $t('tenant_handbook.body.chapter-4.no-rent-stabilization.p1') }}</p>
               <p>
-                <strong>HOWEVER</strong>, the law requires that advance written notice be given to the tenant, stating that the landlord no longer wants to rent to the tenant.
+                <strong>{{ $t('tenant_handbook.body.chapter-4.no-rent-stabilization.however') }}</strong>,
+                {{ $t('tenant_handbook.body.chapter-4.no-rent-stabilization.notice_requirement') }}
               </p>
 
               <ul>
-                <li>If the tenant has lived in the unit for <strong>MORE than one year</strong>, then the landlord must give a <strong>60-day notice</strong>.</li>
-                <li>If any tenant has lived in the unit for <strong>LESS than one year</strong>, then the landlord only has to give <strong>30-day notice</strong>.</li>
+                <li>
+                  {{ $t('tenant_handbook.body.chapter-4.no-rent-stabilization.notice_windows.more_than_year.before') }}
+                  <strong>{{ $t('tenant_handbook.body.chapter-4.no-rent-stabilization.notice_windows.more_than_year.duration') }}</strong>
+                  {{ $t('tenant_handbook.body.chapter-4.no-rent-stabilization.notice_windows.more_than_year.middle') }}
+                  <strong>{{ $t('tenant_handbook.body.chapter-4.no-rent-stabilization.notice_windows.more_than_year.notice') }}</strong>.
+                </li>
+                <li>
+                  {{ $t('tenant_handbook.body.chapter-4.no-rent-stabilization.notice_windows.less_than_year.before') }}
+                  <strong>{{ $t('tenant_handbook.body.chapter-4.no-rent-stabilization.notice_windows.less_than_year.duration') }}</strong>
+                  {{ $t('tenant_handbook.body.chapter-4.no-rent-stabilization.notice_windows.less_than_year.middle') }}
+                  <strong>{{ $t('tenant_handbook.body.chapter-4.no-rent-stabilization.notice_windows.less_than_year.notice') }}</strong>.
+                </li>
               </ul>
 
-              <h4 class="font-semibold mt-4">3-Day Notice</h4>
-              <p>Under California law, a landlord can evict a tenant with only a <strong>3-DAY</strong> advance written notice for any of the following reasons:</p>
+              <h4 class="font-semibold mt-4">{{ $t('tenant_handbook.body.chapter-4.no-rent-stabilization.three_day.heading') }}</h4>
+              <p>
+                {{ $t('tenant_handbook.body.chapter-4.no-rent-stabilization.three_day.p_before') }}
+                <strong>{{ $t('tenant_handbook.body.chapter-4.no-rent-stabilization.three_day.p_emphasis') }}</strong>
+                {{ $t('tenant_handbook.body.chapter-4.no-rent-stabilization.three_day.p_after') }}
+              </p>
               <ul>
-                <li>Failure to pay rent.</li>
-                <li>A violation of the lease agreement or contract.</li>
-                <li>Materially damaging the property.</li>
-                <li>Being a nuisance.</li>
-                <li>Using the apartment for any illegal activities.</li>
+                <li v-for="(item, index) in getStringList('tenant_handbook.body.chapter-4.no-rent-stabilization.three_day.reasons')" :key="index">{{ item }}</li>
               </ul>
 
-              <p>The tenant has 3 days to correct the violation. If corrected within 3 days, they will not have to move out.</p>
+              <p>{{ $t('tenant_handbook.body.chapter-4.no-rent-stabilization.three_day.p2') }}</p>
 
-              <TenantHandbookEvidenceNote title="California Civil Code 1942.4" tone="source">
-                If the landlord has failed to adequately respond to official instructions for over 35 days,
-                the landlord of a dwelling may not demand rent, collect rent, issue a notice of a rent increase,
-                or issue a 3-day notice to pay rent or quit.
-                <strong>DO NOT ATTEMPT TO WITHHOLD RENT WITHOUT LEGAL CONSULTATION.</strong>
+              <TenantHandbookEvidenceNote :title="$t('tenant_handbook.body.chapter-4.no-rent-stabilization.civil_code_note.title')" tone="source">
+                {{ $t('tenant_handbook.body.chapter-4.no-rent-stabilization.civil_code_note.text') }}
+                <strong>{{ $t('tenant_handbook.body.chapter-4.no-rent-stabilization.civil_code_note.strong') }}</strong>
               </TenantHandbookEvidenceNote>
             </section>
 

@@ -761,6 +761,44 @@
             "Si el edificio es un hotel residencial que el propietario convertirá o demolerá.",
             "Si el propietario convertirá el edificio en vivienda asequible certificada por el gobierno."
           ]
+        },
+        "no-rent-stabilization": {
+          "p1": "El propietario puede desalojarte por cualquier motivo.",
+          "however": "SIN EMBARGO",
+          "notice_requirement": "la ley exige que se le entregue al inquilino un aviso por escrito con anticipación, indicando que el propietario ya no quiere rentarle al inquilino.",
+          "notice_windows": {
+            "more_than_year": {
+              "before": "Si el inquilino ha vivido en la unidad por ",
+              "duration": "MÁS de un año",
+              "middle": ", entonces el propietario debe dar un ",
+              "notice": "aviso de 60 días"
+            },
+            "less_than_year": {
+              "before": "Si cualquier inquilino ha vivido en la unidad por ",
+              "duration": "MENOS de un año",
+              "middle": ", entonces el propietario solo tiene que dar ",
+              "notice": "aviso de 30 días"
+            }
+          },
+          "three_day": {
+            "heading": "Aviso de 3 días",
+            "p_before": "Bajo la ley de California, un propietario puede desalojar a un inquilino con solo un aviso por escrito con ",
+            "p_emphasis": "3 DÍAS",
+            "p_after": " de anticipación por cualquiera de las siguientes razones:",
+            "reasons": [
+              "Falta de pago del alquiler.",
+              "Una violación del contrato de arrendamiento.",
+              "Dañar materialmente la propiedad.",
+              "Ser una molestia.",
+              "Usar el apartamento para actividades ilegales."
+            ],
+            "p2": "El inquilino tiene 3 días para corregir la violación. Si se corrige dentro de 3 días, no tendrá que mudarse."
+          },
+          "civil_code_note": {
+            "title": "Código Civil de California 1942.4",
+            "text": "Si el propietario no ha respondido adecuadamente a instrucciones oficiales por más de 35 días, el propietario de una vivienda no puede exigir alquiler, cobrar alquiler, emitir un aviso de aumento de alquiler, ni emitir un aviso de 3 días para pagar el alquiler o desalojar.",
+            "strong": "NO INTENTES RETENER EL ALQUILER SIN CONSULTA LEGAL."
+          }
         }
       }
     }
