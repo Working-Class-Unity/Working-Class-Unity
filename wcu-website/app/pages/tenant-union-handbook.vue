@@ -340,7 +340,7 @@ const highlightMatch = (text: string): string => {
         >
           <!-- Mobile Drawer Header -->
           <div class="flex items-center justify-between mb-4">
-            <h2 id="toc-title" class="text-lg font-semibold text-base-content">Contents</h2>
+            <h2 id="toc-title" class="text-lg font-semibold text-base-content">{{ $t('tenant_handbook.toc.contents_title') }}</h2>
             <button 
               ref="mobileDrawerCloseButtonRef"
               class="btn btn-ghost btn-circle h-10 min-h-10 w-10"
@@ -409,7 +409,7 @@ const highlightMatch = (text: string): string => {
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 mx-auto mb-2 opacity-50">
               <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
             </svg>
-            <p class="text-sm">No sections found for "{{ searchQuery }}"</p>
+            <p class="text-sm">{{ $t('tenant_handbook.toc.no_results_mobile', { query: searchQuery }) }}</p>
           </div>
         </div>
       </div>
@@ -431,7 +431,7 @@ const highlightMatch = (text: string): string => {
                   ref="searchInputRef"
                   v-model="searchQuery"
                   type="text"
-                  placeholder="Search chapter, section, keyword..."
+                  :placeholder="$t('tenant_handbook.a11y.search_placeholder')"
                   class="grow bg-transparent text-sm"
                 />
                 <kbd class="kbd kbd-xs opacity-80">⌘K</kbd>
@@ -440,7 +440,7 @@ const highlightMatch = (text: string): string => {
 
             <!-- TOC Header -->
             <h2 class="text-xs font-semibold text-base-content/80 uppercase tracking-wider mb-3">
-              On This Page
+              {{ $t('tenant_handbook.toc.on_this_page') }}
             </h2>
 
             <!-- TOC Navigation -->
@@ -463,7 +463,7 @@ const highlightMatch = (text: string): string => {
                   </button>
                   <button
                     class="p-1 hover:bg-base-200 rounded transition-colors"
-                    :aria-label="expandedChapters.has(chapter.id) ? 'Collapse chapter' : 'Expand chapter'"
+                    :aria-label="expandedChapters.has(chapter.id) ? $t('tenant_handbook.a11y.collapse_chapter') : $t('tenant_handbook.a11y.expand_chapter')"
                     @click="toggleChapter(chapter.id)"
                   >
                     <svg 
@@ -506,12 +506,12 @@ const highlightMatch = (text: string): string => {
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 mx-auto mb-2 opacity-50">
                 <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
               </svg>
-              <p class="text-xs">No sections match "{{ searchQuery }}"</p>
+              <p class="text-xs">{{ $t('tenant_handbook.toc.no_results_desktop', { query: searchQuery }) }}</p>
               <button 
                 class="btn btn-xs btn-ghost mt-2"
                 @click="searchQuery = ''"
               >
-                Clear search
+                {{ $t('tenant_handbook.toc.clear_search') }}
               </button>
             </div>
 
@@ -521,7 +521,7 @@ const highlightMatch = (text: string): string => {
                 class="text-xs text-base-content/80 hover:text-secondary transition-colors"
                 @click="toggleAllChapters"
               >
-                {{ expandedChapters.size === chapters.length ? 'Collapse all' : 'Expand all' }}
+                {{ expandedChapters.size === chapters.length ? $t('tenant_handbook.toc.collapse_all') : $t('tenant_handbook.toc.expand_all') }}
               </button>
             </div>
           </nav>

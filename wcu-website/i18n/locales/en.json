@@ -178,8 +178,10 @@
   "tenant_handbook": {
     "a11y": {
       "open_toc": "Open table of contents",
-      "search_placeholder": "Search sections...",
-      "clear_search": "Clear search"
+      "search_placeholder": "Search chapter, section, keyword...",
+      "clear_search": "Clear search",
+      "collapse_chapter": "Collapse chapter",
+      "expand_chapter": "Expand chapter"
     },
     "hero": {
       "eyebrow": "Tenant Defense Manual",
@@ -199,6 +201,25 @@
       "title": "Key reporting contacts",
       "phone_label": "Phone:",
       "email_label": "Email:"
+    },
+    "toc": {
+      "contents_title": "Contents",
+      "on_this_page": "On This Page",
+      "no_results_mobile": "No sections found for \"{query}\"",
+      "no_results_desktop": "No sections match \"{query}\"",
+      "clear_search": "Clear search",
+      "collapse_all": "Collapse all",
+      "expand_all": "Expand all"
+    },
+    "chapter_context": {
+      "eyebrow": "Chapter Brief",
+      "evidence_aria_label": "Documentation checklist",
+      "evidence_title": "What to gather before taking action",
+      "mistakes_aria_label": "Common mistakes",
+      "mistakes_title": "Mistakes that weaken your case",
+      "escalate_prefix": "Escalate now if:",
+      "sources_summary": "Source notes and review status",
+      "last_reviewed": "Last reviewed:"
     }
   },
   "about_page": {

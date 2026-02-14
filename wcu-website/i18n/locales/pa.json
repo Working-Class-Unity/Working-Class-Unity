@@ -178,8 +178,10 @@
   "tenant_handbook": {
     "a11y": {
       "open_toc": "ਸਮੱਗਰੀ ਸੂਚੀ ਖੋਲ੍ਹੋ",
-      "search_placeholder": "ਭਾਗ ਖੋਜੋ...",
-      "clear_search": "ਖੋਜ ਸਾਫ਼ ਕਰੋ"
+      "search_placeholder": "ਅਧਿਆਇ, ਭਾਗ, ਕੀਵਰਡ ਖੋਜੋ...",
+      "clear_search": "ਖੋਜ ਸਾਫ਼ ਕਰੋ",
+      "collapse_chapter": "ਅਧਿਆਇ ਸਮੇਟੋ",
+      "expand_chapter": "ਅਧਿਆਇ ਖੋਲ੍ਹੋ"
     },
     "hero": {
       "eyebrow": "ਕਿਰਾਏਦਾਰ ਰੱਖਿਆ ਮੈਨੁਅਲ",
@@ -199,6 +201,25 @@
       "title": "ਮੁੱਖ ਰਿਪੋਰਟਿੰਗ ਸੰਪਰਕ",
       "phone_label": "ਫੋਨ:",
       "email_label": "ਈਮੇਲ:"
+    },
+    "toc": {
+      "contents_title": "ਸਮੱਗਰੀ",
+      "on_this_page": "ਇਸ ਪੰਨੇ 'ਤੇ",
+      "no_results_mobile": "\"{query}\" ਲਈ ਕੋਈ ਭਾਗ ਨਹੀਂ ਮਿਲਿਆ",
+      "no_results_desktop": "\"{query}\" ਨਾਲ ਮਿਲਦਾ ਕੋਈ ਭਾਗ ਨਹੀਂ",
+      "clear_search": "ਖੋਜ ਸਾਫ਼ ਕਰੋ",
+      "collapse_all": "ਸਭ ਸਮੇਟੋ",
+      "expand_all": "ਸਭ ਖੋਲ੍ਹੋ"
+    },
+    "chapter_context": {
+      "eyebrow": "ਅਧਿਆਇ ਸੰਖੇਪ",
+      "evidence_aria_label": "ਦਸਤਾਵੇਜ਼ੀ ਚੈਕਲਿਸਟ",
+      "evidence_title": "ਕਾਰਵਾਈ ਤੋਂ ਪਹਿਲਾਂ ਕੀ ਇਕੱਠਾ ਕਰਨਾ ਹੈ",
+      "mistakes_aria_label": "ਆਮ ਗਲਤੀਆਂ",
+      "mistakes_title": "ਗਲਤੀਆਂ ਜੋ ਤੁਹਾਡਾ ਕੇਸ ਕਮਜ਼ੋਰ ਕਰਦੀਆਂ ਹਨ",
+      "escalate_prefix": "ਜੇ ਇਹ ਹੋਵੇ ਤਾਂ ਤੁਰੰਤ ਐਸਕਲੇਟ ਕਰੋ:",
+      "sources_summary": "ਸਰੋਤ ਨੋਟਸ ਅਤੇ ਸਮੀਖਿਆ ਸਥਿਤੀ",
+      "last_reviewed": "ਆਖਰੀ ਵਾਰ ਸਮੀਖਿਆ:"
     }
   },
   "about_page": {

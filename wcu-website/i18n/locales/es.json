@@ -178,8 +178,10 @@
   "tenant_handbook": {
     "a11y": {
       "open_toc": "Abrir tabla de contenidos",
-      "search_placeholder": "Buscar secciones...",
-      "clear_search": "Limpiar búsqueda"
+      "search_placeholder": "Buscar capítulo, sección, palabra clave...",
+      "clear_search": "Limpiar búsqueda",
+      "collapse_chapter": "Contraer capítulo",
+      "expand_chapter": "Expandir capítulo"
     },
     "hero": {
       "eyebrow": "Manual de defensa de inquilinos",
@@ -199,6 +201,25 @@
       "title": "Contactos clave para reportar",
       "phone_label": "Teléfono:",
       "email_label": "Correo:"
+    },
+    "toc": {
+      "contents_title": "Índice",
+      "on_this_page": "En esta página",
+      "no_results_mobile": "No se encontraron secciones para \"{query}\"",
+      "no_results_desktop": "Ninguna sección coincide con \"{query}\"",
+      "clear_search": "Limpiar búsqueda",
+      "collapse_all": "Contraer todo",
+      "expand_all": "Expandir todo"
+    },
+    "chapter_context": {
+      "eyebrow": "Resumen del capítulo",
+      "evidence_aria_label": "Lista de verificación de documentación",
+      "evidence_title": "Qué reunir antes de actuar",
+      "mistakes_aria_label": "Errores comunes",
+      "mistakes_title": "Errores que debilitan tu caso",
+      "escalate_prefix": "Escala de inmediato si:",
+      "sources_summary": "Notas de fuentes y estado de revisión",
+      "last_reviewed": "Última revisión:"
     }
   },
   "about_page": {
