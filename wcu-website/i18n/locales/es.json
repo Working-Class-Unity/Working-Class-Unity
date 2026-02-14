@@ -162,6 +162,7 @@
     "close": "cerrar",
     "skip_to_main": "Saltar al contenido principal",
     "home": "Inicio",
+    "back_to_top": "Volver arriba",
     "return_home": "Volver al inicio",
     "critical": "Crítico",
     "required": "Requerido",
@@ -933,6 +934,50 @@
             "heading": "Reglas especiales para mostrar a un comprador potencial:",
             "p1": "El propietario debe dar un aviso por escrito con 24 horas de anticipación para mostrar la unidad a un comprador potencial. Alternativamente, puede publicar un aviso por escrito con 120 días de anticipación una sola vez, pero aun así debe dar un aviso verbal con 24 horas de anticipación cada vez."
           }
+        },
+        "security-deposits": {
+          "what_is": {
+            "heading": "¿Qué es un depósito de seguridad?",
+            "p1": "El depósito de seguridad también puede llamarse: alquiler del último mes, depósito de seguridad, depósito por mascota, cargo por llave o cargo de limpieza. Asegúrate de que tu contrato de alquiler indique claramente que pagaste un depósito de seguridad y la cantidad correcta."
+          },
+          "refundable": {
+            "heading": "Bajo la ley de California, los depósitos de seguridad DEBEN ser reembolsables. Sin embargo, el propietario puede quedarse con una parte o con todo por:",
+            "items": [
+              "Se debe alquiler",
+              "La unidad está menos limpia que cuando te mudaste por primera vez",
+              "La unidad está dañada más allá del desgaste normal",
+              "No restaurar propiedad personal (como llaves o muebles)"
+            ]
+          },
+          "limits": {
+            "heading": "Límite legal para el depósito de seguridad total:",
+            "unfurnished": {
+              "label": "Unidad sin amueblar:",
+              "text_before": "El total no puede ser más de ",
+              "emphasis": "un mes de alquiler",
+              "text_after": " (según el Código Civil de CA 1950.5)"
+            },
+            "furnished": {
+              "label": "Unidad amueblada:",
+              "text_before": "El total no puede ser más de ",
+              "emphasis": "tres meses de alquiler",
+              "text_after": ""
+            }
+          },
+          "first_month_note": "El propietario también puede exigirte que pagues el alquiler del primer mes además del depósito de seguridad.",
+          "increase": {
+            "heading": "¿Puede un nuevo propietario aumentar el depósito de seguridad?",
+            "p1": "El propietario solo puede aumentar el depósito de seguridad al final de tu periodo de contrato, o si tu contrato permite específicamente un aumento. La nueva cantidad no puede exceder el límite legal."
+          },
+          "deadline_note": {
+            "title": "Plazo de 21 días",
+            "p1": "Después de mudarte, el propietario tiene 21 días para:",
+            "items": [
+              "Enviar un reembolso completo del depósito de seguridad, o",
+              "Entregar un estado de cuenta detallado con las razones de las deducciones y cualquier reembolso restante."
+            ]
+          },
+          "address_note": "Es responsabilidad del inquilino proporcionar una dirección donde se pueda enviar por correo el depósito de seguridad."
         }
       }
     }

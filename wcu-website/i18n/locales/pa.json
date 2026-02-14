@@ -162,6 +162,7 @@
     "close": "ਬੰਦ ਕਰੋ",
     "skip_to_main": "ਮੁੱਖ ਸਮੱਗਰੀ 'ਤੇ ਜਾਓ",
     "home": "ਮੁੱਖ ਪੰਨਾ",
+    "back_to_top": "ਉੱਪਰ ਵਾਪਸ",
     "return_home": "ਮੁੱਖ ਪੰਨੇ ਤੇ ਵਾਪਸ",
     "critical": "ਨਾਜ਼ੁਕ",
     "required": "ਲੋੜੀਂਦਾ",
@@ -933,6 +934,50 @@
             "heading": "Special rules for showing to prospective buyer:",
             "p1": "A landlord must give 24-hour advance written notice to show the unit to a prospective buyer. Alternatively, they can post a 120-day advance written notice one time, but must still give 24-hour advance verbal notice each time."
           }
+        },
+        "security-deposits": {
+          "what_is": {
+            "heading": "What is a security deposit?",
+            "p1": "The security deposit may also be called: last month's rent, security deposit, pet deposit, key fee, or cleaning fee. Make sure your rental agreement clearly states you have paid a security deposit and the correct amount."
+          },
+          "refundable": {
+            "heading": "Under California law, security deposits MUST be refundable. However, the landlord may keep part or all for:",
+            "items": [
+              "Rent is owed",
+              "The unit is less clean than when you first moved in",
+              "The unit is damaged beyond normal wear and tear",
+              "Failure to restore personal property (such as keys or furniture)"
+            ]
+          },
+          "limits": {
+            "heading": "Legal limit for total security deposit:",
+            "unfurnished": {
+              "label": "Unfurnished rental unit:",
+              "text_before": "Total cannot be more than ",
+              "emphasis": "one month's rent",
+              "text_after": " (per CA Civil Code 1950.5)"
+            },
+            "furnished": {
+              "label": "Furnished rental unit:",
+              "text_before": "Total cannot be more than ",
+              "emphasis": "three months' rent",
+              "text_after": ""
+            }
+          },
+          "first_month_note": "The landlord can also require you to pay the first month's rent in addition to the security deposit.",
+          "increase": {
+            "heading": "Can a new landlord increase the security deposit?",
+            "p1": "The landlord can only increase the security deposit at the end of your lease period, or if your lease specifically allows for an increase. The new amount cannot exceed the legal limit."
+          },
+          "deadline_note": {
+            "title": "21-day deadline",
+            "p1": "After moving out, the landlord has 21 days to:",
+            "items": [
+              "Send a full refund of the security deposit, or",
+              "Deliver an itemized statement with reasons for deductions and any remaining refund."
+            ]
+          },
+          "address_note": "It is the tenant's responsibility to provide an address where the security deposit can be mailed."
         }
       }
     }

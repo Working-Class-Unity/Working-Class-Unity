@@ -1197,53 +1197,55 @@ const highlightMatch = (text: string): string => {
             </section>
 
             <section id="security-deposits" data-section class="mt-10">
-              <h3 class="text-xl font-bold text-base-content">Security Deposits</h3>
-              <p class="text-sm text-base-content/80">For ALL tenants (with or without Rent Stabilization)</p>
+              <h3 class="text-xl font-bold text-base-content">{{ $t('tenant_handbook.chapters.chapter-5.sections.security-deposits.title') }}</h3>
+              <p class="text-sm text-base-content/80">{{ $t('tenant_handbook.body.chapter-5.applies_to_all') }}</p>
               
-              <h4 class="font-semibold mt-4">What is a security deposit?</h4>
+              <h4 class="font-semibold mt-4">{{ $t('tenant_handbook.body.chapter-5.security-deposits.what_is.heading') }}</h4>
               <p>
-                The security deposit may also be called: last month's rent, security deposit, pet deposit, key fee, or cleaning fee. 
-                Make sure your rental agreement clearly states you have paid a security deposit and the correct amount.
+                {{ $t('tenant_handbook.body.chapter-5.security-deposits.what_is.p1') }}
               </p>
 
-              <h4 class="font-semibold mt-4">Under California law, security deposits MUST be refundable. However, the landlord may keep part or all for:</h4>
+              <h4 class="font-semibold mt-4">{{ $t('tenant_handbook.body.chapter-5.security-deposits.refundable.heading') }}</h4>
               <ul>
-                <li>Rent is owed</li>
-                <li>The unit is less clean than when you first moved in</li>
-                <li>The unit is damaged beyond normal wear and tear</li>
-                <li>Failure to restore personal property (such as keys or furniture)</li>
+                <li v-for="(item, index) in getStringList('tenant_handbook.body.chapter-5.security-deposits.refundable.items')" :key="index">{{ item }}</li>
               </ul>
 
-              <h4 class="font-semibold mt-4">Legal limit for total security deposit:</h4>
+              <h4 class="font-semibold mt-4">{{ $t('tenant_handbook.body.chapter-5.security-deposits.limits.heading') }}</h4>
               <div class="grid md:grid-cols-2 gap-4 mt-2">
                 <div class="bg-base-200 p-4 rounded-lg">
-                  <p class="font-semibold">Unfurnished rental unit:</p>
-                  <p class="mb-0">Total cannot be more than <strong>one month's rent</strong> (per CA Civil Code 1950.5)</p>
+                  <p class="font-semibold">{{ $t('tenant_handbook.body.chapter-5.security-deposits.limits.unfurnished.label') }}</p>
+                  <p class="mb-0">
+                    {{ $t('tenant_handbook.body.chapter-5.security-deposits.limits.unfurnished.text_before') }}
+                    <strong>{{ $t('tenant_handbook.body.chapter-5.security-deposits.limits.unfurnished.emphasis') }}</strong>
+                    {{ $t('tenant_handbook.body.chapter-5.security-deposits.limits.unfurnished.text_after') }}
+                  </p>
                 </div>
                 <div class="bg-base-200 p-4 rounded-lg">
-                  <p class="font-semibold">Furnished rental unit:</p>
-                  <p class="mb-0">Total cannot be more than <strong>three months' rent</strong></p>
+                  <p class="font-semibold">{{ $t('tenant_handbook.body.chapter-5.security-deposits.limits.furnished.label') }}</p>
+                  <p class="mb-0">
+                    {{ $t('tenant_handbook.body.chapter-5.security-deposits.limits.furnished.text_before') }}
+                    <strong>{{ $t('tenant_handbook.body.chapter-5.security-deposits.limits.furnished.emphasis') }}</strong>
+                    {{ $t('tenant_handbook.body.chapter-5.security-deposits.limits.furnished.text_after') }}
+                  </p>
                 </div>
               </div>
 
-              <p class="mt-4">The landlord can also require you to pay the first month's rent in addition to the security deposit.</p>
+              <p class="mt-4">{{ $t('tenant_handbook.body.chapter-5.security-deposits.first_month_note') }}</p>
 
-              <h4 class="font-semibold mt-4">Can a new landlord increase the security deposit?</h4>
+              <h4 class="font-semibold mt-4">{{ $t('tenant_handbook.body.chapter-5.security-deposits.increase.heading') }}</h4>
               <p>
-                The landlord can only increase the security deposit at the end of your lease period, or if your lease specifically allows for an increase. 
-                The new amount cannot exceed the legal limit.
+                {{ $t('tenant_handbook.body.chapter-5.security-deposits.increase.p1') }}
               </p>
 
-              <TenantHandbookEvidenceNote title="21-day deadline" tone="source">
-                <p>After moving out, the landlord has 21 days to:</p>
+              <TenantHandbookEvidenceNote :title="$t('tenant_handbook.body.chapter-5.security-deposits.deadline_note.title')" tone="source">
+                <p>{{ $t('tenant_handbook.body.chapter-5.security-deposits.deadline_note.p1') }}</p>
                 <ul class="mb-0">
-                  <li>Send a full refund of the security deposit, or</li>
-                  <li>Deliver an itemized statement with reasons for deductions and any remaining refund.</li>
+                  <li v-for="(item, index) in getStringList('tenant_handbook.body.chapter-5.security-deposits.deadline_note.items')" :key="index">{{ item }}</li>
                 </ul>
               </TenantHandbookEvidenceNote>
 
               <p class="mt-4 text-sm text-base-content/80">
-                It is the tenant's responsibility to provide an address where the security deposit can be mailed.
+                {{ $t('tenant_handbook.body.chapter-5.security-deposits.address_note') }}
               </p>
             </section>
 
@@ -1256,7 +1258,7 @@ const highlightMatch = (text: string): string => {
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" />
                 </svg>
-                Back to Top
+                {{ $t('common.back_to_top') }}
               </button>
             </div>
           </article>
