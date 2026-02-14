@@ -799,6 +799,68 @@
             "text": "If the landlord has failed to adequately respond to official instructions for over 35 days, the landlord of a dwelling may not demand rent, collect rent, issue a notice of a rent increase, or issue a 3-day notice to pay rent or quit.",
             "strong": "DO NOT ATTEMPT TO WITHHOLD RENT WITHOUT LEGAL CONSULTATION."
           }
+        },
+        "eviction-process": {
+          "landlord_serves": {
+            "heading": "Landlord serves eviction notice",
+            "p1": "If you receive any of the following documents, respond immediately. If you DO NOT respond, you could lose your home or enter a court process."
+          },
+          "documents": {
+            "three_day": {
+              "title": "3-Day Notice to Perform or Quit",
+              "text": "The written notice must indicate the unit involved and the issue. It also must present an alternative to the tenant about how to resolve the problem."
+            },
+            "notice": {
+              "title": "30-Day Notice / 60-Day Notice",
+              "text": "Advance notice that the landlord no longer wants to rent to you."
+            },
+            "summons": {
+              "title": "5-Day Court Summons",
+              "text_before": "When you receive this it means your landlord has filed an eviction case against you in court. ",
+              "emphasis": "You have 5 days to reply to this notice.",
+              "text_after": " If you don't, then you can lose your case in court. This is the moment in which you need assistance from a lawyer."
+            }
+          },
+          "no_response": {
+            "heading": "If tenant DOES NOT file response:",
+            "steps": [
+              "Landlord requests entry of default and clerk's judgment for possession.",
+              "Default and judgment are entered.",
+              "Landlord files writ of possession.",
+              "Sheriff posts 5-day notice to vacate.",
+              "Case ends."
+            ]
+          },
+          "response": {
+            "heading": "If tenant files response:",
+            "steps": [
+              "Landlord requests trial date.",
+              "Court mails notice of trial date to landlord and tenant.",
+              "Trial within 20 days of request."
+            ]
+          },
+          "outcomes": {
+            "heading": "Four possible outcomes:",
+            "note": "(The parties can negotiate a settlement at any time during the process.)",
+            "items": {
+              "tenant_wins": {
+                "label": "Tenant wins (legal or technical issue):",
+                "text": "Tenant can stay."
+              },
+              "conditional_judgment": {
+                "label": "Conditional judgment (habitability issue):",
+                "text": "Tenant wins if they can pay reduced back-rent within 5 days."
+              },
+              "stipulated_judgment": {
+                "label": "Stipulated judgment (court-approved settlement):",
+                "text": "Tenant must pay back rent and other costs."
+              },
+              "landlord_wins": {
+                "label": "Landlord wins:",
+                "text": "Receives judgment for possession."
+              }
+            }
+          }
         }
       }
     }

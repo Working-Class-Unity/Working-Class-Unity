@@ -799,6 +799,68 @@
             "text": "Si el propietario no ha respondido adecuadamente a instrucciones oficiales por más de 35 días, el propietario de una vivienda no puede exigir alquiler, cobrar alquiler, emitir un aviso de aumento de alquiler, ni emitir un aviso de 3 días para pagar el alquiler o desalojar.",
             "strong": "NO INTENTES RETENER EL ALQUILER SIN CONSULTA LEGAL."
           }
+        },
+        "eviction-process": {
+          "landlord_serves": {
+            "heading": "El propietario entrega un aviso de desalojo",
+            "p1": "Si recibes cualquiera de los siguientes documentos, responde de inmediato. Si NO respondes, podrías perder tu hogar o entrar en un proceso en la corte."
+          },
+          "documents": {
+            "three_day": {
+              "title": "Aviso de 3 días para cumplir o desalojar",
+              "text": "El aviso por escrito debe indicar la unidad involucrada y el problema. También debe presentar una alternativa al inquilino sobre cómo resolver el problema."
+            },
+            "notice": {
+              "title": "Aviso de 30 días / Aviso de 60 días",
+              "text": "Aviso anticipado de que el propietario ya no quiere rentarte."
+            },
+            "summons": {
+              "title": "Citación de la corte de 5 días",
+              "text_before": "Cuando recibes esto, significa que tu propietario presentó un caso de desalojo en tu contra en la corte. ",
+              "emphasis": "Tienes 5 días para responder a este aviso.",
+              "text_after": "Si no lo haces, puedes perder tu caso en la corte. Este es el momento en que necesitas ayuda de un abogado."
+            }
+          },
+          "no_response": {
+            "heading": "Si el inquilino NO presenta respuesta:",
+            "steps": [
+              "El propietario solicita el default y la sentencia del secretario para posesión.",
+              "Se registra el default y se dicta la sentencia.",
+              "El propietario presenta una orden de posesión (writ of possession).",
+              "El sheriff publica un aviso de 5 días para desalojar.",
+              "El caso termina."
+            ]
+          },
+          "response": {
+            "heading": "Si el inquilino presenta respuesta:",
+            "steps": [
+              "El propietario solicita fecha de juicio.",
+              "La corte envía por correo el aviso de fecha de juicio al propietario y al inquilino.",
+              "El juicio ocurre dentro de 20 días de la solicitud."
+            ]
+          },
+          "outcomes": {
+            "heading": "Cuatro posibles resultados:",
+            "note": "(Las partes pueden negociar un acuerdo en cualquier momento durante el proceso.)",
+            "items": {
+              "tenant_wins": {
+                "label": "El inquilino gana (problema legal o técnico):",
+                "text": "El inquilino puede quedarse."
+              },
+              "conditional_judgment": {
+                "label": "Sentencia condicional (problema de habitabilidad):",
+                "text": "El inquilino gana si puede pagar el alquiler atrasado reducido dentro de 5 días."
+              },
+              "stipulated_judgment": {
+                "label": "Sentencia estipulada (acuerdo aprobado por la corte):",
+                "text": "El inquilino debe pagar el alquiler atrasado y otros costos."
+              },
+              "landlord_wins": {
+                "label": "El propietario gana:",
+                "text": "Recibe sentencia de posesión."
+              }
+            }
+          }
         }
       }
     }

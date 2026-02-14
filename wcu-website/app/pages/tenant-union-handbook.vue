@@ -1065,49 +1065,59 @@ const highlightMatch = (text: string): string => {
             </section>
 
             <section id="eviction-process" data-section class="mt-10">
-              <h3 class="text-xl font-bold text-base-content">Eviction Process</h3>
+              <h3 class="text-xl font-bold text-base-content">{{ $t('tenant_handbook.chapters.chapter-4.sections.eviction-process.title') }}</h3>
               
-              <h4 class="font-semibold mt-4">Landlord Serves Eviction Notice</h4>
-              <p>If you receive any of the following documents, respond immediately. If you DO NOT respond, you could lose your home or enter a court process.</p>
+              <h4 class="font-semibold mt-4">{{ $t('tenant_handbook.body.chapter-4.eviction-process.landlord_serves.heading') }}</h4>
+              <p>{{ $t('tenant_handbook.body.chapter-4.eviction-process.landlord_serves.p1') }}</p>
 
               <div class="space-y-4 mt-4">
                 <div class="bg-base-200 p-4 rounded-lg">
-                  <p class="font-semibold">3-Day Notice to Perform or Quit</p>
-                  <p class="text-sm mb-0">The written notice must indicate the unit involved and the issue. It also must present an alternative to the tenant about how to resolve the problem.</p>
+                  <p class="font-semibold">{{ $t('tenant_handbook.body.chapter-4.eviction-process.documents.three_day.title') }}</p>
+                  <p class="text-sm mb-0">{{ $t('tenant_handbook.body.chapter-4.eviction-process.documents.three_day.text') }}</p>
                 </div>
                 <div class="bg-base-200 p-4 rounded-lg">
-                  <p class="font-semibold">30-Day Notice / 60-Day Notice</p>
-                  <p class="text-sm mb-0">Advance notice that the landlord no longer wants to rent to you.</p>
+                  <p class="font-semibold">{{ $t('tenant_handbook.body.chapter-4.eviction-process.documents.notice.title') }}</p>
+                  <p class="text-sm mb-0">{{ $t('tenant_handbook.body.chapter-4.eviction-process.documents.notice.text') }}</p>
                 </div>
                 <div class="bg-error/10 p-4 rounded-lg border border-error">
-                  <p class="font-semibold text-base-content">5-Day Court Summons</p>
-                  <p class="text-sm mb-0">When you receive this it means your landlord has filed an eviction case against you in court. <strong>You have 5 days to reply to this notice.</strong> If you don't, then you can lose your case in court. This is the moment in which you need assistance from a lawyer.</p>
+                  <p class="font-semibold text-base-content">{{ $t('tenant_handbook.body.chapter-4.eviction-process.documents.summons.title') }}</p>
+                  <p class="text-sm mb-0">
+                    {{ $t('tenant_handbook.body.chapter-4.eviction-process.documents.summons.text_before') }}
+                    <strong>{{ $t('tenant_handbook.body.chapter-4.eviction-process.documents.summons.emphasis') }}</strong>
+                    {{ $t('tenant_handbook.body.chapter-4.eviction-process.documents.summons.text_after') }}
+                  </p>
                 </div>
               </div>
 
-              <h4 class="font-semibold mt-6">If Tenant DOES NOT File Response:</h4>
+              <h4 class="font-semibold mt-6">{{ $t('tenant_handbook.body.chapter-4.eviction-process.no_response.heading') }}</h4>
               <ol>
-                <li>Landlord requests entry of default and clerk's judgment for possession.</li>
-                <li>Default and judgment are entered.</li>
-                <li>Landlord files writ of possession.</li>
-                <li>Sheriff posts 5-day notice to vacate.</li>
-                <li>Case ends.</li>
+                <li v-for="(item, index) in getStringList('tenant_handbook.body.chapter-4.eviction-process.no_response.steps')" :key="index">{{ item }}</li>
               </ol>
 
-              <h4 class="font-semibold mt-4">If Tenant Files Response:</h4>
+              <h4 class="font-semibold mt-4">{{ $t('tenant_handbook.body.chapter-4.eviction-process.response.heading') }}</h4>
               <ol>
-                <li>Landlord requests trial date.</li>
-                <li>Court mails notice of trial date to landlord and tenant.</li>
-                <li>Trial within 20 days of request.</li>
+                <li v-for="(item, index) in getStringList('tenant_handbook.body.chapter-4.eviction-process.response.steps')" :key="index">{{ item }}</li>
               </ol>
 
-              <h4 class="font-semibold mt-4">Four Possible Outcomes:</h4>
-              <p class="text-sm text-base-content/80">(The parties can negotiate a settlement at any time during the process.)</p>
+              <h4 class="font-semibold mt-4">{{ $t('tenant_handbook.body.chapter-4.eviction-process.outcomes.heading') }}</h4>
+              <p class="text-sm text-base-content/80">{{ $t('tenant_handbook.body.chapter-4.eviction-process.outcomes.note') }}</p>
               <ol>
-                <li><strong>Tenant wins (legal or technical issue):</strong> Tenant can stay.</li>
-                <li><strong>Conditional judgment (habitability issue):</strong> Tenant wins if they can pay reduced back-rent within 5 days.</li>
-                <li><strong>Stipulated judgment (court-approved settlement):</strong> Tenant must pay back rent and other costs.</li>
-                <li><strong>Landlord wins:</strong> Receives judgment for possession.</li>
+                <li>
+                  <strong>{{ $t('tenant_handbook.body.chapter-4.eviction-process.outcomes.items.tenant_wins.label') }}</strong>
+                  {{ $t('tenant_handbook.body.chapter-4.eviction-process.outcomes.items.tenant_wins.text') }}
+                </li>
+                <li>
+                  <strong>{{ $t('tenant_handbook.body.chapter-4.eviction-process.outcomes.items.conditional_judgment.label') }}</strong>
+                  {{ $t('tenant_handbook.body.chapter-4.eviction-process.outcomes.items.conditional_judgment.text') }}
+                </li>
+                <li>
+                  <strong>{{ $t('tenant_handbook.body.chapter-4.eviction-process.outcomes.items.stipulated_judgment.label') }}</strong>
+                  {{ $t('tenant_handbook.body.chapter-4.eviction-process.outcomes.items.stipulated_judgment.text') }}
+                </li>
+                <li>
+                  <strong>{{ $t('tenant_handbook.body.chapter-4.eviction-process.outcomes.items.landlord_wins.label') }}</strong>
+                  {{ $t('tenant_handbook.body.chapter-4.eviction-process.outcomes.items.landlord_wins.text') }}
+                </li>
               </ol>
             </section>
 
