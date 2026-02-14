@@ -732,6 +732,36 @@
           "p1": "Presenta quejas con Cumplimiento de Códigos de Stockton sobre problemas estructurales en tu unidad, como termitas o daño en el techo.",
           "p2": "Cada vez que presentes una queja con Cumplimiento de Códigos de Stockton, también puedes pedir que inspeccionen todos los detectores de humo y monóxido de carbono del edificio. También pueden citar al propietario por cualquier otra violación que vean en la propiedad."
         }
+      },
+      "chapter-4": {
+        "legal-reasons": {
+          "p1": "La Ley de Protección de Inquilinos de 2019 (AB 1482) introdujo control de alquiler a nivel estatal y protecciones de desalojo por causa justa para ciertos inquilinos residenciales."
+        },
+        "at-fault": {
+          "items": [
+            "Falta de pago del alquiler según lo requerido por el contrato de arrendamiento.",
+            "Incumplimiento de un término material del contrato: violar términos importantes del contrato, como alteraciones no autorizadas o actividades prohibidas.",
+            "Negarse a firmar un nuevo contrato: negarse a firmar una renovación o extensión con términos similares cuando el propietario lo solicita.",
+            "Actividad criminal: cometer delitos en la propiedad o realizar actos criminales dirigidos al propietario o su agente.",
+            "Molestias o daño: participar en conductas que molestan a otros inquilinos o causan daños.",
+            "Negación de entrada legal: negarse a permitir que el propietario entre a la unidad por razones legítimas, como reparaciones o inspecciones.",
+            "El inquilino interfiere de manera irrazonable con la capacidad del propietario para realizar una renovación mayor de una unidad o del edificio."
+          ]
+        },
+        "no-fault": {
+          "compensation_note": {
+            "title": "Regla de compensación",
+            "text": "La ley exige que el propietario compense a un inquilino por costos de reubicación por las razones de abajo."
+          },
+          "items": [
+            "Si el propietario necesita el apartamento para mudarse él mismo o su hijo, cónyuge, padre/madre o gerente.",
+            "Si el propietario va a demoler el edificio o quiere retirar el apartamento del mercado de vivienda (Ley Ellis).",
+            "Si una agencia gubernamental le ordenó al propietario desalojar las unidades.",
+            "Si el Departamento Federal de Vivienda y Desarrollo Urbano (HUD) es dueño del edificio y quiere venderlo.",
+            "Si el edificio es un hotel residencial que el propietario convertirá o demolerá.",
+            "Si el propietario convertirá el edificio en vivienda asequible certificada por el gobierno."
+          ]
+        }
       }
     }
   },

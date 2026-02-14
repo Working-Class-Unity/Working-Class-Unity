@@ -989,47 +989,36 @@ const highlightMatch = (text: string): string => {
             <!-- CHAPTER 4: EVICTIONS -->
             <!-- ============================================================= -->
             <h2 id="chapter-4" data-section class="text-2xl md:text-3xl font-bold text-secondary border-b-2 border-primary pb-2 mt-16">
-              Chapter 4: Evictions
+              {{ $t('tenant_handbook.chapters.chapter-4.title') }}
             </h2>
             <div class="not-prose mt-5">
               <TenantHandbookChapterContext :chapter="getChapterContext('chapter-4')" />
             </div>
 
             <section id="legal-reasons" data-section class="mt-8">
-              <h3 class="text-xl font-bold text-base-content">Legal Reasons for Evictions</h3>
+              <h3 class="text-xl font-bold text-base-content">{{ $t('tenant_handbook.chapters.chapter-4.sections.legal-reasons.title') }}</h3>
               <p>
-                The Tenant Protection Act of 2019 (AB 1482) introduced statewide rent control and just cause eviction protections for certain residential tenants.
+                {{ $t('tenant_handbook.body.chapter-4.legal-reasons.p1') }}
               </p>
             </section>
 
             <section id="at-fault" data-section class="mt-10">
-              <h3 class="text-xl font-bold text-base-content">At-Fault Evictions</h3>
+              <h3 class="text-xl font-bold text-base-content">{{ $t('tenant_handbook.chapters.chapter-4.sections.at-fault.title') }}</h3>
               
               <ol>
-                <li>Failure to pay rent as required by the lease agreement.</li>
-                <li>Breach of a material lease term: Violating significant terms of the lease, such as unauthorized alterations or prohibited activities.</li>
-                <li>Refusal to sign a new lease: declining to sign a lease renewal or extension with similar terms when requested by the landlord.</li>
-                <li>Criminal activity: committing crimes on the property or engaging in criminal acts directed at the landlord or their agent.</li>
-                <li>Nuisance or waste: engaging in behavior that disturbs other tenants or causes damage.</li>
-                <li>Denial of lawful entry: refusing to allow the landlord access to the unit for legitimate reasons, such as repairs or inspections.</li>
-                <li>The tenant unreasonably interferes with the landlord's ability to perform major renovation to a unit or the building.</li>
+                <li v-for="(item, index) in getStringList('tenant_handbook.body.chapter-4.at-fault.items')" :key="index">{{ item }}</li>
               </ol>
             </section>
 
             <section id="no-fault" data-section class="mt-10">
-              <h3 class="text-xl font-bold text-base-content">No-Fault Evictions</h3>
+              <h3 class="text-xl font-bold text-base-content">{{ $t('tenant_handbook.chapters.chapter-4.sections.no-fault.title') }}</h3>
               
-              <TenantHandbookEvidenceNote title="Compensation rule" tone="source">
-                The landlord is required by law to compensate a tenant for relocation costs for the reasons below.
+              <TenantHandbookEvidenceNote :title="$t('tenant_handbook.body.chapter-4.no-fault.compensation_note.title')" tone="source">
+                {{ $t('tenant_handbook.body.chapter-4.no-fault.compensation_note.text') }}
               </TenantHandbookEvidenceNote>
 
               <ol>
-                <li>If the landlord needs the apartment to move in their child, spouse, parent, manager, and/or themselves.</li>
-                <li>If the landlord is going to demolish the building or wants to remove the apartment from the housing market (Ellis Act).</li>
-                <li>If the landlord was told by a government agency to empty the units.</li>
-                <li>If the Federal Department of Housing and Urban Development (HUD) owns the building and wants to sell it.</li>
-                <li>If the building is a residential hotel that the landlord will convert or demolish.</li>
-                <li>If the landlord will convert the building to government certified affordable housing.</li>
+                <li v-for="(item, index) in getStringList('tenant_handbook.body.chapter-4.no-fault.items')" :key="index">{{ item }}</li>
               </ol>
             </section>
 
