@@ -568,7 +568,54 @@
               "department": "Department/Service",
               "agency": "Agency/Office",
               "phone": "Phone Number"
-            }
+            },
+            "rows": [
+              {
+                "department": "Housing Abatement",
+                "agency": "Community Development",
+                "phone": "209-468-3141"
+              },
+              {
+                "department": "Housing Administration",
+                "agency": "San Joaquin Fair Housing Authority",
+                "phone": "209-460-5084"
+              },
+              {
+                "department": "Housing Assistance Applications (Section 8)",
+                "agency": "San Joaquin Fair Housing Authority",
+                "phone": "209-460-5085"
+              },
+              {
+                "department": "Housing Assistance Programs",
+                "agency": "Neighborhood Preservation",
+                "phone": "209-468-3065"
+              },
+              {
+                "department": "Housing Authority Customer Service",
+                "agency": "San Joaquin Fair Housing Authority",
+                "phone": "209-460-5095"
+              },
+              {
+                "department": "Housing Discrimination",
+                "agency": "San Joaquin Fair Housing Authority",
+                "phone": "800-994-0999 or 209-460-0999"
+              },
+              {
+                "department": "Housing General Information",
+                "agency": "San Joaquin Fair Housing Authority",
+                "phone": "209-460-5000"
+              },
+              {
+                "department": "Housing Rental Assistance (Section 8)",
+                "agency": "San Joaquin Fair Housing Authority",
+                "phone": "209-460-5088"
+              },
+              {
+                "department": "Housing Weatherization",
+                "agency": "Human Services Agency",
+                "phone": "209-468-0439"
+              }
+            ]
           },
           "remember_note": "For ALL tenants, landlords must provide at least a 24-hour advance written notice to enter the unit to do repairs and they can enter even when you are not home."
         },

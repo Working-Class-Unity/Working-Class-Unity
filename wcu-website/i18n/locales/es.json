@@ -568,7 +568,54 @@
               "department": "Departamento/Servicio",
               "agency": "Agencia/Oficina",
               "phone": "Número de teléfono"
-            }
+            },
+            "rows": [
+              {
+                "department": "Mitigación de vivienda",
+                "agency": "Desarrollo Comunitario",
+                "phone": "209-468-3141"
+              },
+              {
+                "department": "Administración de vivienda",
+                "agency": "Autoridad de Vivienda Justa de San Joaquín",
+                "phone": "209-460-5084"
+              },
+              {
+                "department": "Solicitudes de asistencia de vivienda (Sección 8)",
+                "agency": "Autoridad de Vivienda Justa de San Joaquín",
+                "phone": "209-460-5085"
+              },
+              {
+                "department": "Programas de asistencia de vivienda",
+                "agency": "Preservación del Vecindario",
+                "phone": "209-468-3065"
+              },
+              {
+                "department": "Servicio al cliente de la Autoridad de Vivienda",
+                "agency": "Autoridad de Vivienda Justa de San Joaquín",
+                "phone": "209-460-5095"
+              },
+              {
+                "department": "Discriminación de vivienda",
+                "agency": "Autoridad de Vivienda Justa de San Joaquín",
+                "phone": "800-994-0999 o 209-460-0999"
+              },
+              {
+                "department": "Información general de vivienda",
+                "agency": "Autoridad de Vivienda Justa de San Joaquín",
+                "phone": "209-460-5000"
+              },
+              {
+                "department": "Asistencia de alquiler de vivienda (Sección 8)",
+                "agency": "Autoridad de Vivienda Justa de San Joaquín",
+                "phone": "209-460-5088"
+              },
+              {
+                "department": "Climatización de vivienda",
+                "agency": "Agencia de Servicios Humanos",
+                "phone": "209-468-0439"
+              }
+            ]
           },
           "remember_note": "Para TODOS los inquilinos, los propietarios deben dar al menos un aviso por escrito con 24 horas de anticipación para entrar a la vivienda a hacer reparaciones, y pueden entrar incluso si no estás en casa."
         },

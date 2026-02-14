@@ -53,6 +53,21 @@ const getStringList = (key: string) => {
   return getList(key).map((item) => rt(item))
 }
 
+type TableRow = {
+  department: string
+  agency: string
+  phone: string
+}
+
+const getTableRows = (key: string): TableRow[] => {
+  const rows = tm(key) as unknown as TableRow[]
+  return rows.map((row) => ({
+    department: rt(row.department),
+    agency: rt(row.agency),
+    phone: rt(row.phone),
+  }))
+}
+
 const chapters = computed<HandbookChapterMeta[]>(() => {
   return handbookChapters.map((chapter) => {
     const chapterKey = `tenant_handbook.chapters.${chapter.id}`
@@ -704,50 +719,10 @@ const highlightMatch = (text: string): string => {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td>Housing Abatement</td>
-                      <td>Community Development</td>
-                      <td>209-468-3141</td>
-                    </tr>
-                    <tr>
-                      <td>Housing Administration</td>
-                      <td>San Joaquin Fair Housing Authority</td>
-                      <td>209-460-5084</td>
-                    </tr>
-                    <tr>
-                      <td>Housing Assistance Applications (Section 8)</td>
-                      <td>San Joaquin Fair Housing Authority</td>
-                      <td>209-460-5085</td>
-                    </tr>
-                    <tr>
-                      <td>Housing Assistance Programs</td>
-                      <td>Neighborhood Preservation</td>
-                      <td>209-468-3065</td>
-                    </tr>
-                    <tr>
-                      <td>Housing Authority Customer Service</td>
-                      <td>San Joaquin Fair Housing Authority</td>
-                      <td>209-460-5095</td>
-                    </tr>
-                    <tr>
-                      <td>Housing Discrimination</td>
-                      <td>San Joaquin Fair Housing Authority</td>
-                      <td>800-994-0999 or 209-460-0999</td>
-                    </tr>
-                    <tr>
-                      <td>Housing General Information</td>
-                      <td>San Joaquin Fair Housing Authority</td>
-                      <td>209-460-5000</td>
-                    </tr>
-                    <tr>
-                      <td>Housing Rental Assistance (Section 8)</td>
-                      <td>San Joaquin Fair Housing Authority</td>
-                      <td>209-460-5088</td>
-                    </tr>
-                    <tr>
-                      <td>Housing Weatherization</td>
-                      <td>Human Services Agency</td>
-                      <td>209-468-0439</td>
+                    <tr v-for="(row, index) in getTableRows('tenant_handbook.body.chapter-1.repairs.table.rows')" :key="index">
+                      <td>{{ row.department }}</td>
+                      <td>{{ row.agency }}</td>
+                      <td>{{ row.phone }}</td>
                     </tr>
                   </tbody>
                 </table>
