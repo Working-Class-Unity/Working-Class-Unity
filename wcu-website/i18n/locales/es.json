@@ -899,6 +899,26 @@
       "focus": "Campaña Principal",
       "side-quest": "Proyecto Secundario"
     },
+    "tenantUnion": {
+      "title": "Unión de Inquilinos",
+      "description": "Organiza a los inquilinos para construir poder independiente de la clase trabajadora que pueda desafiar el dominio de los propietarios y transformar la vivienda de un negocio para la ganancia en un derecho humano garantizado."
+    },
+    "noVotesForGenocide": {
+      "title": "Ni un voto por el genocidio",
+      "description": "Moviliza a los votantes para retirar el apoyo a candidatos que permiten el genocidio en Palestina, usando nuestro poder colectivo para exigir un alto al fuego inmediato."
+    },
+    "knowYourRights": {
+      "title": "Conozca Sus Derechos",
+      "description": "Educa a miembros de la comunidad sobre sus derechos constitucionales durante encuentros con la policía y agentes de inmigración."
+    },
+    "bdsCentralValley": {
+      "title": "BDS en el Valle Central",
+      "description": "Investiga y señala inversiones municipales locales para apoyar el movimiento BDS, exigiendo que nuestras ciudades y puertos desinviertan del genocidio en Gaza."
+    },
+    "republicServicesFairContract": {
+      "title": "Exigir que Republic Services negocie un contrato justo",
+      "description": "Solidaridad con los trabajadores Teamsters Local 439 en huelga mediante una campaña de presión dirigida contra Republic Services, exigiendo un contrato justo."
+    },
     "tenetUnion": {
       "title": "Trabajo Sindical de Tenet",
       "description": "Apoyando a los trabajadores de la salud en su lucha por salarios justos y mejores condiciones laborales en los hospitales Tenet en todo el Valle Central."
