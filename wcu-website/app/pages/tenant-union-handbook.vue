@@ -1143,22 +1143,19 @@ const highlightMatch = (text: string): string => {
             </section>
 
             <section id="estoppel" data-section class="mt-10">
-              <h3 class="text-xl font-bold text-base-content">Estoppel Certificate</h3>
+              <h3 class="text-xl font-bold text-base-content">{{ $t('tenant_handbook.chapters.chapter-4.sections.estoppel.title') }}</h3>
               
-              <h4 class="font-semibold mt-4">What is an Estoppel Certificate?</h4>
+              <h4 class="font-semibold mt-4">{{ $t('tenant_handbook.body.chapter-4.estoppel.what_is.heading') }}</h4>
               <p>
-                An Estoppel Certificate does NOT mean you will be evicted. An estoppel indicates that there will be changes in the building or ownership.
+                {{ $t('tenant_handbook.body.chapter-4.estoppel.what_is.p1') }}
               </p>
               <p>
-                An Estoppel Certificate is NOT a lease or new lease. It confirms the terms of occupancy—rental agreement and lease terms—for tenants.
+                {{ $t('tenant_handbook.body.chapter-4.estoppel.what_is.p2') }}
               </p>
 
-              <h4 class="font-semibold mt-4">Estoppel Certificates can be of value to tenants:</h4>
+              <h4 class="font-semibold mt-4">{{ $t('tenant_handbook.body.chapter-4.estoppel.value.heading') }}</h4>
               <ul>
-                <li>In the event that there is a dispute between you and a future owner, you can use the estoppel to prove your terms of occupancy.</li>
-                <li>The certificate invites you to note informal or verbal agreements outside of your written lease.</li>
-                <li>You MUST note any incorrect information on the certificate on the form or a separate letter that is signed and dated.</li>
-                <li>Sign and date ALL documents and make two copies (one for yourself).</li>
+                <li v-for="(item, index) in getStringList('tenant_handbook.body.chapter-4.estoppel.value.items')" :key="index">{{ item }}</li>
               </ul>
             </section>
 

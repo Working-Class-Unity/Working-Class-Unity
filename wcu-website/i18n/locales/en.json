@@ -881,6 +881,22 @@
               "When calculating the financial impact of accepting a buyout offer, consider: How much money will you need to move out without hurting financially? How far will you have to move to find a place you can afford?"
             ]
           }
+        },
+        "estoppel": {
+          "what_is": {
+            "heading": "What is an estoppel certificate?",
+            "p1": "An estoppel certificate does NOT mean you will be evicted. An estoppel indicates that there will be changes in the building or ownership.",
+            "p2": "An estoppel certificate is NOT a lease or new lease. It confirms the terms of occupancy—rental agreement and lease terms—for tenants."
+          },
+          "value": {
+            "heading": "Estoppel certificates can be of value to tenants:",
+            "items": [
+              "In the event that there is a dispute between you and a future owner, you can use the estoppel to prove your terms of occupancy.",
+              "The certificate invites you to note informal or verbal agreements outside of your written lease.",
+              "You MUST note any incorrect information on the certificate on the form or a separate letter that is signed and dated.",
+              "Sign and date ALL documents and make two copies (one for yourself)."
+            ]
+          }
         }
       }
     }

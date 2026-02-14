@@ -881,6 +881,22 @@
               "Al calcular el impacto financiero de aceptar una oferta de compra, considera: ¿Cuánto dinero necesitarás para mudarte sin dañarte financieramente? ¿Qué tan lejos tendrás que mudarte para encontrar un lugar que puedas pagar?"
             ]
           }
+        },
+        "estoppel": {
+          "what_is": {
+            "heading": "¿Qué es un certificado de estoppel?",
+            "p1": "Un certificado de estoppel NO significa que te van a desalojar. Un estoppel indica que habrá cambios en el edificio o en la propiedad.",
+            "p2": "Un certificado de estoppel NO es un contrato de arrendamiento ni un nuevo contrato. Confirma los términos de ocupación—el acuerdo de renta y los términos del contrato—para los inquilinos."
+          },
+          "value": {
+            "heading": "Los certificados de estoppel pueden ser valiosos para los inquilinos:",
+            "items": [
+              "En caso de que haya una disputa entre tú y un futuro propietario, puedes usar el estoppel para probar tus términos de ocupación.",
+              "El certificado te invita a anotar acuerdos informales o verbales fuera de tu contrato escrito.",
+              "DEBES anotar cualquier información incorrecta en el certificado en el formulario o en una carta aparte que esté firmada y fechada.",
+              "Firma y fecha TODOS los documentos y haz dos copias (una para ti)."
+            ]
+          }
         }
       }
     }
