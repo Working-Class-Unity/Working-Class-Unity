@@ -213,66 +213,74 @@
   },
   "join": {
     "hero": {
-      "title": "collective, class-conscious power",
-      "description": "If you believe in mass organizing over fighting alone, in democracy over monied interests, and in building class-consciousness over supporting the status quo, you are already one of us. There is a war being waged against the working class. Join us and fight back."
+      "title": "poder colectivo y conciencia de clase",
+      "description": "Si crees en organizarnos en masa en vez de luchar solos, en la democracia por encima de los intereses del dinero y en construir conciencia de clase en lugar de sostener el status quo, ya eres de los nuestros. Hay una guerra contra la clase trabajadora. Únete y lucha con nosotros."
+    },
+    "social_proof": {
+      "line": "Únete a {count} en el condado de San Joaquín",
+      "count": "18+ miembros"
+    },
+    "labels": {
+      "recommended": "Recomendado"
     },
     "membership": {
+      "title": "Opciones de membresía",
       "rank_and_file": {
-        "title": "Membership",
-        "description": "Become a rank and file member.",
-        "price": "$10 per month",
-        "button": "Join"
+        "title": "Membresía de base",
+        "description": "Hazte miembro de base.",
+        "price": "$10 al mes",
+        "button": "Únete"
       },
       "solidarity": {
-        "title": "Solidarity",
-        "description": "Become a rank and file member. Paying more does not get you additional benefits, but it does let us print more flyers.",
-        "price": "$27 per month",
-        "button": "Join"
+        "title": "Solidaridad",
+        "description": "Hazte miembro de base. Aportar más no te da beneficios adicionales, pero nos permite imprimir más volantes.",
+        "price": "$27 al mes",
+        "button": "Únete"
       },
       "donate": {
-        "title": "Donate - One Time",
-        "description": "If you cannot become a member but still want to support WCU, you can make a one time donation.",
-        "price": "$27 or custom amount",
-        "button": "Donate"
+        "title": "Donación única",
+        "description": "Si no puedes hacerte miembro pero aún quieres apoyar a WCU, puedes hacer una donación de una sola vez.",
+        "price": "$27 o monto personalizado",
+        "button": "Donar"
       }
     },
     "benefits": {
-      "title": "Rank and File Membership",
-      "description": "Joining Working Class Unity means actively shaping the organization's direction, taking responsibility for actions, and engaging in our campaigns.",
+      "title": "Membresía de base",
+      "description": "Unirse a Working Class Unity significa dar forma activamente a la dirección de la organización, asumir responsabilidad en las acciones y participar en nuestras campañas.",
       "items": {
         "voting": {
-          "title": "Voting Rights",
-          "description": "Members participate in all decision-making processes and determine the direction of our organization."
+          "title": "Derecho a voto",
+          "description": "Los miembros participan en todos los procesos de toma de decisiones y determinan el rumbo de nuestra organización."
         },
         "leadership": {
-          "title": "Leadership",
-          "description": "All members are eligible to hold any office or serve on any committee within our organization."
+          "title": "Liderazgo",
+          "description": "Todos los miembros pueden ocupar cualquier cargo o servir en cualquier comité dentro de nuestra organización."
         },
         "campaigns": {
-          "title": "Campaigns",
-          "description": "Our campaigns primarily aim to advance socialism and build power for the working class."
+          "title": "Campañas",
+          "description": "Nuestras campañas buscan principalmente impulsar el socialismo y construir poder para la clase trabajadora."
         },
         "education": {
-          "title": "Education",
-          "description": "Members work together to produce political educational material & organizing skill trainings."
+          "title": "Educación",
+          "description": "Los miembros trabajan juntos para crear material de educación política y capacitaciones de organización."
         }
       }
     },
     "faq": {
-      "title": "FAQ",
-      "subtitle": "Frequently Asked Questions About Membership and Participation",
+      "title": "Preguntas frecuentes",
+      "subtitle": "Preguntas frecuentes sobre membresía y participación",
       "items": {
         "eligibility": {
-          "question": "What are the eligibility requirements to become a member of Working Class Unity?",
-          "answer": "To be eligible for membership in WCU, individuals must be in good standing and either reside, work, or attend school or church in San Joaquin County, California."
+          "question": "¿Cuáles son los requisitos para ser miembro de Working Class Unity?",
+          "answer": "Para ser elegible para la membresía en WCU, las personas deben estar en buen estado y vivir, trabajar o asistir a la escuela o a la iglesia en el condado de San Joaquín, California."
         },
         "good_standing": {
-          "question": "What does it mean to be a member in good standing?",
-          "answer": "Members in good standing have paid their dues (with a 30-day grace period), attended at least one regular meeting per year, adhered to WCU’s values and mission, and have not engaged in behavior that violates WCU’s Code of Conduct."
+          "question": "¿Qué significa ser miembro en buen estado?",
+          "answer": "Los miembros en buen estado han pagado sus cuotas (con un período de gracia de 30 días), han asistido al menos a una reunión regular al año, han respetado los valores y la misión de WCU y no han participado en conductas que violen el Código de Conducta de WCU."
         },
         "dues": {
-          "question": "Why do you have membership dues?",
-          "answer": "WCU is fully funded by Member dues and donations. By not taking large donor or government grants, we are able to focus solely on our mission and the interests of the working class without external influence."
+          "question": "¿Por qué tienen cuotas de membresía?",
+          "answer": "WCU se financia completamente con cuotas y donaciones de sus miembros. Al no aceptar grandes donantes ni subsidios del gobierno, podemos enfocarnos únicamente en nuestra misión y en los intereses de la clase trabajadora sin influencia externa."
         },
         "contact": {
           "question": "¿Puedo hablar con alguien antes de unirme?",

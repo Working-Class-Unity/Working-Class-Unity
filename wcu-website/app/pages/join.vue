@@ -47,7 +47,9 @@ useSchemaOrg([
   }),
   defineQuestion({
     name: t('join.faq.items.contact.question'),
-    acceptedAnswer: 'Yes, of course! You can schedule a quick call with a member of the Steering Committee by using the link on our website.',
+    acceptedAnswer: t('join.faq.items.contact.answer', {
+      link: t('join.faq.items.contact.link_text'),
+    }),
   }),
 ])
 </script>
@@ -84,8 +86,12 @@ useSchemaOrg([
                   <span class="text-sm">U</span>
                 </div>
               </div>
-            </div>
-            <p class="text-base-content/80 text-sm">Join <span class="font-semibold text-base-content">18+ members</span> in San Joaquin County</p>
+           </div>
+            <i18n-t keypath="join.social_proof.line" tag="p" class="text-base-content/80 text-sm">
+              <template #count>
+                <span class="font-semibold text-base-content">{{ $t('join.social_proof.count') }}</span>
+              </template>
+            </i18n-t>
           </div>
         </div>
       </div>
@@ -103,29 +109,29 @@ useSchemaOrg([
               <div class="mt-3 mb-2">
                 <span class="text-4xl sm:text-5xl font-bold text-secondary">{{ $t('join.membership.rank_and_file.price') }}</span>
               </div>
-              <p class="text-base-content/80 mb-5 flex-grow">{{ $t('join.membership.rank_and_file.description') }}</p>
-              <div class="card-actions mt-auto">
-                <a href="https://pay.workingclassunity.com/b/7sI4hF1hc9IIepq4gh" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-primary w-full min-h-11">{{ $t('join.membership.rank_and_file.button') }}<span class="sr-only">(opens in new tab)</span></a>
-              </div>
-            </div>
-          </div>
+               <p class="text-base-content/80 mb-5 flex-grow">{{ $t('join.membership.rank_and_file.description') }}</p>
+               <div class="card-actions mt-auto">
+                 <a href="https://pay.workingclassunity.com/b/7sI4hF1hc9IIepq4gh" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-primary w-full min-h-11">{{ $t('join.membership.rank_and_file.button') }}<span class="sr-only">{{ $t('common.opens_in_new_tab') }}</span></a>
+               </div>
+             </div>
+           </div>
 
           <!-- Solidarity Member ($27 - Red/Accent) - Recommended -->
           <div class="card h-full bg-base-100 border border-base-300 border-t-4 border-t-accent shadow-lg shadow-accent/20 md:scale-105">
-            <div class="card-body p-4 sm:p-6">
-              <div class="flex items-center gap-2 flex-wrap">
-                <span class="badge badge-outline border-accent text-base-content rounded-full">{{ $t('join.membership.solidarity.title') }}</span>
-                <span class="badge badge-sm border border-primary/60 bg-primary/15 text-secondary font-semibold">Recommended</span>
-              </div>
-              <div class="mt-3 mb-2">
-                <span class="text-4xl sm:text-5xl font-bold text-accent">{{ $t('join.membership.solidarity.price') }}</span>
-              </div>
-              <p class="text-base-content/80 mb-5 flex-grow">{{ $t('join.membership.solidarity.description') }}</p>
-              <div class="card-actions mt-auto">
-                <a href="https://pay.workingclassunity.com/b/bIY4hF4tof325SUaEE" target="_blank" rel="noopener noreferrer" class="btn btn-accent w-full min-h-11">{{ $t('join.membership.solidarity.button') }}<span class="sr-only">(opens in new tab)</span></a>
-              </div>
-            </div>
-          </div>
+             <div class="card-body p-4 sm:p-6">
+               <div class="flex items-center gap-2 flex-wrap">
+                 <span class="badge badge-outline border-accent text-base-content rounded-full">{{ $t('join.membership.solidarity.title') }}</span>
+                 <span class="badge badge-sm border border-primary/60 bg-primary/15 text-secondary font-semibold">{{ $t('join.labels.recommended') }}</span>
+               </div>
+               <div class="mt-3 mb-2">
+                 <span class="text-4xl sm:text-5xl font-bold text-accent">{{ $t('join.membership.solidarity.price') }}</span>
+               </div>
+               <p class="text-base-content/80 mb-5 flex-grow">{{ $t('join.membership.solidarity.description') }}</p>
+               <div class="card-actions mt-auto">
+                 <a href="https://pay.workingclassunity.com/b/bIY4hF4tof325SUaEE" target="_blank" rel="noopener noreferrer" class="btn btn-accent w-full min-h-11">{{ $t('join.membership.solidarity.button') }}<span class="sr-only">{{ $t('common.opens_in_new_tab') }}</span></a>
+               </div>
+             </div>
+           </div>
 
           <!-- One Time Donation (Donate - Blue) -->
           <div class="card h-full bg-base-100 border border-base-300 border-t-4 border-t-secondary shadow-md">
@@ -134,12 +140,12 @@ useSchemaOrg([
               <div class="mt-3 mb-2">
                 <span class="text-4xl sm:text-5xl font-bold text-secondary">{{ $t('join.membership.donate.price') }}</span>
               </div>
-              <p class="text-base-content/80 mb-5 flex-grow">{{ $t('join.membership.donate.description') }}</p>
-              <div class="card-actions mt-auto">
-                <a href="https://pay.workingclassunity.com/b/aEU5lJbVQ2gg1CE002" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-secondary w-full min-h-11">{{ $t('join.membership.donate.button') }}<span class="sr-only">(opens in new tab)</span></a>
-              </div>
-            </div>
-          </div>
+               <p class="text-base-content/80 mb-5 flex-grow">{{ $t('join.membership.donate.description') }}</p>
+               <div class="card-actions mt-auto">
+                 <a href="https://pay.workingclassunity.com/b/aEU5lJbVQ2gg1CE002" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-secondary w-full min-h-11">{{ $t('join.membership.donate.button') }}<span class="sr-only">{{ $t('common.opens_in_new_tab') }}</span></a>
+               </div>
+             </div>
+           </div>
         </div>
       </section>
 

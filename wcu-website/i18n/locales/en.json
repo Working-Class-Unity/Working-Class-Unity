@@ -216,7 +216,15 @@
       "title": "collective, class-conscious power",
       "description": "If you believe in mass organizing over fighting alone, in democracy over monied interests, and in building class-consciousness over supporting the status quo, you are already one of us. There is a war being waged against the working class. Join us and fight back."
     },
+    "social_proof": {
+      "line": "Join {count} in San Joaquin County",
+      "count": "18+ members"
+    },
+    "labels": {
+      "recommended": "Recommended"
+    },
     "membership": {
+      "title": "Membership Options",
       "rank_and_file": {
         "title": "Membership",
         "description": "Become a rank and file member.",

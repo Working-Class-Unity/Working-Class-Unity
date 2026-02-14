@@ -171,7 +171,7 @@
     "say_this": "ਇਹ ਕਹੋ",
     "remember": "ਯਾਦ ਰੱਖੋ",
     "item_label": "ਆਈਟਮ {number}",
-    "opens_in_new_tab": "(opens in new tab)"
+    "opens_in_new_tab": "(ਨਵੀਂ ਟੈਬ ਵਿੱਚ ਖੁੱਲ੍ਹਦਾ ਹੈ)"
   },
   "logo_alt": "WCU ਲੋਗੋ",
   "tenant_handbook": {
@@ -213,66 +213,74 @@
   },
   "join": {
     "hero": {
-      "title": "collective, class-conscious power",
-      "description": "If you believe in mass organizing over fighting alone, in democracy over monied interests, and in building class-consciousness over supporting the status quo, you are already one of us. There is a war being waged against the working class. Join us and fight back."
+      "title": "ਸਾਂਝੀ, ਵਰਗ-ਚੇਤਨ ਤਾਕਤ",
+      "description": "ਜੇ ਤੁਸੀਂ ਇਕੱਲੇ ਲੜਨ ਦੀ ਬਜਾਏ ਵੱਡੇ ਪੱਧਰ 'ਤੇ ਸੰਗਠਿਤ ਹੋਣ ਵਿੱਚ, ਪੈਸੇਦਾਰ ਹਿੱਤਾਂ ਤੋਂ ਉੱਪਰ ਲੋਕਤੰਤਰ ਵਿੱਚ, ਅਤੇ ਸਟੇਟਸ ਕ੍ਵੋ ਨੂੰ ਸਮਰਥਨ ਦੇਣ ਦੀ ਬਜਾਏ ਵਰਗ-ਚੇਤਨਾ ਬਣਾਉਣ ਵਿੱਚ ਵਿਸ਼ਵਾਸ ਕਰਦੇ ਹੋ, ਤਾਂ ਤੁਸੀਂ ਪਹਿਲਾਂ ਹੀ ਸਾਡੇ ਵਿੱਚੋਂ ਇੱਕ ਹੋ। ਮਜ਼ਦੂਰ ਜਮਾਤ ਵਿਰੁੱਧ ਇੱਕ ਜੰਗ ਚੱਲ ਰਹੀ ਹੈ। ਸਾਡੇ ਨਾਲ ਸ਼ਾਮਲ ਹੋਵੋ ਅਤੇ ਲੜੋ।"
+    },
+    "social_proof": {
+      "line": "ਸੈਨ ਜੋਆਕਿਨ ਕਾਊਂਟੀ ਵਿੱਚ {count} ਨਾਲ ਸ਼ਾਮਲ ਹੋਵੋ",
+      "count": "18+ ਮੈਂਬਰਾਂ"
+    },
+    "labels": {
+      "recommended": "ਸਿਫਾਰਸ਼ ਕੀਤੀ"
     },
     "membership": {
+      "title": "ਮੈਂਬਰਸ਼ਿਪ ਵਿਕਲਪ",
       "rank_and_file": {
-        "title": "Membership",
-        "description": "Become a rank and file member.",
-        "price": "$10 per month",
-        "button": "Join"
+        "title": "ਬੇਸ ਮੈਂਬਰਸ਼ਿਪ",
+        "description": "ਬੇਸ ਮੈਂਬਰ ਬਣੋ।",
+        "price": "$10 ਪ੍ਰਤੀ ਮਹੀਨਾ",
+        "button": "ਸ਼ਾਮਲ ਹੋਵੋ"
       },
       "solidarity": {
-        "title": "Solidarity",
-        "description": "Become a rank and file member. Paying more does not get you additional benefits, but it does let us print more flyers.",
-        "price": "$27 per month",
-        "button": "Join"
+        "title": "ਏਕਤਾ",
+        "description": "ਬੇਸ ਮੈਂਬਰ ਬਣੋ। ਵਧੇਰੇ ਦੇਣ ਨਾਲ ਤੁਹਾਨੂੰ ਕੋਈ ਵਾਧੂ ਫਾਇਦੇ ਨਹੀਂ ਮਿਲਦੇ, ਪਰ ਇਸ ਨਾਲ ਅਸੀਂ ਹੋਰ ਫਲਾਇਰ ਛਾਪ ਸਕਦੇ ਹਾਂ।",
+        "price": "$27 ਪ੍ਰਤੀ ਮਹੀਨਾ",
+        "button": "ਸ਼ਾਮਲ ਹੋਵੋ"
       },
       "donate": {
-        "title": "Donate - One Time",
-        "description": "If you cannot become a member but still want to support WCU, you can make a one time donation.",
-        "price": "$27 or custom amount",
-        "button": "Donate"
+        "title": "ਇਕ-ਵਾਰ ਦਾਨ",
+        "description": "ਜੇ ਤੁਸੀਂ ਮੈਂਬਰ ਨਹੀਂ ਬਣ ਸਕਦੇ ਪਰ ਫਿਰ ਵੀ WCU ਦਾ ਸਮਰਥਨ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ, ਤਾਂ ਤੁਸੀਂ ਇਕ-ਵਾਰ ਦਾਨ ਕਰ ਸਕਦੇ ਹੋ।",
+        "price": "$27 ਜਾਂ ਆਪਣੀ ਮਰਜ਼ੀ ਦੀ ਰਕਮ",
+        "button": "ਦਾਨ ਕਰੋ"
       }
     },
     "benefits": {
-      "title": "Rank and File Membership",
-      "description": "Joining Working Class Unity means actively shaping the organization's direction, taking responsibility for actions, and engaging in our campaigns.",
+      "title": "ਬੇਸ ਮੈਂਬਰਸ਼ਿਪ",
+      "description": "Working Class Unity ਵਿੱਚ ਸ਼ਾਮਲ ਹੋਣਾ ਮਤਲਬ ਸੰਗਠਨ ਦੀ ਦਿਸ਼ਾ ਨੂੰ ਸਰਗਰਮੀ ਨਾਲ ਘੜਨਾ, ਕਾਰਵਾਈਆਂ ਦੀ ਜ਼ਿੰਮੇਵਾਰੀ ਲੈਣਾ, ਅਤੇ ਸਾਡੀਆਂ ਮੁਹਿੰਮਾਂ ਵਿੱਚ ਹਿੱਸਾ ਲੈਣਾ।",
       "items": {
         "voting": {
-          "title": "Voting Rights",
-          "description": "Members participate in all decision-making processes and determine the direction of our organization."
+          "title": "ਵੋਟ ਦਾ ਹੱਕ",
+          "description": "ਮੈਂਬਰ ਫੈਸਲਾ-ਸਾਜ਼ੀ ਦੀ ਹਰ ਪ੍ਰਕਿਰਿਆ ਵਿੱਚ ਹਿੱਸਾ ਲੈਂਦੇ ਹਨ ਅਤੇ ਸਾਡੇ ਸੰਗਠਨ ਦੀ ਦਿਸ਼ਾ ਤੈਅ ਕਰਦੇ ਹਨ।"
         },
         "leadership": {
-          "title": "Leadership",
-          "description": "All members are eligible to hold any office or serve on any committee within our organization."
+          "title": "ਨੇਤ੍ਰਤਵ",
+          "description": "ਸਾਰੇ ਮੈਂਬਰ ਕਿਸੇ ਵੀ ਪਦ ਲਈ ਯੋਗ ਹਨ ਜਾਂ ਸਾਡੇ ਸੰਗਠਨ ਦੇ ਕਿਸੇ ਵੀ ਕਮੇਟੀ ਵਿੱਚ ਸੇਵਾ ਕਰ ਸਕਦੇ ਹਨ।"
         },
         "campaigns": {
-          "title": "Campaigns",
-          "description": "Our campaigns primarily aim to advance socialism and build power for the working class."
+          "title": "ਮੁਹਿੰਮਾਂ",
+          "description": "ਸਾਡੀਆਂ ਮੁਹਿੰਮਾਂ ਦਾ ਮੁੱਖ ਮਕਸਦ ਸੋਸ਼ਲਿਜ਼ਮ ਨੂੰ ਅੱਗੇ ਵਧਾਉਣਾ ਅਤੇ ਮਜ਼ਦੂਰ ਜਮਾਤ ਲਈ ਤਾਕਤ ਬਣਾਉਣਾ ਹੈ।"
         },
         "education": {
-          "title": "Education",
-          "description": "Members work together to produce political educational material & organizing skill trainings."
+          "title": "ਸਿੱਖਿਆ",
+          "description": "ਮੈਂਬਰ ਮਿਲ ਕੇ ਰਾਜਨੀਤਿਕ ਸਿੱਖਿਆ ਸਮੱਗਰੀ ਅਤੇ ਸੰਗਠਨ-ਕੌਸ਼ਲ ਟ੍ਰੇਨਿੰਗ ਤਿਆਰ ਕਰਦੇ ਹਨ।"
         }
       }
     },
     "faq": {
-      "title": "FAQ",
-      "subtitle": "Frequently Asked Questions About Membership and Participation",
+      "title": "ਅਕਸਰ ਪੁੱਛੇ ਸਵਾਲ",
+      "subtitle": "ਮੈਂਬਰਸ਼ਿਪ ਅਤੇ ਭਾਗੀਦਾਰੀ ਬਾਰੇ ਅਕਸਰ ਪੁੱਛੇ ਸਵਾਲ",
       "items": {
         "eligibility": {
-          "question": "What are the eligibility requirements to become a member of Working Class Unity?",
-          "answer": "To be eligible for membership in WCU, individuals must be in good standing and either reside, work, or attend school or church in San Joaquin County, California."
+          "question": "Working Class Unity ਦਾ ਮੈਂਬਰ ਬਣਨ ਲਈ ਯੋਗਤਾ ਦੀਆਂ ਕੀ ਸ਼ਰਤਾਂ ਹਨ?",
+          "answer": "WCU ਦੀ ਮੈਂਬਰਸ਼ਿਪ ਲਈ, ਵਿਅਕਤੀ ਨੂੰ ਚੰਗੀ ਸਥਿਤੀ ਵਿੱਚ ਹੋਣਾ ਚਾਹੀਦਾ ਹੈ ਅਤੇ ਸੈਨ ਜੋਆਕਿਨ ਕਾਊਂਟੀ, ਕੈਲੀਫੋਰਨੀਆ ਵਿੱਚ ਰਹਿਣਾ, ਕੰਮ ਕਰਨਾ, ਜਾਂ ਸਕੂਲ ਜਾਂ ਚਰਚ ਵਿੱਚ ਹਾਜ਼ਰੀ ਲਗਾਉਣੀ ਚਾਹੀਦੀ ਹੈ।"
         },
         "good_standing": {
-          "question": "What does it mean to be a member in good standing?",
-          "answer": "Members in good standing have paid their dues (with a 30-day grace period), attended at least one regular meeting per year, adhered to WCU’s values and mission, and have not engaged in behavior that violates WCU’s Code of Conduct."
+          "question": "ਚੰਗੀ ਸਥਿਤੀ ਵਾਲਾ ਮੈਂਬਰ ਹੋਣ ਦਾ ਕੀ ਮਤਲਬ ਹੈ?",
+          "answer": "ਚੰਗੀ ਸਥਿਤੀ ਵਾਲੇ ਮੈਂਬਰਾਂ ਨੇ ਆਪਣੀਆਂ ਫੀਸਾਂ ਅਦਾ ਕੀਤੀਆਂ ਹੁੰਦੀਆਂ ਹਨ (30 ਦਿਨਾਂ ਦੀ ਛੂਟ ਸਮੇਤ), ਸਾਲ ਵਿੱਚ ਘੱਟੋ-ਘੱਟ ਇੱਕ ਨਿਯਮਤ ਮੀਟਿੰਗ ਵਿੱਚ ਹਾਜ਼ਰੀ ਦਿੱਤੀ ਹੁੰਦੀ ਹੈ, WCU ਦੇ ਮੁੱਲਾਂ ਅਤੇ ਮਿਸ਼ਨ ਦੀ ਪਾਲਣਾ ਕੀਤੀ ਹੁੰਦੀ ਹੈ, ਅਤੇ ਐਸਾ ਵਿਹਾਰ ਨਹੀਂ ਕੀਤਾ ਹੁੰਦਾ ਜੋ WCU ਦੇ ਕੋਡ ਆਫ਼ ਕੰਡਕਟ ਦੀ ਉਲੰਘਣਾ ਕਰੇ।"
         },
         "dues": {
-          "question": "Why do you have membership dues?",
-          "answer": "WCU is fully funded by Member dues and donations. By not taking large donor or government grants, we are able to focus solely on our mission and the interests of the working class without external influence."
+          "question": "ਤੁਸੀਂ ਮੈਂਬਰਸ਼ਿਪ ਫੀਸ ਕਿਉਂ ਰੱਖਦੇ ਹੋ?",
+          "answer": "WCU ਦੀ ਫੰਡਿੰਗ ਪੂਰੀ ਤਰ੍ਹਾਂ ਮੈਂਬਰ ਫੀਸਾਂ ਅਤੇ ਦਾਨਾਂ ਨਾਲ ਹੁੰਦੀ ਹੈ। ਵੱਡੇ ਦਾਤਿਆਂ ਜਾਂ ਸਰਕਾਰੀ ਗ੍ਰਾਂਟਾਂ ਤੋਂ ਬਿਨਾਂ, ਅਸੀਂ ਬਾਹਰੀ ਦਖ਼ਲ ਤੋਂ ਬਿਨਾਂ ਸਿਰਫ਼ ਆਪਣੀ ਮਿਸ਼ਨ ਅਤੇ ਮਜ਼ਦੂਰ ਜਮਾਤ ਦੇ ਹਿੱਤਾਂ 'ਤੇ ਧਿਆਨ ਦੇ ਸਕਦੇ ਹਾਂ।"
         },
         "contact": {
           "question": "ਕੀ ਮੈਂ ਸ਼ਾਮਲ ਹੋਣ ਤੋਂ ਪਹਿਲਾਂ ਕਿਸੇ ਨਾਲ ਗੱਲ ਕਰ ਸਕਦਾ/ਸਕਦੀ ਹਾਂ?",
