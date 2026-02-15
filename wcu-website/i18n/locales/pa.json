@@ -348,45 +348,45 @@
         }
       },
       "chapter-3": {
-        "title": "Chapter 3: Reporting Violations",
-        "summary": "Use this chapter to report code issues with evidence that agencies can act on.",
-        "goal": "File complaints in the right channel and follow up until closure.",
+        "title": "ਅਧਿਆਇ 3: ਉਲੰਘਣਾਵਾਂ ਰਿਪੋਰਟ ਕਰਨਾ",
+        "summary": "ਇਹ ਅਧਿਆਇ code violations/ਮਸਲਿਆਂ ਨੂੰ ਐਸੇ ਸਬੂਤ ਨਾਲ ਰਿਪੋਰਟ ਕਰਨ ਲਈ ਹੈ ਜਿਸ 'ਤੇ ਏਜੰਸੀ ਕਾਰਵਾਈ ਕਰ ਸਕੇ।",
+        "goal": "ਸਹੀ ਚੈਨਲ ਵਿੱਚ ਸ਼ਿਕਾਇਤ ਦਰਜ ਕਰੋ ਅਤੇ ਕੇਸ ਬੰਦ ਹੋਣ ਤੱਕ follow-up ਕਰੋ।",
         "evidence_checklist": [
-          "Case number and inspector contact card",
-          "Photo/video set with dates and timestamps",
-          "Copies of landlord and agency communications"
+          "case number ਅਤੇ inspector ਦਾ contact card",
+          "ਮਿਤੀ ਅਤੇ timestamp ਵਾਲੀਆਂ ਫੋਟੋਆਂ/ਵੀਡੀਓਜ਼",
+          "ਮਕਾਨ ਮਾਲਕ ਅਤੇ ਏਜੰਸੀ ਨਾਲ ਸਾਰੀ communication ਦੀਆਂ ਕਾਪੀਆਂ"
         ],
         "common_mistakes": [
-          "Filing vague complaints without visible evidence",
-          "Assuming one complaint covers other units",
-          "Stopping follow-up after the initial inspection"
+          "ਦਿੱਖਣ ਵਾਲੇ ਸਬੂਤ ਤੋਂ ਬਿਨਾਂ ਧੁੰਦਲੀ/ਅਸਪੱਸ਼ਟ ਸ਼ਿਕਾਇਤ ਕਰ ਦੇਣਾ",
+          "ਸੋਚਣਾ ਕਿ ਇੱਕ ਸ਼ਿਕਾਇਤ ਹੋਰ ਯੂਨਿਟਾਂ ਨੂੰ ਵੀ ਕਵਰ ਕਰਦੀ ਹੈ",
+          "ਪਹਿਲੀ inspection ਤੋਂ ਬਾਅਦ follow-up ਬੰਦ ਕਰ ਦੇਣਾ"
         ],
-        "escalate_when": "Case is closed without repairs, or hazards continue after inspection deadlines.",
+        "escalate_when": "ਮੁਰੰਮਤਾਂ ਤੋਂ ਬਿਨਾਂ ਕੇਸ ਬੰਦ ਕਰ ਦਿੱਤਾ ਜਾਵੇ, ਜਾਂ inspection deadline ਤੋਂ ਬਾਅਦ ਵੀ ਖ਼ਤਰੇ ਜਾਰੀ ਰਹਿਣ।",
         "source_notes": [
           "Stockton Neighborhood Services intake process",
           "San Joaquin County health reporting channels"
         ],
-        "last_reviewed": "February 6, 2026",
+        "last_reviewed": "6 ਫਰਵਰੀ, 2026",
         "sections": {
           "code-enforcement": {
             "title": "Stockton Code Enforcement",
-            "summary": "Where and how to file city code complaints in Stockton.",
-            "keywords": ["stockton code enforcement", "inspection", "email", "phone"]
+            "summary": "Stockton ਵਿੱਚ city code ਸ਼ਿਕਾਇਤ ਕਿੱਥੇ ਅਤੇ ਕਿਵੇਂ ਦਰਜ ਕਰਨੀ ਹੈ।",
+            "keywords": ["Stockton Code Enforcement", "inspection", "email", "phone", "ਸ਼ਿਕਾਇਤ"]
           },
           "filing-tips": {
-            "title": "Tips for Filing Complaints",
-            "summary": "Tactics that improve inspection quality and reduce case closure risk.",
-            "keywords": ["filing tips", "case number", "inspection report", "follow up"]
+            "title": "ਸ਼ਿਕਾਇਤ ਦਰਜ ਕਰਨ ਲਈ ਸੁਝਾਅ",
+            "summary": "ਅਜਿਹੇ ਤਰੀਕੇ ਜੋ inspection ਦੀ ਗੁਣਵੱਤਾ ਬਹਿਤਰ ਕਰਦੇ ਹਨ ਅਤੇ ਕੇਸ ਬਿਨਾਂ ਕੰਮ ਦੇ ਬੰਦ ਹੋਣ ਦਾ ਜੋਖਮ ਘਟਾਉਂਦੇ ਹਨ।",
+            "keywords": ["filing tips", "case number", "inspection report", "follow up", "ਸੁਝਾਅ"]
           },
           "health-violations": {
-            "title": "Health Code Violations",
-            "summary": "When to involve county health for vermin, mold, sewage, and sanitation.",
-            "keywords": ["health code", "mold", "rats", "cockroaches", "public health"]
+            "title": "Health Code ਉਲੰਘਣਾਵਾਂ",
+            "summary": "ਕੀੜੇ-ਮਕੌੜੇ, mold, sewage, ਅਤੇ ਸਫਾਈ ਵਾਲੇ ਮਸਲਿਆਂ ਲਈ county health ਨੂੰ ਕਦੋਂ ਸ਼ਾਮਲ ਕਰਨਾ ਹੈ।",
+            "keywords": ["health code", "mold", "rats", "cockroaches", "public health", "ਸਿਹਤ"]
           },
           "building-violations": {
-            "title": "Building Code Violations",
-            "summary": "Structural or systems issues that should be sent to code enforcement.",
-            "keywords": ["building code", "termites", "roof", "smoke detector"]
+            "title": "Building Code ਉਲੰਘਣਾਵਾਂ",
+            "summary": "ਢਾਂਚੇ ਜਾਂ ਸਿਸਟਮ ਵਾਲੇ ਮਸਲੇ ਜੋ Code Enforcement ਨੂੰ ਭੇਜੇ ਜਾਣੇ ਚਾਹੀਦੇ ਹਨ।",
+            "keywords": ["building code", "termites", "roof", "smoke detector", "Code Enforcement"]
           }
         }
       },
@@ -738,47 +738,47 @@
       },
       "chapter-3": {
         "intro": {
-          "p1": "The most important part of reporting code violations is to remember that bad appearances are not necessarily a code violation.",
-          "emphasis": "It is a code violation if it should work and does not."
+          "p1": "Code violations ਰਿਪੋਰਟ ਕਰਨ ਵਿੱਚ ਸਭ ਤੋਂ ਮਹੱਤਵਪੂਰਨ ਗੱਲ ਇਹ ਯਾਦ ਰੱਖਣਾ ਹੈ ਕਿ ਸਿਰਫ਼ ਦਿੱਖ ਮਾੜੀ ਹੋਣਾ ਹਰ ਵਾਰ code violation ਨਹੀਂ ਹੁੰਦਾ।",
+          "emphasis": "ਜੇ ਕੋਈ ਚੀਜ਼ ਕੰਮ ਕਰਨੀ ਚਾਹੀਦੀ ਹੈ ਪਰ ਨਹੀਂ ਕਰਦੀ—ਤਾਂ ਇਹ code violation ਹੋ ਸਕਦਾ ਹੈ।"
         },
         "evidence_notes": {
           "critical_caution": {
-            "title": "Critical caution",
-            "text": "If you are going to file ANY official complaints, you MUST follow all of the Rent Paying tips in Chapter 2. Hostile landlords will try to claim nonpayment of rent as one of their first methods for retaliation.",
-            "strong": "DO NOT ATTEMPT TO WITHHOLD RENT WITHOUT LEGAL CONSULTATION."
+            "title": "ਨਾਜ਼ੁਕ ਚੇਤਾਵਨੀ",
+            "text": "ਜੇ ਤੁਸੀਂ ਕੋਈ ਵੀ official complaint ਦਰਜ ਕਰਨ ਵਾਲੇ ਹੋ, ਤਾਂ ਤੁਹਾਨੂੰ ਅਧਿਆਇ 2 ਵਾਲੀਆਂ Rent Paying ਟਿੱਪਸ ਪੂਰੀ ਤਰ੍ਹਾਂ ਫੋਲੋ ਕਰਨੀ ਚਾਹੀਦੀਆਂ ਹਨ। ਵੈਰੀ/ਬਦਲੇਵਾਲੇ ਮਕਾਨ ਮਾਲਕ ਅਕਸਰ retaliation ਦੇ ਪਹਿਲੇ ਤਰੀਕਿਆਂ ਵਿੱਚੋਂ ਇੱਕ ਵਜੋਂ nonpayment of rent ਦਾ ਦਾਅਵਾ ਕਰਨ ਦੀ ਕੋਸ਼ਿਸ਼ ਕਰਦੇ ਹਨ।",
+            "strong": "ਕਾਨੂੰਨੀ ਸਲਾਹ ਤੋਂ ਬਿਨਾਂ ਕਿਰਾਇਆ ਰੋਕਣ ਦੀ ਕੋਸ਼ਿਸ਼ ਨਾ ਕਰੋ।"
           }
         },
         "code-enforcement": {
-          "p1": "This email address is for submitting information requests, reporting code violations, and requesting payoff demands to remove recorded notices/liens from properties. You can also contact Neighborhood Services at (209) 937-8813 or fax a demand request to (209) 937-7264."
+          "p1": "ਇਹ email address ਜਾਣਕਾਰੀ ਦੀਆਂ ਬੇਨਤੀਆਂ ਭੇਜਣ, code violations ਰਿਪੋਰਟ ਕਰਨ, ਅਤੇ properties 'ਤੇ ਦਰਜ notices/liens ਹਟਾਉਣ ਲਈ payoff demands ਮੰਗਣ ਵਾਸਤੇ ਹੈ। ਤੁਸੀਂ Neighborhood Services ਨੂੰ (209) 937-8813 'ਤੇ ਵੀ ਸੰਪਰਕ ਕਰ ਸਕਦੇ ਹੋ ਜਾਂ demand request ਨੂੰ (209) 937-7264 'ਤੇ fax ਕਰ ਸਕਦੇ ਹੋ।"
         },
         "filing-tips": {
-          "heading": "Tips for Filing Complaints with Code Enforcement",
+          "heading": "Code Enforcement ਨਾਲ ਸ਼ਿਕਾਇਤ ਦਰਜ ਕਰਨ ਲਈ ਸੁਝਾਅ",
           "tips": [
-            "Code Enforcement inspectors will ONLY write a report of what they see. They will not go under buildings, on roofs, or pull open walls to look for mold.",
-            "You can book an inspection based on one complaint and have them look at any other potential issues while they are in your unit.",
-            "Each separate unit has to place its own complaint(s). You cannot make a complaint for other apartments.",
-            "Overall building inspection can be requested for common areas.",
-            "After filing a complaint, make sure to get the inspector's card with your case number on it. Call and follow up OFTEN to check the status of the case.",
-            "Sometimes they will close the case without notifying you. You can contest the closing of a case and ask that it be reopened if the repairs have not been completed.",
-            "Take photos and videos and either text them to someone or email them to someone to have a time-coded record of the issue.",
-            "Keep copies of all communications with the landlord and with code enforcement.",
-            "Be there for the inspection because sometimes the landlord will be there instead and they will attempt to minimize any issues.",
-            "Ask for copies of any inspection reports."
+            "Code Enforcement inspectors ਸਿਰਫ਼ ਉਹੀ ਲਿਖਦੇ ਹਨ ਜੋ ਉਹ ਆਪਣੀ ਅੱਖੀਂ ਵੇਖਦੇ ਹਨ। ਉਹ ਇਮਾਰਤਾਂ ਦੇ ਹੇਠਾਂ, ਛੱਤਾਂ ਉੱਤੇ, ਜਾਂ ਕੰਧਾਂ ਖੋਲ੍ਹ ਕੇ mold ਲੱਭਣ ਨਹੀਂ ਜਾਂਦੇ।",
+            "ਤੁਸੀਂ ਇੱਕ ਸ਼ਿਕਾਇਤ ਦੇ ਆਧਾਰ 'ਤੇ inspection ਬੁੱਕ ਕਰ ਸਕਦੇ ਹੋ ਅਤੇ ਜਦੋਂ ਉਹ ਤੁਹਾਡੀ ਯੂਨਿਟ ਵਿੱਚ ਹੋਣ, ਤਾਂ ਹੋਰ ਸੰਭਾਵਿਤ ਮਸਲਿਆਂ ਨੂੰ ਵੀ ਵੇਖਣ ਲਈ ਕਹਿ ਸਕਦੇ ਹੋ।",
+            "ਹਰ ਵੱਖਰੀ ਯੂਨਿਟ ਨੂੰ ਆਪਣੀ ਸ਼ਿਕਾਇਤ(ਾਂ) ਖੁਦ ਦਰਜ ਕਰਨੀ ਪੈਂਦੀ ਹੈ। ਤੁਸੀਂ ਹੋਰ ਅਪਾਰਟਮੈਂਟਾਂ ਲਈ ਸ਼ਿਕਾਇਤ ਨਹੀਂ ਕਰ ਸਕਦੇ।",
+            "common areas ਲਈ ਪੂਰੀ ਇਮਾਰਤ ਦੀ inspection ਮੰਗੀ ਜਾ ਸਕਦੀ ਹੈ।",
+            "ਸ਼ਿਕਾਇਤ ਦਰਜ ਕਰਨ ਤੋਂ ਬਾਅਦ, inspector ਦਾ card ਲਾਜ਼ਮੀ ਲਵੋ ਜਿਸ 'ਤੇ ਤੁਹਾਡਾ case number ਹੋਵੇ। ਕੇਸ ਦੀ ਸਥਿਤੀ ਜਾਣਨ ਲਈ ਵਾਰ-ਵਾਰ ਕਾਲ ਕਰ ਕੇ follow-up ਕਰੋ।",
+            "ਕਈ ਵਾਰ ਉਹ ਤੁਹਾਨੂੰ ਦੱਸੇ ਬਿਨਾਂ ਹੀ ਕੇਸ ਬੰਦ ਕਰ ਦੇਂਦੇ ਹਨ। ਜੇ ਮੁਰੰਮਤਾਂ ਪੂਰੀਆਂ ਨਹੀਂ ਹੋਈਆਂ, ਤਾਂ ਤੁਸੀਂ ਕੇਸ ਬੰਦ ਕਰਨ ਨੂੰ contest ਕਰ ਸਕਦੇ ਹੋ ਅਤੇ re-open ਕਰਨ ਲਈ ਕਹਿ ਸਕਦੇ ਹੋ।",
+            "ਫੋਟੋਆਂ ਅਤੇ ਵੀਡੀਓਜ਼ ਬਣਾਓ ਅਤੇ ਉਹ ਕਿਸੇ ਨੂੰ text ਜਾਂ email ਕਰ ਦਿਓ ਤਾਂ ਜੋ ਸਮੱਸਿਆ ਦਾ time-coded ਰਿਕਾਰਡ ਬਣੇ।",
+            "ਮਕਾਨ ਮਾਲਕ ਅਤੇ Code Enforcement ਨਾਲ ਹੋਈ ਹਰ communication ਦੀਆਂ ਕਾਪੀਆਂ ਸੰਭਾਲੋ।",
+            "inspection ਵੇਲੇ ਮੌਜੂਦ ਰਹੋ, ਕਿਉਂਕਿ ਕਈ ਵਾਰ ਮਕਾਨ ਮਾਲਕ ਖੁਦ ਉੱਥੇ ਹੁੰਦਾ ਹੈ ਅਤੇ ਮਸਲਿਆਂ ਨੂੰ ਘੱਟ ਦਿਖਾਉਣ ਦੀ ਕੋਸ਼ਿਸ਼ ਕਰਦਾ ਹੈ।",
+            "ਕਿਸੇ ਵੀ inspection report ਦੀਆਂ ਕਾਪੀਆਂ ਮੰਗੋ।"
           ]
         },
         "health-violations": {
-          "p1": "Health code violations include cockroaches (but not water bugs), rat or mice infestation, visible mold or mildew, and sewage in the bathtub. Contact the Health and Human Services Department for your city of residence.",
+          "p1": "Health code violations ਵਿੱਚ cockroaches (ਪਰ water bugs ਨਹੀਂ), rats ਜਾਂ mice ਦੀ infestation, ਦਿੱਖਣ ਵਾਲਾ mold ਜਾਂ mildew, ਅਤੇ ਬਾਥਟਬ ਵਿੱਚ sewage ਸ਼ਾਮਲ ਹੋ ਸਕਦੇ ਹਨ। ਆਪਣੇ ਰਹਾਇਸ਼ੀ ਸ਼ਹਿਰ ਲਈ Health and Human Services Department ਨਾਲ ਸੰਪਰਕ ਕਰੋ।",
           "contact": {
-            "general_info_label": "General Information:",
-            "administration_label": "Administration:",
-            "public_info_label": "Public Info and Communication:"
+            "general_info_label": "ਆਮ ਜਾਣਕਾਰੀ:",
+            "administration_label": "ਪ੍ਰਸ਼ਾਸਨ:",
+            "public_info_label": "ਜਨਤਕ ਜਾਣਕਾਰੀ ਅਤੇ ਸੰਚਾਰ:"
           },
-          "p2": "Depending on where you live, lodge a complaint with both the city and county. They will ONLY create a report based on what they can see, and only create a file based on health code violations (e.g. rats), not building code violations (e.g. a faulty water faucet)."
+          "p2": "ਤੁਸੀਂ ਕਿੱਥੇ ਰਹਿੰਦੇ ਹੋ—ਇਸ 'ਤੇ ਨਿਰਭਰ ਕਰਦਾ ਹੈ ਕਿ ਤੁਸੀਂ ਸ਼ਹਿਰ ਅਤੇ county ਦੋਵੇਂ ਕੋਲ ਸ਼ਿਕਾਇਤ ਦਰਜ ਕਰੋ। ਉਹ ਸਿਰਫ਼ ਉਸਦੇ ਆਧਾਰ 'ਤੇ report ਬਣਾਉਣਗੇ ਜੋ ਉਹ ਵੇਖ ਸਕਦੇ ਹਨ, ਅਤੇ ਸਿਰਫ਼ health code violations (ਜਿਵੇਂ rats) ਲਈ ਫਾਈਲ ਬਣਾਉਣਗੇ—building code violations (ਜਿਵੇਂ ਖਰਾਬ ਪਾਣੀ ਦਾ ਨਲਕਾ) ਲਈ ਨਹੀਂ।"
         },
         "building-violations": {
           "contact_heading": "Stockton Code Enforcement Building Inspections",
-          "p1": "File complaints with Stockton Code Enforcement regarding issues with the structure of your unit, such as termites or roof damage.",
-          "p2": "Whenever you file a complaint with Stockton Code Enforcement, you can also ask that they inspect all the smoke and carbon monoxide detectors in the building. They can also write up the landlord for any other violations seen on the property."
+          "p1": "ਤੁਹਾਡੀ ਯੂਨਿਟ ਦੇ ਢਾਂਚੇ ਨਾਲ ਜੁੜੇ ਮਸਲਿਆਂ (ਜਿਵੇਂ termites ਜਾਂ roof damage) ਲਈ Stockton Code Enforcement ਕੋਲ ਸ਼ਿਕਾਇਤ ਦਰਜ ਕਰੋ।",
+          "p2": "ਜਦੋਂ ਵੀ ਤੁਸੀਂ Stockton Code Enforcement ਕੋਲ ਸ਼ਿਕਾਇਤ ਦਰਜ ਕਰੋ, ਤੁਸੀਂ ਇਹ ਵੀ ਕਹਿ ਸਕਦੇ ਹੋ ਕਿ ਉਹ ਇਮਾਰਤ ਵਿੱਚ ਸਾਰੇ smoke ਅਤੇ carbon monoxide detectors ਨੂੰ inspect ਕਰਨ। ਉਹ property 'ਤੇ ਦਿੱਖਣ ਵਾਲੀਆਂ ਹੋਰ ਉਲੰਘਣਾਵਾਂ ਲਈ ਵੀ ਮਕਾਨ ਮਾਲਕ ਨੂੰ cite ਕਰ ਸਕਦੇ ਹਨ।"
         }
       },
       "chapter-4": {
