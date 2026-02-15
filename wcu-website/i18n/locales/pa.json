@@ -187,12 +187,12 @@
     },
     "page_title": "ਕਿਰਾਏਦਾਰ ਯੂਨੀਅਨ ਹੈਂਡਬੁੱਕ",
     "seo": {
-      "description": "Complete guide for tenants in San Joaquin County covering your rights, paying rent, reporting violations, evictions, and more."
+      "description": "San Joaquin County ਵਿੱਚ ਕਿਰਾਏਦਾਰਾਂ ਲਈ ਪੂਰੀ ਗਾਈਡ: ਤੁਹਾਡੇ ਅਧਿਕਾਰ, ਕਿਰਾਇਆ ਭਰਨਾ, ਉਲੰਘਣਾਵਾਂ ਰਿਪੋਰਟ ਕਰਨਾ, ਬੇਦਖਲੀਆਂ, ਅਤੇ ਹੋਰ।"
     },
     "hero": {
       "eyebrow": "ਕਿਰਾਏਦਾਰ ਰੱਖਿਆ ਮੈਨੁਅਲ",
       "title": "ਕਿਰਾਏਦਾਰ ਯੂਨੀਅਨ ਹੈਂਡਬੁੱਕ",
-      "subtitle": "ਸੈਨ ਜੋਆਕਿਨ ਕਾਊਂਟੀ ਵਿੱਚ ਸੰਗਠਿਤ ਹੋਣ, ਇਕ-ਦੂਜੇ ਦੀ ਰੱਖਿਆ ਕਰਨ, ਅਤੇ ਜਿੱਤਣ ਲਈ ਇੱਕ ਵਿਹਾਰਿਕ ਗਾਈਡ।",
+      "subtitle": "San Joaquin County ਵਿੱਚ ਸੰਗਠਿਤ ਹੋਣ, ਇਕ-ਦੂਜੇ ਦੀ ਰੱਖਿਆ ਕਰਨ, ਅਤੇ ਜਿੱਤਣ ਲਈ ਇੱਕ ਵਿਹਾਰਿਕ ਗਾਈਡ।",
       "disclaimer": "ਕਾਨੂੰਨੀ ਸਲਾਹ ਨਹੀਂ। ਜੇ ਤੁਸੀਂ ਤੁਰੰਤ ਖ਼ਤਰੇ ਵਿੱਚ ਹੋ, 911 'ਤੇ ਕਾਲ ਕਰੋ।"
     },
     "quick_paths": {
@@ -204,20 +204,20 @@
       },
       "items": {
         "quick-eviction": {
-          "title": "I got a notice or court summons",
-          "description": "Start with timelines, response deadlines, and what to document before court."
+          "title": "ਮੈਨੂੰ ਨੋਟਿਸ ਜਾਂ ਕੋਰਟ ਸਮਨ ਮਿਲਿਆ ਹੈ",
+          "description": "ਟਾਈਮਲਾਈਨਾਂ, ਜਵਾਬ ਦੀਆਂ ਡੈਡਲਾਈਨਾਂ, ਅਤੇ ਕੋਰਟ ਤੋਂ ਪਹਿਲਾਂ ਕੀ ਦਸਤਾਵੇਜ਼ ਬਣਾਉਣੇ ਹਨ—ਇਥੋਂ ਸ਼ੁਰੂ ਕਰੋ।"
         },
         "quick-repairs": {
-          "title": "My unit has unsafe conditions",
-          "description": "Use the repair workflow, evidence checklist, and agency contacts."
+          "title": "ਮੇਰੀ ਯੂਨਿਟ ਵਿੱਚ ਅਸੁਰੱਖਿਅਤ ਹਾਲਤਾਂ ਹਨ",
+          "description": "ਮੁਰੰਮਤ ਵਰਕਫਲੋ, ਸਬੂਤ ਚੈਕਲਿਸਟ, ਅਤੇ ਏਜੰਸੀ ਸੰਪਰਕ ਵਰਤੋ।"
         },
         "quick-rent": {
-          "title": "My rent changed or I was threatened",
-          "description": "Review protections, legal notice windows, and retaliation warning signs."
+          "title": "ਮੇਰਾ ਕਿਰਾਇਆ ਬਦਲਿਆ ਜਾਂ ਮੈਨੂੰ ਧਮਕੀ ਮਿਲੀ",
+          "description": "ਸੁਰੱਖਿਆਵਾਂ, ਕਾਨੂੰਨੀ ਨੋਟਿਸ ਵਿੰਡੋਜ਼, ਅਤੇ ਬਦਲੇ ਵਾਲੇ ਚੇਤਾਵਨੀ ਸੰਕੇਤ ਵੇਖੋ।"
         },
         "quick-file": {
-          "title": "I need to file a complaint",
-          "description": "Go to filing tips before contacting code enforcement or county health."
+          "title": "ਮੈਨੂੰ ਸ਼ਿਕਾਇਤ ਦਰਜ ਕਰਨੀ ਹੈ",
+          "description": "Code Enforcement ਜਾਂ County Health ਨਾਲ ਸੰਪਰਕ ਕਰਨ ਤੋਂ ਪਹਿਲਾਂ filing tips ਵੇਖੋ।"
         }
       }
     },
@@ -228,15 +228,15 @@
       "items": {
         "contact-stockton-code": {
           "label": "Stockton Code Enforcement",
-          "note": "Use for housing/building complaints and inspection follow-up."
+          "note": "Housing/Building ਸ਼ਿਕਾਇਤਾਂ ਅਤੇ inspection follow-up ਲਈ ਵਰਤੋ।"
         },
         "contact-county-health": {
           "label": "San Joaquin County Public Health Services",
-          "note": "Use for health code violations like vermin, sewage, and visible mold."
+          "note": "Health code violations ਲਈ (ਕੀੜੇ-ਮਕੌੜੇ, sewage, ਅਤੇ ਦਿੱਖਣ ਵਾਲਾ mold)।"
         },
         "contact-housing-authority": {
           "label": "San Joaquin Fair Housing Authority",
-          "note": "Use for tenant assistance programs and housing discrimination support."
+          "note": "Tenant assistance programs ਅਤੇ housing discrimination support ਲਈ ਵਰਤੋ।"
         }
       }
     },
