@@ -202,11 +202,11 @@
         "next": "ਇੱਥੇ ਤੋਂ ਸ਼ੁਰੂ ਕਰੋ",
         "learn": "ਗਹਿਰਾਈ ਨਾਲ"
       },
-      "items": {
-        "quick-eviction": {
-          "title": "ਮੈਨੂੰ ਨੋਟਿਸ ਜਾਂ ਕੋਰਟ ਸਮਨ ਮਿਲਿਆ ਹੈ",
-          "description": "ਟਾਈਮਲਾਈਨਾਂ, ਜਵਾਬ ਦੀਆਂ ਡੈਡਲਾਈਨਾਂ, ਅਤੇ ਕੋਰਟ ਤੋਂ ਪਹਿਲਾਂ ਕੀ ਦਸਤਾਵੇਜ਼ ਬਣਾਉਣੇ ਹਨ—ਇਥੋਂ ਸ਼ੁਰੂ ਕਰੋ।"
-        },
+        "items": {
+          "quick-eviction": {
+            "title": "ਮੈਨੂੰ ਨੋਟਿਸ ਜਾਂ ਕੋਰਟ ਸਮਨ ਮਿਲਿਆ ਹੈ",
+            "description": "ਟਾਈਮਲਾਈਨਾਂ, ਜਵਾਬ ਦੀਆਂ ਡੈਡਲਾਈਨਾਂ, ਅਤੇ ਕੋਰਟ ਤੋਂ ਪਹਿਲਾਂ ਕੀ ਦਸਤਾਵੇਜ਼ ਬਣਾਉਣੇ ਹਨ—ਇਥੋਂ ਸ਼ੁਰੂ ਕਰੋ।"
+          },
         "quick-repairs": {
           "title": "ਮੇਰੀ ਯੂਨਿਟ ਵਿੱਚ ਅਸੁਰੱਖਿਅਤ ਹਾਲਤਾਂ ਹਨ",
           "description": "ਮੁਰੰਮਤ ਵਰਕਫਲੋ, ਸਬੂਤ ਚੈਕਲਿਸਟ, ਅਤੇ ਏਜੰਸੀ ਸੰਪਰਕ ਵਰਤੋ।"
@@ -215,31 +215,31 @@
           "title": "ਮੇਰਾ ਕਿਰਾਇਆ ਬਦਲਿਆ ਜਾਂ ਮੈਨੂੰ ਧਮਕੀ ਮਿਲੀ",
           "description": "ਸੁਰੱਖਿਆਵਾਂ, ਕਾਨੂੰਨੀ ਨੋਟਿਸ ਵਿੰਡੋਜ਼, ਅਤੇ ਬਦਲੇ ਵਾਲੇ ਚੇਤਾਵਨੀ ਸੰਕੇਤ ਵੇਖੋ।"
         },
-        "quick-file": {
-          "title": "ਮੈਨੂੰ ਸ਼ਿਕਾਇਤ ਦਰਜ ਕਰਨੀ ਹੈ",
-          "description": "Code Enforcement ਜਾਂ County Health ਨਾਲ ਸੰਪਰਕ ਕਰਨ ਤੋਂ ਪਹਿਲਾਂ filing tips ਵੇਖੋ।"
+          "quick-file": {
+            "title": "ਮੈਨੂੰ ਸ਼ਿਕਾਇਤ ਦਰਜ ਕਰਨੀ ਹੈ",
+            "description": "Code Enforcement ਜਾਂ County Health ਨਾਲ ਸੰਪਰਕ ਕਰਨ ਤੋਂ ਪਹਿਲਾਂ ਸ਼ਿਕਾਇਤ ਦਰਜ ਕਰਨ ਵਾਲੇ ਸੁਝਾਅ ਵੇਖੋ।"
+          }
         }
-      }
-    },
-    "contacts": {
+      },
+      "contacts": {
       "title": "ਮੁੱਖ ਰਿਪੋਰਟਿੰਗ ਸੰਪਰਕ",
       "phone_label": "ਫੋਨ:",
       "email_label": "ਈਮੇਲ:",
-      "items": {
-        "contact-stockton-code": {
-          "label": "Stockton Code Enforcement",
-          "note": "Housing/Building ਸ਼ਿਕਾਇਤਾਂ ਅਤੇ inspection follow-up ਲਈ ਵਰਤੋ।"
-        },
-        "contact-county-health": {
-          "label": "San Joaquin County Public Health Services",
-          "note": "Health code violations ਲਈ (ਕੀੜੇ-ਮਕੌੜੇ, sewage, ਅਤੇ ਦਿੱਖਣ ਵਾਲਾ mold)।"
-        },
-        "contact-housing-authority": {
-          "label": "San Joaquin Fair Housing Authority",
-          "note": "Tenant assistance programs ਅਤੇ housing discrimination support ਲਈ ਵਰਤੋ।"
+        "items": {
+          "contact-stockton-code": {
+            "label": "Stockton Code Enforcement",
+            "note": "ਰਿਹਾਇਸ਼/ਇਮਾਰਤ ਸ਼ਿਕਾਇਤਾਂ ਅਤੇ ਜਾਂਚ ਤੋਂ ਬਾਅਦ ਫਾਲੋ-ਅੱਪ ਲਈ ਵਰਤੋ।"
+          },
+          "contact-county-health": {
+            "label": "San Joaquin County Public Health Services",
+            "note": "ਸਿਹਤ ਕੋਡ ਦੀਆਂ ਉਲੰਘਣਾਵਾਂ ਲਈ—ਜਿਵੇਂ ਕੀੜੇ-ਮਕੌੜੇ, ਸੀਵਰੇਜ, ਅਤੇ ਦਿੱਖਣ ਵਾਲਾ ਮੋਲਡ।"
+          },
+          "contact-housing-authority": {
+            "label": "San Joaquin Fair Housing Authority",
+            "note": "ਕਿਰਾਏਦਾਰ ਸਹਾਇਤਾ ਪ੍ਰੋਗਰਾਮਾਂ ਅਤੇ ਰਹਾਇਸ਼ੀ ਭੇਦਭਾਵ ਸਬੰਧੀ ਮਦਦ ਲਈ ਵਰਤੋ।"
+          }
         }
-      }
-    },
+      },
     "toc": {
       "contents_title": "ਸਮੱਗਰੀ",
       "on_this_page": "ਇਸ ਪੰਨੇ 'ਤੇ",
@@ -341,7 +341,7 @@
             "keywords": ["rent", "ਕਿਰਾਇਆ", "money order", "receipt", "mail proof", "due date"]
           },
           "notice-to-pay": {
-            "title": "Notice to Pay Rent",
+            "title": "ਕਿਰਾਇਆ ਭਰਨ ਲਈ ਨੋਟਿਸ (Notice to Pay Rent)",
             "summary": "ਨੋਟਿਸ ਦਾ ਜਵਾਬ ਕਿਵੇਂ ਦੇਣਾ ਤਾਂ ਜੋ ਕਾਨੂੰਨੀ ਬਚਾਅ ਬਚੇ ਅਤੇ timing proof ਬਣੇ।",
             "keywords": ["notice to pay", "3 day notice", "delivery", "witness", "deadline", "ਨੋਟਿਸ", "ਡੈਡਲਾਈਨ"]
           }
@@ -438,12 +438,12 @@
             "keywords": ["summons", "trial", "writ of possession", "deadline", "timeline"]
           },
           "voluntary-vacate": {
-            "title": "Voluntary Vacate Agreements",
+            "title": "ਸਵੈਚੱਛਿਕ ਖਾਲੀ ਕਰਨ ਦੇ ਸਮਝੌਤੇ (Voluntary Vacate Agreements)",
             "summary": "cash-for-keys ਦੇ ਜੋਖਮ ਅਤੇ ਸਾਇਨ ਕਰਨ ਤੋਂ ਪਹਿਲਾਂ ਸਲਾਹ ਲੈਣ ਦੀ ਲੋੜ।",
             "keywords": ["cash-for-keys", "buyout", "voluntary vacate"]
           },
           "estoppel": {
-            "title": "Estoppel Certificate",
+            "title": "ਐਸਟੋਪਲ ਸਰਟੀਫਿਕੇਟ (Estoppel Certificate)",
             "summary": "ownership change ਦੌਰਾਨ estoppel certificates ਕਿਵੇਂ terms ਨੂੰ ਦਸਤਾਵੇਜ਼ ਕਰ ਸਕਦੇ ਹਨ।",
             "keywords": ["estoppel", "ownership change", "occupancy terms", "terms"]
           }
