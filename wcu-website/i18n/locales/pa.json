@@ -261,55 +261,55 @@
     },
     "chapters": {
       "chapter-1": {
-        "title": "Chapter 1: Know Your Rights",
-        "summary": "Use this chapter to confirm legal protections before negotiating with a landlord.",
-        "goal": "Document conditions, assert legal notice rights, and avoid retaliation traps.",
+        "title": "ਅਧਿਆਇ 1: ਆਪਣੇ ਅਧਿਕਾਰ ਜਾਣੋ",
+        "summary": "ਮਕਾਨ ਮਾਲਕ ਨਾਲ ਗੱਲਬਾਤ/ਮੁਜ਼ਾਕਰਾ ਕਰਨ ਤੋਂ ਪਹਿਲਾਂ ਕਾਨੂੰਨੀ ਸੁਰੱਖਿਆਵਾਂ ਪੱਕੀਆਂ ਕਰਨ ਲਈ ਇਹ ਅਧਿਆਇ ਵਰਤੋ।",
+        "goal": "ਹਾਲਤਾਂ ਦਾ ਸਬੂਤ ਬਣਾਓ, ਕਾਨੂੰਨੀ ਨੋਟਿਸ ਵਾਲੇ ਹੱਕ ਵਰਤੋ, ਅਤੇ ਬਦਲੇ ਵਾਲੇ ਜਾਲ ਤੋਂ ਬਚੋ।",
         "evidence_checklist": [
-          "Dated photos/videos of conditions",
-          "Written repair requests and landlord replies",
-          "Rent receipts, lease clauses, and notices"
+          "ਹਾਲਤਾਂ ਦੀ ਮਿਤੀ ਵਾਲੀਆਂ ਫੋਟੋਆਂ/ਵੀਡੀਓਜ਼",
+          "ਲਿਖਤੀ ਮੁਰੰਮਤ ਬੇਨਤੀਆਂ ਅਤੇ ਮਕਾਨ ਮਾਲਕ ਦੇ ਜਵਾਬ",
+          "ਕਿਰਾਏ ਦੀਆਂ ਰਸੀਦਾਂ, lease ਦੀਆਂ ਸ਼ਰਤਾਂ, ਅਤੇ ਨੋਟਿਸ"
         ],
         "common_mistakes": [
-          "Relying on verbal requests only",
-          "Paying rent in cash without records",
-          "Signing documents you have not reviewed"
+          "ਸਿਰਫ਼ ਮੌਖਿਕ ਬੇਨਤੀਆਂ 'ਤੇ ਨਿਰਭਰ ਕਰਨਾ",
+          "ਬਿਨਾਂ ਰਿਕਾਰਡ ਕੈਸ਼ ਵਿੱਚ ਕਿਰਾਇਆ ਦੇਣਾ",
+          "ਜੋ ਦਸਤਾਵੇਜ਼ ਤੁਸੀਂ ਪੜ੍ਹੇ ਨਹੀਂ, ਉਨ੍ਹਾਂ 'ਤੇ ਸਾਇਨ ਕਰਨਾ"
         ],
-        "escalate_when": "Landlord ignores repairs, threatens move-out after complaints, or increases rent without proper notice.",
+        "escalate_when": "ਮਕਾਨ ਮਾਲਕ ਮੁਰੰਮਤਾਂ ਨੂੰ ਨਜ਼ਰਅੰਦਾਜ਼ ਕਰੇ, ਸ਼ਿਕਾਇਤ ਕਰਨ ਤੋਂ ਬਾਅਦ ਘਰ ਖਾਲੀ ਕਰਨ ਦੀ ਧਮਕੀ ਦੇਵੇ, ਜਾਂ ਠੀਕ ਨੋਟਿਸ ਤੋਂ ਬਿਨਾਂ ਕਿਰਾਇਆ ਵਧਾਏ।",
         "source_notes": [
           "California Tenant Protection Act (AB 1482)",
-          "Local rent increase limits for San Joaquin County",
-          "California Civil Code repair and entry rules"
+          "San Joaquin County ਲਈ ਸਥਾਨਕ ਕਿਰਾਇਆ ਵਾਧਾ ਸੀਮਾਵਾਂ",
+          "California Civil Code ਦੇ ਮੁਰੰਮਤ ਅਤੇ ਦਾਖ਼ਲਾ ਨਿਯਮ"
         ],
-        "last_reviewed": "February 6, 2026",
+        "last_reviewed": "6 ਫਰਵਰੀ, 2026",
         "sections": {
           "tenant-protections": {
-            "title": "Tenant Protections & Rent Increases",
-            "summary": "How rent caps, notice windows, and anti-retaliation rules protect occupied units.",
-            "keywords": ["rent increase", "ab 1482", "notice", "retaliation", "lease"]
+            "title": "ਕਿਰਾਏਦਾਰ ਸੁਰੱਖਿਆ ਅਤੇ ਕਿਰਾਇਆ ਵਾਧੇ",
+            "summary": "ਕਿਰਾਇਆ ਸੀਮਾਵਾਂ, ਨੋਟਿਸ ਵਿੰਡੋਜ਼, ਅਤੇ anti-retaliation ਨਿਯਮ ਕਿਵੇਂ ਰਹਿੰਦੇ ਕਿਰਾਏਦਾਰਾਂ ਦੀ ਰੱਖਿਆ ਕਰਦੇ ਹਨ।",
+            "keywords": ["ਕਿਰਾਇਆ ਵਾਧਾ", "AB 1482", "notice", "retaliation", "lease"]
           },
           "know-your-rights": {
-            "title": "Know Your Rights",
-            "summary": "Habitability standards and rights every tenant keeps with or without stabilization.",
-            "keywords": ["habitability", "safe unit", "landlord duties", "health", "entry"]
+            "title": "ਆਪਣੇ ਅਧਿਕਾਰ ਜਾਣੋ",
+            "summary": "Habitability ਮਾਪਦੰਡ ਅਤੇ ਉਹ ਹੱਕ ਜੋ ਹਰ ਕਿਰਾਏਦਾਰ ਕੋਲ ਹੁੰਦੇ ਹਨ—Rent Stabilization ਹੋਵੇ ਜਾਂ ਨਾ।",
+            "keywords": ["habitability", "ਸੁਰੱਖਿਅਤ ਘਰ", "landlord duties", "health", "entry"]
           },
           "repairs": {
-            "title": "Repairs, Damage, or Infestation",
-            "summary": "Step-by-step workflow to request repairs and preserve evidence.",
+            "title": "ਮੁਰੰਮਤ, ਨੁਕਸਾਨ, ਜਾਂ ਕੀੜੇ-ਮਕੌੜੇ",
+            "summary": "ਮੁਰੰਮਤ ਮੰਗਣ ਅਤੇ ਸਬੂਤ ਸੰਭਾਲਣ ਲਈ ਕਦਮ-ਦਰ-ਕਦਮ ਪ੍ਰਕਿਰਿਆ।",
             "keywords": ["repair request", "certified mail", "photos", "inspection", "infestation"]
           },
           "harassment": {
-            "title": "Harassment",
-            "summary": "How to document harassment and build a record that can be used later.",
+            "title": "ਤੰਗ-ਪ੍ਰੇਸ਼ਾਨੀ (Harassment)",
+            "summary": "ਤੰਗ-ਪ੍ਰੇਸ਼ਾਨੀ ਨੂੰ ਦਸਤਾਵੇਜ਼ ਬਣਾਉਣਾ ਅਤੇ ਐਸਾ ਰਿਕਾਰਡ ਤਿਆਰ ਕਰਨਾ ਜੋ ਬਾਅਦ ਵਿੱਚ ਵਰਤਿਆ ਜਾ ਸਕੇ।",
             "keywords": ["harassment", "documentation", "witness", "tenant union"]
           },
           "utilities": {
-            "title": "Utilities",
-            "summary": "Who pays, what notice is required, and what utility shutoff behavior is illegal.",
+            "title": "ਯੂਟਿਲਿਟੀਜ਼ (Utilities)",
+            "summary": "ਕੌਣ ਭਰਦਾ ਹੈ, ਕਿਹੜਾ ਨੋਟਿਸ ਲੋੜੀਂਦਾ ਹੈ, ਅਤੇ utilities ਬੰਦ ਕਰਨਾ ਕਦੋਂ ਗੈਰਕਾਨੂੰਨੀ ਹੈ।",
             "keywords": ["utilities", "notice", "billing", "landlord responsibilities"]
           },
           "dos-donts": {
-            "title": "Dos and Don'ts",
-            "summary": "Practical behaviors that protect your legal position before, during, and after tenancy.",
+            "title": "ਕਰੋ ਅਤੇ ਨਾ ਕਰੋ",
+            "summary": "ਰਿਹਾਇਸ਼ ਸ਼ੁਰੂ ਕਰਨ ਤੋਂ ਪਹਿਲਾਂ, ਦੌਰਾਨ, ਅਤੇ ਬਾਅਦ ਵਿੱਚ ਉਹ ਤਰੀਕੇ ਜੋ ਤੁਹਾਡੀ ਕਾਨੂੰਨੀ ਪੋਜ਼ੀਸ਼ਨ ਦੀ ਰੱਖਿਆ ਕਰਦੇ ਹਨ।",
             "keywords": ["best practices", "move-in", "move-out", "receipts"]
           }
         }
@@ -486,88 +486,88 @@
     "body": {
       "chapter-1": {
         "tenant-protections": {
-          "heading_tenant_protection": "Tenant Protection",
-          "intro": "The California Tenant Protection Act restricts how much a landlord can increase your rent. Everyone in San Joaquin County is protected by this Act.",
-          "protects_heading": "What does this act protect?",
+          "heading_tenant_protection": "ਕਿਰਾਏਦਾਰ ਸੁਰੱਖਿਆ",
+          "intro": "California Tenant Protection Act ਮਕਾਨ ਮਾਲਕ ਨੂੰ ਤੁਹਾਡਾ ਕਿਰਾਇਆ ਕਿੰਨਾ ਵਧਾ ਸਕਦਾ ਹੈ—ਇਸ 'ਤੇ ਸੀਮਾ ਲਗਾਂਦਾ ਹੈ। San Joaquin County ਵਿੱਚ ਹਰ ਕਿਰਾਏਦਾਰ ਇਸ ਕਾਨੂੰਨ ਨਾਲ ਸੁਰੱਖਿਅਤ ਹੈ।",
+          "protects_heading": "ਇਹ ਕਾਨੂੰਨ ਕੀ ਸੁਰੱਖਿਆ ਦਿੰਦਾ ਹੈ?",
           "protects": {
-            "cap": "Through January 1, 2030, landlords cannot raise rent more than 8.8% total or 5% plus the Consumer Price Index (CPI)—depending on whichever is lower.",
-            "cap_local": "Between 8/1/24 and 7/31/25 in San Joaquin County the maximum for rent increase is 8.8%",
-            "frequency": "Increases can only occur no more than two times every 12 months.",
-            "initial_rent": "Does not limit how much money a landlord can charge at the start of a rental agreement, only how much the rent can increase once the unit is occupied by the same tenant.",
-            "eviction_reasons": "Limits the legal reasons for eviction. You can only be evicted for the reasons listed in the SJCOG, and in some cases you MUST be compensated. (See Chapter 4)",
-            "no_retaliation": "Rent increases cannot be retaliatory."
+            "cap": "1 ਜਨਵਰੀ 2030 ਤੱਕ, ਮਕਾਨ ਮਾਲਕ ਕੁੱਲ ਮਿਲਾ ਕੇ ਕਿਰਾਇਆ 8.8% ਤੋਂ ਵੱਧ ਨਹੀਂ ਵਧਾ ਸਕਦੇ, ਜਾਂ Consumer Price Index (CPI) ਤੋਂ 5% ਵੱਧ—ਜੋ ਵੀ ਘੱਟ ਹੋਵੇ।",
+            "cap_local": "San Joaquin County ਵਿੱਚ 8/1/24 ਤੋਂ 7/31/25 ਤੱਕ ਕਿਰਾਇਆ ਵਾਧੇ ਦੀ ਵੱਧ ਤੋਂ ਵੱਧ ਸੀਮਾ 8.8% ਹੈ।",
+            "frequency": "ਹਰ 12 ਮਹੀਨੇ ਵਿੱਚ ਵਾਧਾ ਵੱਧ ਤੋਂ ਵੱਧ ਦੋ ਵਾਰ ਹੋ ਸਕਦਾ ਹੈ।",
+            "initial_rent": "ਇਹ ਕਾਨੂੰਨ ਨਵਾਂ rental agreement ਸ਼ੁਰੂ ਹੋਣ ਵੇਲੇ ਕਿਰਾਇਆ ਕਿੰਨਾ ਹੋਵੇ—ਇਸ 'ਤੇ ਸੀਮਾ ਨਹੀਂ ਲਗਾਂਦਾ; ਇਹ ਸਿਰਫ਼ ਉਸ ਵੇਲੇ ਕਿਰਾਏ ਵਿੱਚ ਵਾਧਾ ਸੀਮਿਤ ਕਰਦਾ ਹੈ ਜਦੋਂ ਇਕੋ ਕਿਰਾਏਦਾਰ ਯੂਨਿਟ ਵਿੱਚ ਰਹਿ ਰਿਹਾ ਹੋਵੇ।",
+            "eviction_reasons": "ਇਹ ਕਾਨੂੰਨ ਬੇਦਖਲੀ ਲਈ ਕਾਨੂੰਨੀ ਕਾਰਨ ਵੀ ਸੀਮਿਤ ਕਰਦਾ ਹੈ। ਤੁਸੀਂ ਸਿਰਫ਼ SJCOG ਵਿੱਚ ਦਿੱਤੇ ਕਾਰਨਾਂ ਲਈ ਹੀ ਬੇਦਖਲ ਹੋ ਸਕਦੇ ਹੋ, ਅਤੇ ਕੁਝ ਹਾਲਤਾਂ ਵਿੱਚ ਤੁਹਾਨੂੰ ਮੁਆਵਜ਼ਾ ਮਿਲਣਾ ਲਾਜ਼ਮੀ ਹੈ। (ਅਧਿਆਇ 4 ਵੇਖੋ)",
+            "no_retaliation": "ਕਿਰਾਏ ਵਿੱਚ ਵਾਧਾ ਬਦਲੇ (retaliation) ਵਜੋਂ ਨਹੀਂ ਕੀਤਾ ਜਾ ਸਕਦਾ।"
           },
-          "increase_heading": "When can a Landlord increase your rent?",
+          "increase_heading": "ਮਕਾਨ ਮਾਲਕ ਤੁਹਾਡਾ ਕਿਰਾਇਆ ਕਦੋਂ ਵਧਾ ਸਕਦਾ ਹੈ?",
           "increase": {
-            "lease_term_label": "Lease of more than month-to-month:",
+            "lease_term_label": "ਮਹੀਨਾ-ਮਹੀਨਾ ਤੋਂ ਲੰਬਾ lease:",
             "lease_term_items": {
-              "no_increase_during_term": "Landlords CANNOT increase rent during the term of the lease, unless the lease explicitly allows for rent increases.",
-              "not_in_first_year": "Rent increases cannot be considered within the first year of occupancy."
+              "no_increase_during_term": "ਜੇ lease ਵਿੱਚ ਖਾਸ ਤੌਰ 'ਤੇ ਕਿਰਾਇਆ ਵਧਾਉਣ ਦੀ ਇਜਾਜ਼ਤ ਨਹੀਂ, ਤਾਂ lease ਦੇ ਮਿਆਦ ਦੌਰਾਨ ਮਕਾਨ ਮਾਲਕ ਕਿਰਾਇਆ ਨਹੀਂ ਵਧਾ ਸਕਦਾ।",
+              "not_in_first_year": "ਰਿਹਾਇਸ਼ ਦੇ ਪਹਿਲੇ ਸਾਲ ਵਿੱਚ ਕਿਰਾਇਆ ਨਹੀਂ ਵਧਾਇਆ ਜਾ ਸਕਦਾ।"
             },
-            "periodic_label": "Periodic lease agreement (a month-to-month or shorter):",
+            "periodic_label": "ਪਿਰਿਓਡਿਕ lease agreement (ਮਹੀਨਾ-ਮਹੀਨਾ ਜਾਂ ਇਸ ਤੋਂ ਛੋਟਾ):",
             "periodic_items": {
-              "notice_required": "Landlords can increase your rent as often as they like, but must provide a written notice"
+              "notice_required": "ਮਕਾਨ ਮਾਲਕ ਜਿੰਨੀ ਵਾਰ ਮਰਜ਼ੀ ਕਿਰਾਇਆ ਵਧਾ ਸਕਦਾ ਹੈ, ਪਰ ਲਿਖਤੀ ਨੋਟਿਸ ਦੇਣਾ ਲਾਜ਼ਮੀ ਹੈ।"
             }
           },
           "notice_box": {
-            "title": "Landlords MUST provide a formal written notice for rent increases at least:",
+            "title": "ਕਿਰਾਇਆ ਵਧਾਉਣ ਲਈ ਮਕਾਨ ਮਾਲਕ ਨੂੰ ਘੱਟੋ-ਘੱਟ ਇਹ ਲਿਖਤੀ ਨੋਟਿਸ ਦੇਣਾ ਲਾਜ਼ਮੀ ਹੈ:",
             "items": {
-              "week_to_week_30": "30-day notice for all week-to-week leases",
-              "month_to_month_under_year_30": "30-day notice for all month-to-month leases for tenants who have lived there for less than one year",
-              "month_to_month_over_year_60": "60-day notice for all month-to-month or yearly leases with tenants who have lived there for more than one year",
-              "over_cap_90": "90-day advance notice if the rent increase is greater than 8.8%"
+              "week_to_week_30": "ਹਰ week-to-week lease ਲਈ 30 ਦਿਨਾਂ ਦਾ ਨੋਟਿਸ",
+              "month_to_month_under_year_30": "ਮਹੀਨਾ-ਮਹੀਨਾ lease ਲਈ 30 ਦਿਨਾਂ ਦਾ ਨੋਟਿਸ, ਜੇ ਤੁਸੀਂ ਉੱਥੇ ਇੱਕ ਸਾਲ ਤੋਂ ਘੱਟ ਰਹੇ ਹੋ",
+              "month_to_month_over_year_60": "ਮਹੀਨਾ-ਮਹੀਨਾ ਜਾਂ ਸਾਲਾਨਾ lease ਲਈ 60 ਦਿਨਾਂ ਦਾ ਨੋਟਿਸ, ਜੇ ਤੁਸੀਂ ਉੱਥੇ ਇੱਕ ਸਾਲ ਤੋਂ ਵੱਧ ਰਹੇ ਹੋ",
+              "over_cap_90": "ਜੇ ਕਿਰਾਇਆ ਵਾਧਾ 8.8% ਤੋਂ ਵੱਧ ਹੋਵੇ ਤਾਂ 90 ਦਿਨ ਪਹਿਲਾਂ ਦਾ ਨੋਟਿਸ"
             }
           }
         },
         "know-your-rights": {
-          "p1": "The WCU Tenants Union knows that many landlords use their failure to make repairs as a way to evict tenants. When tenants complain to their landlords about the lack of repairs, or about the quality of repair, many landlords tell tenants to move out if they are unhappy.",
-          "illegal": "That is illegal.",
-          "p2": "Under California law, ALL Tenants (with or without Rent Stabilization) have the right to live in a unit that is both safe and sanitary.",
-          "required_heading": "This means that your landlord is legally required to repair or address:",
+          "p1": "WCU Tenant Union ਨੂੰ ਪਤਾ ਹੈ ਕਿ ਕਈ ਮਕਾਨ ਮਾਲਕ ਮੁਰੰਮਤ ਨਾ ਕਰਨ ਨੂੰ ਕਿਰਾਏਦਾਰਾਂ ਨੂੰ ਬੇਦਖਲ ਕਰਨ ਦਾ ਤਰੀਕਾ ਬਣਾਉਂਦੇ ਹਨ। ਜਦੋਂ ਕਿਰਾਏਦਾਰ ਮੁਰੰਮਤਾਂ ਦੀ ਕਮੀ ਜਾਂ ਮੁਰੰਮਤ ਦੀ ਗੁਣਵੱਤਾ ਬਾਰੇ ਸ਼ਿਕਾਇਤ ਕਰਦੇ ਹਨ, ਤਾਂ ਕਈ ਮਕਾਨ ਮਾਲਕ ਕਹਿੰਦੇ ਹਨ ਕਿ ਜੇ ਤੁਸੀਂ ਖੁਸ਼ ਨਹੀਂ ਤਾਂ ਘਰ ਖਾਲੀ ਕਰ ਦਿਓ।",
+          "illegal": "ਇਹ ਗੈਰਕਾਨੂੰਨੀ ਹੈ।",
+          "p2": "California ਦੇ ਕਾਨੂੰਨ ਅਨੁਸਾਰ, ਹਰ ਕਿਰਾਏਦਾਰ (Rent Stabilization ਹੋਵੇ ਜਾਂ ਨਾ) ਨੂੰ ਐਸੇ ਘਰ ਵਿੱਚ ਰਹਿਣ ਦਾ ਹੱਕ ਹੈ ਜੋ ਸੁਰੱਖਿਅਤ ਅਤੇ ਸਾਫ਼-ਸੁਥਰਾ ਹੋਵੇ।",
+          "required_heading": "ਇਸਦਾ ਮਤਲਬ ਹੈ ਕਿ ਤੁਹਾਡੇ ਮਕਾਨ ਮਾਲਕ ਨੂੰ ਕਾਨੂੰਨ ਮੁਤਾਬਕ ਇਹਨਾਂ ਨੂੰ ਠੀਕ ਕਰਨਾ/ਸੁਧਾਰਨਾ ਲਾਜ਼ਮੀ ਹੈ:",
           "repairs_required": [
-            "Water dripping from ceilings and walls (from leaking pipes, bathtubs, or sinks)",
-            "Holes in walls or floors (or missing thresholds at the base of doorways)",
-            "Plaster/paint shedding",
-            "Visible mildew or mold from not having enough air circulation",
-            "Damaged heater",
-            "Bad plumbing (or sewage back up)",
-            "Broken windows",
-            "Missing window screens",
-            "Broken smoke detectors or carbon monoxide detectors",
-            "Large gaps behind kitchen drawers or cupboards where insects can enter",
-            "Inadequate garbage collection",
-            "Unsafe stairs/handrails",
-            "Unsecure/improper doorknobs",
-            "Faulty electrical wiring",
-            "Vermin infestations that violate the Health Code: cockroaches (the small ones), rats, mice, and raccoons (See Chapter 3)",
-            "Infestations that violate the Building Code: termites (See Chapter 3)"
+            "ਛੱਤ ਜਾਂ ਕੰਧਾਂ ਤੋਂ ਪਾਣੀ ਟਪਕਣਾ (ਲੀਕ ਕਰਦੇ ਪਾਈਪਾਂ, ਬਾਥਟਬ, ਜਾਂ ਸਿੰਕ ਕਾਰਨ)",
+            "ਕੰਧਾਂ ਜਾਂ ਫਰਸ਼ ਵਿੱਚ ਛੇਦ (ਜਾਂ ਦਰਵਾਜ਼ਿਆਂ ਦੇ ਹੇਠਾਂ threshold ਗੁੰਮ ਹੋਣਾ)",
+            "ਪਲਾਸਟਰ/ਪੇਂਟ ਦਾ ਝੜਨਾ",
+            "ਹਵਾ ਦੀ ਆਵਾਜਾਈ ਘੱਟ ਹੋਣ ਕਰਕੇ ਦਿੱਖਣ ਵਾਲਾ mildew ਜਾਂ mold",
+            "ਹੀਟਰ ਖਰਾਬ ਹੋਣਾ",
+            "ਪਲੰਬਿੰਗ ਖਰਾਬ ਹੋਣਾ (ਜਾਂ sewage back up ਹੋਣਾ)",
+            "ਖਿੜਕੀਆਂ ਟੁੱਟੀਆਂ ਹੋਣਾ",
+            "ਖਿੜਕੀ ਦੇ ਸਕ੍ਰੀਨ ਨਾ ਹੋਣਾ",
+            "smoke detector ਜਾਂ carbon monoxide detector ਖਰਾਬ ਹੋਣਾ",
+            "ਰਸੋਈ ਦੇ ਦਰਾਜ਼ਾਂ ਜਾਂ ਕੱਪਬੋਰਡਾਂ ਦੇ ਪਿੱਛੇ ਵੱਡੇ ਖਾਲੀ ਸਥਾਨ ਜਿੱਥੋਂ ਕੀੜੇ ਅੰਦਰ ਆ ਸਕਦੇ ਹਨ",
+            "ਕੂੜਾ ਇਕੱਠਾ ਕਰਨ ਦੀ ਢੰਗ ਦੀ ਸੇਵਾ ਨਾ ਹੋਣਾ",
+            "ਅਸੁਰੱਖਿਅਤ ਸਿੜ੍ਹੀਆਂ/ਹੈਂਡਰੇਲ",
+            "ਦਰਵਾਜ਼ੇ ਦੇ ਹੈਂਡਲ/ਲਾਕ ਢੰਗ ਨਾਲ ਨਾ ਹੋਣਾ",
+            "ਬਿਜਲੀ ਦੀ ਵਾਇਰਿੰਗ ਖਰਾਬ ਹੋਣਾ",
+            "Health Code ਦੀ ਉਲੰਘਣਾ ਵਾਲੀ infestation: cockroaches (ਛੋਟੀਆਂ ਵਾਲੀਆਂ), rats, mice, ਅਤੇ raccoons (ਅਧਿਆਇ 3 ਵੇਖੋ)",
+            "Building Code ਦੀ ਉਲੰਘਣਾ ਵਾਲੀ infestation: termites (ਅਧਿਆਇ 3 ਵੇਖੋ)"
           ],
-          "rights_heading": "Also, tenants have the right to:",
+          "rights_heading": "ਇਸ ਤੋਂ ਇਲਾਵਾ, ਕਿਰਾਏਦਾਰਾਂ ਕੋਲ ਇਹ ਹੱਕ ਵੀ ਹਨ:",
           "rights_list": [
-            "Receive 24-hour advance written notice before the landlord enters your home",
-            "Submit a written list of repairs that you need in your home",
-            "Impartial inspections by a third party",
-            "Pay rent with money order",
-            "Receive a receipt that clearly states the landlord's name, date covered by the rent, and the amount paid",
-            "Organize themselves to fight against bad conditions, harassment, or illegal evictions"
+            "ਮਕਾਨ ਮਾਲਕ ਦੇ ਘਰ ਵਿੱਚ ਦਾਖ਼ਲ ਹੋਣ ਤੋਂ ਪਹਿਲਾਂ 24 ਘੰਟੇ ਪਹਿਲਾਂ ਲਿਖਤੀ ਨੋਟਿਸ ਮਿਲਣਾ",
+            "ਘਰ ਵਿੱਚ ਲੋੜੀਂਦੀਆਂ ਮੁਰੰਮਤਾਂ ਦੀ ਲਿਖਤੀ ਸੂਚੀ ਦੇਣਾ",
+            "ਤੀਜੀ ਪਾਰਟੀ ਵੱਲੋਂ ਨਿਰਪੱਖ inspection",
+            "money order ਨਾਲ ਕਿਰਾਇਆ ਭਰਨਾ",
+            "ਐਸੀ ਰਸੀਦ ਮਿਲਣਾ ਜਿਸ ਵਿੱਚ ਮਕਾਨ ਮਾਲਕ ਦਾ ਨਾਮ, ਕਿਰਾਏ ਨਾਲ ਕਵਰ ਹੋਇਆ ਸਮਾਂ, ਅਤੇ ਦਿੱਤੀ ਰਕਮ ਸਾਫ਼ ਲਿਖੀ ਹੋਵੇ",
+            "ਮਾੜੀਆਂ ਹਾਲਤਾਂ, ਤੰਗ-ਪ੍ਰੇਸ਼ਾਨੀ, ਜਾਂ ਗੈਰਕਾਨੂੰਨੀ ਬੇਦਖਲੀ ਖ਼ਿਲਾਫ਼ ਇਕੱਠੇ ਸੰਗਠਿਤ ਹੋਣਾ"
           ]
         },
         "repairs": {
-          "lead": "If you have repairs, damage, or infestation:",
+          "lead": "ਜੇ ਤੁਹਾਨੂੰ ਮੁਰੰਮਤ, ਨੁਕਸਾਨ, ਜਾਂ infestation ਦੀ ਸਮੱਸਿਆ ਹੈ:",
           "steps": {
-            "1": "Make a list of the damaged or infested areas (if your landlord has provided you with a repairs sheet, fill it out thoroughly).",
-            "2": "Take photographs of the damaged or infested areas, and include the day's newspaper to show the date the photograph was taken.",
-            "3": "Write a letter to the landlord, attach the photos and list (or repairs sheet), and send it by mail with a delivery confirmation receipt, such as certified mail or USPS Priority Mail.",
-            "3_note": "Email and text are also options.",
-            "4": "Keep dated documentation (e.g. receipt from post office, texts, emails, letters, etc.), and copies of all correspondence and photographs sent to the landlord.",
-            "5": "If the landlord does not repair the unit in a timely manner, you can file a complaint."
+            "1": "ਖਰਾਬ ਜਾਂ infestation ਵਾਲੀਆਂ ਥਾਵਾਂ ਦੀ ਸੂਚੀ ਬਣਾਓ (ਜੇ ਮਕਾਨ ਮਾਲਕ ਨੇ repair sheet ਦਿੱਤੀ ਹੈ, ਤਾਂ ਉਸਨੂੰ ਪੂਰੀ ਤਰ੍ਹਾਂ ਭਰੋ)।",
+            "2": "ਖਰਾਬ ਜਾਂ infestation ਵਾਲੀਆਂ ਥਾਵਾਂ ਦੀਆਂ ਫੋਟੋਆਂ ਖਿੱਚੋ, ਅਤੇ ਮਿਤੀ ਦਿਖਾਉਣ ਲਈ ਉਸ ਦਿਨ ਦਾ ਅਖ਼ਬਾਰ ਵੀ ਫੋਟੋ ਵਿੱਚ ਰੱਖੋ।",
+            "3": "ਮਕਾਨ ਮਾਲਕ ਨੂੰ ਇੱਕ ਚਿੱਠੀ ਲਿਖੋ, ਫੋਟੋਆਂ ਅਤੇ ਸੂਚੀ (ਜਾਂ repair sheet) ਨਾਲ ਲਗਾਓ, ਅਤੇ delivery confirmation ਵਾਲੇ ਮੇਲ ਨਾਲ ਭੇਜੋ—ਜਿਵੇਂ certified mail ਜਾਂ USPS Priority Mail।",
+            "3_note": "Email ਅਤੇ text ਵੀ ਵਿਕਲਪ ਹਨ।",
+            "4": "ਮਿਤੀ ਵਾਲੇ ਰਿਕਾਰਡ ਸੰਭਾਲੋ (ਉਦਾਹਰਨ ਲਈ: post office ਦੀ ਰਸੀਦ, texts, emails, letters, ਆਦਿ) ਅਤੇ ਮਕਾਨ ਮਾਲਕ ਨੂੰ ਭੇਜੀ ਸਾਰੀ correspondence ਅਤੇ ਫੋਟੋਆਂ ਦੀਆਂ ਕਾਪੀਆਂ ਵੀ ਰੱਖੋ।",
+            "5": "ਜੇ ਮਕਾਨ ਮਾਲਕ ਸਮੇਂ 'ਤੇ ਮੁਰੰਮਤ ਨਹੀਂ ਕਰਦਾ, ਤਾਂ ਤੁਸੀਂ ਸ਼ਿਕਾਇਤ ਦਰਜ ਕਰ ਸਕਦੇ ਹੋ।"
           },
-          "inspection_timeline": "Depending on the specific city or problem, you can request an inspection, and the landlord will be REQUIRED to repair the problem. In some cases, landlords have up to 30 days to start the repair work, and then another 60 days to finish it.",
+          "inspection_timeline": "ਸ਼ਹਿਰ ਜਾਂ ਸਮੱਸਿਆ ਦੇ ਅਨੁਸਾਰ, ਤੁਸੀਂ inspection ਮੰਗ ਸਕਦੇ ਹੋ ਅਤੇ ਮਕਾਨ ਮਾਲਕ ਨੂੰ ਸਮੱਸਿਆ ਠੀਕ ਕਰਨੀ ਲਾਜ਼ਮੀ ਹੋ ਸਕਦੀ ਹੈ। ਕੁਝ ਹਾਲਤਾਂ ਵਿੱਚ, ਮਕਾਨ ਮਾਲਕ ਕੋਲ ਮੁਰੰਮਤ ਸ਼ੁਰੂ ਕਰਨ ਲਈ 30 ਦਿਨ ਤੱਕ, ਅਤੇ ਪੂਰੀ ਕਰਨ ਲਈ ਹੋਰ 60 ਦਿਨ ਤੱਕ ਹੋ ਸਕਦੇ ਹਨ।",
           "table": {
             "headers": {
-              "department": "Department/Service",
-              "agency": "Agency/Office",
-              "phone": "Phone Number"
+              "department": "ਵਿਭਾਗ/ਸੇਵਾ",
+              "agency": "ਏਜੰਸੀ/ਦਫ਼ਤਰ",
+              "phone": "ਫੋਨ ਨੰਬਰ"
             },
             "rows": [
               {
@@ -617,73 +617,73 @@
               }
             ]
           },
-          "remember_note": "For ALL tenants, landlords must provide at least a 24-hour advance written notice to enter the unit to do repairs and they can enter even when you are not home."
+          "remember_note": "ਹਰ ਕਿਰਾਏਦਾਰ ਲਈ, ਮਕਾਨ ਮਾਲਕ ਨੂੰ ਮੁਰੰਮਤ ਕਰਨ ਲਈ ਯੂਨਿਟ ਵਿੱਚ ਦਾਖ਼ਲ ਹੋਣ ਤੋਂ ਘੱਟੋ-ਘੱਟ 24 ਘੰਟੇ ਪਹਿਲਾਂ ਲਿਖਤੀ ਨੋਟਿਸ ਦੇਣਾ ਲਾਜ਼ਮੀ ਹੈ, ਅਤੇ ਉਹ ਉਸ ਵੇਲੇ ਵੀ ਅੰਦਰ ਆ ਸਕਦੇ ਹਨ ਜਦੋਂ ਤੁਸੀਂ ਘਰ ਵਿੱਚ ਨਾ ਹੋ।"
         },
         "harassment": {
-          "lead": "To fight back against harassment, you must:",
+          "lead": "ਤੰਗ-ਪ੍ਰੇਸ਼ਾਨੀ (harassment) ਦਾ ਮੁਕਾਬਲਾ ਕਰਨ ਲਈ, ਤੁਹਾਨੂੰ ਇਹ ਕਰਨਾ ਚਾਹੀਦਾ ਹੈ:",
           "steps": [
-            "Document the events. Keep a notebook where you write the date, time, and a detailed description of what happened.",
-            "Send the landlord a letter documenting the harassment and asking for it to stop. Keep a copy of this dated documentation.",
-            "Do not suffer harassment in silence or fear. Come to a Working Class Unity Tenant Union meeting and share your experience."
+            "ਘਟਨਾਵਾਂ ਦਾ ਰਿਕਾਰਡ ਬਣਾਓ। ਇੱਕ ਨੋਟਬੁੱਕ ਰੱਖੋ ਜਿਸ ਵਿੱਚ ਤੁਸੀਂ ਮਿਤੀ, ਸਮਾਂ, ਅਤੇ ਕੀ ਹੋਇਆ—ਇਸ ਦਾ ਵਿਸਥਾਰ ਨਾਲ ਵੇਰਵਾ ਲਿਖੋ।",
+            "ਮਕਾਨ ਮਾਲਕ ਨੂੰ ਇੱਕ ਚਿੱਠੀ ਭੇਜੋ ਜਿਸ ਵਿੱਚ ਤੰਗ-ਪ੍ਰੇਸ਼ਾਨੀ ਦਾ ਵੇਰਵਾ ਹੋਵੇ ਅਤੇ ਉਸਨੂੰ ਰੋਕਣ ਲਈ ਕਹੋ। ਇਸ ਮਿਤੀ ਵਾਲੇ ਰਿਕਾਰਡ ਦੀ ਕਾਪੀ ਸੰਭਾਲੋ।",
+            "ਡਰ ਜਾਂ ਚੁੱਪ ਵਿੱਚ ਇਹ ਨਾ ਸਹੋ। Working Class Unity Tenant Union ਦੀ ਮੀਟਿੰਗ ਵਿੱਚ ਆਓ ਅਤੇ ਆਪਣਾ ਤਜਰਬਾ ਸਾਂਝਾ ਕਰੋ।"
           ]
         },
         "utilities": {
-          "responsible_heading": "Who is responsible?",
+          "responsible_heading": "ਕੌਣ ਜ਼ਿੰਮੇਵਾਰ ਹੈ?",
           "responsible_list": [
-            "California landlord-tenant laws do not mandate landlords to cover utility costs but require clarity in lease agreements.",
-            "Unpaid utility bills are the responsibility of whoever's name is on the bills."
+            "California ਦੇ landlord-tenant ਕਾਨੂੰਨ ਮਕਾਨ ਮਾਲਕ ਨੂੰ utilities ਦੇ ਖਰਚੇ ਭਰਨ ਲਈ ਲਾਜ਼ਮੀ ਨਹੀਂ ਬਣਾਉਂਦੇ, ਪਰ lease agreements ਵਿੱਚ ਸਪੱਸ਼ਟਤਾ ਲੋੜੀਂਦੀ ਹੈ।",
+            "Unpaid utility bills ਦੀ ਜ਼ਿੰਮੇਵਾਰੀ ਆਮ ਤੌਰ 'ਤੇ ਉਸ ਵਿਅਕਤੀ ਦੀ ਹੁੰਦੀ ਹੈ ਜਿਸਦੇ ਨਾਮ 'ਤੇ ਬਿੱਲ ਹੁੰਦੇ ਹਨ।"
           ],
-          "landlord_name_heading": "If the utilities are under your Landlord's name:",
+          "landlord_name_heading": "ਜੇ utilities ਤੁਹਾਡੇ ਮਕਾਨ ਮਾਲਕ ਦੇ ਨਾਮ 'ਤੇ ਹਨ:",
           "landlord_name_list": [
-            "Landlords must ensure tenants can access utilities and cannot charge more than the actual utility cost.",
-            "Tenants have a right to get utilities even if their landlord doesn't pay the bills on time.",
-            "Tenants with medical conditions that require at-home medical equipment have a right to a reduced utility cost."
+            "ਮਕਾਨ ਮਾਲਕ ਨੂੰ ਯਕੀਨੀ ਬਣਾਉਣਾ ਪੈਂਦਾ ਹੈ ਕਿ ਕਿਰਾਏਦਾਰ utilities ਵਰਤ ਸਕਣ, ਅਤੇ ਉਹ ਅਸਲ utility ਖਰਚੇ ਤੋਂ ਵੱਧ ਨਹੀਂ ਲੈ ਸਕਦੇ।",
+            "ਜੇ ਮਕਾਨ ਮਾਲਕ ਬਿੱਲ ਸਮੇਂ 'ਤੇ ਨਾ ਭਰੇ, ਤਾਂ ਵੀ ਕਿਰਾਏਦਾਰਾਂ ਨੂੰ utilities ਮਿਲਣ ਦਾ ਹੱਕ ਹੈ।",
+            "ਜਿਨ੍ਹਾਂ ਕਿਰਾਏਦਾਰਾਂ ਨੂੰ ਘਰ ਵਿੱਚ medical equipment ਦੀ ਲੋੜ ਹੈ, ਉਹ ਘਟੇ ਹੋਏ utility ਖਰਚੇ ਦਾ ਹੱਕ ਰੱਖ ਸਕਦੇ ਹਨ।"
           ],
-          "cannot_heading": "By Law your Landlord cannot:",
+          "cannot_heading": "ਕਾਨੂੰਨ ਅਨੁਸਾਰ ਤੁਹਾਡਾ ਮਕਾਨ ਮਾਲਕ ਇਹ ਨਹੀਂ ਕਰ ਸਕਦਾ:",
           "cannot": {
             "items": {
-              "shutoff": "Turn off your utilities just because you are late on rent.",
-              "increase_without_notice": "Increase the price of your utilities (e.g. gas, electricity, trash, etc.) without a 30-day advance notice before the next rent due date",
-              "increase_note_1": "If they do NOT give you advanced written notice of the utilities price increase you should pay the increase AND file a complaint for further investigation. (See Chapter 3)",
-              "increase_note_2": "Note: This is only if the utility costs are included in your rent"
+              "shutoff": "ਸਿਰਫ਼ ਇਸ ਕਰਕੇ ਕਿ ਤੁਸੀਂ ਕਿਰਾਏ ਵਿੱਚ ਦੇਰ ਕਰ ਦਿੱਤੀ, ਤੁਹਾਡੀਆਂ utilities ਬੰਦ ਕਰ ਦੇਣਾ।",
+              "increase_without_notice": "utilities (ਜਿਵੇਂ gas, electricity, trash, ਆਦਿ) ਦੀ ਕੀਮਤ ਵਧਾਉਣਾ ਬਿਨਾਂ 30 ਦਿਨ ਪਹਿਲਾਂ ਦੇ ਲਿਖਤੀ ਨੋਟਿਸ ਦੇ, ਜੋ ਅਗਲੀ rent due date ਤੋਂ ਪਹਿਲਾਂ ਮਿਲੇ",
+              "increase_note_1": "ਜੇ ਉਹ utilities ਦੀ ਕੀਮਤ ਵਧਾਉਣ ਬਾਰੇ ਪਹਿਲਾਂ ਲਿਖਤੀ ਨੋਟਿਸ ਨਹੀਂ ਦਿੰਦੇ, ਤਾਂ ਤੁਹਾਨੂੰ ਵਧੀ ਹੋਈ ਰਕਮ ਭਰਨੀ ਚਾਹੀਦੀ ਹੈ ਅਤੇ ਹੋਰ ਜਾਂਚ ਲਈ ਸ਼ਿਕਾਇਤ ਦਰਜ ਕਰਨੀ ਚਾਹੀਦੀ ਹੈ। (ਅਧਿਆਇ 3 ਵੇਖੋ)",
+              "increase_note_2": "ਨੋਟ: ਇਹ ਸਿਰਫ਼ ਉਸ ਵੇਲੇ ਲਾਗੂ ਹੁੰਦਾ ਹੈ ਜਦੋਂ utility ਖਰਚੇ ਤੁਹਾਡੇ ਕਿਰਾਏ ਵਿੱਚ ਸ਼ਾਮਲ ਹੋਣ"
             }
           },
-          "additional_info": "Additional information:",
+          "additional_info": "ਹੋਰ ਜਾਣਕਾਰੀ:",
           "link_text": "California Landlord Tenant Law - Utilities"
         },
         "dos-donts": {
-          "before_heading": "Before You Move In:",
+          "before_heading": "ਘਰ ਵਿੱਚ ਜਾਣ ਤੋਂ ਪਹਿਲਾਂ:",
           "before": {
             "do": [
-              "Read and understand what you sign.",
-              "Take pictures to document the condition, especially of things that are already wrong or damaged."
+              "ਜੋ ਕੁਝ ਤੁਸੀਂ ਸਾਇਨ ਕਰਦੇ ਹੋ, ਉਹ ਪੜ੍ਹੋ ਅਤੇ ਸਮਝੋ।",
+              "ਹਾਲਤਾਂ ਦਾ ਸਬੂਤ ਬਣਾਉਣ ਲਈ ਤਸਵੀਰਾਂ ਖਿੱਚੋ—ਖ਼ਾਸ ਕਰਕੇ ਜੋ ਪਹਿਲਾਂ ਤੋਂ ਖਰਾਬ ਜਾਂ ਟੁੱਟਿਆ ਹੋਇਆ ਹੈ।"
             ],
             "do_not": [
-              "Sign things that are false.",
-              "If you have a pet, do not sign that you do not own one.",
-              "If there are bad conditions, do not sign that the place is in good condition."
+              "ਝੂਠੀਆਂ ਗੱਲਾਂ 'ਤੇ ਸਾਇਨ ਨਾ ਕਰੋ।",
+              "ਜੇ ਤੁਹਾਡੇ ਕੋਲ ਪਾਲਤੂ ਜਾਨਵਰ ਹੈ, ਤਾਂ ਇਹ ਨਾ ਸਾਇਨ ਕਰੋ ਕਿ ਤੁਹਾਡੇ ਕੋਲ ਨਹੀਂ ਹੈ।",
+              "ਜੇ ਹਾਲਤਾਂ ਮਾੜੀਆਂ ਹਨ, ਤਾਂ ਇਹ ਨਾ ਸਾਇਨ ਕਰੋ ਕਿ ਘਰ ਚੰਗੀ ਹਾਲਤ ਵਿੱਚ ਹੈ।"
             ]
           },
-          "during_heading": "During the Rental:",
+          "during_heading": "ਕਿਰਾਏਦਾਰੀ ਦੌਰਾਨ:",
           "during": {
             "do": [
-              "Pay rent on time.",
-              "Ask for receipts for rent payments, which clearly state the landlord's name, date covered, and amount paid.",
-              "Talk to a lawyer or housing advocate at the first sign of trouble."
+              "ਕਿਰਾਇਆ ਸਮੇਂ 'ਤੇ ਭਰੋ।",
+              "ਕਿਰਾਏ ਦੀ ਭੁਗਤਾਨ ਰਸੀਦਾਂ ਮੰਗੋ, ਜਿਨ੍ਹਾਂ 'ਤੇ ਮਕਾਨ ਮਾਲਕ ਦਾ ਨਾਮ, ਕਵਰ ਕੀਤੀ ਅਵਧੀ, ਅਤੇ ਦਿੱਤੀ ਰਕਮ ਸਾਫ਼ ਲਿਖੀ ਹੋਵੇ।",
+              "ਪਹਿਲੀ ਹੀ ਗੜਬੜ 'ਤੇ ਵਕੀਲ ਜਾਂ housing advocate ਨਾਲ ਗੱਲ ਕਰੋ।"
             ],
             "do_not": [
-              "Pay rent in cash.",
-              "Accept false or incorrect receipts.",
-              "Violate the lease agreement.",
-              "Sign anything you do not understand."
+              "ਕਿਰਾਇਆ ਕੈਸ਼ ਵਿੱਚ ਨਾ ਦਿਓ।",
+              "ਝੂਠੀਆਂ ਜਾਂ ਗਲਤ ਰਸੀਦਾਂ ਕਬੂਲ ਨਾ ਕਰੋ।",
+              "lease agreement ਦੀ ਉਲੰਘਣਾ ਨਾ ਕਰੋ।",
+              "ਜੋ ਤੁਸੀਂ ਨਹੀਂ ਸਮਝਦੇ, ਉਸ 'ਤੇ ਸਾਇਨ ਨਾ ਕਰੋ।"
             ]
           },
-          "move_out_heading": "When You Move Out:",
+          "move_out_heading": "ਜਦੋਂ ਤੁਸੀਂ ਘਰ ਖਾਲੀ ਕਰਦੇ ਹੋ:",
           "move_out": {
             "do": [
-              "Give more than 30 days written notice. Mail it with proof of mailing (certified mail or USPS Priority Mail).",
-              "Ask for a move out inspection, and take pictures of how you left the apartment.",
-              "Talk to a lawyer or housing advocate at the first sign of trouble."
+              "30 ਦਿਨਾਂ ਤੋਂ ਵੱਧ ਪਹਿਲਾਂ ਲਿਖਤੀ ਨੋਟਿਸ ਦਿਓ। ਇਸਨੂੰ proof of mailing ਨਾਲ ਭੇਜੋ (certified mail ਜਾਂ USPS Priority Mail)।",
+              "move-out inspection ਮੰਗੋ, ਅਤੇ ਤੁਸੀਂ ਅਪਾਰਟਮੈਂਟ ਕਿਵੇਂ ਛੱਡਿਆ ਉਸ ਦੀਆਂ ਤਸਵੀਰਾਂ ਖਿੱਚੋ।",
+              "ਪਹਿਲੀ ਹੀ ਗੜਬੜ 'ਤੇ ਵਕੀਲ ਜਾਂ housing advocate ਨਾਲ ਗੱਲ ਕਰੋ।"
             ]
           }
         }
