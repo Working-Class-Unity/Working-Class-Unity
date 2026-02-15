@@ -315,35 +315,35 @@
         }
       },
       "chapter-2": {
-        "title": "Chapter 2: Paying Rent",
-        "summary": "This chapter helps you pay rent in ways that create proof and reduce legal risk.",
-        "goal": "Protect payment evidence and follow notice instructions exactly.",
+        "title": "ਅਧਿਆਇ 2: ਕਿਰਾਇਆ ਭਰਨਾ",
+        "summary": "ਇਹ ਅਧਿਆਇ ਤੁਹਾਨੂੰ ਕਿਰਾਇਆ ਇਸ ਤਰ੍ਹਾਂ ਭਰਨ ਵਿੱਚ ਮਦਦ ਕਰਦਾ ਹੈ ਕਿ ਸਬੂਤ ਬਣੇ ਅਤੇ ਕਾਨੂੰਨੀ ਜੋਖਮ ਘੱਟ ਹੋਵੇ।",
+        "goal": "ਭੁਗਤਾਨ ਦਾ ਸਬੂਤ ਸੁਰੱਖਿਅਤ ਰੱਖੋ ਅਤੇ ਨੋਟਿਸ ਦੀਆਂ ਹਦਾਇਤਾਂ ਬਿਲਕੁਲ ਠੀਕ ਤਰ੍ਹਾਂ ਫੋਲੋ ਕਰੋ।",
         "evidence_checklist": [
-          "Money order or cashier check stubs",
-          "Dated receipts showing amount and coverage period",
-          "Mailing receipts with delivery confirmation"
+          "money order ਜਾਂ cashier's check ਦੇ stubs",
+          "ਮਿਤੀ ਵਾਲੀਆਂ ਰਸੀਦਾਂ (ਰਕਮ ਅਤੇ ਕਵਰ ਕੀਤੀ ਅਵਧੀ ਸਮੇਤ)",
+          "delivery confirmation ਵਾਲੀਆਂ mailing receipts"
         ],
         "common_mistakes": [
-          "Using regular mail without tracking",
-          "Missing payment method instructions in notices",
-          "Assuming late-fee terms create a legal grace period"
+          "tracking ਤੋਂ ਬਿਨਾਂ regular mail ਵਰਤਣਾ",
+          "ਨੋਟਿਸ ਵਿੱਚ ਦਿੱਤੀਆਂ payment method ਹਦਾਇਤਾਂ ਮਿਸ ਕਰਨਾ",
+          "ਸੋਚਣਾ ਕਿ late-fee ਵਾਲੀ ਸ਼ਰਤ ਆਪੇ ਹੀ grace period ਬਣਾਉਂਦੀ ਹੈ"
         ],
-        "escalate_when": "Landlord rejects compliant payment or claims nonpayment after documented delivery.",
+        "escalate_when": "ਮਕਾਨ ਮਾਲਕ compliant ਭੁਗਤਾਨ ਨੂੰ ਰੱਦ ਕਰੇ ਜਾਂ documented delivery ਹੋਣ ਦੇ ਬਾਵਜੂਦ nonpayment ਦਾ ਦਾਅਵਾ ਕਰੇ।",
         "source_notes": [
-          "California unlawful detainer notice rules",
-          "Lease-specific payment method and due-date requirements"
+          "California unlawful detainer ਨੋਟਿਸ ਨਿਯਮ",
+          "lease-specific payment method ਅਤੇ due-date requirements"
         ],
-        "last_reviewed": "February 6, 2026",
+        "last_reviewed": "6 ਫਰਵਰੀ, 2026",
         "sections": {
           "paying-rent": {
-            "title": "Easy Steps to Protect Yourself",
-            "summary": "Payment methods, witnesses, and receipt rules that help prove payment.",
-            "keywords": ["rent", "money order", "receipt", "mail proof", "due date"]
+            "title": "ਆਪਣੇ ਆਪ ਨੂੰ ਸੁਰੱਖਿਅਤ ਕਰਨ ਲਈ ਸੌਖੇ ਕਦਮ",
+            "summary": "Payment methods, witness, ਅਤੇ ਰਸੀਦ ਵਾਲੇ ਨਿਯਮ ਜੋ ਭੁਗਤਾਨ ਸਾਬਤ ਕਰਨ ਵਿੱਚ ਮਦਦ ਕਰਦੇ ਹਨ।",
+            "keywords": ["rent", "ਕਿਰਾਇਆ", "money order", "receipt", "mail proof", "due date"]
           },
           "notice-to-pay": {
             "title": "Notice to Pay Rent",
-            "summary": "How to respond to a notice while preserving legal defenses and timing proof.",
-            "keywords": ["notice to pay", "3 day notice", "delivery", "witness", "deadline"]
+            "summary": "ਨੋਟਿਸ ਦਾ ਜਵਾਬ ਕਿਵੇਂ ਦੇਣਾ ਤਾਂ ਜੋ ਕਾਨੂੰਨੀ ਬਚਾਅ ਬਚੇ ਅਤੇ timing proof ਬਣੇ।",
+            "keywords": ["notice to pay", "3 day notice", "delivery", "witness", "deadline", "ਨੋਟਿਸ", "ਡੈਡਲਾਈਨ"]
           }
         }
       },
@@ -690,49 +690,49 @@
       },
       "chapter-2": {
         "paying-rent": {
-          "title": "Easy Steps to Protect Yourself and Your Rent Money",
-          "forms_heading": "Forms of Payment",
+          "title": "ਆਪਣੇ ਆਪ ਨੂੰ ਅਤੇ ਆਪਣੇ ਕਿਰਾਏ ਦੇ ਪੈਸੇ ਨੂੰ ਸੁਰੱਖਿਅਤ ਕਰਨ ਲਈ ਸੌਖੇ ਕਦਮ",
+          "forms_heading": "ਭੁਗਤਾਨ ਦੇ ਤਰੀਕੇ",
           "forms_list": [
-            "Payment in person is always preferable.",
-            "Never pay with cash or a personal check.",
-            "Always buy a money order or cashier's check with the date of purchase clearly stamped on it."
+            "ਸਾਮ੍ਹਣੇ ਜਾ ਕੇ ਭੁਗਤਾਨ ਕਰਨਾ ਹਮੇਸ਼ਾਂ ਵਧੀਆ ਹੁੰਦਾ ਹੈ।",
+            "ਕਦੇ ਵੀ ਕੈਸ਼ ਜਾਂ personal check ਨਾਲ ਭੁਗਤਾਨ ਨਾ ਕਰੋ।",
+            "ਹਮੇਸ਼ਾਂ money order ਜਾਂ cashier's check ਲਵੋ ਜਿਸ 'ਤੇ ਖਰੀਦ ਦੀ ਮਿਤੀ ਸਾਫ਼ ਮੋਹਰ ਹੋਵੇ।"
           ],
-          "personal_heading": "Personal Delivery or Pick-up",
+          "personal_heading": "ਸਿੱਧਾ ਦੇਣਾ ਜਾਂ ਲੈਣਾ",
           "personal_list": [
-            "If you pay someone directly, take a witness with you (preferably not a family member).",
-            "Ask for a receipt or a signed paper to show proof of payment that clearly states the landlord's name, date covered by the rent, and the amount paid.",
-            "To be safe, take a photo of the receipt together with your payment method."
+            "ਜੇ ਤੁਸੀਂ ਕਿਸੇ ਨੂੰ ਸਿੱਧਾ ਭੁਗਤਾਨ ਕਰਦੇ ਹੋ, ਤਾਂ ਆਪਣੇ ਨਾਲ ਇੱਕ witness ਲੈ ਜਾਓ (ਚੰਗਾ ਹੈ ਪਰਿਵਾਰਕ ਮੈਂਬਰ ਨਾ ਹੋਵੇ)।",
+            "ਭੁਗਤਾਨ ਦਾ ਸਬੂਤ ਲਈ ਰਸੀਦ ਜਾਂ ਸਾਇਨ ਕੀਤਾ ਕਾਗਜ਼ ਮੰਗੋ ਜਿਸ 'ਤੇ ਮਕਾਨ ਮਾਲਕ ਦਾ ਨਾਮ, ਕਿਰਾਏ ਨਾਲ ਕਵਰ ਕੀਤੀ ਅਵਧੀ, ਅਤੇ ਦਿੱਤੀ ਰਕਮ ਸਾਫ਼ ਲਿਖੀ ਹੋਵੇ।",
+            "ਸੁਰੱਖਿਅਤ ਰਹਿਣ ਲਈ, ਰਸੀਦ ਦੀ ਫੋਟੋ ਆਪਣੇ payment method ਦੇ ਨਾਲ ਖਿੱਚੋ।"
           ],
-          "mail_heading": "By Mail",
+          "mail_heading": "ਮੇਲ ਰਾਹੀਂ",
           "mail_list": [
-            "Payment in person is always preferable.",
-            "Never pay your rent via regular mail.",
-            "Make sure you mail it with proof of mailing (certified mail with no signature required, or mail with a delivery confirmation receipt, such as USPS Priority Mail).",
-            "If you mail the rent and it is lost, you are responsible for the lost money. You must have proof that you mailed it (your testimony is not sufficient)."
+            "ਸਾਮ੍ਹਣੇ ਜਾ ਕੇ ਭੁਗਤਾਨ ਕਰਨਾ ਹਮੇਸ਼ਾਂ ਵਧੀਆ ਹੁੰਦਾ ਹੈ।",
+            "regular mail ਰਾਹੀਂ ਕਿਰਾਇਆ ਕਦੇ ਨਾ ਭੇਜੋ।",
+            "ਪੈਸੇ proof of mailing ਨਾਲ ਹੀ ਭੇਜੋ (certified mail—no signature required, ਜਾਂ delivery confirmation receipt ਵਾਲਾ ਮੇਲ, ਜਿਵੇਂ USPS Priority Mail)।",
+            "ਜੇ ਤੁਸੀਂ ਮੇਲ ਨਾਲ ਕਿਰਾਇਆ ਭੇਜੋ ਅਤੇ ਉਹ ਗੁੰਮ ਹੋ ਜਾਏ, ਤਾਂ ਗੁੰਮ ਪੈਸੇ ਦੀ ਜ਼ਿੰਮੇਵਾਰੀ ਤੁਹਾਡੀ ਹੋਵੇਗੀ। ਤੁਹਾਡੇ ਕੋਲ proof ਹੋਣਾ ਚਾਹੀਦਾ ਹੈ ਕਿ ਤੁਸੀਂ ਮੇਲ ਕੀਤਾ ਸੀ (ਸਿਰਫ਼ ਤੁਹਾਡਾ ਕਹਿਣਾ ਕਾਫ਼ੀ ਨਹੀਂ)।"
           ],
-          "when_heading": "When to Pay Rent",
-          "when_p": "Rent is due on the 1st of the month—unless your contract states a different date. The law does not recognize a grace period unless your contract states that you have one. A term in your lease stating that a late fee will apply if you pay after the 3rd or the 5th of the month, for example, is not a grace period."
+          "when_heading": "ਕਿਰਾਇਆ ਕਦੋਂ ਭਰਨਾ ਹੈ",
+          "when_p": "ਆਮ ਤੌਰ 'ਤੇ ਕਿਰਾਇਆ ਮਹੀਨੇ ਦੀ 1 ਤਾਰੀਖ ਨੂੰ ਦੇਣਾ ਹੁੰਦਾ ਹੈ—ਜਦੋਂ ਤੱਕ ਤੁਹਾਡੇ contract ਵਿੱਚ ਕੋਈ ਹੋਰ ਮਿਤੀ ਨਾ ਲਿਖੀ ਹੋਵੇ। ਕਾਨੂੰਨ grace period ਨੂੰ ਨਹੀਂ ਮੰਨਦਾ ਜਦੋਂ ਤੱਕ ਤੁਹਾਡੇ contract ਵਿੱਚ ਸਪੱਸ਼ਟ ਤੌਰ 'ਤੇ ਇਹ ਨਾ ਲਿਖਿਆ ਹੋਵੇ ਕਿ ਤੁਹਾਡੇ ਕੋਲ grace period ਹੈ। ਉਦਾਹਰਨ ਲਈ, lease ਵਿੱਚ ਇਹ ਲਿਖਿਆ ਹੋਵੇ ਕਿ 3 ਤਾਰੀਖ ਜਾਂ 5 ਤਾਰੀਖ ਤੋਂ ਬਾਅਦ ਭੁਗਤਾਨ ਕਰਨ 'ਤੇ late fee ਲੱਗੇਗੀ—ਇਹ grace period ਨਹੀਂ ਹੁੰਦੀ।"
         },
         "notice-to-pay": {
-          "intro": "If you are served a Notice to Pay Rent, pay attention. Check how the Notice requires payment, and do exactly as it requires.",
-          "mail_heading": "Payment by Mail",
-          "mail_p": "If the Notice states you must pay by mail OR if the address provided only allows you to pay by mail:",
+          "intro": "ਜੇ ਤੁਹਾਨੂੰ Notice to Pay Rent ਮਿਲੇ, ਧਿਆਨ ਦਿਓ। ਨੋਟਿਸ ਵਿੱਚ ਭੁਗਤਾਨ ਕਰਨ ਦਾ ਜੋ ਤਰੀਕਾ ਲਿਖਿਆ ਹੈ, ਉਹੀ ਬਿਲਕੁਲ ਠੀਕ ਤਰ੍ਹਾਂ ਕਰੋ।",
+          "mail_heading": "ਮੇਲ ਰਾਹੀਂ ਭੁਗਤਾਨ",
+          "mail_p": "ਜੇ ਨੋਟਿਸ ਵਿੱਚ ਲਿਖਿਆ ਹੈ ਕਿ ਤੁਹਾਨੂੰ ਮੇਲ ਰਾਹੀਂ ਭੁਗਤਾਨ ਕਰਨਾ ਹੀ ਹੈ, ਜਾਂ ਦਿੱਤਾ ਪਤਾ ਸਿਰਫ਼ ਮੇਲ ਰਾਹੀਂ ਹੀ ਭੁਗਤਾਨ ਦੀ ਇਜਾਜ਼ਤ ਦਿੰਦਾ ਹੈ:",
           "mail_list": [
-            "Mail the rent to the address stated in the Notice.",
-            "Mail it with proof of mailing."
+            "ਨੋਟਿਸ ਵਿੱਚ ਦਿੱਤੇ ਪਤੇ 'ਤੇ ਕਿਰਾਇਆ ਮੇਲ ਕਰੋ।",
+            "proof of mailing ਨਾਲ ਹੀ ਭੇਜੋ।"
           ],
-          "in_person_heading": "Payment in Person",
-          "in_person_p": "If the Notice does not direct you to pay by mail and allows you the option to pay in person OR if it directs you to pay in person:",
+          "in_person_heading": "ਸਾਮ੍ਹਣੇ ਜਾ ਕੇ ਭੁਗਤਾਨ",
+          "in_person_p": "ਜੇ ਨੋਟਿਸ ਤੁਹਾਨੂੰ ਮੇਲ ਰਾਹੀਂ ਭੁਗਤਾਨ ਕਰਨ ਲਈ ਨਹੀਂ ਕਹਿੰਦਾ ਅਤੇ ਸਾਮ੍ਹਣੇ ਜਾ ਕੇ ਭੁਗਤਾਨ ਕਰਨ ਦੀ ਚੋਣ ਦਿੰਦਾ ਹੈ, ਜਾਂ ਜੇ ਉਹ ਸਿੱਧਾ ਸਾਮ੍ਹਣੇ ਜਾ ਕੇ ਭੁਗਤਾਨ ਕਰਨ ਲਈ ਕਹਿੰਦਾ ਹੈ:",
           "in_person_list": [
-            "Deliver during the hours indicated in the Notice.",
-            "Take a witness with you (preferably not a family member).",
-            "Ask for a receipt or a signed paper to show proof of payment."
+            "ਨੋਟਿਸ ਵਿੱਚ ਦਿੱਤੇ ਘੰਟਿਆਂ ਦੌਰਾਨ ਹੀ ਭੁਗਤਾਨ ਦਿਓ।",
+            "ਆਪਣੇ ਨਾਲ ਇੱਕ witness ਲੈ ਜਾਓ (ਚੰਗਾ ਹੈ ਪਰਿਵਾਰਕ ਮੈਂਬਰ ਨਾ ਹੋਵੇ)।",
+            "ਭੁਗਤਾਨ ਦਾ ਸਬੂਤ ਲਈ ਰਸੀਦ ਜਾਂ ਸਾਇਨ ਕੀਤਾ ਕਾਗਜ਼ ਮੰਗੋ।"
           ],
-          "pickup_heading": "Payment Pick-up",
-          "pickup_p": "If the Notice states that the landlord/manager will pick up the rent:",
+          "pickup_heading": "ਭੁਗਤਾਨ ਲੈ ਜਾਣਾ (Pick-up)",
+          "pickup_p": "ਜੇ ਨੋਟਿਸ ਵਿੱਚ ਲਿਖਿਆ ਹੈ ਕਿ landlord/manager ਕਿਰਾਇਆ ਲੈ ਜਾਣ ਲਈ ਆਵੇਗਾ:",
           "pickup_list": [
-            "Buy the money order(s) right away and have them ready for pick up. This means that all adults in the household know where they are and can pay the landlord/manager when they come.",
-            "If no one comes to pick it up by 2:00 PM on the final day given to make payment, then mail your rent immediately with proof of mailing, and keep the receipt from the Post Office that shows the time you mailed the rent."
+            "money order(s) ਤੁਰੰਤ ਖਰੀਦੋ ਅਤੇ pick up ਲਈ ਤਿਆਰ ਰੱਖੋ। ਇਸਦਾ ਮਤਲਬ ਹੈ ਕਿ ਘਰ ਦੇ ਸਾਰੇ ਵੱਡੇ ਮੈਂਬਰਾਂ ਨੂੰ ਪਤਾ ਹੋਵੇ ਕਿ ਇਹ ਕਿੱਥੇ ਹਨ ਅਤੇ ਜਦੋਂ landlord/manager ਆਵੇ ਤਾਂ ਭੁਗਤਾਨ ਕੀਤਾ ਜਾ ਸਕੇ।",
+            "ਜੇ ਭੁਗਤਾਨ ਲਈ ਦਿੱਤੇ ਆਖਰੀ ਦਿਨ 2:00 PM ਤੱਕ ਕੋਈ ਲੈਣ ਨਹੀਂ ਆਉਂਦਾ, ਤਾਂ ਤੁਰੰਤ proof of mailing ਨਾਲ ਕਿਰਾਇਆ ਮੇਲ ਕਰੋ, ਅਤੇ Post Office ਦੀ ਉਹ ਰਸੀਦ ਸੰਭਾਲੋ ਜਿਸ 'ਤੇ ਸਮਾਂ ਲਿਖਿਆ ਹੋਵੇ ਕਿ ਤੁਸੀਂ ਕਿਰਾਇਆ ਕਦੋਂ ਮੇਲ ਕੀਤਾ ਸੀ।"
           ]
         }
       },
