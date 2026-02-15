@@ -391,61 +391,61 @@
         }
       },
       "chapter-4": {
-        "title": "Chapter 4: Evictions",
-        "summary": "Use this chapter to identify legal grounds, deadlines, and possible case outcomes.",
-        "goal": "Respond quickly to notices, preserve defenses, and avoid avoidable displacement.",
+        "title": "ਅਧਿਆਇ 4: ਬੇਦਖਲੀ",
+        "summary": "ਇਸ ਅਧਿਆਇ ਨਾਲ ਬੇਦਖਲੀ ਦੇ ਕਾਨੂੰਨੀ ਆਧਾਰ, ਡੈਡਲਾਈਨਾਂ, ਅਤੇ ਕੇਸ ਦੇ ਸੰਭਾਵਿਤ ਨਤੀਜੇ ਪਛਾਣੋ।",
+        "goal": "ਨੋਟਿਸ ਮਿਲਦੇ ਹੀ ਤੇਜ਼ੀ ਨਾਲ ਜਵਾਬ ਦਿਓ, ਬਚਾਅ (defenses) ਸੰਭਾਲੋ, ਅਤੇ ਟਾਲੀ ਜਾ ਸਕਣ ਵਾਲੀ ਬੇਘਰਤਾ ਤੋਂ ਬਚੋ।",
         "evidence_checklist": [
-          "All notices with service date and method",
-          "Lease and payment records",
-          "Repair/retaliation documentation if relevant"
+          "ਸਾਰੇ notices (service date ਅਤੇ ਤਰੀਕੇ ਸਮੇਤ)",
+          "lease ਅਤੇ payment records",
+          "ਜੇ ਲਾਗੂ ਹੋਵੇ ਤਾਂ repairs/retaliation ਦਾ ਰਿਕਾਰਡ"
         ],
         "common_mistakes": [
-          "Missing the court response deadline",
-          "Signing voluntary move-out agreements without advice",
-          "Withholding rent without legal consultation"
+          "ਕੋਰਟ response ਦੀ ਡੈਡਲਾਈਨ ਮਿਸ ਕਰ ਦੇਣਾ",
+          "ਸਲਾਹ ਤੋਂ ਬਿਨਾਂ voluntary move-out agreement 'ਤੇ ਸਾਇਨ ਕਰ ਦੇਣਾ",
+          "ਕਾਨੂੰਨੀ ਸਲਾਹ ਤੋਂ ਬਿਨਾਂ ਕਿਰਾਇਆ ਰੋਕਣਾ"
         ],
-        "escalate_when": "You receive a summons, writ, lockout threat, or relocation terms you do not understand.",
+        "escalate_when": "ਤੁਹਾਨੂੰ summons, writ, lockout ਦੀ ਧਮਕੀ, ਜਾਂ ਅਜਿਹੇ relocation terms ਮਿਲਣ ਜੋ ਤੁਹਾਨੂੰ ਸਮਝ ਨਾ ਆਉਣ।",
         "source_notes": [
           "AB 1482 just-cause framework",
-          "California unlawful detainer process and court timelines",
-          "California Civil Code 1942.4 limits on rent demands"
+          "California unlawful detainer process ਅਤੇ court timelines",
+          "California Civil Code 1942.4 ਅਧੀਨ rent demands ਉੱਤੇ ਸੀਮਾਵਾਂ"
         ],
-        "last_reviewed": "February 6, 2026",
+        "last_reviewed": "6 ਫਰਵਰੀ, 2026",
         "sections": {
           "legal-reasons": {
-            "title": "Legal Reasons for Evictions",
-            "summary": "What qualifies as just cause under current California protections.",
-            "keywords": ["legal reasons", "just cause", "ab 1482"]
+            "title": "ਬੇਦਖਲੀ ਦੇ ਕਾਨੂੰਨੀ ਕਾਰਨ",
+            "summary": "ਮੌਜੂਦਾ California protections ਅਧੀਨ ਕੀ ਕੁਝ just cause ਬਣਦਾ ਹੈ।",
+            "keywords": ["legal reasons", "just cause", "AB 1482", "ਕਾਨੂੰਨੀ ਕਾਰਨ"]
           },
           "at-fault": {
-            "title": "At-Fault Evictions",
-            "summary": "Acts or lease violations landlords can use for eviction claims.",
-            "keywords": ["at fault", "lease breach", "nuisance", "entry denial"]
+            "title": "ਦੋਸ਼ ਵਾਲੀ ਬੇਦਖਲੀ (At-Fault)",
+            "summary": "ਉਹ ਕਰਤੂਤਾਂ ਜਾਂ lease ਉਲੰਘਣਾਵਾਂ ਜਿਨ੍ਹਾਂ ਨੂੰ ਮਕਾਨ ਮਾਲਕ ਬੇਦਖਲੀ ਦੇ ਦਾਅਵੇ ਲਈ ਵਰਤ ਸਕਦਾ ਹੈ।",
+            "keywords": ["at fault", "lease breach", "nuisance", "entry denial", "ਦੋਸ਼"]
           },
           "no-fault": {
-            "title": "No-Fault Evictions",
-            "summary": "No-fault grounds that generally require relocation compensation.",
-            "keywords": ["no fault", "ellis act", "relocation", "owner move in"]
+            "title": "ਬਿਨਾਂ ਦੋਸ਼ ਵਾਲੀ ਬੇਦਖਲੀ (No-Fault)",
+            "summary": "ਬਿਨਾਂ ਦੋਸ਼ ਵਾਲੇ ਕਾਰਨ ਜਿਨ੍ਹਾਂ ਵਿੱਚ ਆਮ ਤੌਰ 'ਤੇ relocation compensation ਲੋੜੀਂਦੀ ਹੁੰਦੀ ਹੈ।",
+            "keywords": ["no fault", "Ellis Act", "relocation", "owner move in"]
           },
           "no-rent-stabilization": {
-            "title": "If You DO NOT Live in Rent Stabilization",
-            "summary": "Notice windows and 3-day triggers outside rent stabilization coverage.",
-            "keywords": ["60 day notice", "30 day notice", "3 day notice"]
+            "title": "ਜੇ ਤੁਹਾਡਾ ਘਰ Rent Stabilization ਦੇ ਅਧੀਨ ਨਹੀਂ",
+            "summary": "Rent Stabilization coverage ਤੋਂ ਬਾਹਰ notice windows ਅਤੇ 3-day triggers।",
+            "keywords": ["60-day notice", "30-day notice", "3-day notice", "Rent Stabilization"]
           },
           "eviction-process": {
-            "title": "Eviction Process",
-            "summary": "Timeline from notice to court outcomes and sheriff enforcement.",
-            "keywords": ["summons", "trial", "writ of possession", "deadline"]
+            "title": "ਬੇਦਖਲੀ ਦੀ ਪ੍ਰਕਿਰਿਆ (Eviction Process)",
+            "summary": "notice ਤੋਂ ਲੈ ਕੇ court outcomes ਅਤੇ sheriff enforcement ਤੱਕ ਦੀ ਟਾਈਮਲਾਈਨ।",
+            "keywords": ["summons", "trial", "writ of possession", "deadline", "timeline"]
           },
           "voluntary-vacate": {
             "title": "Voluntary Vacate Agreements",
-            "summary": "Risks in cash-for-keys and why to seek advice before signing.",
-            "keywords": ["cash for keys", "buyout", "voluntary vacate"]
+            "summary": "cash-for-keys ਦੇ ਜੋਖਮ ਅਤੇ ਸਾਇਨ ਕਰਨ ਤੋਂ ਪਹਿਲਾਂ ਸਲਾਹ ਲੈਣ ਦੀ ਲੋੜ।",
+            "keywords": ["cash-for-keys", "buyout", "voluntary vacate"]
           },
           "estoppel": {
             "title": "Estoppel Certificate",
-            "summary": "How estoppel certificates can document terms during ownership changes.",
-            "keywords": ["estoppel", "ownership change", "occupancy terms"]
+            "summary": "ownership change ਦੌਰਾਨ estoppel certificates ਕਿਵੇਂ terms ਨੂੰ ਦਸਤਾਵੇਜ਼ ਕਰ ਸਕਦੇ ਹਨ।",
+            "keywords": ["estoppel", "ownership change", "occupancy terms", "terms"]
           }
         }
       },
@@ -783,166 +783,166 @@
       },
       "chapter-4": {
         "legal-reasons": {
-          "p1": "The Tenant Protection Act of 2019 (AB 1482) introduced statewide rent control and just cause eviction protections for certain residential tenants."
+          "p1": "Tenant Protection Act of 2019 (AB 1482) ਨੇ ਸੂਬਾ ਪੱਧਰ 'ਤੇ rent control ਅਤੇ just cause eviction protections ਨੂੰ ਕੁਝ ਰਿਹਾਇਸ਼ੀ ਕਿਰਾਏਦਾਰਾਂ ਲਈ ਲਾਗੂ ਕੀਤਾ।"
         },
         "at-fault": {
           "items": [
-            "Failure to pay rent as required by the lease agreement.",
-            "Breach of a material lease term: Violating significant terms of the lease, such as unauthorized alterations or prohibited activities.",
-            "Refusal to sign a new lease: declining to sign a lease renewal or extension with similar terms when requested by the landlord.",
-            "Criminal activity: committing crimes on the property or engaging in criminal acts directed at the landlord or their agent.",
-            "Nuisance or waste: engaging in behavior that disturbs other tenants or causes damage.",
-            "Denial of lawful entry: refusing to allow the landlord access to the unit for legitimate reasons, such as repairs or inspections.",
-            "The tenant unreasonably interferes with the landlord's ability to perform major renovation to a unit or the building."
+            "lease agreement ਮੁਤਾਬਕ ਲਾਜ਼ਮੀ ਕਿਰਾਇਆ ਨਾ ਭਰਨਾ।",
+            "lease ਦੀ ਕਿਸੇ ਮਹੱਤਵਪੂਰਨ ਸ਼ਰਤ ਦੀ ਉਲੰਘਣਾ: ਜਿਵੇਂ ਬਿਨਾਂ ਇਜਾਜ਼ਤ ਤਬਦੀਲੀਆਂ ਕਰਨਾ ਜਾਂ ਮਨਾਹੀਸ਼ੁਦਾ ਗਤੀਵਿਧੀਆਂ।",
+            "ਨਵਾਂ lease ਸਾਇਨ ਕਰਨ ਤੋਂ ਇਨਕਾਰ: ਜਦੋਂ ਮਕਾਨ ਮਾਲਕ ਕਹੇ ਅਤੇ ਸ਼ਰਤਾਂ ਮਿਲਦੀਆਂ-ਜੁਲਦੀਆਂ ਹੋਣ, ਤਾਂ renewal ਜਾਂ extension 'ਤੇ ਸਾਇਨ ਨਾ ਕਰਨਾ।",
+            "Criminal activity: property 'ਤੇ ਜੁਰਮ ਕਰਨਾ ਜਾਂ ਮਕਾਨ ਮਾਲਕ/ਉਸਦੇ agent ਵਿਰੁੱਧ ਅਪਰਾਧਕ ਕਿਰਿਆਵਾਂ।",
+            "Nuisance ਜਾਂ waste: ਐਸਾ ਵਿਹਾਰ ਜੋ ਹੋਰ ਕਿਰਾਏਦਾਰਾਂ ਨੂੰ ਤੰਗ ਕਰੇ ਜਾਂ ਨੁਕਸਾਨ ਕਰੇ।",
+            "lawful entry ਤੋਂ ਇਨਕਾਰ: ਮੁਰੰਮਤ ਜਾਂ inspection ਵਰਗੇ ਜਾਇਜ਼ ਕਾਰਨਾਂ ਲਈ ਮਕਾਨ ਮਾਲਕ ਨੂੰ ਯੂਨਿਟ ਵਿੱਚ ਦਾਖ਼ਲ ਹੋਣ ਨਾ ਦੇਣਾ।",
+            "ਕਿਰਾਏਦਾਰ ਬਿਨਾਂ ਵਜ੍ਹਾ ਮਕਾਨ ਮਾਲਕ ਨੂੰ ਯੂਨਿਟ ਜਾਂ ਬਿਲਡਿੰਗ ਦੀ ਵੱਡੀ renovation ਕਰਨ ਤੋਂ ਰੋਕਦਾ/ਰੋਕਦੀ ਹੈ।"
           ]
         },
         "no-fault": {
           "compensation_note": {
-            "title": "Compensation rule",
-            "text": "The landlord is required by law to compensate a tenant for relocation costs for the reasons below."
+            "title": "ਮੁਆਵਜ਼ੇ ਦਾ ਨਿਯਮ",
+            "text": "ਹੇਠ ਦਿੱਤੇ ਕਾਰਨਾਂ ਲਈ ਕਾਨੂੰਨ ਮੁਤਾਬਕ ਮਕਾਨ ਮਾਲਕ ਨੂੰ ਕਿਰਾਏਦਾਰ ਨੂੰ relocation costs ਲਈ ਮੁਆਵਜ਼ਾ ਦੇਣਾ ਪੈਂਦਾ ਹੈ।"
           },
           "items": [
-            "If the landlord needs the apartment to move in their child, spouse, parent, manager, and/or themselves.",
-            "If the landlord is going to demolish the building or wants to remove the apartment from the housing market (Ellis Act).",
-            "If the landlord was told by a government agency to empty the units.",
-            "If the Federal Department of Housing and Urban Development (HUD) owns the building and wants to sell it.",
-            "If the building is a residential hotel that the landlord will convert or demolish.",
-            "If the landlord will convert the building to government certified affordable housing."
+            "ਜੇ ਮਕਾਨ ਮਾਲਕ ਅਪਾਰਟਮੈਂਟ ਵਿੱਚ ਆਪਣੇ ਆਪ, ਆਪਣਾ ਬੱਚਾ, ਜੀਵਨਸਾਥੀ (spouse), ਮਾਪੇ, manager, ਆਦਿ ਨੂੰ ਵਸਾਉਣਾ ਚਾਹੇ।",
+            "ਜੇ ਮਕਾਨ ਮਾਲਕ ਇਮਾਰਤ ਨੂੰ demolish ਕਰਨ ਵਾਲਾ ਹੋਵੇ ਜਾਂ ਅਪਾਰਟਮੈਂਟ ਨੂੰ housing market ਤੋਂ ਹਟਾਉਣਾ ਚਾਹੇ (Ellis Act)।",
+            "ਜੇ ਕਿਸੇ ਸਰਕਾਰੀ ਏਜੰਸੀ ਨੇ ਮਕਾਨ ਮਾਲਕ ਨੂੰ ਯੂਨਿਟ ਖਾਲੀ ਕਰਨ ਲਈ ਕਿਹਾ ਹੋਵੇ।",
+            "ਜੇ Federal Department of Housing and Urban Development (HUD) ਇਮਾਰਤ ਦਾ ਮਾਲਕ ਹੋਵੇ ਅਤੇ ਵੇਚਣਾ ਚਾਹੇ।",
+            "ਜੇ ਇਮਾਰਤ residential hotel ਹੋਵੇ ਜਿਸਨੂੰ ਮਕਾਨ ਮਾਲਕ convert ਜਾਂ demolish ਕਰਨ ਵਾਲਾ ਹੋਵੇ।",
+            "ਜੇ ਮਕਾਨ ਮਾਲਕ ਇਮਾਰਤ ਨੂੰ ਸਰਕਾਰੀ ਤੌਰ 'ਤੇ certified affordable housing ਵਿੱਚ convert ਕਰਨ ਵਾਲਾ ਹੋਵੇ।"
           ]
         },
         "no-rent-stabilization": {
-          "p1": "The landlord may evict you for any reason.",
-          "however": "HOWEVER",
-          "notice_requirement": "the law requires that advance written notice be given to the tenant, stating that the landlord no longer wants to rent to the tenant.",
+          "p1": "ਮਕਾਨ ਮਾਲਕ ਤੁਹਾਨੂੰ ਕਿਸੇ ਵੀ ਕਾਰਨ ਲਈ ਬੇਦਖਲ ਕਰ ਸਕਦਾ ਹੈ।",
+          "however": "ਹਾਲਾਂਕਿ",
+          "notice_requirement": "ਕਾਨੂੰਨ ਮੁਤਾਬਕ ਕਿਰਾਏਦਾਰ ਨੂੰ ਪਹਿਲਾਂ ਤੋਂ ਲਿਖਤੀ ਨੋਟਿਸ ਦੇਣਾ ਲਾਜ਼ਮੀ ਹੈ, ਜਿਸ ਵਿੱਚ ਲਿਖਿਆ ਹੋਵੇ ਕਿ ਮਕਾਨ ਮਾਲਕ ਹੁਣ ਕਿਰਾਏਦਾਰ ਨੂੰ ਘਰ ਨਹੀਂ ਰੱਖਣਾ ਚਾਹੁੰਦਾ।",
           "notice_windows": {
             "more_than_year": {
-              "before": "If the tenant has lived in the unit for ",
-              "duration": "MORE than one year",
-              "middle": ", then the landlord must give a ",
+              "before": "ਜੇ ਕਿਰਾਏਦਾਰ ਯੂਨਿਟ ਵਿੱਚ ",
+              "duration": "ਇੱਕ ਸਾਲ ਤੋਂ ਵੱਧ",
+              "middle": " ਰਹਿੰਦਾ/ਰਹਿੰਦੀ ਆ ਰਿਹਾ/ਰਹੀ ਹੈ, ਤਾਂ ਮਕਾਨ ਮਾਲਕ ਨੂੰ ",
               "notice": "60-day notice"
             },
             "less_than_year": {
-              "before": "If any tenant has lived in the unit for ",
-              "duration": "LESS than one year",
-              "middle": ", then the landlord only has to give ",
+              "before": "ਜੇ ਯੂਨਿਟ ਵਿੱਚ ਕੋਈ ਵੀ ਕਿਰਾਏਦਾਰ ",
+              "duration": "ਇੱਕ ਸਾਲ ਤੋਂ ਘੱਟ",
+              "middle": " ਰਹਿਆ/ਰਹੀ ਹੈ, ਤਾਂ ਮਕਾਨ ਮਾਲਕ ਨੂੰ ਸਿਰਫ਼ ",
               "notice": "30-day notice"
             }
           },
           "three_day": {
             "heading": "3-Day Notice",
-            "p_before": "Under California law, a landlord can evict a tenant with only a ",
+            "p_before": "California ਦੇ ਕਾਨੂੰਨ ਅਧੀਨ, ਮਕਾਨ ਮਾਲਕ ਸਿਰਫ਼ ਇੱਕ ",
             "p_emphasis": "3-DAY",
-            "p_after": " advance written notice for any of the following reasons:",
+            "p_after": " advance written notice ਦੇ ਕੇ ਹੇਠ ਲਿਖੇ ਕਾਰਨਾਂ ਲਈ ਕਿਰਾਏਦਾਰ ਨੂੰ ਬੇਦਖਲ ਕਰ ਸਕਦਾ ਹੈ:",
             "reasons": [
-              "Failure to pay rent.",
-              "A violation of the lease agreement or contract.",
-              "Materially damaging the property.",
-              "Being a nuisance.",
-              "Using the apartment for any illegal activities."
+              "ਕਿਰਾਇਆ ਨਾ ਭਰਨਾ।",
+              "lease agreement ਜਾਂ contract ਦੀ ਉਲੰਘਣਾ।",
+              "property ਨੂੰ ਗੰਭੀਰ ਨੁਕਸਾਨ ਪਹੁੰਚਾਉਣਾ।",
+              "nuisance ਬਣਨਾ/ਤੰਗ ਕਰਨਾ।",
+              "ਅਪਾਰਟਮੈਂਟ ਨੂੰ ਕਿਸੇ ਵੀ illegal activity ਲਈ ਵਰਤਣਾ।"
             ],
-            "p2": "The tenant has 3 days to correct the violation. If corrected within 3 days, they will not have to move out."
+            "p2": "ਕਿਰਾਏਦਾਰ ਕੋਲ ਉਲੰਘਣਾ ਠੀਕ ਕਰਨ ਲਈ 3 ਦਿਨ ਹੁੰਦੇ ਹਨ। ਜੇ 3 ਦਿਨਾਂ ਅੰਦਰ ਠੀਕ ਕਰ ਦਿੱਤੀ ਜਾਵੇ, ਤਾਂ ਘਰ ਛੱਡਣਾ ਨਹੀਂ ਪੈਂਦਾ।"
           },
           "civil_code_note": {
             "title": "California Civil Code 1942.4",
-            "text": "If the landlord has failed to adequately respond to official instructions for over 35 days, the landlord of a dwelling may not demand rent, collect rent, issue a notice of a rent increase, or issue a 3-day notice to pay rent or quit.",
-            "strong": "DO NOT ATTEMPT TO WITHHOLD RENT WITHOUT LEGAL CONSULTATION."
+            "text": "ਜੇ ਮਕਾਨ ਮਾਲਕ 35 ਦਿਨ ਤੋਂ ਵੱਧ official instructions ਦਾ ਢੰਗ ਨਾਲ ਜਵਾਬ ਨਹੀਂ ਦਿੰਦਾ, ਤਾਂ dwelling ਦਾ landlord ਕਿਰਾਇਆ ਮੰਗ ਨਹੀਂ ਸਕਦਾ, ਕਿਰਾਇਆ ਇਕੱਠਾ ਨਹੀਂ ਕਰ ਸਕਦਾ, rent increase ਦਾ ਨੋਟਿਸ ਜਾਰੀ ਨਹੀਂ ਕਰ ਸਕਦਾ, ਜਾਂ 3-day notice to pay rent or quit ਜਾਰੀ ਨਹੀਂ ਕਰ ਸਕਦਾ।",
+            "strong": "ਕਾਨੂੰਨੀ ਸਲਾਹ ਤੋਂ ਬਿਨਾਂ ਕਿਰਾਇਆ ਰੋਕਣ ਦੀ ਕੋਸ਼ਿਸ਼ ਨਾ ਕਰੋ।"
           }
         },
         "eviction-process": {
           "landlord_serves": {
-            "heading": "Landlord serves eviction notice",
-            "p1": "If you receive any of the following documents, respond immediately. If you DO NOT respond, you could lose your home or enter a court process."
+            "heading": "ਮਕਾਨ ਮਾਲਕ ਬੇਦਖਲੀ ਦਾ ਨੋਟਿਸ ਦਿੰਦਾ ਹੈ",
+            "p1": "ਜੇ ਤੁਸੀਂ ਹੇਠਾਂ ਦਿੱਤੇ ਕਿਸੇ ਵੀ ਦਸਤਾਵੇਜ਼ ਨੂੰ ਪ੍ਰਾਪਤ ਕਰੋ, ਤੁਰੰਤ ਕਾਰਵਾਈ ਕਰੋ। ਜੇ ਤੁਸੀਂ ਜਵਾਬ ਨਹੀਂ ਦਿੰਦੇ, ਤਾਂ ਤੁਸੀਂ ਆਪਣਾ ਘਰ ਗੁਆ ਸਕਦੇ ਹੋ ਜਾਂ ਕੋਰਟ ਪ੍ਰਕਿਰਿਆ ਵਿੱਚ ਫਸ ਸਕਦੇ ਹੋ।"
           },
           "documents": {
             "three_day": {
               "title": "3-Day Notice to Perform or Quit",
-              "text": "The written notice must indicate the unit involved and the issue. It also must present an alternative to the tenant about how to resolve the problem."
+              "text": "ਲਿਖਤੀ ਨੋਟਿਸ ਵਿੱਚ ਯੂਨਿਟ ਅਤੇ ਸਮੱਸਿਆ ਦਰਸਾਈ ਹੋਣੀ ਚਾਹੀਦੀ ਹੈ। ਇਸ ਵਿੱਚ ਇਹ ਵੀ ਦੱਸਿਆ ਹੋਣਾ ਚਾਹੀਦਾ ਹੈ ਕਿ ਕਿਰਾਏਦਾਰ ਸਮੱਸਿਆ ਕਿਵੇਂ ਠੀਕ ਕਰ ਸਕਦਾ/ਸਕਦੀ ਹੈ।"
             },
             "notice": {
               "title": "30-Day Notice / 60-Day Notice",
-              "text": "Advance notice that the landlord no longer wants to rent to you."
+              "text": "ਅਗਾਊਂ ਨੋਟਿਸ ਕਿ ਮਕਾਨ ਮਾਲਕ ਹੁਣ ਤੁਹਾਨੂੰ ਕਿਰਾਏ 'ਤੇ ਨਹੀਂ ਰੱਖਣਾ ਚਾਹੁੰਦਾ।"
             },
             "summons": {
               "title": "5-Day Court Summons",
-              "text_before": "When you receive this it means your landlord has filed an eviction case against you in court. ",
-              "emphasis": "You have 5 days to reply to this notice.",
-              "text_after": " If you don't, then you can lose your case in court. This is the moment in which you need assistance from a lawyer."
+              "text_before": "ਜਦੋਂ ਤੁਹਾਨੂੰ ਇਹ ਮਿਲਦਾ ਹੈ, ਇਸਦਾ ਮਤਲਬ ਹੈ ਕਿ ਤੁਹਾਡੇ ਮਕਾਨ ਮਾਲਕ ਨੇ ਤੁਹਾਡੇ ਖ਼ਿਲਾਫ਼ ਕੋਰਟ ਵਿੱਚ eviction case ਫਾਈਲ ਕਰ ਦਿੱਤਾ ਹੈ। ",
+              "emphasis": "ਤੁਹਾਡੇ ਕੋਲ ਇਸ ਨੋਟਿਸ ਦਾ ਜਵਾਬ ਦੇਣ ਲਈ 5 ਦਿਨ ਹਨ।",
+              "text_after": " ਜੇ ਤੁਸੀਂ ਨਹੀਂ ਕਰਦੇ, ਤਾਂ ਤੁਸੀਂ ਕੋਰਟ ਵਿੱਚ ਕੇਸ ਹਾਰ ਸਕਦੇ ਹੋ। ਇਹ ਉਹ ਸਮਾਂ ਹੈ ਜਦੋਂ ਤੁਹਾਨੂੰ ਵਕੀਲ ਦੀ ਮਦਦ ਲੈਣੀ ਚਾਹੀਦੀ ਹੈ।"
             }
           },
           "no_response": {
-            "heading": "If tenant DOES NOT file response:",
+            "heading": "ਜੇ ਕਿਰਾਏਦਾਰ ਜਵਾਬ ਫਾਈਲ ਨਹੀਂ ਕਰਦਾ:",
             "steps": [
-              "Landlord requests entry of default and clerk's judgment for possession.",
-              "Default and judgment are entered.",
-              "Landlord files writ of possession.",
-              "Sheriff posts 5-day notice to vacate.",
-              "Case ends."
+              "Landlord entry of default ਅਤੇ clerk's judgment for possession ਲਈ ਬੇਨਤੀ ਕਰਦਾ ਹੈ।",
+              "Default ਅਤੇ judgment ਦਰਜ ਹੋ ਜਾਂਦੇ ਹਨ।",
+              "Landlord writ of possession ਫਾਈਲ ਕਰਦਾ ਹੈ।",
+              "Sheriff 5-day notice to vacate ਲਗਾਉਂਦਾ ਹੈ।",
+              "ਕੇਸ ਖਤਮ ਹੋ ਜਾਂਦਾ ਹੈ।"
             ]
           },
           "response": {
-            "heading": "If tenant files response:",
+            "heading": "ਜੇ ਕਿਰਾਏਦਾਰ ਜਵਾਬ ਫਾਈਲ ਕਰਦਾ ਹੈ:",
             "steps": [
-              "Landlord requests trial date.",
-              "Court mails notice of trial date to landlord and tenant.",
-              "Trial within 20 days of request."
+              "Landlord trial date ਲਈ ਬੇਨਤੀ ਕਰਦਾ ਹੈ।",
+              "Court landlord ਅਤੇ tenant ਨੂੰ trial date ਦਾ ਨੋਟਿਸ ਮੇਲ ਕਰਦੀ ਹੈ।",
+              "ਬੇਨਤੀ ਤੋਂ 20 ਦਿਨਾਂ ਅੰਦਰ trial।"
             ]
           },
           "outcomes": {
-            "heading": "Four possible outcomes:",
-            "note": "(The parties can negotiate a settlement at any time during the process.)",
+            "heading": "ਚਾਰ ਸੰਭਾਵਿਤ ਨਤੀਜੇ:",
+            "note": "(ਪ੍ਰਕਿਰਿਆ ਦੌਰਾਨ ਕਿਸੇ ਵੀ ਸਮੇਂ ਦੋਵੇਂ ਪੱਖ settlement 'ਤੇ ਗੱਲਬਾਤ ਕਰ ਸਕਦੇ ਹਨ।)",
             "items": {
               "tenant_wins": {
-                "label": "Tenant wins (legal or technical issue):",
-                "text": "Tenant can stay."
+                "label": "ਕਿਰਾਏਦਾਰ ਜਿੱਤਦਾ/ਜਿੱਤਦੀ ਹੈ (ਕਾਨੂੰਨੀ ਜਾਂ ਤਕਨੀਕੀ ਮਸਲਾ):",
+                "text": "ਕਿਰਾਏਦਾਰ ਰਹਿ ਸਕਦਾ/ਸਕਦੀ ਹੈ।"
               },
               "conditional_judgment": {
-                "label": "Conditional judgment (habitability issue):",
-                "text": "Tenant wins if they can pay reduced back-rent within 5 days."
+                "label": "ਸ਼ਰਤੀ ਫੈਸਲਾ (habitability ਮਸਲਾ):",
+                "text": "ਜੇ ਕਿਰਾਏਦਾਰ 5 ਦਿਨਾਂ ਅੰਦਰ ਘੱਟ ਕੀਤਾ back-rent ਭਰ ਦੇਵੇ, ਤਾਂ ਕਿਰਾਏਦਾਰ ਜਿੱਤਦਾ/ਜਿੱਤਦੀ ਹੈ।"
               },
               "stipulated_judgment": {
-                "label": "Stipulated judgment (court-approved settlement):",
-                "text": "Tenant must pay back rent and other costs."
+                "label": "ਸਹਿਮਤੀ ਵਾਲਾ ਫੈਸਲਾ (court-approved settlement):",
+                "text": "ਕਿਰਾਏਦਾਰ ਨੂੰ back rent ਅਤੇ ਹੋਰ ਖਰਚੇ ਭਰਨੇ ਪੈਂਦੇ ਹਨ।"
               },
               "landlord_wins": {
-                "label": "Landlord wins:",
-                "text": "Receives judgment for possession."
+                "label": "ਮਕਾਨ ਮਾਲਕ ਜਿੱਤਦਾ ਹੈ:",
+                "text": "possession ਲਈ ਫੈਸਲਾ ਮਿਲਦਾ ਹੈ।"
               }
             }
           }
         },
         "voluntary-vacate": {
           "what_is": {
-            "heading": "What is a voluntary vacate agreement or cash-for-keys?",
-            "p1": "Cash-for-keys is an illegal buyout that happens when a landlord offers money for a tenant to voluntarily end a lease and leave an apartment without informing the tenants of their legal rights regarding eviction."
+            "heading": "Voluntary Vacate Agreement ਜਾਂ cash-for-keys ਕੀ ਹੈ?",
+            "p1": "cash-for-keys ਇੱਕ ਗੈਰਕਾਨੂੰਨੀ buyout ਹੈ ਜਦੋਂ ਮਕਾਨ ਮਾਲਕ ਕਿਰਾਏਦਾਰ ਨੂੰ ਪੈਸੇ ਦੀ ਪੇਸ਼ਕਸ਼ ਕਰਦਾ ਹੈ ਤਾਂ ਜੋ ਕਿਰਾਏਦਾਰ ਆਪਣੀ ਮਰਜ਼ੀ ਨਾਲ lease ਖਤਮ ਕਰਕੇ ਅਪਾਰਟਮੈਂਟ ਛੱਡ ਦੇਵੇ—ਬਿਨਾਂ ਕਿਰਾਏਦਾਰ ਨੂੰ ਬੇਦਖਲੀ ਬਾਰੇ ਆਪਣੇ ਕਾਨੂੰਨੀ ਹੱਕਾਂ ਦੀ ਜਾਣਕਾਰੀ ਦਿੱਤੇ।"
           },
           "warning_note": {
-            "title": "Do not sign under pressure",
-            "strong": "Tenants have NO legal obligation to sign a voluntary vacate agreement or to accept cash-for-keys under any circumstances.",
-            "after": "Never relinquish your rights without consulting with an attorney."
+            "title": "ਦਬਾਅ ਹੇਠ ਸਾਇਨ ਨਾ ਕਰੋ",
+            "strong": "ਕਿਸੇ ਵੀ ਹਾਲਤ ਵਿੱਚ ਕਿਰਾਏਦਾਰ 'ਤੇ voluntary vacate agreement ਸਾਇਨ ਕਰਨ ਜਾਂ cash-for-keys ਕਬੂਲ ਕਰਨ ਦੀ ਕੋਈ ਕਾਨੂੰਨੀ ਜ਼ਿੰਮੇਵਾਰੀ ਨਹੀਂ।",
+            "after": "ਵਕੀਲ ਨਾਲ ਸਲਾਹ ਕੀਤੇ ਬਿਨਾਂ ਕਦੇ ਵੀ ਆਪਣੇ ਹੱਕ ਨਾ ਛੱਡੋ।"
           },
           "considerations": {
-            "heading": "Some things to consider about buyout offers:",
+            "heading": "buyout offers ਬਾਰੇ ਕੁਝ ਗੱਲਾਂ ਧਿਆਨ ਵਿੱਚ ਰੱਖੋ:",
             "items": [
-              "30% of the buyout offer will be paid to the federal government and still more to the state.",
-              "10-30% of the amount will be used for legal fees.",
-              "The requirements to rent have become more intense. Many landlords require you to earn twice the rental amount in order to qualify.",
-              "When calculating the financial impact of accepting a buyout offer, consider: How much money will you need to move out without hurting financially? How far will you have to move to find a place you can afford?"
+              "buyout offer ਦਾ ਲਗਭਗ 30% federal government ਨੂੰ ਟੈਕਸ ਵਜੋਂ ਜਾ ਸਕਦਾ ਹੈ, ਅਤੇ ਰਾਜ ਨੂੰ ਵੀ ਹੋਰ।",
+              "ਰਕਮ ਦਾ 10-30% legal fees ਵਿੱਚ ਲੱਗ ਸਕਦਾ ਹੈ।",
+              "ਘਰ ਕਿਰਾਏ 'ਤੇ ਲੈਣ ਦੀਆਂ ਸ਼ਰਤਾਂ ਹੁਣ ਹੋਰ ਸਖ਼ਤ ਹਨ। ਕਈ landlords ਕਹਿੰਦੇ ਹਨ ਕਿ qualify ਕਰਨ ਲਈ ਤੁਹਾਡੀ ਆਮਦਨ ਕਿਰਾਏ ਤੋਂ ਦੋਗੁਣੀ ਹੋਵੇ।",
+              "buyout accept ਕਰਨ ਦਾ ਵਿੱਤੀ ਅਸਰ ਗਿਣਦੇ ਸਮੇਂ ਸੋਚੋ: ਤੁਸੀਂ ਬਿਨਾਂ ਵਿੱਤੀ ਨੁਕਸਾਨ ਦੇ ਘਰ ਛੱਡਣ ਲਈ ਕਿੰਨਾ ਪੈਸਾ ਚਾਹੀਦਾ ਹੈ? ਤੁਸੀਂ ਸਸਤਾ ਘਰ ਲੱਭਣ ਲਈ ਕਿੰਨਾ ਦੂਰ ਜਾਣਾ ਪੈ ਸਕਦਾ ਹੈ?"
             ]
           }
         },
         "estoppel": {
           "what_is": {
-            "heading": "What is an estoppel certificate?",
-            "p1": "An estoppel certificate does NOT mean you will be evicted. An estoppel indicates that there will be changes in the building or ownership.",
-            "p2": "An estoppel certificate is NOT a lease or new lease. It confirms the terms of occupancy—rental agreement and lease terms—for tenants."
+            "heading": "Estoppel Certificate ਕੀ ਹੈ?",
+            "p1": "Estoppel Certificate ਦਾ ਮਤਲਬ ਇਹ ਨਹੀਂ ਕਿ ਤੁਹਾਨੂੰ ਬੇਦਖਲ ਕੀਤਾ ਜਾਵੇਗਾ। Estoppel ਦੱਸਦਾ ਹੈ ਕਿ ਬਿਲਡਿੰਗ ਜਾਂ ownership ਵਿੱਚ ਤਬਦੀਲੀਆਂ ਹੋਣ ਵਾਲੀਆਂ ਹਨ।",
+            "p2": "Estoppel Certificate ਕੋਈ lease ਜਾਂ ਨਵਾਂ lease ਨਹੀਂ ਹੁੰਦਾ। ਇਹ ਕਿਰਾਏਦਾਰ ਲਈ occupancy terms—rental agreement ਅਤੇ lease terms—ਦੀ ਪੁਸ਼ਟੀ ਕਰਦਾ ਹੈ।"
           },
           "value": {
-            "heading": "Estoppel certificates can be of value to tenants:",
+            "heading": "Estoppel Certificates ਕਿਰਾਏਦਾਰਾਂ ਲਈ ਲਾਭਦਾਇਕ ਹੋ ਸਕਦੇ ਹਨ:",
             "items": [
-              "In the event that there is a dispute between you and a future owner, you can use the estoppel to prove your terms of occupancy.",
-              "The certificate invites you to note informal or verbal agreements outside of your written lease.",
-              "You MUST note any incorrect information on the certificate on the form or a separate letter that is signed and dated.",
-              "Sign and date ALL documents and make two copies (one for yourself)."
+              "ਜੇ ਭਵਿੱਖ ਦੇ owner ਨਾਲ ਤੁਹਾਡਾ ਵਿਵਾਦ ਹੋਵੇ, ਤਾਂ ਤੁਸੀਂ estoppel ਨੂੰ ਆਪਣੇ occupancy terms ਸਾਬਤ ਕਰਨ ਲਈ ਵਰਤ ਸਕਦੇ ਹੋ।",
+              "ਇਹ certificate ਤੁਹਾਨੂੰ ਲਿਖਤੀ lease ਤੋਂ ਬਾਹਰ ਹੋਏ ਗੈਰ-ਰਸਮੀ ਜਾਂ ਮੌਖਿਕ ਸਮਝੌਤਿਆਂ ਨੂੰ ਦਰਜ ਕਰਨ ਲਈ ਕਹਿੰਦਾ ਹੈ।",
+              "certificate 'ਤੇ ਕੋਈ ਵੀ ਗਲਤ ਜਾਣਕਾਰੀ ਹੋਵੇ, ਤਾਂ ਤੁਸੀਂ ਫਾਰਮ 'ਤੇ ਜਾਂ ਵੱਖਰੀ ਚਿੱਠੀ ਵਿੱਚ (ਸਾਇਨ ਅਤੇ ਮਿਤੀ ਸਮੇਤ) ਲਾਜ਼ਮੀ ਲਿਖੋ।",
+              "ਸਾਰੇ ਦਸਤਾਵੇਜ਼ਾਂ 'ਤੇ ਸਾਇਨ ਅਤੇ ਮਿਤੀ ਲਗਾਓ ਅਤੇ ਦੋ ਕਾਪੀਆਂ ਬਣਾਓ (ਇੱਕ ਆਪਣੇ ਲਈ)।"
             ]
           }
         }
