@@ -450,35 +450,35 @@
         }
       },
       "chapter-5": {
-        "title": "Chapter 5: Legal Entry & Security Deposit",
-        "summary": "This chapter covers lawful entry limits and the timeline for deposit returns.",
-        "goal": "Prevent unlawful entry and preserve your right to full deposit accounting.",
+        "title": "ਅਧਿਆਇ 5: ਕਾਨੂੰਨੀ ਦਾਖ਼ਲਾ ਅਤੇ ਸੁਰੱਖਿਆ ਜਮ੍ਹਾਂ ਰਕਮ",
+        "summary": "ਇਸ ਅਧਿਆਇ ਵਿੱਚ ਕਾਨੂੰਨੀ ਦਾਖ਼ਲੇ ਦੀਆਂ ਸੀਮਾਵਾਂ ਅਤੇ deposit ਵਾਪਸੀ ਦੀ ਟਾਈਮਲਾਈਨ ਦਿੱਤੀ ਹੈ।",
+        "goal": "ਗੈਰਕਾਨੂੰਨੀ ਦਾਖ਼ਲੇ ਤੋਂ ਬਚੋ ਅਤੇ deposit ਦੀ ਪੂਰੀ accounting ਦਾ ਹੱਕ ਸੁਰੱਖਿਅਤ ਰੱਖੋ।",
         "evidence_checklist": [
-          "Entry notices with date/time/purpose",
-          "Move-in and move-out photos",
-          "Forwarding address and deposit correspondence"
+          "Entry notices (date/time/purpose ਸਮੇਤ)",
+          "move-in ਅਤੇ move-out ਫੋਟੋਆਂ",
+          "forwarding address ਅਤੇ deposit correspondence"
         ],
         "common_mistakes": [
-          "Accepting multi-day 24-hour entry notices",
-          "Failing to request or document move-out inspection",
-          "Not providing mailing address for deposit return"
+          "ਕਈ ਦਿਨਾਂ ਨੂੰ ਕਵਰ ਕਰਨ ਵਾਲੇ 24-hour entry notices ਮਨ ਲੈਣਾ",
+          "move-out inspection ਮੰਗਣ ਜਾਂ ਦਸਤਾਵੇਜ਼ ਨਾ ਕਰਨਾ",
+          "deposit ਵਾਪਸੀ ਲਈ mailing address ਨਾ ਦੇਣਾ"
         ],
-        "escalate_when": "Landlord enters without proper notice or misses the 21-day deposit timeline.",
+        "escalate_when": "ਮਕਾਨ ਮਾਲਕ ਠੀਕ ਨੋਟਿਸ ਤੋਂ ਬਿਨਾਂ ਦਾਖ਼ਲ ਹੋਵੇ ਜਾਂ 21 ਦਿਨਾਂ ਦੀ deposit ਟਾਈਮਲਾਈਨ ਮਿਸ ਕਰੇ।",
         "source_notes": [
           "California Civil Code entry notice requirements",
           "California Civil Code 1950.5 security deposit rules"
         ],
-        "last_reviewed": "February 6, 2026",
+        "last_reviewed": "6 ਫਰਵਰੀ, 2026",
         "sections": {
           "legal-entry": {
-            "title": "Legal Entry",
-            "summary": "When notice is required, what counts as emergency entry, and buyer showing rules.",
-            "keywords": ["24 hour notice", "entry", "business hours", "buyer showings"]
+            "title": "ਕਾਨੂੰਨੀ ਦਾਖ਼ਲਾ (Legal Entry)",
+            "summary": "ਨੋਟਿਸ ਕਦੋਂ ਲੋੜੀਂਦਾ ਹੈ, emergency entry ਕੀ ਮੰਨੀ ਜਾਂਦੀ ਹੈ, ਅਤੇ buyer showings ਦੇ ਨਿਯਮ।",
+            "keywords": ["24 hour notice", "entry", "business hours", "buyer showings", "ਨੋਟਿਸ"]
           },
           "security-deposits": {
-            "title": "Security Deposits",
-            "summary": "Deposit limits, legal deductions, and 21-day return requirements.",
-            "keywords": ["security deposit", "21 days", "deductions", "refund"]
+            "title": "ਸੁਰੱਖਿਆ ਜਮ੍ਹਾਂ ਰਕਮ (Security Deposits)",
+            "summary": "deposit limits, ਕਾਨੂੰਨੀ deductions, ਅਤੇ 21-ਦਿਨਾਂ ਦੀ ਵਾਪਸੀ ਦੀ ਲੋੜ।",
+            "keywords": ["security deposit", "21 days", "deductions", "refund", "ਜਮ੍ਹਾਂ"]
           }
         }
       }
@@ -948,83 +948,83 @@
         }
       },
       "chapter-5": {
-        "applies_to_all": "For ALL tenants (with or without Rent Stabilization)",
+        "applies_to_all": "ਸਭ ਕਿਰਾਏਦਾਰਾਂ ਲਈ (Rent Stabilization ਹੋਵੇ ਜਾਂ ਨਾ)",
         "legal-entry": {
           "when_can_enter": {
-            "heading": "When can the landlord enter?",
+            "heading": "ਮਕਾਨ ਮਾਲਕ ਕਦੋਂ ਦਾਖ਼ਲ ਹੋ ਸਕਦਾ ਹੈ?",
             "items": [
-              "California law states that a landlord can enter a unit with reasonable advance written notice (24 hours or 6 days by mail).",
-              "A landlord can enter only during normal business hours (generally, weekdays 8:00 AM-5:00 PM).",
-              "The notice must state the date, approximate time, and purpose of entry.",
-              "A landlord cannot issue a 24-hour notice that covers multiple days."
+              "California ਦੇ ਕਾਨੂੰਨ ਅਨੁਸਾਰ, ਮਕਾਨ ਮਾਲਕ reasonable advance written notice ਦੇ ਕੇ ਯੂਨਿਟ ਵਿੱਚ ਦਾਖ਼ਲ ਹੋ ਸਕਦਾ ਹੈ (24 ਘੰਟੇ ਪਹਿਲਾਂ, ਜਾਂ ਮੇਲ ਰਾਹੀਂ 6 ਦਿਨ)।",
+              "ਮਕਾਨ ਮਾਲਕ ਆਮ business hours ਵਿੱਚ ਹੀ ਦਾਖ਼ਲ ਹੋ ਸਕਦਾ ਹੈ (ਆਮ ਤੌਰ 'ਤੇ weekdays 8:00 AM-5:00 PM)।",
+              "ਨੋਟਿਸ ਵਿੱਚ ਦਾਖ਼ਲੇ ਦੀ ਮਿਤੀ, ਲਗਭਗ ਸਮਾਂ, ਅਤੇ ਮਕਸਦ ਲਿਖਿਆ ਹੋਣਾ ਚਾਹੀਦਾ ਹੈ।",
+              "ਮਕਾਨ ਮਾਲਕ ਐਸਾ 24-hour notice ਨਹੀਂ ਦੇ ਸਕਦਾ ਜੋ ਕਈ ਦਿਨਾਂ ਨੂੰ ਕਵਰ ਕਰੇ।"
             ]
           },
           "notice_required": {
-            "heading": "Reasonable advance written notice IS required for:",
+            "heading": "Reasonable advance written notice ਇਹਨਾਂ ਲਈ ਲੋੜੀਂਦਾ ਹੈ:",
             "items": [
-              "To make necessary or agreed-upon repairs, decorations, alterations, or improvements",
-              "To show the unit to prospective tenants, purchasers, or lenders",
-              "To provide entry to contractors or workers",
-              "When a court order permits the landlord to enter"
+              "ਲੋੜੀਂਦੀਆਂ ਜਾਂ ਸਹਿਮਤ ਮੁਰੰਮਤਾਂ, ਸਜਾਵਟ, ਤਬਦੀਲੀਆਂ, ਜਾਂ ਸੁਧਾਰ ਕਰਨ ਲਈ",
+              "ਯੂਨਿਟ ਨੂੰ prospective tenants, purchasers, ਜਾਂ lenders ਨੂੰ ਦਿਖਾਉਣ ਲਈ",
+              "contractors ਜਾਂ workers ਨੂੰ ਦਾਖ਼ਲਾ ਦੇਣ ਲਈ",
+              "ਜਦੋਂ court order ਮਕਾਨ ਮਾਲਕ ਨੂੰ ਦਾਖ਼ਲ ਹੋਣ ਦੀ ਇਜਾਜ਼ਤ ਦੇਵੇ"
             ]
           },
           "notice_not_required": {
-            "heading": "Advance written notice is NOT required for:",
+            "heading": "Advance written notice ਇਹਨਾਂ ਲਈ ਲੋੜੀਂਦਾ ਨਹੀਂ ਹੈ:",
             "items": [
-              "An emergency that constitutes a negative impact to property, health, or safety",
-              "When a tenant has moved out or abandoned the unit",
-              "When a tenant is present and consents to entry",
-              "When the tenant and landlord have already agreed on entry for repairs"
+              "ਕੋਈ emergency ਜਿਸ ਨਾਲ property, health, ਜਾਂ safety ਨੂੰ ਨੁਕਸਾਨ ਹੋ ਸਕਦਾ ਹੋਵੇ",
+              "ਜਦੋਂ ਕਿਰਾਏਦਾਰ ਘਰ ਛੱਡ ਚੁੱਕਾ/ਛੱਡ ਚੁੱਕੀ ਹੋਵੇ ਜਾਂ ਯੂਨਿਟ abandoned ਹੋਵੇ",
+              "ਜਦੋਂ ਕਿਰਾਏਦਾਰ ਮੌਜੂਦ ਹੋਵੇ ਅਤੇ ਦਾਖ਼ਲੇ ਲਈ consent ਦੇਵੇ",
+              "ਜਦੋਂ repairs ਲਈ ਕਿਰਾਏਦਾਰ ਅਤੇ ਮਕਾਨ ਮਾਲਕ ਪਹਿਲਾਂ ਹੀ ਦਾਖ਼ਲੇ 'ਤੇ ਸਹਿਮਤ ਹੋ ਚੁੱਕੇ ਹੋਣ"
             ]
           },
           "special_rules": {
-            "heading": "Special rules for showing to prospective buyer:",
-            "p1": "A landlord must give 24-hour advance written notice to show the unit to a prospective buyer. Alternatively, they can post a 120-day advance written notice one time, but must still give 24-hour advance verbal notice each time."
+            "heading": "prospective buyer ਨੂੰ ਦਿਖਾਉਣ ਲਈ ਖਾਸ ਨਿਯਮ:",
+            "p1": "prospective buyer ਨੂੰ ਯੂਨਿਟ ਦਿਖਾਉਣ ਲਈ ਮਕਾਨ ਮਾਲਕ ਨੂੰ 24-hour advance written notice ਦੇਣਾ ਲਾਜ਼ਮੀ ਹੈ। ਵਿਕਲਪ ਵਜੋਂ, ਉਹ 120-day advance written notice ਇੱਕ ਵਾਰ post ਕਰ ਸਕਦੇ ਹਨ, ਪਰ ਹਰ ਵਾਰ ਫਿਰ ਵੀ 24-hour advance verbal notice ਦੇਣਾ ਪਵੇਗਾ।"
           }
         },
         "security-deposits": {
           "what_is": {
-            "heading": "What is a security deposit?",
-            "p1": "The security deposit may also be called: last month's rent, security deposit, pet deposit, key fee, or cleaning fee. Make sure your rental agreement clearly states you have paid a security deposit and the correct amount."
+            "heading": "ਸੁਰੱਖਿਆ ਜਮ੍ਹਾਂ ਰਕਮ (security deposit) ਕੀ ਹੈ?",
+            "p1": "security deposit ਨੂੰ ਕਈ ਵਾਰ ਇਹਨਾਂ ਨਾਮਾਂ ਨਾਲ ਵੀ ਬੁਲਾਇਆ ਜਾਂਦਾ ਹੈ: last month's rent, security deposit, pet deposit, key fee, ਜਾਂ cleaning fee। ਯਕੀਨੀ ਬਣਾਓ ਕਿ ਤੁਹਾਡੇ rental agreement ਵਿੱਚ ਸਾਫ਼ ਲਿਖਿਆ ਹੋਵੇ ਕਿ ਤੁਸੀਂ security deposit ਦਿੱਤਾ ਹੈ ਅਤੇ ਸਹੀ ਰਕਮ ਕਿੰਨੀ ਹੈ।"
           },
           "refundable": {
-            "heading": "Under California law, security deposits MUST be refundable. However, the landlord may keep part or all for:",
+            "heading": "California ਦੇ ਕਾਨੂੰਨ ਅਨੁਸਾਰ, security deposit ਵਾਪਸ ਮਿਲਣਯੋਗ (refundable) ਹੋਣਾ ਲਾਜ਼ਮੀ ਹੈ। ਹਾਲਾਂਕਿ, ਮਕਾਨ ਮਾਲਕ ਹੇਠਾਂ ਦਿੱਤੀਆਂ ਹਾਲਤਾਂ ਵਿੱਚ ਕੁਝ ਜਾਂ ਸਾਰਾ ਰੱਖ ਸਕਦਾ ਹੈ:",
             "items": [
-              "Rent is owed",
-              "The unit is less clean than when you first moved in",
-              "The unit is damaged beyond normal wear and tear",
-              "Failure to restore personal property (such as keys or furniture)"
+              "ਕਿਰਾਇਆ ਬਕਾਇਆ ਹੋਵੇ",
+              "ਯੂਨਿਟ ਉਸ ਹਾਲਤ ਤੋਂ ਘੱਟ ਸਾਫ਼ ਹੋਵੇ ਜਦੋਂ ਤੁਸੀਂ ਪਹਿਲੀ ਵਾਰ ਅੰਦਰ ਆਏ ਸੀ",
+              "ਯੂਨਿਟ ਵਿੱਚ normal wear and tear ਤੋਂ ਵੱਧ ਨੁਕਸਾਨ ਹੋਵੇ",
+              "personal property (ਜਿਵੇਂ ਚਾਬੀਆਂ ਜਾਂ ਫਰਨੀਚਰ) ਵਾਪਸ ਨਾ ਕਰਨਾ"
             ]
           },
           "limits": {
-            "heading": "Legal limit for total security deposit:",
+            "heading": "ਕੁੱਲ security deposit ਲਈ ਕਾਨੂੰਨੀ ਹੱਦ:",
             "unfurnished": {
-              "label": "Unfurnished rental unit:",
-              "text_before": "Total cannot be more than ",
-              "emphasis": "one month's rent",
-              "text_after": " (per CA Civil Code 1950.5)"
+              "label": "ਬਿਨਾਂ ਫਰਨੀਚਰ ਵਾਲੀ ਯੂਨਿਟ:",
+              "text_before": "ਕੁੱਲ ਰਕਮ ",
+              "emphasis": "ਇੱਕ ਮਹੀਨੇ ਦੇ ਕਿਰਾਏ",
+              "text_after": " ਤੋਂ ਵੱਧ ਨਹੀਂ ਹੋ ਸਕਦੀ (CA Civil Code 1950.5 ਮੁਤਾਬਕ)"
             },
             "furnished": {
-              "label": "Furnished rental unit:",
-              "text_before": "Total cannot be more than ",
-              "emphasis": "three months' rent",
-              "text_after": ""
+              "label": "ਫਰਨੀਚਰ ਵਾਲੀ ਯੂਨਿਟ:",
+              "text_before": "ਕੁੱਲ ਰਕਮ ",
+              "emphasis": "ਤਿੰਨ ਮਹੀਨੇ ਦੇ ਕਿਰਾਏ",
+              "text_after": " ਤੋਂ ਵੱਧ ਨਹੀਂ ਹੋ ਸਕਦੀ"
             }
           },
-          "first_month_note": "The landlord can also require you to pay the first month's rent in addition to the security deposit.",
+          "first_month_note": "ਮਕਾਨ ਮਾਲਕ security deposit ਤੋਂ ਇਲਾਵਾ ਪਹਿਲੇ ਮਹੀਨੇ ਦਾ ਕਿਰਾਇਆ ਵੀ ਮੰਗ ਸਕਦਾ ਹੈ।",
           "increase": {
-            "heading": "Can a new landlord increase the security deposit?",
-            "p1": "The landlord can only increase the security deposit at the end of your lease period, or if your lease specifically allows for an increase. The new amount cannot exceed the legal limit."
+            "heading": "ਕੀ ਨਵਾਂ ਮਕਾਨ ਮਾਲਕ security deposit ਵਧਾ ਸਕਦਾ ਹੈ?",
+            "p1": "ਮਕਾਨ ਮਾਲਕ security deposit ਸਿਰਫ਼ ਤੁਹਾਡੀ lease period ਦੇ ਅੰਤ ਵਿੱਚ ਹੀ ਵਧਾ ਸਕਦਾ ਹੈ, ਜਾਂ ਜੇ ਤੁਹਾਡੀ lease ਵਿੱਚ ਖਾਸ ਤੌਰ 'ਤੇ ਵਾਧੇ ਦੀ ਇਜਾਜ਼ਤ ਹੋਵੇ। ਨਵੀਂ ਰਕਮ ਕਾਨੂੰਨੀ ਹੱਦ ਤੋਂ ਵੱਧ ਨਹੀਂ ਹੋ ਸਕਦੀ।"
           },
           "deadline_note": {
-            "title": "21-day deadline",
-            "p1": "After moving out, the landlord has 21 days to:",
+            "title": "21-ਦਿਨਾਂ ਦੀ ਡੈਡਲਾਈਨ",
+            "p1": "ਘਰ ਛੱਡਣ ਤੋਂ ਬਾਅਦ, ਮਕਾਨ ਮਾਲਕ ਕੋਲ 21 ਦਿਨ ਹਨ:",
             "items": [
-              "Send a full refund of the security deposit, or",
-              "Deliver an itemized statement with reasons for deductions and any remaining refund."
+              "security deposit ਦਾ ਪੂਰਾ ਰਿਫੰਡ ਭੇਜਣ ਲਈ, ਜਾਂ",
+              "deductions ਦੇ ਕਾਰਨਾਂ ਸਮੇਤ itemized statement ਅਤੇ ਕੋਈ ਵੀ ਬਾਕੀ ਰਿਫੰਡ ਦੇਣ ਲਈ।"
             ]
           },
-          "address_note": "It is the tenant's responsibility to provide an address where the security deposit can be mailed."
+          "address_note": "security deposit ਮੇਲ ਕਰਨ ਲਈ ਪਤਾ ਦੇਣਾ ਕਿਰਾਏਦਾਰ ਦੀ ਜ਼ਿੰਮੇਵਾਰੀ ਹੈ।"
         }
       }
     }
