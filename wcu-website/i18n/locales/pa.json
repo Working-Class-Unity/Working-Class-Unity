@@ -290,7 +290,7 @@
           "know-your-rights": {
             "title": "ਆਪਣੇ ਅਧਿਕਾਰ ਜਾਣੋ",
             "summary": "Habitability ਮਾਪਦੰਡ ਅਤੇ ਉਹ ਹੱਕ ਜੋ ਹਰ ਕਿਰਾਏਦਾਰ ਕੋਲ ਹੁੰਦੇ ਹਨ—Rent Stabilization ਹੋਵੇ ਜਾਂ ਨਾ।",
-            "keywords": ["habitability", "ਸੁਰੱਖਿਅਤ ਘਰ", "landlord duties", "health", "entry"]
+            "keywords": ["habitability", "ਸੁਰੱਖਿਅਤ ਘਰ", "ਮਕਾਨ ਮਾਲਕ ਦੀਆਂ ਜ਼ਿੰਮੇਵਾਰੀਆਂ", "health", "entry"]
           },
           "repairs": {
             "title": "ਮੁਰੰਮਤ, ਨੁਕਸਾਨ, ਜਾਂ ਕੀੜੇ-ਮਕੌੜੇ",
@@ -305,7 +305,7 @@
           "utilities": {
             "title": "ਯੂਟਿਲਿਟੀਜ਼ (Utilities)",
             "summary": "ਕੌਣ ਭਰਦਾ ਹੈ, ਕਿਹੜਾ ਨੋਟਿਸ ਲੋੜੀਂਦਾ ਹੈ, ਅਤੇ utilities ਬੰਦ ਕਰਨਾ ਕਦੋਂ ਗੈਰਕਾਨੂੰਨੀ ਹੈ।",
-            "keywords": ["utilities", "notice", "billing", "landlord responsibilities"]
+            "keywords": ["utilities", "notice", "billing", "ਮਕਾਨ ਮਾਲਕ ਦੀਆਂ ਜ਼ਿੰਮੇਵਾਰੀਆਂ"]
           },
           "dos-donts": {
             "title": "ਕਰੋ ਅਤੇ ਨਾ ਕਰੋ",
@@ -630,7 +630,7 @@
         "utilities": {
           "responsible_heading": "ਕੌਣ ਜ਼ਿੰਮੇਵਾਰ ਹੈ?",
           "responsible_list": [
-            "California ਦੇ landlord-tenant ਕਾਨੂੰਨ ਮਕਾਨ ਮਾਲਕ ਨੂੰ utilities ਦੇ ਖਰਚੇ ਭਰਨ ਲਈ ਲਾਜ਼ਮੀ ਨਹੀਂ ਬਣਾਉਂਦੇ, ਪਰ lease agreements ਵਿੱਚ ਸਪੱਸ਼ਟਤਾ ਲੋੜੀਂਦੀ ਹੈ।",
+            "California ਦੇ ਮਕਾਨ ਮਾਲਕ-ਕਿਰਾਏਦਾਰ ਕਾਨੂੰਨ ਮਕਾਨ ਮਾਲਕ ਨੂੰ utilities ਦੇ ਖਰਚੇ ਭਰਨ ਲਈ ਲਾਜ਼ਮੀ ਨਹੀਂ ਬਣਾਉਂਦੇ, ਪਰ lease agreements ਵਿੱਚ ਸਪੱਸ਼ਟਤਾ ਲੋੜੀਂਦੀ ਹੈ।",
             "Unpaid utility bills ਦੀ ਜ਼ਿੰਮੇਵਾਰੀ ਆਮ ਤੌਰ 'ਤੇ ਉਸ ਵਿਅਕਤੀ ਦੀ ਹੁੰਦੀ ਹੈ ਜਿਸਦੇ ਨਾਮ 'ਤੇ ਬਿੱਲ ਹੁੰਦੇ ਹਨ।"
           ],
           "landlord_name_heading": "ਜੇ utilities ਤੁਹਾਡੇ ਮਕਾਨ ਮਾਲਕ ਦੇ ਨਾਮ 'ਤੇ ਹਨ:",
@@ -729,9 +729,9 @@
             "ਭੁਗਤਾਨ ਦਾ ਸਬੂਤ ਲਈ ਰਸੀਦ ਜਾਂ ਸਾਇਨ ਕੀਤਾ ਕਾਗਜ਼ ਮੰਗੋ।"
           ],
           "pickup_heading": "ਭੁਗਤਾਨ ਲੈ ਜਾਣਾ (Pick-up)",
-          "pickup_p": "ਜੇ ਨੋਟਿਸ ਵਿੱਚ ਲਿਖਿਆ ਹੈ ਕਿ landlord/manager ਕਿਰਾਇਆ ਲੈ ਜਾਣ ਲਈ ਆਵੇਗਾ:",
+          "pickup_p": "ਜੇ ਨੋਟਿਸ ਵਿੱਚ ਲਿਖਿਆ ਹੈ ਕਿ ਮਕਾਨ ਮਾਲਕ/ਮੈਨੇਜਰ ਕਿਰਾਇਆ ਲੈ ਜਾਣ ਲਈ ਆਵੇਗਾ:",
           "pickup_list": [
-            "money order(s) ਤੁਰੰਤ ਖਰੀਦੋ ਅਤੇ pick up ਲਈ ਤਿਆਰ ਰੱਖੋ। ਇਸਦਾ ਮਤਲਬ ਹੈ ਕਿ ਘਰ ਦੇ ਸਾਰੇ ਵੱਡੇ ਮੈਂਬਰਾਂ ਨੂੰ ਪਤਾ ਹੋਵੇ ਕਿ ਇਹ ਕਿੱਥੇ ਹਨ ਅਤੇ ਜਦੋਂ landlord/manager ਆਵੇ ਤਾਂ ਭੁਗਤਾਨ ਕੀਤਾ ਜਾ ਸਕੇ।",
+            "money order(s) ਤੁਰੰਤ ਖਰੀਦੋ ਅਤੇ pick up ਲਈ ਤਿਆਰ ਰੱਖੋ। ਇਸਦਾ ਮਤਲਬ ਹੈ ਕਿ ਘਰ ਦੇ ਸਾਰੇ ਵੱਡੇ ਮੈਂਬਰਾਂ ਨੂੰ ਪਤਾ ਹੋਵੇ ਕਿ ਇਹ ਕਿੱਥੇ ਹਨ ਅਤੇ ਜਦੋਂ ਮਕਾਨ ਮਾਲਕ/ਮੈਨੇਜਰ ਆਵੇ ਤਾਂ ਭੁਗਤਾਨ ਕੀਤਾ ਜਾ ਸਕੇ।",
             "ਜੇ ਭੁਗਤਾਨ ਲਈ ਦਿੱਤੇ ਆਖਰੀ ਦਿਨ 2:00 PM ਤੱਕ ਕੋਈ ਲੈਣ ਨਹੀਂ ਆਉਂਦਾ, ਤਾਂ ਤੁਰੰਤ proof of mailing ਨਾਲ ਕਿਰਾਇਆ ਮੇਲ ਕਰੋ, ਅਤੇ Post Office ਦੀ ਉਹ ਰਸੀਦ ਸੰਭਾਲੋ ਜਿਸ 'ਤੇ ਸਮਾਂ ਲਿਖਿਆ ਹੋਵੇ ਕਿ ਤੁਸੀਂ ਕਿਰਾਇਆ ਕਦੋਂ ਮੇਲ ਕੀਤਾ ਸੀ।"
           ]
         }
@@ -844,7 +844,7 @@
           },
           "civil_code_note": {
             "title": "California Civil Code 1942.4",
-            "text": "ਜੇ ਮਕਾਨ ਮਾਲਕ 35 ਦਿਨ ਤੋਂ ਵੱਧ official instructions ਦਾ ਢੰਗ ਨਾਲ ਜਵਾਬ ਨਹੀਂ ਦਿੰਦਾ, ਤਾਂ dwelling ਦਾ landlord ਕਿਰਾਇਆ ਮੰਗ ਨਹੀਂ ਸਕਦਾ, ਕਿਰਾਇਆ ਇਕੱਠਾ ਨਹੀਂ ਕਰ ਸਕਦਾ, rent increase ਦਾ ਨੋਟਿਸ ਜਾਰੀ ਨਹੀਂ ਕਰ ਸਕਦਾ, ਜਾਂ 3-day notice to pay rent or quit ਜਾਰੀ ਨਹੀਂ ਕਰ ਸਕਦਾ।",
+            "text": "ਜੇ ਮਕਾਨ ਮਾਲਕ 35 ਦਿਨ ਤੋਂ ਵੱਧ official instructions ਦਾ ਢੰਗ ਨਾਲ ਜਵਾਬ ਨਹੀਂ ਦਿੰਦਾ, ਤਾਂ dwelling ਦਾ ਮਕਾਨ ਮਾਲਕ ਕਿਰਾਇਆ ਮੰਗ ਨਹੀਂ ਸਕਦਾ, ਕਿਰਾਇਆ ਇਕੱਠਾ ਨਹੀਂ ਕਰ ਸਕਦਾ, rent increase ਦਾ ਨੋਟਿਸ ਜਾਰੀ ਨਹੀਂ ਕਰ ਸਕਦਾ, ਜਾਂ 3-day notice to pay rent or quit ਜਾਰੀ ਨਹੀਂ ਕਰ ਸਕਦਾ।",
             "strong": "ਕਾਨੂੰਨੀ ਸਲਾਹ ਤੋਂ ਬਿਨਾਂ ਕਿਰਾਇਆ ਰੋਕਣ ਦੀ ਕੋਸ਼ਿਸ਼ ਨਾ ਕਰੋ।"
           }
         },
@@ -872,9 +872,9 @@
           "no_response": {
             "heading": "ਜੇ ਕਿਰਾਏਦਾਰ ਜਵਾਬ ਫਾਈਲ ਨਹੀਂ ਕਰਦਾ:",
             "steps": [
-              "Landlord entry of default ਅਤੇ clerk's judgment for possession ਲਈ ਬੇਨਤੀ ਕਰਦਾ ਹੈ।",
+              "ਮਕਾਨ ਮਾਲਕ entry of default ਅਤੇ clerk's judgment for possession ਲਈ ਬੇਨਤੀ ਕਰਦਾ ਹੈ।",
               "Default ਅਤੇ judgment ਦਰਜ ਹੋ ਜਾਂਦੇ ਹਨ।",
-              "Landlord writ of possession ਫਾਈਲ ਕਰਦਾ ਹੈ।",
+              "ਮਕਾਨ ਮਾਲਕ writ of possession ਫਾਈਲ ਕਰਦਾ ਹੈ।",
               "Sheriff 5-day notice to vacate ਲਗਾਉਂਦਾ ਹੈ।",
               "ਕੇਸ ਖਤਮ ਹੋ ਜਾਂਦਾ ਹੈ।"
             ]
@@ -882,8 +882,8 @@
           "response": {
             "heading": "ਜੇ ਕਿਰਾਏਦਾਰ ਜਵਾਬ ਫਾਈਲ ਕਰਦਾ ਹੈ:",
             "steps": [
-              "Landlord trial date ਲਈ ਬੇਨਤੀ ਕਰਦਾ ਹੈ।",
-              "Court landlord ਅਤੇ tenant ਨੂੰ trial date ਦਾ ਨੋਟਿਸ ਮੇਲ ਕਰਦੀ ਹੈ।",
+              "ਮਕਾਨ ਮਾਲਕ trial date ਲਈ ਬੇਨਤੀ ਕਰਦਾ ਹੈ।",
+              "Court ਮਕਾਨ ਮਾਲਕ ਅਤੇ ਕਿਰਾਏਦਾਰ ਨੂੰ trial date ਦਾ ਨੋਟਿਸ ਮੇਲ ਕਰਦੀ ਹੈ।",
               "ਬੇਨਤੀ ਤੋਂ 20 ਦਿਨਾਂ ਅੰਦਰ trial।"
             ]
           },
