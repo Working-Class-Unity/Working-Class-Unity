@@ -351,14 +351,25 @@ watch(mobileDrawerOpen, async (open) => {
   mobileDrawerButtonRef.value?.focus()
 })
 
-// Highlight matching text in search results
-const highlightMatch = (text: string): string => {
+type HighlightSegment = {
+  text: string
+  highlight: boolean
+}
+
+const getHighlightSegments = (text: string): HighlightSegment[] => {
   const query = searchQuery.value.trim()
-  if (!query) return text
+  if (!query) return [{ text, highlight: false }]
 
   const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
   const regex = new RegExp(`(${escapedQuery})`, 'gi')
-  return text.replace(regex, '<mark class="bg-primary/30 text-base-content rounded px-0.5">$1</mark>')
+  const parts = text.split(regex).filter((part) => part.length > 0)
+
+  return parts.map((part, index) => {
+    return {
+      text: part,
+      highlight: index % 2 === 1,
+    }
+  })
 }
 </script>
 
@@ -457,7 +468,12 @@ const highlightMatch = (text: string): string => {
                 :class="{ 'bg-primary/10 text-secondary': activeSection === chapter.id }"
                 @click="scrollToSection(chapter.id)"
               >
-                <span v-html="highlightMatch(chapter.title)"></span>
+                <span>
+                  <template v-for="(segment, index) in getHighlightSegments(chapter.title)" :key="index">
+                    <mark v-if="segment.highlight" class="bg-primary/30 text-base-content rounded px-0.5">{{ segment.text }}</mark>
+                    <span v-else>{{ segment.text }}</span>
+                  </template>
+                </span>
               </button>
               <ul class="ml-4 mt-1 space-y-0.5 border-l-2 border-base-300 pl-3">
                 <li v-for="section in chapter.sections" :key="section.id">
@@ -469,7 +485,12 @@ const highlightMatch = (text: string): string => {
                     }"
                     @click="scrollToSection(section.id)"
                   >
-                    <span v-html="highlightMatch(section.title)"></span>
+                    <span>
+                      <template v-for="(segment, index) in getHighlightSegments(section.title)" :key="index">
+                        <mark v-if="segment.highlight" class="bg-primary/30 text-base-content rounded px-0.5">{{ segment.text }}</mark>
+                        <span v-else>{{ segment.text }}</span>
+                      </template>
+                    </span>
                   </button>
                 </li>
               </ul>
@@ -529,7 +550,12 @@ const highlightMatch = (text: string): string => {
                     @click="scrollToSection(chapter.id)"
                   >
                     <span class="block">
-                      <span class="block" v-html="highlightMatch(chapter.title)"></span>
+                      <span class="block">
+                        <template v-for="(segment, index) in getHighlightSegments(chapter.title)" :key="index">
+                          <mark v-if="segment.highlight" class="bg-primary/30 text-base-content rounded px-0.5">{{ segment.text }}</mark>
+                          <span v-else>{{ segment.text }}</span>
+                        </template>
+                      </span>
                       <span class="mt-0.5 block text-xs font-normal text-base-content/70">{{ chapter.summary }}</span>
                     </span>
                   </button>
@@ -566,7 +592,12 @@ const highlightMatch = (text: string): string => {
                       }"
                       @click="scrollToSection(section.id)"
                     >
-                      <span v-html="highlightMatch(section.title)"></span>
+                      <span>
+                        <template v-for="(segment, index) in getHighlightSegments(section.title)" :key="index">
+                          <mark v-if="segment.highlight" class="bg-primary/30 text-base-content rounded px-0.5">{{ segment.text }}</mark>
+                          <span v-else>{{ segment.text }}</span>
+                        </template>
+                      </span>
                     </button>
                   </li>
                 </ul>

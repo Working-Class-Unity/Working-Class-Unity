@@ -32,6 +32,7 @@ Medium
   - `Cache-Control: no-store` for `/api/**` and member dashboards
   - Stricter `Referrer-Policy` on `/api/v1/auth/verify`
 - Added server-side rate limiting for `/api/**` (in-memory, per-IP)
+- Removed `v-html` search highlighting sink on tenant handbook TOC (safe rendering)
 
 ## Verification Commands (to rerun)
 
