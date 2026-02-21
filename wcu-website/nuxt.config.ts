@@ -3,6 +3,33 @@ import tailwindcss from "@tailwindcss/vite";
 const isDevelopment = process.env.NODE_ENV === 'development'
 const isProduction = process.env.NODE_ENV === 'production'
 
+const contentSecurityPolicy = [
+  "default-src 'self'",
+  `script-src 'self' 'unsafe-inline'${isProduction ? '' : " 'unsafe-eval'"} https://app.cal.com https://form.workingclassunity.com`,
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "font-src 'self' data: https://fonts.gstatic.com",
+  "img-src 'self' data: blob: https:",
+  "connect-src 'self' https://app.cal.com https://form.workingclassunity.com https://api.formbricks.com",
+  "frame-src 'self' https://app.cal.com https://cal.com",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'self'",
+  "upgrade-insecure-requests",
+].join('; ')
+
+const baseSecurityHeaders: Record<string, string> = {
+  ...(isProduction ? { 'Strict-Transport-Security': 'max-age=31536000' } : {}),
+  'X-Frame-Options': 'SAMEORIGIN',
+  'X-Content-Type-Options': 'nosniff',
+  'X-XSS-Protection': '1; mode=block',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Permissions-Policy': 'geolocation=(), microphone=(), camera=()',
+  'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
+  'Cross-Origin-Resource-Policy': 'same-site',
+  'Content-Security-Policy': contentSecurityPolicy,
+}
+
 export default defineNuxtConfig({
   compatibilityDate: "2024-11-01",
   devtools: { enabled: isDevelopment },
@@ -121,70 +148,83 @@ export default defineNuxtConfig({
       },
       '/member/**': {
         headers: {
+          ...baseSecurityHeaders,
           'X-Robots-Tag': 'noindex, nofollow, noarchive',
+          'Cache-Control': 'no-store',
         },
       },
       '/organizing/**': {
         headers: {
+          ...baseSecurityHeaders,
           'X-Robots-Tag': 'noindex, nofollow, noarchive',
+          'Cache-Control': 'no-store',
         },
       },
       '/finance/**': {
         headers: {
+          ...baseSecurityHeaders,
           'X-Robots-Tag': 'noindex, nofollow, noarchive',
+          'Cache-Control': 'no-store',
         },
       },
       '/es/member/**': {
         headers: {
+          ...baseSecurityHeaders,
           'X-Robots-Tag': 'noindex, nofollow, noarchive',
+          'Cache-Control': 'no-store',
         },
       },
       '/es/organizing/**': {
         headers: {
+          ...baseSecurityHeaders,
           'X-Robots-Tag': 'noindex, nofollow, noarchive',
+          'Cache-Control': 'no-store',
         },
       },
       '/es/finance/**': {
         headers: {
+          ...baseSecurityHeaders,
           'X-Robots-Tag': 'noindex, nofollow, noarchive',
+          'Cache-Control': 'no-store',
         },
       },
       '/pa/member/**': {
         headers: {
+          ...baseSecurityHeaders,
           'X-Robots-Tag': 'noindex, nofollow, noarchive',
+          'Cache-Control': 'no-store',
         },
       },
       '/pa/organizing/**': {
         headers: {
+          ...baseSecurityHeaders,
           'X-Robots-Tag': 'noindex, nofollow, noarchive',
+          'Cache-Control': 'no-store',
         },
       },
       '/pa/finance/**': {
         headers: {
+          ...baseSecurityHeaders,
           'X-Robots-Tag': 'noindex, nofollow, noarchive',
+          'Cache-Control': 'no-store',
+        },
+      },
+      '/api/**': {
+        headers: {
+          ...baseSecurityHeaders,
+          'Cache-Control': 'no-store',
+        },
+      },
+      '/api/v1/auth/verify': {
+        headers: {
+          ...baseSecurityHeaders,
+          'Cache-Control': 'no-store',
+          'Referrer-Policy': 'no-referrer',
         },
       },
       '/**': {
         headers: {
-          'X-Frame-Options': 'SAMEORIGIN',
-          'X-Content-Type-Options': 'nosniff',
-          'X-XSS-Protection': '1; mode=block',
-          'Referrer-Policy': 'strict-origin-when-cross-origin',
-          'Permissions-Policy': 'geolocation=(), microphone=(), camera=()',
-          'Content-Security-Policy': [
-            "default-src 'self'",
-            `script-src 'self' 'unsafe-inline'${isProduction ? '' : " 'unsafe-eval'"} https://app.cal.com https://form.workingclassunity.com`,
-            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-            "font-src 'self' data: https://fonts.gstatic.com",
-            "img-src 'self' data: blob: https:",
-            "connect-src 'self' https://app.cal.com https://form.workingclassunity.com https://api.formbricks.com",
-            "frame-src 'self' https://app.cal.com https://cal.com",
-            "object-src 'none'",
-            "base-uri 'self'",
-            "form-action 'self'",
-            "frame-ancestors 'self'",
-            "upgrade-insecure-requests",
-          ].join('; '),
+          ...baseSecurityHeaders,
         },
       },
     },

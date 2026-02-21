@@ -21,7 +21,16 @@ Medium
 
 ## Fixes Applied
 
-Pending (this report is updated as tasks complete).
+- Added CI guardrails:
+  - gitleaks secret scan
+  - dependency review + npm audit (high+)
+  - Semgrep OWASP Top 10 scan
+  - Dependabot updates
+- Added baseline runtime hardening:
+  - HSTS (production only)
+  - COOP + CORP headers
+  - `Cache-Control: no-store` for `/api/**` and member dashboards
+  - Stricter `Referrer-Policy` on `/api/v1/auth/verify`
 
 ## Verification Commands (to rerun)
 
