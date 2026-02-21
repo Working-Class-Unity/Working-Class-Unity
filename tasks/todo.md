@@ -59,7 +59,8 @@ Abuse / Failure Modes
 - [x] Task 4: Add rate limiting for /api/** (middleware)
 - [x] Task 5: Remove v-html highlight sink (tenant handbook)
 - [x] Task 6: Clean 400s for input validation (no noisy 500s)
-- [ ] Task 7: Run verification commands and update the gate report with results
+- [x] Task 7: Address dependency audit findings (npm audit)
+- [ ] Task 8: Run verification commands and update the gate report with results
 
 ## Review Notes (fill as we go)
 

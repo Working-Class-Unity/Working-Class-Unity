@@ -34,6 +34,8 @@ Medium
 - Added server-side rate limiting for `/api/**` (in-memory, per-IP)
 - Removed `v-html` search highlighting sink on tenant handbook TOC (safe rendering)
 - Converted Zod validation failures into clean 400s (no noisy internal errors)
+- Updated npm lockfile via `npm audit fix` and re-validated `npm run quality` + `npm run build`
+- Added an npm-audit CI gate script with an explicit allowlist for one build-time advisory
 
 ## Verification Commands (to rerun)
 
@@ -46,7 +48,7 @@ gitleaks detect --source .
 # Dependencies
 cd wcu-website
 npm ci
-npm audit --omit=dev
+npm run audit:prod
 
 # SAST
 semgrep --config p/owasp-top-ten --error wcu-website
@@ -62,4 +64,8 @@ curl -sI https://workingclassunity.com | sed -n '1,40p'
 
 ## Remaining Risks / Explicit Acceptances
 
-None recorded yet.
+- `GHSA-3PPC-4F35-3M26` (minimatch ReDoS)
+  - Present in Nuxt build-time toolchain dependencies (glob/archiver/eslint path).
+  - Risk accepted because these packages are not shipped as runtime `node_modules` in the Docker image (the image copies `.output/` only), and the affected code paths are not exposed to untrusted user-supplied glob patterns in production.
+  - Tracking: `wcu-website/scripts/npm-audit-gate.mjs` allowlist.
+  - Revisit: remove allowlist when upstream (Nuxt/Nitro toolchain) upgrades away from vulnerable minimatch versions.
