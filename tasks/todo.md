@@ -60,7 +60,8 @@ Abuse / Failure Modes
 - [x] Task 5: Remove v-html highlight sink (tenant handbook)
 - [x] Task 6: Clean 400s for input validation (no noisy 500s)
 - [x] Task 7: Address dependency audit findings (npm audit)
-- [ ] Task 8: Run verification commands and update the gate report with results
+- [x] Task 8: Fix header/cookie findings from verification (X-Powered-By, i18n cookie Secure)
+- [ ] Task 9: Run verification commands and update the gate report with results
 
 ## Review Notes (fill as we go)
 

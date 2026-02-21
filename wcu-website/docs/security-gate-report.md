@@ -36,6 +36,8 @@ Medium
 - Converted Zod validation failures into clean 400s (no noisy internal errors)
 - Updated npm lockfile via `npm audit fix` and re-validated `npm run quality` + `npm run build`
 - Added an npm-audit CI gate script with an explicit allowlist for one build-time advisory
+- Removed `x-powered-by` header at runtime (Nitro `beforeResponse` hook)
+- i18n redirect cookie is `Secure` in production (`detectBrowserLanguage.cookieSecure`)
 
 ## Verification Commands (to rerun)
 
