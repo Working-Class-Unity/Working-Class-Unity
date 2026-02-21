@@ -13,6 +13,9 @@ on:
       - ".github/workflows/a11y.yml"
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   a11y:
     runs-on: ubuntu-latest

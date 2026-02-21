@@ -1,0 +1,10 @@
+title = "WCU gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Ignore knowledgebase and other non-prod docs"
+paths = [
+  '''^knowledgebase/''',
+]
