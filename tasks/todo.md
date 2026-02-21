@@ -56,7 +56,7 @@ Abuse / Failure Modes
 - [x] Task 1: Add security docs (gate report + runbook + PocketBase auth notes)
 - [x] Task 2: Add CI guardrails (secret scan, dependency scan, SAST, dependabot)
 - [x] Task 3: Add baseline runtime hardening (headers + no-store caching rules)
-- [ ] Task 4: Add rate limiting for /api/** (middleware)
+- [x] Task 4: Add rate limiting for /api/** (middleware)
 - [ ] Task 5: Remove v-html highlight sink (tenant handbook)
 - [ ] Task 6: Clean 400s for input validation (no noisy 500s)
 - [ ] Task 7: Run verification commands and update the gate report with results
