@@ -61,7 +61,7 @@ Abuse / Failure Modes
 - [x] Task 6: Clean 400s for input validation (no noisy 500s)
 - [x] Task 7: Address dependency audit findings (npm audit)
 - [x] Task 8: Fix header/cookie findings from verification (X-Powered-By, i18n cookie Secure)
-- [ ] Task 9: Run verification commands and update the gate report with results
+- [x] Task 9: Run verification commands and update the gate report with results
 
 ## Review Notes (fill as we go)
 
