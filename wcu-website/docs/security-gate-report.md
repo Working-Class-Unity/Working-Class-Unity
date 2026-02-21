@@ -33,6 +33,7 @@ Medium
   - Stricter `Referrer-Policy` on `/api/v1/auth/verify`
 - Added server-side rate limiting for `/api/**` (in-memory, per-IP)
 - Removed `v-html` search highlighting sink on tenant handbook TOC (safe rendering)
+- Converted Zod validation failures into clean 400s (no noisy internal errors)
 
 ## Verification Commands (to rerun)
 

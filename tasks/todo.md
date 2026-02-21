@@ -58,7 +58,7 @@ Abuse / Failure Modes
 - [x] Task 3: Add baseline runtime hardening (headers + no-store caching rules)
 - [x] Task 4: Add rate limiting for /api/** (middleware)
 - [x] Task 5: Remove v-html highlight sink (tenant handbook)
-- [ ] Task 6: Clean 400s for input validation (no noisy 500s)
+- [x] Task 6: Clean 400s for input validation (no noisy 500s)
 - [ ] Task 7: Run verification commands and update the gate report with results
 
 ## Review Notes (fill as we go)

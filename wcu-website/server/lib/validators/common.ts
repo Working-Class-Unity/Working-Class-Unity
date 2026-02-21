@@ -7,10 +7,28 @@ export const idSchema = z.string().trim().min(1)
 
 export async function parseBodyWithSchema<T extends ZodTypeAny>(event: H3Event, schema: T): Promise<z.output<T>> {
   const body = await readBody(event)
-  return schema.parse(body)
+  const parsed = schema.safeParse(body)
+
+  if (!parsed.success) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Invalid request body',
+    })
+  }
+
+  return parsed.data
 }
 
 export function parseQueryWithSchema<T extends ZodTypeAny>(event: H3Event, schema: T): z.output<T> {
   const query = getQuery(event)
-  return schema.parse(query)
+  const parsed = schema.safeParse(query)
+
+  if (!parsed.success) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Invalid query parameters',
+    })
+  }
+
+  return parsed.data
 }
