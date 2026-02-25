@@ -1890,6 +1890,14 @@
         "title": "Grupo de Lectura: Socialismo 101",
         "description": "¡Únete a nuestra nueva serie de Socialismo 101! Lugar por confirmar (vuelve pronto para más detalles)."
       },
+      "afterHoursWithWcu": {
+        "title": "After Hours con WCU",
+        "description": "Conversación de mesa: Frente Unido vs. Frente Popular"
+      },
+      "wcuGameNight": {
+        "title": "Noche de juegos con WCU",
+        "description": "Ven a convivir y jugar juegos de mesa y cartas con Working Class Unity. ¡Todos son bienvenidos!"
+      },
       "event1": {
         "title": "Reunión General de Miembros",
         "description": "Reunión mensual de miembros generales para discutir campañas en curso y actualizaciones organizacionales."
