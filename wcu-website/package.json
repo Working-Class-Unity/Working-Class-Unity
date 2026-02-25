@@ -26,7 +26,7 @@
     "@nuxt/scripts": "^0.13.0",
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.1.17",
-    "daisyui": "^5.5.5",
+    "daisyui": "^5.5.19",
     "nuxt": "^4.2.1",
     "nuxt-schema-org": "^5.0.9",
     "pocketbase": "^0.26.8",
