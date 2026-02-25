@@ -20,7 +20,7 @@
     "test:a11y": "playwright test tests/a11y.spec.ts"
   },
   "dependencies": {
-    "@formbricks/js": "^4.2.1",
+    "@formbricks/js": "^4.3.0",
     "@nuxt/fonts": "^0.12.1",
     "@nuxt/image": "^2.0.0",
     "@nuxt/scripts": "^0.13.0",
