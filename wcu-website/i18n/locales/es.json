@@ -1902,6 +1902,30 @@
         "title": "After Hours con WCU | ¿Quién paga el imperio? La guerra de EE. UU. e Israel contra Irán",
         "description": "Únete a WCU para una conversación presencial centrada en lo que está materialmente en juego: imperio, petróleo, poder regional, represión y cómo podría verse una política antibélica seria."
       },
+      "wcuGameNightSeries": {
+        "title": "Noche de Juegos con WCU",
+        "description": "Noche de Juegos con WCU"
+      },
+      "coffeeWithWcuSeries": {
+        "title": "Café con WCU",
+        "description": "Café con WCU"
+      },
+      "afterHoursWithWcuSeries": {
+        "title": "After Hours con WCU",
+        "description": "After Hours con WCU"
+      },
+      "wcuSteeringCommitteeMeeting": {
+        "title": "Reunión del Comité Directivo de WCU",
+        "description": "Reunión del Comité Directivo de WCU"
+      },
+      "wcuGeneralMeetingSeries": {
+        "title": "Reunión General de WCU",
+        "description": "Reunión General de WCU"
+      },
+      "socialism101ReadingGroupSeries": {
+        "title": "Grupo de Lectura: Socialismo 101",
+        "description": "Grupo de Lectura: Socialismo 101"
+      },
       "event1": {
         "title": "Reunión General de Miembros",
         "description": "Reunión mensual de miembros generales para discutir campañas en curso y actualizaciones organizacionales."
