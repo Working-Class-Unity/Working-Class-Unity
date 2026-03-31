@@ -230,7 +230,27 @@ onUnmounted(() => {
           <h2 class="text-xs uppercase tracking-wide text-base-content mb-3 px-1">
             {{ $t('links.get_involved_heading') }}
           </h2>
-          
+
+          <a
+            href="https://tech.workingclassunity.com/march-31-finish-off-flock-stockton"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center justify-between w-full p-4 min-h-12 bg-accent text-accent-content rounded-xl hover:opacity-90 focus:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-opacity shadow-sm mb-3"
+          >
+            <div class="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.37-1.12-1.106-1.12-1.887v-1.423l6.563-4.101A1.125 1.125 0 0 1 17.5 9.384v5.232a1.125 1.125 0 0 1-1.717.955l-6.563-4.101v2.483c0 1.193.66 2.287 1.715 2.845l.147.077a6.75 6.75 0 0 1 3.168 3.59h-2.307a4.5 4.5 0 0 0-2.108-2.203l-.147-.078ZM18.75 9.75a3.75 3.75 0 0 1 0 4.5" />
+              </svg>
+              <span class="font-semibold">Tell Stockton City Council: Vote No on Flock</span>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+              </svg>
+              <span class="sr-only">{{ $t('common.opens_in_new_tab') }}</span>
+            </div>
+          </a>
+
           <!-- Calendar Link - Primary CTA -->
           <NuxtLinkLocale 
             to="/calendar" 
