@@ -51,11 +51,11 @@ describe('Event registry', () => {
   })
 
   it('keeps events visible for 3 hours after they end', () => {
-    const recentEvent = events.find((event) => event.id === 'event-12')
+    const recentEvent = events.find((event) => event.id === 'event-28')
 
     expect(recentEvent).toBeDefined()
-    expect(isEventVisible(recentEvent!, '2026-02-27T06:59:59.000Z')).toBe(true)
-    expect(isEventVisible(recentEvent!, '2026-02-27T07:00:01.000Z')).toBe(false)
+    expect(isEventVisible(recentEvent!, '2026-04-10T05:59:59.000Z')).toBe(true)
+    expect(isEventVisible(recentEvent!, '2026-04-10T06:00:01.000Z')).toBe(false)
   })
 
   it('event ids are unique', () => {
