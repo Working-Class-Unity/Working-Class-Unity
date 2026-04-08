@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
 import { campaigns, getCampaignBySlug } from '../../app/data/campaigns'
-import { events, getEventsByCampaign, getEventsByType, getUpcomingEvents } from '../../app/data/events'
+import {
+  events,
+  getEventsByCampaign,
+  getEventsByType,
+  getUpcomingEvents,
+  isEventVisible,
+} from '../../app/data/events'
 import { handbookChapterMap, handbookChapters, handbookContacts, handbookQuickPaths } from '../../app/data/tenant-handbook'
 
 describe('Campaign registry', () => {
@@ -34,13 +40,22 @@ describe('Event registry', () => {
   })
 
   it('returns sorted upcoming events and applies limit', () => {
-    const oneUpcomingEvent = getUpcomingEvents(1)
-    const allUpcomingEvents = getUpcomingEvents()
+    const referenceTime = new Date('2026-02-27T05:00:00.000Z')
+    const oneUpcomingEvent = getUpcomingEvents(1, referenceTime)
+    const allUpcomingEvents = getUpcomingEvents(undefined, referenceTime)
 
     expect(oneUpcomingEvent.length).toBeLessThanOrEqual(1)
 
     const sorted = [...allUpcomingEvents].sort((a, b) => a.startDateTime.localeCompare(b.startDateTime))
     expect(allUpcomingEvents).toEqual(sorted)
+  })
+
+  it('keeps events visible for 3 hours after they end', () => {
+    const recentEvent = events.find((event) => event.id === 'event-12')
+
+    expect(recentEvent).toBeDefined()
+    expect(isEventVisible(recentEvent!, '2026-02-27T06:59:59.000Z')).toBe(true)
+    expect(isEventVisible(recentEvent!, '2026-02-27T07:00:01.000Z')).toBe(false)
   })
 
   it('event ids are unique', () => {

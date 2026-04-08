@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
 import type { Campaign } from '~/data/campaigns'
-import { getEventsByCampaign, type Event } from '~/data/events'
+import { getEventsByCampaign, isEventVisible, type Event } from '~/data/events'
 
 interface Props {
   campaign: Campaign
@@ -101,10 +101,9 @@ const committeeBadgeClass = computed(() => {
 const upcomingCampaignEvents = computed(() => {
   const campaignEvents = getEventsByCampaign(props.campaign.id)
   
-  // Filter to only upcoming, active events and sort by startDateTime
-  // Uses now.value from useState for SSR-safe timestamp comparison
+  // Keep campaign events visible through the same post-event grace window used on the calendar
   return campaignEvents
-    .filter((event) => event.isActive && event.startDateTime >= now.value)
+    .filter((event) => isEventVisible(event, now.value))
     .sort((a, b) => a.startDateTime.localeCompare(b.startDateTime))
     .slice(0, 3) // Limit to 3 upcoming events
 })

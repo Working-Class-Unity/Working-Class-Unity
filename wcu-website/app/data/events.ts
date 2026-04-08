@@ -28,6 +28,8 @@ export interface Event {
   committee: Committee
 }
 
+export const EVENT_VISIBILITY_GRACE_PERIOD_MS = 3 * 60 * 60 * 1000
+
 export const events: Event[] = [
   {
     id: 'event-1',
@@ -347,7 +349,7 @@ export const events: Event[] = [
     rsvpLink: 'https://tech.workingclassunity.com/wcu-game-night',
     isVirtual: false,
     isHybrid: false,
-    isActive: false,
+    isActive: true,
     createdAt: '2026-03-28T00:00:00.000Z',
     updatedAt: '2026-03-28T00:00:00.000Z',
     campaignId: null,
@@ -437,7 +439,7 @@ export const events: Event[] = [
     rsvpLink: 'https://tech.workingclassunity.com/coffee-with-wcu',
     isVirtual: false,
     isHybrid: false,
-    isActive: false,
+    isActive: true,
     createdAt: '2026-03-28T00:00:00.000Z',
     updatedAt: '2026-03-28T00:00:00.000Z',
     campaignId: null,
@@ -545,7 +547,7 @@ export const events: Event[] = [
     rsvpLink: 'https://tech.workingclassunity.com/after-hours-with-wcu',
     isVirtual: false,
     isHybrid: false,
-    isActive: false,
+    isActive: true,
     createdAt: '2026-03-28T00:00:00.000Z',
     updatedAt: '2026-03-28T00:00:00.000Z',
     campaignId: null,
@@ -977,7 +979,7 @@ export const events: Event[] = [
     rsvpLink: 'https://tech.workingclassunity.com/wcu-general-meeting',
     isVirtual: false,
     isHybrid: true,
-    isActive: false,
+    isActive: true,
     createdAt: '2026-03-28T00:00:00.000Z',
     updatedAt: '2026-03-28T00:00:00.000Z',
     campaignId: null,
@@ -1193,7 +1195,7 @@ export const events: Event[] = [
     rsvpLink: 'https://tech.workingclassunity.com/socialism-101-reading-group',
     isVirtual: true,
     isHybrid: false,
-    isActive: false,
+    isActive: true,
     createdAt: '2026-03-28T00:00:00.000Z',
     updatedAt: '2026-03-28T00:00:00.000Z',
     campaignId: null,
@@ -1211,7 +1213,7 @@ export const events: Event[] = [
     rsvpLink: 'https://tech.workingclassunity.com/socialism-101-reading-group',
     isVirtual: true,
     isHybrid: false,
-    isActive: false,
+    isActive: true,
     createdAt: '2026-03-28T00:00:00.000Z',
     updatedAt: '2026-03-28T00:00:00.000Z',
     campaignId: null,
@@ -1229,7 +1231,7 @@ export const events: Event[] = [
     rsvpLink: 'https://tech.workingclassunity.com/socialism-101-reading-group',
     isVirtual: true,
     isHybrid: false,
-    isActive: false,
+    isActive: true,
     createdAt: '2026-03-28T00:00:00.000Z',
     updatedAt: '2026-03-28T00:00:00.000Z',
     campaignId: null,
@@ -1247,7 +1249,7 @@ export const events: Event[] = [
     rsvpLink: 'https://tech.workingclassunity.com/socialism-101-reading-group',
     isVirtual: true,
     isHybrid: false,
-    isActive: false,
+    isActive: true,
     createdAt: '2026-03-28T00:00:00.000Z',
     updatedAt: '2026-03-28T00:00:00.000Z',
     campaignId: null,
@@ -1265,7 +1267,7 @@ export const events: Event[] = [
     rsvpLink: 'https://tech.workingclassunity.com/socialism-101-reading-group',
     isVirtual: true,
     isHybrid: false,
-    isActive: false,
+    isActive: true,
     createdAt: '2026-03-28T00:00:00.000Z',
     updatedAt: '2026-03-28T00:00:00.000Z',
     campaignId: null,
@@ -1372,15 +1374,27 @@ export function getEventsByCommittee(committee: string): Event[] {
   return events.filter((event) => event.committee === committee)
 }
 
+function getReferenceTime(referenceTime: Date | string): number {
+  return typeof referenceTime === 'string'
+    ? new Date(referenceTime).getTime()
+    : referenceTime.getTime()
+}
+
+export function isEventVisible(event: Event, referenceTime: Date | string = new Date()): boolean {
+  const visibleUntil = new Date(event.endDateTime).getTime() + EVENT_VISIBILITY_GRACE_PERIOD_MS
+  return event.isActive && visibleUntil >= getReferenceTime(referenceTime)
+}
+
 /**
- * Get upcoming active events sorted by start date/time
+ * Get active events that should remain visible, sorted by start date/time.
+ * Events stay visible until 3 hours after they end.
  * @param limit - Optional maximum number of events to return
- * @returns Array of active events sorted by startDateTime, optionally limited
+ * @param referenceTime - Optional timestamp override for deterministic filtering
+ * @returns Array of visible events sorted by startDateTime, optionally limited
  */
-export function getUpcomingEvents(limit?: number): Event[] {
-  const now = new Date().toISOString()
+export function getUpcomingEvents(limit?: number, referenceTime: Date | string = new Date()): Event[] {
   const upcomingEvents = events
-    .filter((event) => event.isActive && event.startDateTime >= now)
+    .filter((event) => isEventVisible(event, referenceTime))
     .sort((a, b) => a.startDateTime.localeCompare(b.startDateTime))
 
   if (limit !== undefined && limit > 0) {
