@@ -1344,6 +1344,42 @@ export const events: Event[] = [
     updatedAt: '2026-03-28T00:00:00.000Z',
     campaignId: null,
     committee: 'education'
+  },
+  {
+    id: 'event-74',
+    titleKey: 'calendar.events.wcuOpenHouseApr2026.title',
+    descriptionKey: 'calendar.events.wcuOpenHouseApr2026.description',
+    eventType: 'social',
+    startDateTime: '2026-04-24T01:00:00.000Z',
+    endDateTime: '2026-04-24T03:00:00.000Z',
+    allDay: false,
+    location: 'OF Hall - 2522 Grand Canal Blvd, Stockton, CA, USA',
+    rsvpLink: 'https://tech.workingclassunity.com/wcu-open-house',
+    isVirtual: false,
+    isHybrid: false,
+    isActive: true,
+    createdAt: '2026-04-19T00:00:00.000Z',
+    updatedAt: '2026-04-19T00:00:00.000Z',
+    campaignId: null,
+    committee: 'membership'
+  },
+  {
+    id: 'event-75',
+    titleKey: 'calendar.events.mayDay2026.title',
+    descriptionKey: 'calendar.events.mayDay2026.description',
+    eventType: 'action',
+    startDateTime: '2026-05-02T01:00:00.000Z',
+    endDateTime: '2026-05-02T03:00:00.000Z',
+    allDay: false,
+    location: 'Victory Park, Stockton - 1001 N Pershing Ave, Stockton, CA 95203, USA',
+    rsvpLink: 'https://tech.workingclassunity.com/may-day-2026',
+    isVirtual: false,
+    isHybrid: false,
+    isActive: true,
+    createdAt: '2026-04-19T00:00:00.000Z',
+    updatedAt: '2026-04-19T00:00:00.000Z',
+    campaignId: null,
+    committee: null
   }
 ]
 
