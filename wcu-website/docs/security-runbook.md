@@ -6,18 +6,8 @@ This runbook is intentionally short. It documents the minimum operational steps 
 
 Rotate via your deployment platform secret store (Coolify env vars). Do not commit secrets.
 
-- `AUTH_SESSION_SECRET`
-  - Generate a new 64+ char random value.
-  - Deploy.
-  - Note: rotating invalidates existing sessions.
-- `RESEND_API_KEY`
-  - Rotate in Resend dashboard.
-  - Update Coolify.
-  - Deploy.
-- PocketBase service credentials
-  - Rotate the service account password.
-  - Update Coolify vars `POCKETBASE_SERVICE_EMAIL` / `POCKETBASE_SERVICE_PASSWORD`.
-  - Deploy.
+- No server-side application secrets are required for the current public site.
+- If a future integration adds secret values, rotate them in the provider dashboard, update Coolify env vars, and deploy.
 
 ## Dependency Updates
 
@@ -40,8 +30,7 @@ Confirm:
 - `X-Content-Type-Options: nosniff`
 - `Referrer-Policy` present
 
-Cookies:
-- Session cookie is `HttpOnly; Secure; SameSite=Lax` (or stricter)
+Artifacts:
 - No secrets appear in HTML or `.output/` bundles
 
 ## Incident Response (Minimal)

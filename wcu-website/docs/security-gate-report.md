@@ -21,11 +21,7 @@ None.
 - Added baseline runtime hardening:
   - HSTS (production only)
   - COOP + CORP headers
-  - `Cache-Control: no-store` for `/api/**` and member dashboards
-  - Stricter `Referrer-Policy` on `/api/v1/auth/verify`
-- Added server-side rate limiting for `/api/**` (in-memory, per-IP)
 - Removed `v-html` search highlighting sink on tenant handbook TOC (safe rendering)
-- Converted Zod validation failures into clean 400s (no noisy internal errors)
 - Updated npm lockfile via `npm audit fix` and re-validated `npm run quality` + `npm run build`
 - Added an npm-audit CI gate script with an explicit allowlist for one build-time advisory
 - Removed `x-powered-by` header at runtime (Nitro `beforeResponse` hook)
@@ -39,15 +35,11 @@ None.
 - Dependencies
   - `npm run audit:prod` PASSED with allowlist-only findings for `GHSA-3PPC-4F35-3M26`.
 - Build artifacts
-  - `rg` scan of `.output/` found no key material; only expected string "AUTH_SESSION_SECRET is not configured".
+  - `rg` scan of `.output/` found no key material.
 - Headers + caching
   - Local production build (`NODE_ENV=production`) verified:
     - HSTS + CSP + COOP/CORP present on `/`.
-    - `Cache-Control: no-store` on `/member` and `/api/**`.
-    - `Referrer-Policy: no-referrer` on `/api/v1/auth/verify`.
     - `x-powered-by` removed.
-- Rate limiting
-  - 21 sequential GETs to `/api/v1/auth/verify?token=invalid` returned `429` on the last request.
 
 ## Verification Commands (to rerun)
 

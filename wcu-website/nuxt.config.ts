@@ -92,33 +92,6 @@ export default defineNuxtConfig({
   
   // Runtime configuration for environment variables
   runtimeConfig: {
-    pocketbaseUrl: process.env.POCKETBASE_URL || '',
-    pocketbaseServiceEmail: process.env.POCKETBASE_SERVICE_EMAIL || '',
-    pocketbaseServicePassword: process.env.POCKETBASE_SERVICE_PASSWORD || '',
-    pocketbaseAuthCollection: process.env.POCKETBASE_AUTH_COLLECTION || 'users',
-    pocketbaseMagicLinkCollection: process.env.POCKETBASE_MAGIC_LINK_COLLECTION || 'auth_magic_links',
-    pocketbaseMagicLinkTtlMinutes: Number.parseInt(process.env.POCKETBASE_MAGIC_LINK_TTL_MINUTES || '20', 10),
-    pocketbaseMemberProfileCollection: process.env.POCKETBASE_MEMBER_PROFILE_COLLECTION || 'member_profiles',
-    pocketbaseDuesRecordCollection: process.env.POCKETBASE_DUES_RECORD_COLLECTION || 'dues_records',
-    pocketbaseMemberProfileUserField: process.env.POCKETBASE_MEMBER_PROFILE_USER_FIELD || 'userId',
-    pocketbaseDuesRecordUserField: process.env.POCKETBASE_DUES_RECORD_USER_FIELD || 'userId',
-    pocketbaseBuildingsCollection: process.env.POCKETBASE_BUILDINGS_COLLECTION || 'buildings',
-    pocketbaseOutreachCollection: process.env.POCKETBASE_OUTREACH_COLLECTION || 'outreach_interactions',
-    pocketbaseOutreachDateField: process.env.POCKETBASE_OUTREACH_DATE_FIELD || 'occurredAt',
-    pocketbaseOutreachBuildingField: process.env.POCKETBASE_OUTREACH_BUILDING_FIELD || 'buildingId',
-    pocketbaseFinanceIncomeCollection: process.env.POCKETBASE_FINANCE_INCOME_COLLECTION || 'dues_records',
-    pocketbaseFinanceExpenseCollection: process.env.POCKETBASE_FINANCE_EXPENSE_COLLECTION || 'expense_records',
-    pocketbaseFinanceIncomeAmountField: process.env.POCKETBASE_FINANCE_INCOME_AMOUNT_FIELD || 'amountCents',
-    pocketbaseFinanceExpenseAmountField: process.env.POCKETBASE_FINANCE_EXPENSE_AMOUNT_FIELD || 'amountCents',
-    pocketbaseFinanceIncomeDateField: process.env.POCKETBASE_FINANCE_INCOME_DATE_FIELD || 'paidAt',
-    pocketbaseFinanceExpenseDateField: process.env.POCKETBASE_FINANCE_EXPENSE_DATE_FIELD || 'spentAt',
-    pocketbaseUserRoleField: process.env.POCKETBASE_USER_ROLE_FIELD || 'role',
-    pocketbaseUserDuesPaidThroughField: process.env.POCKETBASE_USER_DUES_PAID_THROUGH_FIELD || 'duesPaidThrough',
-    authSessionSecret: process.env.AUTH_SESSION_SECRET || '',
-    authSessionTtlSeconds: Number.parseInt(process.env.AUTH_SESSION_TTL_SECONDS || `${60 * 60 * 24 * 14}`, 10),
-    resendApiKey: process.env.RESEND_API_KEY || '',
-    resendFromEmail: process.env.RESEND_FROM_EMAIL || '',
-    authMagicLinkOrigin: process.env.AUTH_MAGIC_LINK_ORIGIN || 'http://localhost:3000',
     // Public keys (exposed to client) - Formbricks needs client-side access
     public: {
       formbricksEnvironmentId: process.env.NUXT_PUBLIC_FORMBRICKS_ENVIRONMENT_ID || 'cminsehli0009o8015hjuzkuz',
@@ -145,82 +118,6 @@ export default defineNuxtConfig({
         redirect: {
           to: '/pa/know-your-rights',
           statusCode: 301,
-        },
-      },
-      '/member/**': {
-        headers: {
-          ...baseSecurityHeaders,
-          'X-Robots-Tag': 'noindex, nofollow, noarchive',
-          'Cache-Control': 'no-store',
-        },
-      },
-      '/organizing/**': {
-        headers: {
-          ...baseSecurityHeaders,
-          'X-Robots-Tag': 'noindex, nofollow, noarchive',
-          'Cache-Control': 'no-store',
-        },
-      },
-      '/finance/**': {
-        headers: {
-          ...baseSecurityHeaders,
-          'X-Robots-Tag': 'noindex, nofollow, noarchive',
-          'Cache-Control': 'no-store',
-        },
-      },
-      '/es/member/**': {
-        headers: {
-          ...baseSecurityHeaders,
-          'X-Robots-Tag': 'noindex, nofollow, noarchive',
-          'Cache-Control': 'no-store',
-        },
-      },
-      '/es/organizing/**': {
-        headers: {
-          ...baseSecurityHeaders,
-          'X-Robots-Tag': 'noindex, nofollow, noarchive',
-          'Cache-Control': 'no-store',
-        },
-      },
-      '/es/finance/**': {
-        headers: {
-          ...baseSecurityHeaders,
-          'X-Robots-Tag': 'noindex, nofollow, noarchive',
-          'Cache-Control': 'no-store',
-        },
-      },
-      '/pa/member/**': {
-        headers: {
-          ...baseSecurityHeaders,
-          'X-Robots-Tag': 'noindex, nofollow, noarchive',
-          'Cache-Control': 'no-store',
-        },
-      },
-      '/pa/organizing/**': {
-        headers: {
-          ...baseSecurityHeaders,
-          'X-Robots-Tag': 'noindex, nofollow, noarchive',
-          'Cache-Control': 'no-store',
-        },
-      },
-      '/pa/finance/**': {
-        headers: {
-          ...baseSecurityHeaders,
-          'X-Robots-Tag': 'noindex, nofollow, noarchive',
-          'Cache-Control': 'no-store',
-        },
-      },
-      '/api/**': {
-        headers: {
-          ...baseSecurityHeaders,
-          'Cache-Control': 'no-store',
-        },
-      },
-      '/api/v1/auth/verify': {
-        headers: {
-          ...baseSecurityHeaders,
-          'Cache-Control': 'no-store',
-          'Referrer-Policy': 'no-referrer',
         },
       },
       '/**': {

@@ -401,7 +401,7 @@ export function useDateFormat() {
 
 ### 3. Member Features (Future)
 **Improvements:**
-- [ ] **Member dashboard** (if authentication added)
+- [ ] **Members-only tools** (if a future access system is added)
 - [ ] **Event RSVP system** (currently links to Cal.com)
 - [ ] **Member directory** (if privacy allows)
 - [ ] **Discussion forums** integration (currently external link)
@@ -522,5 +522,4 @@ export function useDateFormat() {
 ---
 
 **Last Updated:** January 2025
-
 

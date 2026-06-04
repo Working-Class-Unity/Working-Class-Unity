@@ -6,6 +6,7 @@ const routes = [
   '/about',
   '/calendar',
   '/campaigns',
+  '/deflockstockton',
   '/join',
   '/kyr',
   '/know-your-rights/ice-at-home',
