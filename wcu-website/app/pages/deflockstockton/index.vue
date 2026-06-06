@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const signRoute = '/deflockstockton/sign'
+const signRoute = 'https://tech.workingclassunity.com/deflock-stockton'
 const signLabel = 'Sign the petition'
 
 const navItems = [
@@ -51,11 +51,11 @@ const bridgeCards = [
 ]
 
 const removalItems = [
-  'Terminate or non-renew Flock contracts at the earliest legally available date.',
-  'Suspend all new or expanded Flock-connected surveillance tools, integrations, and deployments.',
-  'Delete or return City data that is not legally needed as evidence or a public record.',
-  'Publish a Flock equipment list, removal schedule, and closeout report.',
-  'Stop new payments, renewals, expansions, or replacement systems that bring Flock back under another name.',
+  'End or non-renew Flock contracts at the earliest legal date.',
+  'Stop new Flock tools, integrations, deployments, and expansions.',
+  'Delete Flock-held vehicle-scan and location data where law allows.',
+  'Publish the Flock equipment list, removal schedule, and closeout report.',
+  'Block new payments, renewals, expansions, or replacement systems that bring Flock or a similar private tracking system back under another name.',
 ]
 
 useHead({
@@ -116,6 +116,7 @@ useSchemaOrg([
             </NuxtLink>
             <NuxtLink
               :to="signRoute"
+              external
               class="btn btn-accent h-10 min-h-10 px-5 text-sm font-bold"
             >
               {{ signLabel }}
@@ -145,6 +146,7 @@ useSchemaOrg([
           <div class="mt-8 flex flex-col gap-3 sm:flex-row">
             <NuxtLink
               :to="signRoute"
+              external
               class="btn btn-lg bg-accent border-accent text-base-100 hover:bg-accent/90 hover:border-accent/90"
             >
               {{ signLabel }}
@@ -331,7 +333,7 @@ useSchemaOrg([
                 What The Removal Resolution Would Do.
               </h2>
               <p class="mt-5 max-w-md text-lg leading-8 text-base-content/85">
-                By signing, you are calling on Stockton to pass a Flock removal resolution that would:
+                By signing, I urge the Stockton City Council to pass a Flock removal resolution. It would:
               </p>
               <div class="mt-6 hidden h-1.5 w-24 bg-secondary md:block" aria-hidden="true"></div>
             </div>
@@ -359,6 +361,7 @@ useSchemaOrg([
             <div class="flex justify-stretch sm:justify-end">
               <NuxtLink
                 :to="signRoute"
+                external
                 class="btn btn-lg w-full bg-accent border-accent text-base-100 hover:bg-accent/90 hover:border-accent/90 sm:w-auto"
               >
                 {{ signLabel }}
