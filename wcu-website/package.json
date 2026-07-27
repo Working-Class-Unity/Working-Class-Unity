@@ -29,7 +29,7 @@
     "daisyui": "^5.5.5",
     "nuxt": "^4.2.1",
     "nuxt-schema-org": "^5.0.9",
-    "tailwindcss": "^4.1.17"
+    "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.1",
