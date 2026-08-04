@@ -1,9 +1,21 @@
-# Reviewed 2026-07-27 by Small Wise Labs maintainers.
-# Historical documentation prose describing a synthetic model identifier, not a credential.
-e2e0d69e2ca987c4f11d0d9c6f568e03e48cb4f1:docs/baseline/README.md:generic-api-key:387
+# Reviewed 2026-08-04 by Working Class Unity maintainers.
+# The ancestry-free Baseline snapshot contains documentation prose describing a
+# synthetic model identifier, not a credential.
+ce833c307793ee0fbca476b2b55e906d41bef15f:docs/baseline/README.md:generic-api-key:389
 
-# Reviewed 2026-07-28 by Small Wise Labs maintainers.
-# Historical test-only Stripe placeholders, not credentials.
-4e2c2a8b3431e2ff2400129a92e68edd1031fc70:apps/web/tests/billing-projection.test.ts:stripe-access-token:14
-4e2c2a8b3431e2ff2400129a92e68edd1031fc70:apps/web/tests/billing-transition.test.ts:stripe-access-token:23
-4efbe2e87d38ec5cdf871dce7a6d77f9b991563b:apps/web/tests/module-states.test.ts:stripe-access-token:159
+# Reviewed 2026-08-04 by Working Class Unity maintainers.
+# The ancestry-free Baseline snapshot contains test-only Stripe placeholders,
+# not provider credentials. The apps/web paths are historical paths in the
+# immutable import commit, not paths in the flattened application.
+ce833c307793ee0fbca476b2b55e906d41bef15f:apps/web/tests/billing-projection.test.ts:stripe-access-token:14
+ce833c307793ee0fbca476b2b55e906d41bef15f:apps/web/tests/billing-transition.test.ts:stripe-access-token:23
+ce833c307793ee0fbca476b2b55e906d41bef15f:apps/web/tests/module-states.test.ts:stripe-access-token:159
+
+# Reviewed 2026-08-04 by Working Class Unity maintainers.
+# Legacy WCU history contains copied public developer-documentation examples,
+# not credentials issued to or used by WCU.
+28b1fd87b8ebe3f49f923d3e513d915de1135458:knowledgebase/Formbricks/formbricks.com_docs_self-hosting_configuration_auth-sso_open-id-connect.md:generic-api-key:95
+576166187f3ffddc26d7fca297168496a5a34a88:knowledgebase/node.js Documentation 2025-11-24/nodejs.org_dist_latest_docs_api_https.html.md:generic-api-key:898
+576166187f3ffddc26d7fca297168496a5a34a88:knowledgebase/node.js Documentation 2025-11-24/nodejs.org_dist_latest_docs_api_https.html.md:generic-api-key:901
+576166187f3ffddc26d7fca297168496a5a34a88:knowledgebase/node.js Documentation 2025-11-24/nodejs.org_dist_latest_docs_api_https.html.md:generic-api-key:904
+576166187f3ffddc26d7fca297168496a5a34a88:knowledgebase/node.js Documentation 2025-11-24/nodejs.org_dist_latest_docs_api_https.html.md:generic-api-key:907
