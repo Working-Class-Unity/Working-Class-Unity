@@ -679,14 +679,14 @@ async function* disabledUploadBody() {
 function coreEnvironment(overrides: Record<string, string | undefined> = {}) {
   return {
     NODE_ENV: 'test',
-    NUXT_DATABASE_URL: 'file:../../data/module-states.test.db',
+    NUXT_DATABASE_URL: 'file:./data/module-states.test.db',
     NUXT_READINESS_TOKEN: 'module-state-readiness-token-with-32-characters',
     NUXT_BETTER_AUTH_SECRET: 'module-state-test-secret-with-32-characters',
     NUXT_BETTER_AUTH_URL: 'https://app.example.test',
     NUXT_SOCIAL_PROVIDERS_GOOGLE_ENABLED: 'false',
     NUXT_EMAIL_TRANSPORT: 'capture',
     NUXT_EMAIL_FROM: 'SmallWiseLabs Base App <no-reply@example.test>',
-    NUXT_EMAIL_CAPTURE_DIRECTORY: '../../data/email-capture-module-states',
+    NUXT_EMAIL_CAPTURE_DIRECTORY: './data/email-capture-module-states',
     NUXT_PUBLIC_APP_URL: 'https://app.example.test',
     NUXT_MODULES_BILLING_ENABLED: 'false',
     NUXT_MODULES_FILES_ENABLED: 'false',

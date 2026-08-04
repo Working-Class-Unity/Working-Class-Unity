@@ -6,7 +6,6 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends python3 make g++ ca-certificates \
   && rm -rf /var/lib/apt/lists/*
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY apps/web/package.json apps/web/package.json
 COPY scripts/run-pnpm.mjs scripts/toolchain-contract.mjs scripts/
 RUN npm run bootstrap
 
@@ -21,14 +20,12 @@ ARG SENTRY_UPLOAD_CACHE_BUST=disabled
 COPY --from=deps /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 RUN test -s /etc/ssl/certs/ca-certificates.crt
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
 COPY . .
 RUN test ! -e /app/.env.container-canary \
-  && test ! -e /app/apps/web/server/.env.container-canary \
+  && test ! -e /app/server/.env.container-canary \
   && test ! -e /app/.env \
   && test ! -e /app/.git \
-  && test ! -e /app/data \
-  && test ! -e /app/apps/web/data
+  && test ! -e /app/data
 RUN --mount=type=secret,id=NUXT_MODULES_OBSERVABILITY_ENABLED,env=BUILD_SECRET_NUXT_MODULES_OBSERVABILITY_ENABLED,required=false \
   --mount=type=secret,id=SENTRY_AUTH_TOKEN,env=BUILD_SECRET_SENTRY_AUTH_TOKEN,required=false \
   --mount=type=secret,id=SENTRY_ORG,env=BUILD_SECRET_SENTRY_ORG,required=false \
@@ -52,19 +49,19 @@ RUN --mount=type=secret,id=NUXT_MODULES_OBSERVABILITY_ENABLED,env=BUILD_SECRET_N
     unset SENTRY_URL; \
   fi \
   && npm run pnpm -- run build
-RUN mkdir -p /app/apps/web/.output/server/db \
-  && cp /app/apps/web/server/maintenance.mjs /app/apps/web/.output/server/maintenance.mjs \
-  && cp -R /app/apps/web/server/db/migrations /app/apps/web/.output/server/db/migrations \
-  && cp /app/apps/web/node_modules/drizzle-orm/better-sqlite3/migrator.js /app/apps/web/.output/server/node_modules/drizzle-orm/better-sqlite3/migrator.js \
-  && cp /app/apps/web/node_modules/drizzle-orm/migrator.js /app/apps/web/.output/server/node_modules/drizzle-orm/migrator.js
+RUN mkdir -p /app/.output/server/db \
+  && cp /app/server/maintenance.mjs /app/.output/server/maintenance.mjs \
+  && cp -R /app/server/db/migrations /app/.output/server/db/migrations \
+  && cp /app/node_modules/drizzle-orm/better-sqlite3/migrator.js /app/.output/server/node_modules/drizzle-orm/better-sqlite3/migrator.js \
+  && cp /app/node_modules/drizzle-orm/migrator.js /app/.output/server/node_modules/drizzle-orm/migrator.js
 
 FROM node:24-bookworm-slim AS runtime
-WORKDIR /app/apps/web
+WORKDIR /app
 ENV NODE_ENV=production
 ENV NUXT_DATABASE_URL=file:/app/data/app.db
 ENV NITRO_HOST=0.0.0.0
 ENV NITRO_PORT=3000
-COPY --from=build --chown=node:node /app/apps/web/.output ./.output
+COPY --from=build --chown=node:node /app/.output ./.output
 RUN mkdir -p /app/data \
   && chown node:node /app/data
 VOLUME ["/app/data"]

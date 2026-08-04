@@ -33,7 +33,7 @@ test('repository manifests, lockfile, scanner pins, and exceptions satisfy the p
   assert.deepEqual(await validateRepositorySupplyChain(root, { now: referenceNow }), [])
 
   const { manifests, lockfile } = await loadRepositoryLockContract(root)
-  assert.equal(manifests.length, 2)
+  assert.equal(manifests.length, 1)
 
   const lockSource = await readFile(join(root, 'pnpm-lock.yaml'), 'utf8')
   assert.deepEqual(inspectPnpmLockfile(lockSource, manifests), {
@@ -137,8 +137,8 @@ test('dependency-free preinstall lock inspection fails before unsafe resolutions
     "\n  '@antfu/install-pkg@1.1.0': # noncanonical header\n"
   )
   const duplicateImporterSection = source.replace(
-    '  .:\n    devDependencies:',
-    '  .:\n    devDependencies:\n    devDependencies:'
+    '  .:\n    dependencies:',
+    '  .:\n    dependencies:\n    dependencies:'
   )
   const duplicatePackages = source.replace(
     '\nsnapshots:\n',

@@ -63,37 +63,37 @@ Read that picture as three statements:
 
 ### The stack in plain language
 
-| Name               | What it does here                                                                                 |
-| ------------------ | ------------------------------------------------------------------------------------------------- |
-| **pnpm workspace** | Installs and coordinates packages in this repository. There is currently one application package. |
-| **Vue**            | Builds interactive browser components from `.vue` files.                                          |
-| **Nuxt**           | Organizes pages, layouts, server rendering, configuration, and the application build.             |
-| **Nitro + h3**     | Run the server and turn files under `server/api` into HTTP endpoints.                             |
-| **Better Auth**    | Owns sign-in, sessions, linked accounts, organizations, memberships, and invitations.             |
-| **SQLite**         | Stores the authoritative local data in one database file.                                         |
-| **Drizzle**        | Gives TypeScript code a typed way to describe tables and run SQL operations.                      |
-| **Zod**            | Validates untrusted input before business logic uses it.                                          |
-| **Adapters**       | Small modules that translate app-shaped requests into provider-specific calls.                    |
+| Name            | What it does here                                                                     |
+| --------------- | ------------------------------------------------------------------------------------- |
+| **pnpm**        | Installs the dependencies for this single application package.                        |
+| **Vue**         | Builds interactive browser components from `.vue` files.                              |
+| **Nuxt**        | Organizes pages, layouts, server rendering, configuration, and the application build. |
+| **Nitro + h3**  | Run the server and turn files under `server/api` into HTTP endpoints.                 |
+| **Better Auth** | Owns sign-in, sessions, linked accounts, organizations, memberships, and invitations. |
+| **SQLite**      | Stores the authoritative local data in one database file.                             |
+| **Drizzle**     | Gives TypeScript code a typed way to describe tables and run SQL operations.          |
+| **Zod**         | Validates untrusted input before business logic uses it.                              |
+| **Adapters**    | Small modules that translate app-shaped requests into provider-specific calls.        |
 
 The exact dependency versions are pinned in
-[`apps/web/package.json`](../apps/web/package.json).
+[`package.json`](../package.json).
 
 ## 2. Where code lives
 
-The repository is a monorepo-shaped workspace, but only `apps/web` contains a production application today.
+The repository contains one production application at its root.
 
 ```mermaid
 flowchart TD
-  Repo["Repository root"] --> Web["apps/web<br/>the Nuxt application"]
+  Repo["Repository root"] --> Web["Nuxt application"]
   Repo --> Docs["docs + ops<br/>contracts, decisions, runbooks"]
   Repo --> Scripts["scripts<br/>local verification + operator helpers"]
 ```
 
-Inside `apps/web`, start with these directories:
+At repository root, start with these directories:
 
 ```mermaid
 flowchart TD
-  Web["apps/web"] --> App["app<br/>browser-facing Vue and Nuxt code"]
+  Web["Nuxt application"] --> App["app<br/>browser-facing Vue and Nuxt code"]
   Web --> Server["server<br/>API, services, database, worker"]
   Web --> Shared["shared<br/>safe for browser and server"]
   Web --> Tests["tests<br/>unit, HTTP, integration helpers"]
@@ -132,7 +132,7 @@ flowchart LR
   Dev -. "optional" .-> LocalProviders["Local email capture<br/>or configured providers"]
 ```
 
-The root `dev` command delegates to the web package. A developer starts the background worker separately when a flow
+The root `dev` command starts the Nuxt application. A developer starts the background worker separately when a flow
 needs queued jobs.
 
 ### 3.2 Production requests
@@ -182,10 +182,10 @@ maintenance, and off-host backup entries separately.
 
 Main sources:
 
-- [web start command](../apps/web/package.json)
-- [`server/worker.ts`](../apps/web/server/worker.ts)
-- [`server/maintenance.mjs`](../apps/web/server/maintenance.mjs)
-- [`server/off-host-backup.mjs`](../apps/web/server/off-host-backup.mjs)
+- [web start command](../package.json)
+- [`server/worker.ts`](../server/worker.ts)
+- [`server/maintenance.mjs`](../server/maintenance.mjs)
+- [`server/off-host-backup.mjs`](../server/off-host-backup.mjs)
 
 ### 3.4 Persistent data and providers
 
@@ -293,11 +293,11 @@ Why return a stable 404 for an exclusive disabled route? A disabled fork should 
 touch its provider, or expose a half-configured endpoint.
 
 The manifest is in
-[`shared/modules.ts`](../apps/web/shared/modules.ts), startup
+[`shared/modules.ts`](../shared/modules.ts), startup
 validation is in
-[`server/utils/runtime.ts`](../apps/web/server/utils/runtime.ts),
+[`server/utils/runtime.ts`](../server/utils/runtime.ts),
 and the request gate is
-[`01-module-boundary.ts`](../apps/web/server/middleware/01-module-boundary.ts).
+[`01-module-boundary.ts`](../server/middleware/01-module-boundary.ts).
 
 ### 4.3 Gate 2: browser-origin policy
 
@@ -323,9 +323,9 @@ This gate reduces cross-site request forgery risk. It does **not** answer "which
 record X?" Those checks still happen in the route and repository.
 
 Implementation:
-[`02-cross-origin.ts`](../apps/web/server/middleware/02-cross-origin.ts)
+[`02-cross-origin.ts`](../server/middleware/02-cross-origin.ts)
 and
-[`request-origin.ts`](../apps/web/server/utils/request-origin.ts).
+[`request-origin.ts`](../server/utils/request-origin.ts).
 
 ### 4.4 Route-specific work
 
@@ -413,7 +413,7 @@ erDiagram
 ```
 
 The Drizzle export surface is
-[`server/db/schema/index.ts`](../apps/web/server/db/schema/index.ts).
+[`server/db/schema/index.ts`](../server/db/schema/index.ts).
 The custom runtime-invariant migration adds family and billing constraints that Drizzle cannot express directly.
 
 ## 6. Read features vertically
@@ -513,10 +513,10 @@ Later read, update, and delete queries match both the project ID and the authent
 
 Read these files in order:
 
-1. [`app/pages/app/projects/index.vue`](../apps/web/app/pages/app/projects/index.vue)
-2. [`server/api/projects/index.post.ts`](../apps/web/server/api/projects/index.post.ts)
-3. [`server/utils/auth/require-session.ts`](../apps/web/server/utils/auth/require-session.ts)
-4. [`server/db/repositories/projects.ts`](../apps/web/server/db/repositories/projects.ts)
+1. [`app/pages/app/projects/index.vue`](../app/pages/app/projects/index.vue)
+2. [`server/api/projects/index.post.ts`](../server/api/projects/index.post.ts)
+3. [`server/utils/auth/require-session.ts`](../server/utils/auth/require-session.ts)
+4. [`server/db/repositories/projects.ts`](../server/db/repositories/projects.ts)
 
 Checkpoint questions:
 
@@ -605,12 +605,12 @@ This bootstrap does not create shared projects or move private records into an o
 
 Follow the code:
 
-1. [`AuthEntryForm.vue`](../apps/web/app/components/AuthEntryForm.vue)
-2. [`server/api/auth/[...all].ts`](../apps/web/server/api/auth/[...all].ts)
-3. [`auth/passwordless.ts`](../apps/web/server/utils/auth/passwordless.ts)
-4. [`auth/create.ts`](../apps/web/server/utils/auth/create.ts)
-5. [email adapter](../apps/web/server/services/email/index.ts)
-6. [passwordless HTTP tests](../apps/web/tests/passwordless-auth-http.test.ts)
+1. [`AuthEntryForm.vue`](../app/components/AuthEntryForm.vue)
+2. [`server/api/auth/[...all].ts`](../server/api/auth/[...all].ts)
+3. [`auth/passwordless.ts`](../server/utils/auth/passwordless.ts)
+4. [`auth/create.ts`](../server/utils/auth/create.ts)
+5. [email adapter](../server/services/email/index.ts)
+6. [passwordless HTTP tests](../tests/passwordless-auth-http.test.ts)
 
 ## 9. Private Files and background cleanup
 
@@ -786,13 +786,13 @@ environment-variable toggle.
 
 Follow the code:
 
-1. [`file-service.ts`](../apps/web/server/services/storage/file-service.ts)
-2. [`file-storage-binding.ts`](../apps/web/server/services/storage/file-storage-binding.ts)
-3. [`local-object-storage.ts`](../apps/web/server/services/storage/local-object-storage.ts)
-4. [`r2-object-storage.ts`](../apps/web/server/services/storage/r2-object-storage.ts)
-5. [`job-queue.ts`](../apps/web/server/services/jobs/job-queue.ts)
-6. [`orphan-cleanup.ts`](../apps/web/server/services/storage/orphan-cleanup.ts)
-7. [`server/worker.ts`](../apps/web/server/worker.ts)
+1. [`file-service.ts`](../server/services/storage/file-service.ts)
+2. [`file-storage-binding.ts`](../server/services/storage/file-storage-binding.ts)
+3. [`local-object-storage.ts`](../server/services/storage/local-object-storage.ts)
+4. [`r2-object-storage.ts`](../server/services/storage/r2-object-storage.ts)
+5. [`job-queue.ts`](../server/services/jobs/job-queue.ts)
+6. [`orphan-cleanup.ts`](../server/services/storage/orphan-cleanup.ts)
+7. [`server/worker.ts`](../server/worker.ts)
 
 Checkpoint questions:
 
@@ -954,11 +954,11 @@ conversation, owner, history revision, attempt, and lease before committing.
 
 Follow the code:
 
-1. [message route](../apps/web/server/api/ai/conversations/[conversationId]/messages/index.post.ts)
-2. [`ai-conversation-service.ts`](../apps/web/server/services/ai/ai-conversation-service.ts)
-3. [`repositories/ai-conversations.ts`](../apps/web/server/db/repositories/ai-conversations.ts)
-4. [`ai-policy.ts`](../apps/web/server/services/ai/ai-policy.ts)
-5. [`openai.ts` adapter](../apps/web/server/services/ai/openai.ts)
+1. [message route](../server/api/ai/conversations/[conversationId]/messages/index.post.ts)
+2. [`ai-conversation-service.ts`](../server/services/ai/ai-conversation-service.ts)
+3. [`repositories/ai-conversations.ts`](../server/db/repositories/ai-conversations.ts)
+4. [`ai-policy.ts`](../server/services/ai/ai-policy.ts)
+5. [`openai.ts` adapter](../server/services/ai/openai.ts)
 
 Checkpoint questions:
 
@@ -1049,10 +1049,10 @@ may cover accepted family members, but it still grants no access to their privat
 
 Follow the code:
 
-1. [`stripe.post.ts`](../apps/web/server/api/webhooks/stripe.post.ts)
-2. [`stripe-client.ts`](../apps/web/server/services/payments/stripe-client.ts)
-3. [`billing-webhook.ts`](../apps/web/server/services/payments/billing-webhook.ts)
-4. [`billing-event-store.ts`](../apps/web/server/services/payments/billing-event-store.ts)
+1. [`stripe.post.ts`](../server/api/webhooks/stripe.post.ts)
+2. [`stripe-client.ts`](../server/services/payments/stripe-client.ts)
+3. [`billing-webhook.ts`](../server/services/payments/billing-webhook.ts)
+4. [`billing-event-store.ts`](../server/services/payments/billing-event-store.ts)
 
 Checkpoint questions:
 
@@ -1194,8 +1194,8 @@ provider corpora, and post-snapshot operations therefore require deliberate reco
 
 Main sources:
 
-- [`maintenance.mjs`](../apps/web/server/maintenance.mjs)
-- [`off-host-backup.mjs`](../apps/web/server/off-host-backup.mjs)
+- [`maintenance.mjs`](../server/maintenance.mjs)
+- [`off-host-backup.mjs`](../server/off-host-backup.mjs)
 - [backup runbook](../ops/backup-runbook.md)
 - [restore runbook](../ops/restore-runbook.md)
 
@@ -1321,16 +1321,16 @@ Read:
 
 This route starts with one concrete feature before asking a junior developer to read the largest policy files.
 
-| Time   | Read or do                                                          | Expected conclusion                                                          |
-| ------ | ------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| 20 min | README introduction, Stack, Repository Shape                        | This is one Nuxt app under repair, not a finished starter                    |
-| 20 min | Root `package.json`, `pnpm-workspace.yaml`, `apps/web/package.json` | Root scripts delegate to one application package                             |
-| 20 min | `app/app.vue` and `app/layouts/default.vue`                         | Nuxt inserts routed pages into the application shell                         |
-| 60 min | Project schema, POST route, session helper, repository              | The client supplies a name; the server supplies the owner                    |
-| 35 min | The two numbered server middleware files                            | Module policy and origin policy run before the route                         |
-| 50 min | Projects page, focusing only on load/create/session-loss paths      | UI state is careful, but security still belongs to the server                |
-| 45 min | Project HTTP tests and one browser success journey                  | Tests reveal the intended guarantees and boundary ownership                  |
-| 20 min | Draw and explain a seven-node project-create flow                   | The learner can locate auth, validation, ownership, SQL, response, and proof |
+| Time   | Read or do                                                     | Expected conclusion                                                          |
+| ------ | -------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| 20 min | README introduction, Stack, Repository Shape                   | This is one Nuxt app under repair, not a finished starter                    |
+| 20 min | Root `package.json` and `pnpm-workspace.yaml`                  | One manifest owns application and tooling dependencies and scripts           |
+| 20 min | `app/app.vue` and `app/layouts/default.vue`                    | Nuxt inserts routed pages into the application shell                         |
+| 60 min | Project schema, POST route, session helper, repository         | The client supplies a name; the server supplies the owner                    |
+| 35 min | The two numbered server middleware files                       | Module policy and origin policy run before the route                         |
+| 50 min | Projects page, focusing only on load/create/session-loss paths | UI state is careful, but security still belongs to the server                |
+| 45 min | Project HTTP tests and one browser success journey             | Tests reveal the intended guarantees and boundary ownership                  |
+| 20 min | Draw and explain a seven-node project-create flow              | The learner can locate auth, validation, ownership, SQL, response, and proof |
 
 ### Filename routing quick reference
 
@@ -1346,15 +1346,15 @@ Nuxt and Nitro use filenames to create routes:
 
 ### Suggested project code trail
 
-1. [public project shapes](../apps/web/shared/projects.ts)
-2. [project validation schema](../apps/web/server/db/schema/projects.validation.ts)
-3. [project POST route](../apps/web/server/api/projects/index.post.ts)
-4. [session requirement](../apps/web/server/utils/auth/require-session.ts)
-5. [project repository](../apps/web/server/db/repositories/projects.ts)
-6. [project table](../apps/web/server/db/schema/projects.ts)
-7. [project page](../apps/web/app/pages/app/projects/index.vue)
-8. [project HTTP tests](../apps/web/tests/workspace-project-http.test.ts)
-9. [private-project browser journey](../apps/web/tests/browser/private-project-journey.mjs)
+1. [public project shapes](../shared/projects.ts)
+2. [project validation schema](../server/db/schema/projects.validation.ts)
+3. [project POST route](../server/api/projects/index.post.ts)
+4. [session requirement](../server/utils/auth/require-session.ts)
+5. [project repository](../server/db/repositories/projects.ts)
+6. [project table](../server/db/schema/projects.ts)
+7. [project page](../app/pages/app/projects/index.vue)
+8. [project HTTP tests](../tests/workspace-project-http.test.ts)
+9. [private-project browser journey](../tests/browser/private-project-journey.mjs)
 
 Questions the learner should be able to answer:
 

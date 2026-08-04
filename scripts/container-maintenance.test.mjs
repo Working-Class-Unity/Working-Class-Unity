@@ -21,11 +21,11 @@ import { promisify } from 'node:util'
 
 const execFileAsync = promisify(execFile)
 const require = createRequire(import.meta.url)
-const Database = require('../apps/web/node_modules/better-sqlite3')
-const { drizzle } = require('../apps/web/node_modules/drizzle-orm/better-sqlite3')
-const { migrate } = require('../apps/web/node_modules/drizzle-orm/better-sqlite3/migrator')
-const entry = resolve('apps/web/server/maintenance.mjs')
-const migrationsFolder = resolve('apps/web/server/db/migrations')
+const Database = require('../node_modules/better-sqlite3')
+const { drizzle } = require('../node_modules/drizzle-orm/better-sqlite3')
+const { migrate } = require('../node_modules/drizzle-orm/better-sqlite3/migrator')
+const entry = resolve('server/maintenance.mjs')
+const migrationsFolder = resolve('server/db/migrations')
 const runPnpm = resolve('scripts/run-pnpm.mjs')
 const stoppedApp = '--confirm-app-stopped'
 const finalMigrationCount = 4
@@ -246,8 +246,8 @@ test('migration rejects an incomplete internal baseline before backup or mutatio
 test('the documented migration command uses maintenance for relative URLs and rejects incomplete state', async (t) => {
   const sandbox = disposableDirectory(t)
   const freshDatabasePath = join(sandbox, 'fresh.db')
-  const webDirectory = resolve('apps/web')
-  const freshRelativeUrl = `file:${relative(webDirectory, freshDatabasePath)}`
+  const appDirectory = resolve('.')
+  const freshRelativeUrl = `file:${relative(appDirectory, freshDatabasePath)}`
 
   const fresh = await runPublicMigration(freshRelativeUrl)
   assert.equal(fresh.code, 0, fresh.stderr)
@@ -300,7 +300,7 @@ test('a failed first initialization rolls back and requires manual disposal befo
   const fixtureMigrations = join(fixtureRoot, 'db', 'migrations')
   const databasePath = join(sandbox, 'app.db')
   mkdirSync(join(fixtureRoot, 'db'), { recursive: true })
-  symlinkSync(resolve('apps/web/node_modules'), join(fixtureRoot, 'node_modules'), 'dir')
+  symlinkSync(resolve('node_modules'), join(fixtureRoot, 'node_modules'), 'dir')
   cpSync(entry, fixtureEntry)
   cpSync(migrationsFolder, fixtureMigrations, { recursive: true })
   appendFileSync(
@@ -965,7 +965,7 @@ function runMaintenance(databasePath, args, environment = {}) {
 }
 
 function runPublicMigration(databaseUrl) {
-  return runExecutable(process.execPath, [runPnpm, '--filter', '@smallwiselabs/web', 'db:migrate'], {
+  return runExecutable(process.execPath, [runPnpm, 'run', 'db:migrate'], {
     NUXT_DATABASE_URL: databaseUrl
   })
 }

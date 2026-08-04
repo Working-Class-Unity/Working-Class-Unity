@@ -15,7 +15,7 @@ PrimeVue, Tailwind CSS, Nuxt UI, shadcn-vue, and utility-class-generated product
 ## Recommended files
 
 ```text
-apps/web/app/assets/css/
+app/assets/css/
   main.css       # ordered imports/layers only
   reset.css      # conservative normalization
   tokens.css     # primitive and semantic custom properties

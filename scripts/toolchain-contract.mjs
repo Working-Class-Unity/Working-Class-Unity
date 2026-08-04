@@ -116,12 +116,7 @@ export function validateRepositoryDeclarations(root) {
     }
   }
 
-  const webManifest = JSON.parse(readFileSync(join(root, 'apps/web/package.json'), 'utf8'))
-  if (webManifest.engines?.node !== SUPPORTED_NODE_RANGE) {
-    errors.push(`apps/web engines.node must be ${SUPPORTED_NODE_RANGE}`)
-  }
-
-  if (webManifest.devDependencies?.['@types/node'] !== EXPECTED_NODE_TYPES_VERSION) {
+  if (manifest?.devDependencies?.['@types/node'] !== EXPECTED_NODE_TYPES_VERSION) {
     errors.push(`@types/node must be pinned to ${EXPECTED_NODE_TYPES_VERSION}`)
   }
 

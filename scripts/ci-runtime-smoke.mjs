@@ -19,15 +19,15 @@ import {
 import { createSqliteWriteObserver, fingerprintDirectory } from './isolated-smoke-policy.mjs'
 
 const root = process.cwd()
-const requireFromWeb = createRequire(resolve(root, 'apps/web/package.json'))
+const requireFromApp = createRequire(resolve(root, 'package.json'))
 const sandbox = mkdtempSync(join(tmpdir(), 'swl-built-runtime-'))
-const runtimeCwd = join(sandbox, 'apps', 'web')
+const runtimeCwd = sandbox
 const buildDatabasePath = join(sandbox, 'build-data', 'must-not-exist.db')
 const canonicalBuildDatabasePath = join(sandbox, 'build-data', 'canonical-must-not-exist.db')
 const runtimeDatabasePath = join(sandbox, 'runtime-data', 'app.db')
 const runtimeEmailCaptureDirectory = join(sandbox, 'runtime-email-capture')
-const serverEntry = resolve(root, 'apps/web/.output/server/index.mjs')
-const serverPreload = resolve(root, 'apps/web/.output/server/sentry.server.config.mjs')
+const serverEntry = resolve(root, '.output/server/index.mjs')
+const serverPreload = resolve(root, '.output/server/sentry.server.config.mjs')
 const buildPrivateCanary = 'legacy-build-private-canary-must-not-enter-output'
 const canonicalBuildAuthCanary = 'canonical-build-auth-canary-must-not-enter-output'
 const canonicalBuildReadinessCanary = 'canonical-build-readiness-canary-must-not-enter-output'
@@ -261,7 +261,7 @@ function assertBuildDatabaseUntouched(stage) {
 }
 
 async function assertDeploymentSmokeReadOnly() {
-  const Database = requireFromWeb('better-sqlite3')
+  const Database = requireFromApp('better-sqlite3')
   const observer = createSqliteWriteObserver(Database, runtimeDatabasePath)
   const objectDirectory = join(dirname(runtimeDatabasePath), 'objects')
   try {
@@ -282,7 +282,7 @@ async function assertDeploymentSmokeReadOnly() {
 }
 
 function assertPrivateBuildCanariesAbsent() {
-  const outputRoot = resolve(root, 'apps/web/.output')
+  const outputRoot = resolve(root, '.output')
   for (const path of walkFiles(outputRoot)) {
     const contents = readFileSync(path)
     for (const forbidden of [
@@ -485,7 +485,7 @@ async function runCommandOriginSmoke() {
 }
 
 function countRuntimeProjects() {
-  const Database = requireFromWeb('better-sqlite3')
+  const Database = requireFromApp('better-sqlite3')
   const sqlite = new Database(runtimeDatabasePath, { readonly: true })
   try {
     return sqlite.prepare('select count(*) as count from projects').get().count

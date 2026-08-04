@@ -24,7 +24,7 @@ const SHA256 = /^[a-f0-9]{64}$/
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 const STATUSES = new Set(['preparing', 'ready', 'compensated', 'cleanup_incomplete', 'deleted'])
 const defaultReceiptDirectory = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'data', 'openai-corpus')
-const webRequire = createRequire(new URL('../apps/web/package.json', import.meta.url))
+const appRequire = createRequire(new URL('../package.json', import.meta.url))
 const usage = `Usage:
   pnpm openai:corpus prepare <manifest.json>
   pnpm openai:corpus verify <store-id>
@@ -255,7 +255,7 @@ async function call(action, deadline, run) {
 
 function createClient({ apiKey, project, fetchImpl, timeoutMs }) {
   check(typeof fetchImpl === 'function', 'OpenAI corpus command requires a fetch implementation')
-  const OpenAI = webRequire('openai')
+  const OpenAI = appRequire('openai')
   const client = new OpenAI.default({
     apiKey,
     baseURL: OPENAI_CORPUS_BASE_URL,

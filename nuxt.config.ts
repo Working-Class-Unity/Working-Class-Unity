@@ -187,7 +187,7 @@ export default defineNuxtConfig({
     storage: {
       local: {
         driver: 'fs',
-        base: '../../data/nitro'
+        base: './data/nitro'
       }
     }
   },

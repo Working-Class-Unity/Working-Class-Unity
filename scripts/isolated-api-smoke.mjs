@@ -22,10 +22,10 @@ import { assertIsolatedSmokeInvocation } from './isolated-smoke-policy.mjs'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const runPnpm = resolve(root, 'scripts/run-pnpm.mjs')
-const serverEntry = resolve(root, 'apps/web/.output/server/index.mjs')
-const serverPreload = resolve(root, 'apps/web/.output/server/sentry.server.config.mjs')
+const serverEntry = resolve(root, '.output/server/index.mjs')
+const serverPreload = resolve(root, '.output/server/sentry.server.config.mjs')
 const stripeProviderPreload = resolve(root, 'scripts/isolated-stripe-provider-preload.mjs')
-const requireFromWeb = createRequire(resolve(root, 'apps/web/package.json'))
+const requireFromApp = createRequire(resolve(root, 'package.json'))
 const inheritedEnvironment = selectEnvironment(process.env, [
   'CI',
   'COLORTERM',
@@ -112,7 +112,7 @@ try {
     await runPhase(
       'isolated API database migration',
       process.execPath,
-      [runPnpm, '--filter', '@smallwiselabs/web', 'db:migrate'],
+      [runPnpm, 'run', 'db:migrate'],
       databaseEnvironment(),
       60_000
     )
@@ -257,7 +257,7 @@ async function runPhase(label, command, args, env, maximumMs) {
 }
 
 function assertFixtureRecorded() {
-  const Database = requireFromWeb('better-sqlite3')
+  const Database = requireFromApp('better-sqlite3')
   const sqlite = new Database(databasePath, { readonly: true, fileMustExist: true })
   try {
     const likeFixture = `%${fixtureId}%`

@@ -433,7 +433,7 @@ function stubRuntimeEnvironment(dsn: string) {
     NUXT_SOCIAL_PROVIDERS_GOOGLE_ENABLED: 'false',
     NUXT_EMAIL_TRANSPORT: 'capture',
     NUXT_EMAIL_FROM: 'SmallWiseLabs Base App <no-reply@example.test>',
-    NUXT_EMAIL_CAPTURE_DIRECTORY: '../../data/email-capture-sentry-test',
+    NUXT_EMAIL_CAPTURE_DIRECTORY: './data/email-capture-sentry-test',
     NUXT_PUBLIC_APP_URL: 'https://app.example.test',
     NUXT_MODULES_BILLING_ENABLED: 'false',
     NUXT_MODULES_FILES_ENABLED: 'false',

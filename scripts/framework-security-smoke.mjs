@@ -13,7 +13,7 @@ import {
 } from './framework-security-helpers.mjs'
 
 const root = process.cwd()
-const appRoot = resolve(root, 'apps/web')
+const appRoot = resolve(root)
 const require = createRequire(import.meta.url)
 const appManifest = JSON.parse(readFileSync(join(appRoot, 'package.json'), 'utf8'))
 const frameworkVersions = Object.fromEntries(

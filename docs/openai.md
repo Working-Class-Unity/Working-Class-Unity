@@ -85,7 +85,7 @@ The fixed application policy is:
 
 ## Exact OpenAI request policy
 
-`apps/web/server/services/ai/openai.ts` lazily creates the only provider client against `https://api.openai.com/v1`. Each call fixes:
+`server/services/ai/openai.ts` lazily creates the only provider client against `https://api.openai.com/v1`. Each call fixes:
 
 - `model: "gpt-5.6-luna"` and `reasoning: { effort: "low" }`;
 - `max_output_tokens` from the validated application bound, never more than 4,096;

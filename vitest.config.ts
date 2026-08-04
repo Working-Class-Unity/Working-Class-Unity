@@ -1,7 +1,7 @@
 import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vitest/config'
 
-const policyReporter = fileURLToPath(new URL('../../scripts/vitest-policy-reporter.mjs', import.meta.url))
+const policyReporter = fileURLToPath(new URL('./scripts/vitest-policy-reporter.mjs', import.meta.url))
 
 export default defineConfig({
   resolve: {
@@ -11,6 +11,7 @@ export default defineConfig({
   },
   test: {
     allowOnly: false,
+    include: ['tests/**/*.test.ts'],
     passWithNoTests: false,
     reporters: ['default', policyReporter]
   }

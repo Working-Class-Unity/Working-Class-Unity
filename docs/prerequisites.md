@@ -52,10 +52,10 @@ A junior developer working in this starter should be comfortable with semantic H
 
 Database-backup credentials are absent from `.env.example` and Nuxt runtime configuration; `.env.production.example` lists only their blank deployment-contract names. Off-host backup is an optional Compose capability. Forks that omit it need neither `COMPOSE_PROFILES=backup` nor any backup value. Persistent baseline staging/production enables the profile for build and runtime and supplies the five Runtime-only, Build-disabled `BACKUP_R2_*` values documented in [the backup runbook](../ops/backup-runbook.md). Reviewed Coolify injects the resource `.env` into every service, so Compose overrides those keys to empty on migration, web, and worker and maps their configured values only into the backup runner, whose startup validates them before any operator can run. Local development and ordinary builds/tests require none.
 
-Root operational scripts load the repository-root `.env` with Node 24's `--env-file-if-exists`; values already exported by the shell take precedence. The Nuxt production build does not load that file. Use root-relative local defaults from the `apps/web` working directory. For example:
+Root operational scripts load the repository-root `.env` with Node 24's `--env-file-if-exists`; values already exported by the shell take precedence. The Nuxt production build does not load that file. Use root-relative local defaults from the repository root. For example:
 
 ```dotenv
-NUXT_DATABASE_URL=file:../../data/app.db
+NUXT_DATABASE_URL=file:./data/app.db
 NUXT_READINESS_TOKEN=local-readiness-token-change-me-32-chars
 NUXT_BETTER_AUTH_SECRET=local-development-secret-change-me-32-chars
 NUXT_BETTER_AUTH_URL=http://localhost:3000
@@ -64,7 +64,7 @@ NUXT_SOCIAL_PROVIDERS_GOOGLE_CLIENT_ID=
 NUXT_SOCIAL_PROVIDERS_GOOGLE_CLIENT_SECRET=
 NUXT_EMAIL_TRANSPORT=capture
 NUXT_EMAIL_FROM="SmallWiseLabs Base App <no-reply@example.test>"
-NUXT_EMAIL_CAPTURE_DIRECTORY=../../data/email-capture
+NUXT_EMAIL_CAPTURE_DIRECTORY=./data/email-capture
 NUXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 

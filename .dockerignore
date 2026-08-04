@@ -13,28 +13,23 @@ scripts/**
 !scripts/run-pnpm.mjs
 !scripts/toolchain-contract.mjs
 
-!apps/
-apps/**
-!apps/web/
-apps/web/**
-!apps/web/package.json
-!apps/web/nuxt.config.ts
-!apps/web/sentry.client.config.ts
-!apps/web/sentry.server.config.ts
-!apps/web/worker-sentry.server.config.ts
-!apps/web/source-map-cleanup.mjs
-!apps/web/tsconfig.json
+!nuxt.config.ts
+!sentry.client.config.ts
+!sentry.server.config.ts
+!worker-sentry.server.config.ts
+!source-map-cleanup.mjs
+!tsconfig.json
 
-!apps/web/app/
-!apps/web/app/**
-!apps/web/i18n/
-!apps/web/i18n/**
-!apps/web/public/
-!apps/web/public/**
-!apps/web/server/
-!apps/web/server/**
-!apps/web/shared/
-!apps/web/shared/**
+!app/
+!app/**
+!i18n/
+!i18n/**
+!public/
+!public/**
+!server/
+!server/**
+!shared/
+!shared/**
 
 # Re-apply local-secret, state, and generated-output exclusions inside every
 # allowlisted source directory. The final exception retains only the committed,

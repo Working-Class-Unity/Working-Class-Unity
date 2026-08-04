@@ -1070,8 +1070,8 @@ describe('server foundation utilities', () => {
       {
         key: 'NUXT_DATABASE_URL',
         arrange: (input, environment) => {
-          input.databaseUrl = 'file:../../data/build-sentinel.db'
-          environment.NUXT_DATABASE_URL = 'file:../../data/runtime-sentinel.db'
+          input.databaseUrl = 'file:./data/build-sentinel.db'
+          environment.NUXT_DATABASE_URL = 'file:./data/runtime-sentinel.db'
         }
       },
       {
@@ -1668,7 +1668,7 @@ describe('server foundation utilities', () => {
     expect(() =>
       readDatabaseUrl({
         NODE_ENV: 'production',
-        NUXT_DATABASE_URL: 'file:../../data/app.db'
+        NUXT_DATABASE_URL: 'file:./data/app.db'
       })
     ).toThrow(/absolute path/)
     expect(() => readDatabaseUrl({ DATABASE_URL: 'file:/legacy/only.db' })).toThrow(/NUXT_DATABASE_URL/)
@@ -1784,7 +1784,7 @@ function runtimeEnvironment(overrides: Record<string, string | undefined> = {}) 
   return {
     CI: 'true',
     NODE_ENV: nodeEnvironment,
-    NUXT_DATABASE_URL: 'file:../../data/test.db',
+    NUXT_DATABASE_URL: 'file:./data/test.db',
     NUXT_READINESS_TOKEN:
       nodeEnvironment === 'production'
         ? 'test-production-readiness-token-with-32-characters'
@@ -1794,7 +1794,7 @@ function runtimeEnvironment(overrides: Record<string, string | undefined> = {}) 
     NUXT_SOCIAL_PROVIDERS_GOOGLE_ENABLED: 'false',
     NUXT_EMAIL_TRANSPORT: 'capture',
     NUXT_EMAIL_FROM: 'baseline@example.test',
-    NUXT_EMAIL_CAPTURE_DIRECTORY: '../../data/test-email-capture',
+    NUXT_EMAIL_CAPTURE_DIRECTORY: './data/test-email-capture',
     NUXT_PUBLIC_APP_URL: 'http://127.0.0.1:3000',
     ...Object.fromEntries(runtimeModuleIds.map((id) => [`NUXT_MODULES_${id.toUpperCase()}_ENABLED`, 'false'])),
     NUXT_OPENAI_FILE_SEARCH_ENABLED: 'false',
@@ -1805,7 +1805,7 @@ function runtimeEnvironment(overrides: Record<string, string | undefined> = {}) 
 
 function completeRuntimeConfig() {
   return {
-    databaseUrl: 'file:../../data/test.db',
+    databaseUrl: 'file:./data/test.db',
     readinessToken: 'local-readiness-token-change-me-32-chars',
     betterAuth: {
       secret: 'test-runtime-secret-with-32-characters',
@@ -1821,7 +1821,7 @@ function completeRuntimeConfig() {
     email: {
       transport: 'capture' as '' | 'capture' | 'smtp',
       from: 'baseline@example.test',
-      captureDirectory: '../../data/test-email-capture',
+      captureDirectory: './data/test-email-capture',
       smtp: {
         host: '',
         port: '',

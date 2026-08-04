@@ -11,7 +11,7 @@ import { createSqliteWriteObserver, fingerprintDirectory } from './isolated-smok
 
 const execFileAsync = promisify(execFile)
 const require = createRequire(import.meta.url)
-const Database = require('../apps/web/node_modules/better-sqlite3')
+const Database = require('../node_modules/better-sqlite3')
 const entry = resolve('scripts/isolated-api-smoke.mjs')
 
 test('isolated API command refuses arbitrary targets before creating a sandbox', async (t) => {

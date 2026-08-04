@@ -2,12 +2,8 @@ import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { parseEnv } from 'node:util'
-import { moduleManifest, runtimeModuleIds } from '../apps/web/shared/modules'
-import {
-  evaluateModuleStates,
-  evaluateRuntimeEnvironment,
-  type RuntimeConfigIssue
-} from '../apps/web/server/utils/runtime'
+import { moduleManifest, runtimeModuleIds } from '../shared/modules'
+import { evaluateModuleStates, evaluateRuntimeEnvironment, type RuntimeConfigIssue } from '../server/utils/runtime'
 
 const args = new Set(process.argv.slice(2))
 const repositoryRoot = fileURLToPath(new URL('../', import.meta.url))

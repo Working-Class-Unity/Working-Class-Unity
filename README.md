@@ -2,7 +2,7 @@
 
 > **Repairs in progress; not fork-ready.** The [2026-07-09 audit](docs/audits/2026-07-09/README.md) remains the historical finding record, and the [canonical baseline contract](docs/baseline/README.md) is authoritative for target behavior. R-006 through R-011 establish the validated runtime, module, security, health, container-maintenance, and isolated-test boundaries. R-012 through R-016 are preserved implementation history; R-017 replaces their custom membership authority with Better Auth Organization, while R-019C separates that invisible family membership from user-owned private data. [ADR 0015](docs/adr/0015-final-pre-release-database-rebaseline.md)/#151 establishes the preserved two-entry starting prefix and permanently returns later schema work to forward-only migrations; #169 adds the current Stripe persistence/invariant pair for four entries total. R-024A supplies the original family billing boundary, and #169 expands it to Stripe Personal/Family subscriptions. R-022 completes private projects, R-025 completes local/R2 Files, R-026 completes private direct-OpenAI conversations, #148/#149 add optional File/Web Search, and R-029S-R removes Local Search/FTS. Real hosted email, Google, Stripe, R2, OpenAI, and other provider certification still blocks deployment and fork readiness.
 
-This is a practical Nuxt 4 baseline for SmallWiseLabs projects. It starts as a pnpm workspace with a single Nuxt/Nitro application in `apps/web`, SQLite, Drizzle, app-owned provider adapters, Sentry hooks, and a Docker target suitable for Coolify on a DigitalOcean Droplet.
+This is a practical Nuxt 4 baseline for SmallWiseLabs projects. It is a single Nuxt/Nitro application at repository root, with SQLite, Drizzle, app-owned provider adapters, Sentry hooks, and a Docker target suitable for Coolify on a DigitalOcean Droplet.
 
 ## Stack
 
@@ -19,7 +19,7 @@ This is a practical Nuxt 4 baseline for SmallWiseLabs projects. It starts as a p
 
 ## Repository Shape
 
-- `apps/web` contains the production Nuxt application.
+- The repository root contains the production Nuxt application.
 - Root scripts are stable entry points for humans, agents, and local verification.
 
 ## Local Start
@@ -152,7 +152,7 @@ An enabled Files database persists one exact storage binding: driver and bucket 
 
 ## Deployment
 
-The included `Dockerfile` builds `apps/web` and runs `.output/server/index.mjs` after preloading the generated Sentry server configuration, as the image's non-root `node:node` user from `/app/apps/web` on port `3000`. Its deny-by-default `.dockerignore` sends only explicit production build inputs. The root `docker-compose.yml` defines one Git-connected Coolify application: Coolify builds one project-and-commit-scoped image locally, stops the old stack, runs a one-shot migration against the shared persistent `/app/data` volume, and starts web and the supervised worker from that image only after migration succeeds. Off-host backup is an optional `backup` Compose profile; persistent baseline staging/production enables it and starts its private same-image runner behind the same migration gate. Docker's `VOLUME` declaration alone does not configure a Coolify mount.
+The included `Dockerfile` builds the root application and runs `.output/server/index.mjs` after preloading the generated Sentry server configuration, as the image's non-root `node:node` user from `/app` on port `3000`. Its deny-by-default `.dockerignore` sends only explicit production build inputs. The root `docker-compose.yml` defines one Git-connected Coolify application: Coolify builds one project-and-commit-scoped image locally, stops the old stack, runs a one-shot migration against the shared persistent `/app/data` volume, and starts web and the supervised worker from that image only after migration succeeds. Off-host backup is an optional `backup` Compose profile; persistent baseline staging/production enables it and starts its private same-image runner behind the same migration gate. Docker's `VOLUME` declaration alone does not configure a Coolify mount.
 
 Before production deploys, copy `.env.production.example` to `.env.production` for local readiness checks or mirror its variables directly in Coolify. Generate a private `NUXT_READINESS_TOKEN`, then run `pnpm run ops:readiness:strict -- --env-file=.env.production`; only modules whose `NUXT_MODULES_*_ENABLED` flag is `true` require provider configuration. Disabled modules remain healthy and inert even if stale provider values are present; remove stale values rather than relying on them.
 

@@ -269,7 +269,7 @@ async function writePersistentState() {
       containerName,
       'node',
       '-e',
-      `const Database=require('/app/apps/web/.output/server/node_modules/better-sqlite3');const{mkdirSync,writeFileSync}=require('node:fs');const db=new Database('/app/data/app.db');db.prepare("insert into app_settings (key,value) values (?,json_quote(?)) on conflict(key) do update set value=excluded.value").run(${JSON.stringify(persistenceKey)},${JSON.stringify(persistenceValue)});db.close();mkdirSync('/app/data/objects',{recursive:true});writeFileSync('/app/data/objects/container-persistence.txt',${JSON.stringify(objectValue)},{flag:'wx'});`
+      `const Database=require('/app/.output/server/node_modules/better-sqlite3');const{mkdirSync,writeFileSync}=require('node:fs');const db=new Database('/app/data/app.db');db.prepare("insert into app_settings (key,value) values (?,json_quote(?)) on conflict(key) do update set value=excluded.value").run(${JSON.stringify(persistenceKey)},${JSON.stringify(persistenceValue)});db.close();mkdirSync('/app/data/objects',{recursive:true});writeFileSync('/app/data/objects/container-persistence.txt',${JSON.stringify(objectValue)},{flag:'wx'});`
     ],
     { label: 'persistent database and object write', timeout: 10_000 }
   )
@@ -282,7 +282,7 @@ async function mutatePersistentDatabase() {
       containerName,
       'node',
       '-e',
-      `const Database=require('/app/apps/web/.output/server/node_modules/better-sqlite3');const db=new Database('/app/data/app.db');db.prepare('update app_settings set value=json_quote(?) where key=?').run(${JSON.stringify(mutatedValue)},${JSON.stringify(persistenceKey)});db.close();`
+      `const Database=require('/app/.output/server/node_modules/better-sqlite3');const db=new Database('/app/data/app.db');db.prepare('update app_settings set value=json_quote(?) where key=?').run(${JSON.stringify(mutatedValue)},${JSON.stringify(persistenceKey)});db.close();`
     ],
     { label: 'post-backup database mutation', timeout: 10_000 }
   )
@@ -311,7 +311,7 @@ async function assertDatabaseValue(expected, phase) {
       image,
       'node',
       '-e',
-      `const Database=require('/app/apps/web/.output/server/node_modules/better-sqlite3');const db=new Database('/app/data/app.db',{readonly:true});const row=db.prepare('select value from app_settings where key=?').get(${JSON.stringify(persistenceKey)});db.close();process.stdout.write(JSON.parse(row.value));`
+      `const Database=require('/app/.output/server/node_modules/better-sqlite3');const db=new Database('/app/data/app.db',{readonly:true});const row=db.prepare('select value from app_settings where key=?').get(${JSON.stringify(persistenceKey)});db.close();process.stdout.write(JSON.parse(row.value));`
     ],
     { label: `database persistence inspection ${phase}`, timeout: 10_000 }
   )
@@ -326,7 +326,7 @@ async function assertPersistentState() {
       containerName,
       'node',
       '-e',
-      `const Database=require('/app/apps/web/.output/server/node_modules/better-sqlite3');const{existsSync,readFileSync,readdirSync}=require('node:fs');const db=new Database('/app/data/app.db',{readonly:true});const row=db.prepare('select value from app_settings where key=?').get(${JSON.stringify(persistenceKey)});db.close();const backups=readdirSync('/app/data/backups');process.stdout.write(JSON.stringify({backups:existsSync(${JSON.stringify(knownGoodBackup)})&&backups.some((name)=>name.includes('pre-migrate'))&&backups.some((name)=>name.includes('pre-restore')),database:JSON.parse(row.value),object:readFileSync('/app/data/objects/container-persistence.txt','utf8')}));`
+      `const Database=require('/app/.output/server/node_modules/better-sqlite3');const{existsSync,readFileSync,readdirSync}=require('node:fs');const db=new Database('/app/data/app.db',{readonly:true});const row=db.prepare('select value from app_settings where key=?').get(${JSON.stringify(persistenceKey)});db.close();const backups=readdirSync('/app/data/backups');process.stdout.write(JSON.stringify({backups:existsSync(${JSON.stringify(knownGoodBackup)})&&backups.some((name)=>name.includes('pre-migrate'))&&backups.some((name)=>name.includes('pre-restore')),database:JSON.parse(row.value),object:readFileSync('/app/data/objects/container-persistence.txt','utf8')}));`
     ],
     { label: 'replacement persistence inspection', timeout: 10_000 }
   )

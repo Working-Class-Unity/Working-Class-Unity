@@ -7,10 +7,10 @@ import { promisify } from 'node:util'
 const execFileAsync = promisify(execFile)
 const image = parseImageArgument(process.argv.slice(2))
 const root = resolve('.')
-const canaryDirectory = resolve('apps/web/server', `.container-canary-${randomBytes(5).toString('hex')}`)
+const canaryDirectory = resolve('server', `.container-canary-${randomBytes(5).toString('hex')}`)
 const canaryPaths = [
   resolve('.env.container-canary'),
-  resolve('apps/web/server/.env.container-canary'),
+  resolve('server/.env.container-canary'),
   ...[
     'private.db',
     'private.sqlite',

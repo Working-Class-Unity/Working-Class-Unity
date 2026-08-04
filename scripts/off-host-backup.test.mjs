@@ -28,12 +28,12 @@ import {
   runOffHostBackupCli,
   uploadVerifiedSnapshot,
   verifyLatestReceipt
-} from '../apps/web/server/off-host-backup.mjs'
+} from '../server/off-host-backup.mjs'
 
 const execFileAsync = promisify(execFile)
 const require = createRequire(import.meta.url)
-const Database = require('../apps/web/node_modules/better-sqlite3')
-const maintenanceEntry = resolve('apps/web/server/maintenance.mjs')
+const Database = require('../node_modules/better-sqlite3')
+const maintenanceEntry = resolve('server/maintenance.mjs')
 const accountId = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
 const fixedNow = new Date('2026-07-16T12:34:56.789Z')
 const fixedSnapshotName = 'sqlite-offhost-2026-07-16T12-34-56-789Z-a1b2c3d4e5f6.db'

@@ -31,7 +31,9 @@ try {
     integrations: privacyOptions.integrations([]),
     transport: (options) =>
       Sentry.createTransport(options, async (request) => {
-        serializedEnvelopes.push(typeof request.body === 'string' ? request.body : new TextDecoder().decode(request.body))
+        serializedEnvelopes.push(
+          typeof request.body === 'string' ? request.body : new TextDecoder().decode(request.body)
+        )
         return { statusCode: 200 }
       })
   })

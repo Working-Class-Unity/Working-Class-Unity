@@ -279,7 +279,7 @@ AI also requires private subordinate `NUXT_OPENAI_FILE_SEARCH_ENABLED` and `NUXT
 
 ### Executable R-007 module-state boundary
 
-R-007/[#8](https://github.com/smallwiselabs/swl-step-by-step/issues/8) adds one authoritative runtime-policy manifest in `apps/web/shared/modules.ts`, now containing six optional modules after [ADR 0010](../adr/0010-remove-local-search-and-fts.md). Runtime validation, readiness, flags, requirements, exclusive route prefixes, and exact UI routes consume that policy. Service/provider behavior is exercised directly; the former exhaustive file, dependency, integration, and test-scope inventories were development bookkeeping and were removed by CI-S02A2/#89.
+R-007/[#8](https://github.com/smallwiselabs/swl-step-by-step/issues/8) adds one authoritative runtime-policy manifest in `shared/modules.ts`, now containing six optional modules after [ADR 0010](../adr/0010-remove-local-search-and-fts.md). Runtime validation, readiness, flags, requirements, exclusive route prefixes, and exact UI routes consume that policy. Service/provider behavior is exercised directly; the former exhaustive file, dependency, integration, and test-scope inventories were development bookkeeping and were removed by CI-S02A2/#89.
 
 The evaluator reports `disabled`, `incomplete`, or `ready`. Missing, malformed, or Nuxt-mismatched flags are `incomplete`; an exact validated `false` is `disabled`; and an enabled module is `ready` only after its core and manifest-declared requirements pass. Because startup rejects incomplete configuration before listen, a running process exposes only `disabled` or `ready`.
 

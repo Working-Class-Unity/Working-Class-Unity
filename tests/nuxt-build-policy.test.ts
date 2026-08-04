@@ -56,7 +56,7 @@ afterEach(() => {
 
 describe('Nuxt build policy', () => {
   it('keeps the committed build environment assignment-free', () => {
-    const buildEnvironment = readFileSync(new URL('../../../.env.build', import.meta.url), 'utf8')
+    const buildEnvironment = readFileSync(new URL('../.env.build', import.meta.url), 'utf8')
     expect(parseEnv(buildEnvironment)).toEqual({})
   })
 

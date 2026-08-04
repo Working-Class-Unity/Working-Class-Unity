@@ -82,12 +82,12 @@ flowchart LR
 
 The web, worker, maintenance, and backup code ship together, but they do not have the same authority:
 
-| Entry           | Lifetime                               | Responsibility                                                                       | Main source                                                                              |
-| --------------- | -------------------------------------- | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------- |
-| Web             | Long-running                           | SSR, public pages, API routes, authentication, domain commands                       | [Package start command → generated `.output/server/index.mjs`](../apps/web/package.json) |
-| Worker          | Long-running; inert when Jobs is off   | Idle when disabled; otherwise lease jobs, reconcile, and delete file objects         | [`server/worker.ts`](../apps/web/server/worker.ts)                                       |
-| Maintenance     | One-shot operator command              | Migrate, verify, create local backups, and perform stopped-writer restore            | [`server/maintenance.mjs`](../apps/web/server/maintenance.mjs)                           |
-| Off-host backup | Scheduled or one-shot operator command | Ask maintenance for a verified snapshot, publish it, then read it back and verify it | [`server/off-host-backup.mjs`](../apps/web/server/off-host-backup.mjs)                   |
+| Entry           | Lifetime                               | Responsibility                                                                       | Main source                                                                     |
+| --------------- | -------------------------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------- |
+| Web             | Long-running                           | SSR, public pages, API routes, authentication, domain commands                       | [Package start command → generated `.output/server/index.mjs`](../package.json) |
+| Worker          | Long-running; inert when Jobs is off   | Idle when disabled; otherwise lease jobs, reconcile, and delete file objects         | [`server/worker.ts`](../server/worker.ts)                                       |
+| Maintenance     | One-shot operator command              | Migrate, verify, create local backups, and perform stopped-writer restore            | [`server/maintenance.mjs`](../server/maintenance.mjs)                           |
+| Off-host backup | Scheduled or one-shot operator command | Ask maintenance for a verified snapshot, publish it, then read it back and verify it | [`server/off-host-backup.mjs`](../server/off-host-backup.mjs)                   |
 
 The Files R2 bucket and database-backup R2 bucket are intentionally separate resources with separate credentials.
 Backup values remain outside Nuxt runtime config, web routes, readiness, worker logic, and Files authorization.
@@ -117,9 +117,9 @@ flowchart TD
   Logic --> State["SQLite and, only when required,<br/>a narrow provider adapter"]
 ```
 
-The implementation is split across the [module boundary](../apps/web/server/middleware/01-module-boundary.ts),
-[origin boundary](../apps/web/server/middleware/02-cross-origin.ts),
-[origin policy](../apps/web/server/utils/request-origin.ts), and route-specific authorization.
+The implementation is split across the [module boundary](../server/middleware/01-module-boundary.ts),
+[origin boundary](../server/middleware/02-cross-origin.ts),
+[origin policy](../server/utils/request-origin.ts), and route-specific authorization.
 
 ## Data authority and ownership
 
@@ -167,23 +167,23 @@ erDiagram
   AI_MESSAGE ||--o{ AI_WEB_CITATION : cites
 ```
 
-The complete Drizzle export surface is in [`server/db/schema/index.ts`](../apps/web/server/db/schema/index.ts). The
+The complete Drizzle export surface is in [`server/db/schema/index.ts`](../server/db/schema/index.ts). The
 generated baseline creates those relationships, while
-[`0001_runtime_invariants.sql`](../apps/web/server/db/migrations/0001_runtime_invariants.sql) adds the family authority
+[`0001_runtime_invariants.sql`](../server/db/migrations/0001_runtime_invariants.sql) adds the family authority
 constraints that Drizzle cannot express.
 
 ## Feature slices
 
 Reading one row from left to right is usually faster than reading the repository directory by directory.
 
-| Slice                  | UI and HTTP entry                                                                                                                                                                                                   | Core implementation                                                                                                                                                | State and external boundary                                        |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------ |
-| Identity and family    | [`/login`, `/signup`, `/account`, `/invite/:invitationId`](../apps/web/app/pages); [`/api/auth/**`](../apps/web/server/api/auth); [`/api/invitations/**`](../apps/web/server/api/invitations)                       | [Better Auth composition](../apps/web/server/utils/auth/create.ts), [invitations](../apps/web/server/services/workspace-invitations.ts), organization repositories | Auth and organization tables; email, optional Google and Turnstile |
-| Projects               | [`/app/projects`](../apps/web/app/pages/app/projects); [`/api/projects/**`](../apps/web/server/api/projects)                                                                                                        | [Owner-scoped project repository](../apps/web/server/db/repositories/projects.ts)                                                                                  | User-owned project rows; no provider                               |
-| Billing                | [`/account/billing`](../apps/web/app/pages/account/billing.vue); [`/api/account/billing/**`](../apps/web/server/api/account/billing); [`POST /api/webhooks/stripe`](../apps/web/server/api/webhooks/stripe.post.ts) | [Billing services](../apps/web/server/services/payments), organization and billing repositories                                                                    | Organization billing projection; Stripe                            |
-| Files                  | No product page; [`/api/files/**`](../apps/web/server/api/files)                                                                                                                                                    | [File service](../apps/web/server/services/storage/file-service.ts), Files repository, storage binding, job queue                                                  | Owner-scoped metadata; local object store or Files R2              |
-| AI                     | No product page; [`/api/ai/**`](../apps/web/server/api/ai)                                                                                                                                                          | [Conversation service](../apps/web/server/services/ai/ai-conversation-service.ts), AI repository                                                                   | Owner-scoped history, attempt, and quota state; OpenAI Responses   |
-| Runtime and operations | Public shell; [`/api/live`, `/api/ready`, `/api/baseline`](../apps/web/server/api)                                                                                                                                  | Runtime evaluator, worker, maintenance, backup operator                                                                                                            | SQLite, Sentry, private local snapshots, and a separate backup R2  |
+| Slice                  | UI and HTTP entry                                                                                                                                                                        | Core implementation                                                                                                                              | State and external boundary                                        |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------ |
+| Identity and family    | [`/login`, `/signup`, `/account`, `/invite/:invitationId`](../app/pages); [`/api/auth/**`](../server/api/auth); [`/api/invitations/**`](../server/api/invitations)                       | [Better Auth composition](../server/utils/auth/create.ts), [invitations](../server/services/workspace-invitations.ts), organization repositories | Auth and organization tables; email, optional Google and Turnstile |
+| Projects               | [`/app/projects`](../app/pages/app/projects); [`/api/projects/**`](../server/api/projects)                                                                                               | [Owner-scoped project repository](../server/db/repositories/projects.ts)                                                                         | User-owned project rows; no provider                               |
+| Billing                | [`/account/billing`](../app/pages/account/billing.vue); [`/api/account/billing/**`](../server/api/account/billing); [`POST /api/webhooks/stripe`](../server/api/webhooks/stripe.post.ts) | [Billing services](../server/services/payments), organization and billing repositories                                                           | Organization billing projection; Stripe                            |
+| Files                  | No product page; [`/api/files/**`](../server/api/files)                                                                                                                                  | [File service](../server/services/storage/file-service.ts), Files repository, storage binding, job queue                                         | Owner-scoped metadata; local object store or Files R2              |
+| AI                     | No product page; [`/api/ai/**`](../server/api/ai)                                                                                                                                        | [Conversation service](../server/services/ai/ai-conversation-service.ts), AI repository                                                          | Owner-scoped history, attempt, and quota state; OpenAI Responses   |
+| Runtime and operations | Public shell; [`/api/live`, `/api/ready`, `/api/baseline`](../server/api)                                                                                                                | Runtime evaluator, worker, maintenance, backup operator                                                                                          | SQLite, Sentry, private local snapshots, and a separate backup R2  |
 
 Primary verification owners follow the same slices:
 
@@ -197,7 +197,7 @@ Primary verification owners follow the same slices:
 | Runtime and operations | Built-runtime, container, integration, maintenance, and backup process suites                           |
 
 Files and AI are deliberately server-side capabilities today: their entries in
-[`shared/modules.ts`](../apps/web/shared/modules.ts) declare API prefixes but no UI routes.
+[`shared/modules.ts`](../shared/modules.ts) declare API prefixes but no UI routes.
 
 The main provider-backed decisions are [direct Stripe family-plan authority](adr/0009-direct-stripe-family-plan-authority.md),
 [private local/R2 Files](adr/0011-private-files-local-and-r2-lifecycle.md),
@@ -235,10 +235,10 @@ sequenceDiagram
 ```
 
 Read this flow in
-[`app/pages/app/projects/index.vue`](../apps/web/app/pages/app/projects/index.vue),
-[`api/projects/index.post.ts`](../apps/web/server/api/projects/index.post.ts),
-[`require-session.ts`](../apps/web/server/utils/auth/require-session.ts), and
-[`repositories/projects.ts`](../apps/web/server/db/repositories/projects.ts).
+[`app/pages/app/projects/index.vue`](../app/pages/app/projects/index.vue),
+[`api/projects/index.post.ts`](../server/api/projects/index.post.ts),
+[`require-session.ts`](../server/utils/auth/require-session.ts), and
+[`repositories/projects.ts`](../server/db/repositories/projects.ts).
 
 ## Passwordless authentication
 
@@ -283,10 +283,10 @@ sequenceDiagram
 ```
 
 The application-owned pieces are
-[`AuthEntryForm.vue`](../apps/web/app/components/AuthEntryForm.vue),
-[`api/auth/[...all].ts`](../apps/web/server/api/auth/[...all].ts),
-[`auth/passwordless.ts`](../apps/web/server/utils/auth/passwordless.ts), and the
-[email adapter](../apps/web/server/services/email/index.ts).
+[`AuthEntryForm.vue`](../app/components/AuthEntryForm.vue),
+[`api/auth/[...all].ts`](../server/api/auth/[...all].ts),
+[`auth/passwordless.ts`](../server/utils/auth/passwordless.ts), and the
+[email adapter](../server/services/email/index.ts).
 
 ## Private file lifecycle
 
@@ -353,10 +353,10 @@ sequenceDiagram
   end
 ```
 
-The main sources are [`file-service.ts`](../apps/web/server/services/storage/file-service.ts),
-[`object-storage.ts`](../apps/web/server/services/storage/object-storage.ts),
-[`job-queue.ts`](../apps/web/server/services/jobs/job-queue.ts), and
-[`orphan-cleanup.ts`](../apps/web/server/services/storage/orphan-cleanup.ts).
+The main sources are [`file-service.ts`](../server/services/storage/file-service.ts),
+[`object-storage.ts`](../server/services/storage/object-storage.ts),
+[`job-queue.ts`](../server/services/jobs/job-queue.ts), and
+[`orphan-cleanup.ts`](../server/services/storage/orphan-cleanup.ts).
 
 ## One AI conversation turn
 
@@ -418,9 +418,9 @@ sequenceDiagram
 ```
 
 Follow the orchestration in
-[`ai-conversation-service.ts`](../apps/web/server/services/ai/ai-conversation-service.ts), the atomic state changes in
-[`repositories/ai-conversations.ts`](../apps/web/server/db/repositories/ai-conversations.ts), and the provider boundary
-in [`openai.ts`](../apps/web/server/services/ai/openai.ts).
+[`ai-conversation-service.ts`](../server/services/ai/ai-conversation-service.ts), the atomic state changes in
+[`repositories/ai-conversations.ts`](../server/db/repositories/ai-conversations.ts), and the provider boundary
+in [`openai.ts`](../server/services/ai/openai.ts).
 
 ## Stripe webhook projection
 
@@ -465,9 +465,9 @@ sequenceDiagram
   Route-->>Stripe: { received: true, duplicate }
 ```
 
-See [`stripe.post.ts`](../apps/web/server/api/webhooks/stripe.post.ts),
-[`billing-webhook.ts`](../apps/web/server/services/payments/billing-webhook.ts), and
-[`billing-event-store.ts`](../apps/web/server/services/payments/billing-event-store.ts).
+See [`stripe.post.ts`](../server/api/webhooks/stripe.post.ts),
+[`billing-webhook.ts`](../server/services/payments/billing-webhook.ts), and
+[`billing-event-store.ts`](../server/services/payments/billing-event-store.ts).
 
 ## Verified off-host backup
 
@@ -507,8 +507,8 @@ sequenceDiagram
   Operator-->>Scheduler: Immutable receipt
 ```
 
-The orchestration is in [`off-host-backup.mjs`](../apps/web/server/off-host-backup.mjs), while snapshot creation and
-schema verification remain in [`maintenance.mjs`](../apps/web/server/maintenance.mjs). Operational policy is in the
+The orchestration is in [`off-host-backup.mjs`](../server/off-host-backup.mjs), while snapshot creation and
+schema verification remain in [`maintenance.mjs`](../server/maintenance.mjs). Operational policy is in the
 [backup runbook](../ops/backup-runbook.md).
 
 ## Stopped-writer restore

@@ -2,15 +2,12 @@ import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
-import { assertFamilyAccountActionsJourney } from '../../apps/web/tests/browser/family-account-actions-journey.mjs'
-import { assertFamilyBillingJourney } from '../../apps/web/tests/browser/family-billing-journey.mjs'
-import { assertIdentityAccountJourney } from '../../apps/web/tests/browser/identity-account-journey.mjs'
-import { assertWorkspaceInvitationJourney } from '../../apps/web/tests/browser/invitation-journey.mjs'
-import {
-  assertPrivateProjectJourney,
-  assertRealProjectSuccessJourney
-} from '../../apps/web/tests/browser/private-project-journey.mjs'
-import { assertProjectBoundaryJourney } from '../../apps/web/tests/browser/project-boundary-journey.mjs'
+import { assertFamilyAccountActionsJourney } from './family-account-actions-journey.mjs'
+import { assertFamilyBillingJourney } from './family-billing-journey.mjs'
+import { assertIdentityAccountJourney } from './identity-account-journey.mjs'
+import { assertWorkspaceInvitationJourney } from './invitation-journey.mjs'
+import { assertPrivateProjectJourney, assertRealProjectSuccessJourney } from './private-project-journey.mjs'
+import { assertProjectBoundaryJourney } from './project-boundary-journey.mjs'
 
 const runtimeName = requiredEnvironment('BROWSER_RUNTIME_APP_NAME')
 const runtimeUrl = requiredEnvironment('BROWSER_RUNTIME_APP_URL')

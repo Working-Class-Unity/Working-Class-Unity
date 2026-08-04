@@ -3,8 +3,8 @@ import { createHash } from 'node:crypto'
 import { createRequire } from 'node:module'
 import { isAbsolute, join } from 'node:path'
 
-const requireFromWeb = createRequire(new URL('../apps/web/package.json', import.meta.url))
-const Stripe = requireFromWeb('stripe')
+const requireFromApp = createRequire(new URL('../package.json', import.meta.url))
+const Stripe = requireFromApp('stripe')
 
 let baseUrl = ''
 let fixtureId = ''
