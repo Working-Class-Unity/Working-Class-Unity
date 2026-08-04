@@ -1,0 +1,580 @@
+{
+  "common": {
+    "cancel": "Cancel",
+    "email": "Email",
+    "emailInvalid": "Enter a valid email address.",
+    "name": "Name",
+    "retry": "Retry",
+    "sessionVerificationFailed": "We could not verify your session right now.",
+    "tryAgain": "Try again",
+    "working": "Working..."
+  },
+  "metadata": {
+    "defaultDescription": "Operational baseline for SmallWiseLabs full-stack apps.",
+    "home": {
+      "title": "Home",
+      "description": "A passwordless personal-app foundation with private data and optional family access."
+    },
+    "login": {
+      "title": "Log in"
+    },
+    "signup": {
+      "title": "Sign up"
+    },
+    "invitation": {
+      "title": "Workspace invitation"
+    },
+    "app": {
+      "title": "App"
+    },
+    "account": {
+      "title": "Account"
+    },
+    "billing": {
+      "title": "Billing"
+    },
+    "observability": {
+      "title": "Observability test"
+    },
+    "projects": {
+      "title": "Projects"
+    },
+    "projectFallback": {
+      "title": "Project"
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "description": "Privacy policy template for this application."
+    },
+    "terms": {
+      "title": "Terms",
+      "description": "Terms template for this application."
+    },
+    "errorTitle": "{heading} {'|'} {appName}"
+  },
+  "navigation": {
+    "skipToMain": "Skip to main content",
+    "applicationLabel": "Application",
+    "brandHome": "{appName} home",
+    "primaryLabel": "Primary",
+    "app": "App",
+    "projects": "Projects",
+    "login": "Log in",
+    "signup": "Sign up"
+  },
+  "account": {
+    "eyebrow": "Personal settings",
+    "title": "Account",
+    "sessionUnavailable": {
+      "title": "Account unavailable"
+    },
+    "loginRequired": {
+      "title": "Continuing to log in",
+      "description": "A signed-in session is required to view this page."
+    },
+    "identity": {
+      "title": "Your identity",
+      "noName": "No name set"
+    },
+    "billing": {
+      "title": "Billing",
+      "description": "View your Personal or Family subscription, Family membership, and available billing actions.",
+      "view": "View billing"
+    },
+    "linkedAccounts": {
+      "title": "Linked sign-in methods",
+      "loadFailed": "We could not load linked sign-in methods right now.",
+      "removeFailed": "We could not remove {provider} sign-in right now. Please try again.",
+      "removed": "{provider} sign-in removed from this app. Email sign-in remains available. This does not revoke access in {provider}.",
+      "notConfigured": "{provider} sign-in is not configured. Email sign-in remains available.",
+      "loading": "Checking linked accounts...",
+      "linked": "{provider} is linked as a sign-in method for this app.",
+      "notLinked": "No {provider} account is linked. Email sign-in remains available.",
+      "removing": "Removing {provider}...",
+      "removeOne": "Remove {provider} sign-in",
+      "removeNumbered": "Remove {provider} account {number}",
+      "addInstructions": "To add {provider}, log out and continue with {provider} using this account's same verified email address."
+    },
+    "menu": {
+      "personalAccount": "Personal account",
+      "triggerLabel": "Account menu for {identity}",
+      "account": "Account",
+      "signingOut": "Signing out...",
+      "signOut": "Sign out",
+      "signOutError": "We could not confirm that you were signed out. Your session may still be active. Please try again."
+    },
+    "deletion": {
+      "title": "Delete account",
+      "description": "Deletion removes your login, private app content, and the Family group you own. Anyone you invited loses access through that group, but their separate accounts and private data remain.",
+      "billingWarning": "If you own a Stripe subscription, deletion waits until cancellation is confirmed. Your account remains available while that result is uncertain; afterward, we may retain only minimized billing references needed for reconciliation.",
+      "confirmationLabel": "Type {confirmation} to confirm",
+      "help": "Once any required Stripe cancellation is confirmed, this action has no grace period or ownership transfer.",
+      "deleting": "Deleting account...",
+      "submit": "Delete account",
+      "sessionTooOld": "Your session is too old for this action. Log out, sign in again, and then retry deletion.",
+      "billingPending": "Stripe cancellation is not confirmed, so your account was not deleted. Wait briefly and retry.",
+      "unknownResult": "We could not confirm whether deletion completed. Try signing in again; if this account still opens, you can retry."
+    }
+  },
+  "projects": {
+    "shared": {
+      "nameLabel": "Project name",
+      "nameRequired": "Enter a project name.",
+      "nameTooLong": "Use {max} characters or fewer."
+    },
+    "list": {
+      "eyebrow": "Your private work",
+      "title": "Projects",
+      "introduction": "Projects belong only to your account unless a future app explicitly adds sharing.",
+      "createTitle": "Create a project",
+      "createAction": "Create project",
+      "creating": "Creating...",
+      "created": "{name} was created.",
+      "createFailed": "We could not create the project. Please try again.",
+      "yourProjects": "Your projects",
+      "view": "View",
+      "sessionUnavailable": {
+        "title": "Projects unavailable"
+      },
+      "loading": {
+        "title": "Loading projects",
+        "description": "Retrieving your private projects."
+      },
+      "unavailable": {
+        "title": "Projects unavailable",
+        "description": "We could not load your projects right now."
+      },
+      "empty": {
+        "title": "No projects yet",
+        "description": "Create your first project with the form above."
+      }
+    },
+    "detail": {
+      "allProjects": "All projects",
+      "eyebrow": "Private project",
+      "fallbackTitle": "Project",
+      "returnToProjects": "Return to projects",
+      "renameTitle": "Rename project",
+      "saveName": "Save name",
+      "saving": "Saving...",
+      "renamed": "Project name updated.",
+      "renameFailed": "We could not update the project. Please try again.",
+      "sessionUnavailable": {
+        "title": "Project unavailable"
+      },
+      "loading": {
+        "title": "Loading project",
+        "description": "Retrieving this private project."
+      },
+      "unavailable": {
+        "title": "Project unavailable",
+        "description": "This project does not exist or is not available to your account."
+      },
+      "loadFailed": {
+        "title": "Project could not load",
+        "description": "A temporary problem prevented this project from loading."
+      }
+    },
+    "deletion": {
+      "title": "Delete project",
+      "description": "Deletion is immediate and cannot be undone.",
+      "confirmation": "Permanently delete {project}?",
+      "deleting": "Deleting...",
+      "submit": "Delete permanently",
+      "failed": "We could not confirm deletion. The project may still exist; retry or return to your projects."
+    }
+  },
+  "security": {
+    "check": {
+      "label": "Security check",
+      "complete": "Security check complete.",
+      "failure": "The security check could not be completed.",
+      "progress": "Security check in progress.",
+      "retry": "Retry security check"
+    }
+  },
+  "auth": {
+    "login": {
+      "eyebrow": "Welcome back",
+      "title": "Log in",
+      "introduction": "Use email or an available provider. If this is your first visit, continuing may create your account."
+    },
+    "signup": {
+      "eyebrow": "Get started",
+      "title": "Create your account",
+      "introduction": "Use a passwordless sign-in method to create or return to your account."
+    },
+    "errors": {
+      "authenticationFailed": "We could not complete authentication. Request a new email link or try the available provider again.",
+      "formInvalid": "Check the highlighted field and try again.",
+      "securityRequired": "Complete the security check before requesting an email link.",
+      "emailLink": "We could not send an email link right now. Please try again.",
+      "google": "We could not start Google authentication right now. Please try again."
+    },
+    "status": {
+      "signedOut": "You are signed out.",
+      "emailLinkSent": "If you can receive email at that address, a sign-in link is on its way."
+    },
+    "sessionUnavailable": {
+      "title": "Session check unavailable",
+      "description": "We could not check your current session. You can still request a new email link."
+    },
+    "email": {
+      "required": "Email is required.",
+      "sending": "Sending...",
+      "submit": "Send email link"
+    },
+    "legal": {
+      "acknowledgment": "By continuing, you acknowledge the {terms} and {privacy}.",
+      "terms": "Terms",
+      "privacy": "Privacy Policy"
+    },
+    "social": {
+      "title": "Continue another way",
+      "googleReady": "Use Google without creating a password.",
+      "providerUnavailable": "Provider availability could not be loaded. Email remains available.",
+      "googleNotConfigured": "Google authentication is not configured. Email remains available.",
+      "openingGoogle": "Opening Google...",
+      "continueWithGoogle": "Continue with Google"
+    }
+  },
+  "invitations": {
+    "management": {
+      "title": "Share access",
+      "description": "Manage accepted members and invite someone by email. Each person uses their own login and cannot see your private data.",
+      "acceptedSeats": "Accepted people",
+      "reservedSeats": "Reserved invitations",
+      "seatValue": "{count} of {capacity}",
+      "creationUnavailable": "New invitations are unavailable while this Family subscription cannot safely add another person.",
+      "emailLabel": "Email address",
+      "sending": "Sending invitation...",
+      "send": "Send invitation",
+      "help": "Invitations grant family-plan member access only; private data stays separate.",
+      "sent": "Invitation sent to {email}.",
+      "deliveryUnknown": "We could not confirm delivery. If the invitation appears below, use Resend to try the email again.",
+      "resent": "Invitation resent to {email}.",
+      "resendError": "We could not resend that invitation. Refresh the list and try again.",
+      "canceled": "Invitation to {email} canceled.",
+      "cancelError": "We could not cancel that invitation. Refresh the list and try again.",
+      "refreshAlsoFailed": "{error} We also could not refresh the pending list.",
+      "refreshFailed": "We could not refresh the pending invitation list.",
+      "expiryUnavailable": "Expiry unavailable",
+      "expires": "Expires {date}",
+      "acceptedTitle": "Accepted members",
+      "removeAriaLabel": "Remove {name} ({email})",
+      "remove": "Remove",
+      "removeConfirmation": "Remove {name} ({email}) from Family access?",
+      "removing": "Removing...",
+      "confirmRemove": "Confirm removal",
+      "memberRemoved": "{name} ({email}) no longer has Family access.",
+      "removeError": "We could not confirm whether that member was removed. Refresh Family access before trying again.",
+      "pendingTitle": "Pending invitations",
+      "resendAriaLabel": "Resend invitation to {email}",
+      "resending": "Resending...",
+      "resend": "Resend",
+      "cancelAriaLabel": "Cancel invitation to {email}",
+      "canceling": "Canceling...",
+      "loading": {
+        "title": "Loading family access",
+        "description": "Checking your pending invitations."
+      },
+      "unavailable": {
+        "title": "Family access unavailable",
+        "description": "We could not load invitation controls right now."
+      },
+      "empty": {
+        "title": "No pending invitations",
+        "description": "New invitations will appear here until they are accepted, canceled, or expire."
+      },
+      "membersEmpty": {
+        "title": "No accepted members",
+        "description": "Accepted Family members will appear here."
+      }
+    },
+    "redemption": {
+      "eyebrow": "Shared workspace",
+      "title": "Workspace invitation",
+      "noLongerAvailable": "This invitation is no longer available.",
+      "signInDescription": "Sign in with the email address that received this invitation.",
+      "signIn": "Sign in to continue",
+      "details": "You were invited to join {workspace} as a member.",
+      "expiry": "Expires {date}.",
+      "joining": "Joining...",
+      "accept": "Accept invitation",
+      "declining": "Declining...",
+      "decline": "Decline invitation",
+      "checking": {
+        "title": "Checking invitation",
+        "description": "Confirming that this invitation belongs to your signed-in account."
+      },
+      "unavailable": {
+        "title": "Invitation unavailable",
+        "sessionDescription": "We could not verify your sign-in right now. Please try again.",
+        "invitationDescription": "This invitation is invalid, expired, already used, or belongs to another account."
+      },
+      "declined": {
+        "title": "Invitation declined",
+        "description": "You have not joined this workspace."
+      }
+    }
+  },
+  "personalApp": {
+    "eyebrow": "Your app",
+    "welcome": "Welcome back",
+    "welcomeNamed": "Welcome back, {name}",
+    "loading": {
+      "title": "Loading your account",
+      "description": "Retrieving your private app session."
+    },
+    "unavailable": {
+      "title": "App unavailable",
+      "description": "We could not load your account right now."
+    },
+    "ready": "Your private app is ready.",
+    "signedInAs": "Signed in as {email}",
+    "viewProjects": "View projects",
+    "manageAccount": "Manage account"
+  },
+  "errors": {
+    "moduleUnavailable": {
+      "heading": "Module unavailable",
+      "description": "This optional module is disabled for this application."
+    },
+    "notFound": {
+      "heading": "Page not found",
+      "description": "The requested page could not be found."
+    },
+    "unexpected": {
+      "heading": "Something went wrong",
+      "description": "The application could not complete this request."
+    },
+    "status": "Status {statusCode}",
+    "code": "Code: {code}",
+    "recoveryFailed": "We could not return home. Please reload the page and try again.",
+    "returningHome": "Returning home...",
+    "returnHome": "Return home"
+  },
+  "observability": {
+    "eyebrow": "Observability",
+    "title": "Client Event Test",
+    "preparing": "Preparing client event test.",
+    "missingToken": "Missing token hash.",
+    "validating": "Validating test token.",
+    "sent": "Client test event sent.",
+    "sentWithId": "Client test event sent: {eventId}",
+    "failed": "Client test validation failed."
+  },
+  "billing": {
+    "eyebrow": "Account",
+    "title": "Billing",
+    "introduction": "Choose Personal for one person or Family for the manager and up to five invited people. Stripe confirms every purchase and billing change.",
+    "shared": {
+      "unavailableTitle": "Billing unavailable",
+      "membershipActiveTitle": "Family membership active",
+      "includedThroughFamily": "Your premium access is included through a Family membership.",
+      "subscription": "Subscription"
+    },
+    "checkoutReturn": {
+      "success": "Checkout returned to the app. Payment and access are confirmed only by the billing status below.",
+      "canceled": "Checkout was canceled. No billing change is assumed."
+    },
+    "loading": {
+      "title": "Loading billing",
+      "description": "Checking your subscription and Family membership."
+    },
+    "loadError": {
+      "afterLeave": "You left the family membership, but we could not load your updated billing status.",
+      "uncertainLeave": "We could not confirm whether you left the family membership. Retry to check your current status.",
+      "general": "We could not load your billing status right now."
+    },
+    "summary": {
+      "membershipEyebrow": "Family membership",
+      "subscriptionEyebrow": "Your subscription",
+      "membershipTitle": "Family membership",
+      "subscriptionTitle": "Stripe subscription"
+    },
+    "plans": {
+      "personal": "Personal",
+      "family": "Family"
+    },
+    "cadences": {
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "annual": "Annual"
+    },
+    "relationships": {
+      "independent": "Independent",
+      "manager": "Family manager",
+      "member": "Family member"
+    },
+    "offerings": {
+      "label": "{plan} · {cadence}",
+      "personalCoverage": "Premium access for you.",
+      "familyCoverage": "Premium access for the manager and up to five invited members.",
+      "availableTitle": "Choose a subscription",
+      "availableDescription": "Prices and currency are shown by Stripe Checkout.",
+      "changeTitle": "Change subscription",
+      "changeDescription": "The app chooses the approved timing and billing behavior. Stripe confirms when the change takes effect."
+    },
+    "presentation": {
+      "unavailable": {
+        "description": "Billing status is not available."
+      },
+      "memberUnavailable": {
+        "title": "Family membership unavailable",
+        "description": "We cannot safely confirm Family coverage right now. The Family manager can review billing."
+      },
+      "memberAtRisk": {
+        "description": "Your access remains available for now, but the Family manager needs to review billing."
+      },
+      "memberInactive": {
+        "title": "Family membership inactive",
+        "description": "Premium access through this Family membership is not currently available."
+      },
+      "checkoutPending": {
+        "title": "Checkout confirmation pending",
+        "description": "Stripe has not yet confirmed the subscription. Check billing status before trying again."
+      },
+      "active": {
+        "title": "{plan} active",
+        "description": "Premium access is available."
+      },
+      "grace": {
+        "title": "Payment needs attention",
+        "description": "Premium access remains available through {date}. Open billing management to resolve the payment."
+      },
+      "suspended": {
+        "title": "Premium access suspended",
+        "description": "The payment grace period ended. Open billing management to recover the subscription."
+      },
+      "reconciliation": {
+        "title": "Billing status unavailable",
+        "description": "We cannot safely confirm the current Stripe state. Check billing status before making another change."
+      },
+      "terminal": {
+        "title": "Subscription ended",
+        "description": "This Stripe subscription no longer grants premium access."
+      },
+      "none": {
+        "title": "No subscription",
+        "description": "Choose a Personal or Family subscription when you are ready."
+      }
+    },
+    "facts": {
+      "access": "Access",
+      "available": "Available",
+      "notAvailable": "Not currently available",
+      "relationship": "Relationship",
+      "provider": "Provider",
+      "cadence": "Cadence",
+      "periodEnd": "Current period ends",
+      "renewal": "Renewal",
+      "renewalOn": "On",
+      "renewalOff": "Off",
+      "acceptedSeats": "Accepted people",
+      "reservedSeats": "Reserved invitations",
+      "seatValue": "{count} of {capacity}"
+    },
+    "transition": {
+      "title": "Subscription change pending",
+      "actionRequired": "{offering} is waiting for payment action. Use Manage billing to complete it.",
+      "upgradePending": "{offering} will appear only after Stripe confirms the upgrade payment.",
+      "scheduled": "{offering} is scheduled for {date}."
+    },
+    "privacyNote": "Family membership shares paid access, not private app data. Data stays private unless a feature explicitly shares it.",
+    "feedback": {
+      "left": "You left the family membership. Your current billing options are shown below.",
+      "leaveUnconfirmed": "We could not confirm that you left the family membership. Your membership is still active.",
+      "checkoutFailed": "We could not start Stripe Checkout. Please try again.",
+      "portalFailed": "We could not open Stripe billing management. Please try again.",
+      "changePending": "Stripe is processing or has scheduled the subscription change.",
+      "changeApplied": "The subscription change is confirmed.",
+      "changeFailed": "We could not safely change the subscription. Refresh billing status before trying again.",
+      "refreshed": "Billing status refreshed.",
+      "refreshFailed": "We could not refresh billing status. Please try again."
+    },
+    "actions": {
+      "openingCheckout": "Opening checkout...",
+      "chooseOffering": "Choose {offering}",
+      "openingBilling": "Opening billing...",
+      "manageBilling": "Manage billing",
+      "changing": "Changing subscription...",
+      "changeOffering": "Change to {offering}",
+      "checkingStatus": "Checking status...",
+      "checkStatus": "Check billing status",
+      "memberExplanation": "The Family manager controls billing. Your payment details and the payer's identity are not shown.",
+      "leave": "Leave family membership",
+      "leaveTitle": "Leave family membership?",
+      "leaveDescription": "You will lose access supplied by this Family membership. Your account and private data remain.",
+      "leaving": "Leaving...",
+      "confirmLeave": "Confirm leave",
+      "keepMembership": "Keep membership",
+      "returnToAccount": "Return to account"
+    }
+  },
+  "legal": {
+    "eyebrow": "Legal template",
+    "privacy": {
+      "title": "Privacy Policy",
+      "notice": "This baseline text is a customization prompt, not a production privacy policy or legal advice. Replace it before launching a fork.",
+      "information": {
+        "title": "Information and purpose",
+        "description": "Describe the information your fork collects, why it is needed, whether it is required, and how people can review or correct it."
+      },
+      "providers": {
+        "title": "Providers and sharing",
+        "description": "List every enabled authentication, payment, storage, analytics, email, AI, and abuse-defense provider together with the information each provider receives."
+      },
+      "abuseDefense": {
+        "title": "Abuse defense",
+        "description": "When Turnstile is enabled, the magic-link pages load Cloudflare's challenge script and frame, which let Cloudflare process browser and network signals to distinguish people from bots. The application sends the resulting opaque token to Cloudflare Siteverify, but does not add the optional visitor IP field, enable widget failure feedback, retain the token or provider response in application data or ordinary logs, or surface provider error codes. Describe your deployment's actual configuration and retention, and link to Cloudflare's {addendum}.",
+        "addendum": "Turnstile Privacy Addendum"
+      },
+      "retention": {
+        "title": "Retention and choices",
+        "description": "State the real retention periods, account-deletion behavior, billing-history exceptions, security controls, and a working contact method for privacy questions."
+      }
+    },
+    "terms": {
+      "title": "Terms",
+      "notice": "This baseline text is a customization prompt, not production terms or legal advice. Replace it before launching a fork.",
+      "service": {
+        "title": "The service",
+        "description": "Describe what your fork provides, who may use it, and any eligibility or account requirements."
+      },
+      "conduct": {
+        "title": "Acceptable use",
+        "description": "Document the conduct, content, automation, and abuse rules that are appropriate for the actual product."
+      },
+      "payments": {
+        "title": "Payments and ending access",
+        "description": "If billing is enabled, explain the real price, renewal, cancellation, refund, account-deletion, and family access behavior."
+      }
+    }
+  },
+  "home": {
+    "eyebrow": "A personal app foundation",
+    "title": "A simple, private place to begin.",
+    "introduction": "Start with passwordless access and data that belongs to each person. Add family access or collaborative features only when the product needs them.",
+    "actionsLabel": "Get started",
+    "getStarted": "Get started",
+    "featuresLabel": "What to expect",
+    "features": {
+      "passwordless": {
+        "eyebrow": "Passwordless",
+        "title": "Email and configured providers",
+        "description": "Use an email link or an available social provider without creating another password."
+      },
+      "private": {
+        "eyebrow": "Private by default",
+        "title": "Your data stays yours",
+        "description": "Family-plan access does not automatically reveal another person's private application data."
+      },
+      "adapt": {
+        "eyebrow": "Ready to adapt",
+        "title": "Share only what matters",
+        "description": "A fork can add focused collaboration to the specific feature that needs it."
+      }
+    }
+  }
+}

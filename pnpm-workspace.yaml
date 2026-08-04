@@ -1,0 +1,22 @@
+packages:
+  - apps/*
+
+overrides:
+  '@types/node': 24.13.3
+  # Drop these when Nitro replaces Archiver 7; both preserve its used APIs while resolving brace-expansion 5.0.8.
+  'archiver-utils@5.0.2>glob': 13.0.6
+  'archiver@7.0.1>readdir-glob': 3.0.0
+  # Stable Drizzle Kit ships a self-contained tsx loader; this dependency is used only by its unpublished development build.
+  'drizzle-kit@0.31.10>@esbuild-kit/esm-loader': '-'
+  vue: 3.5.39
+
+publicHoistPattern:
+  - nuxt
+
+allowBuilds:
+  '@parcel/watcher': true
+  '@sentry/cli': true
+  better-sqlite3: true
+  esbuild: true
+  unrs-resolver: true
+  vue-demi: false

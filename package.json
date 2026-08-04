@@ -1,0 +1,56 @@
+{
+  "name": "swl-base-app",
+  "private": true,
+  "packageManager": "pnpm@11.1.2",
+  "type": "module",
+  "scripts": {
+    "bootstrap": "node scripts/run-pnpm.mjs install --frozen-lockfile",
+    "pnpm": "node scripts/run-pnpm.mjs",
+    "verify:pinned": "node scripts/run-pnpm.mjs run verify",
+    "format:check": "node scripts/format-changed.mjs",
+    "dev": "node --env-file-if-exists=.env scripts/run-pnpm.mjs --filter @smallwiselabs/web dev",
+    "build": "pnpm --filter @smallwiselabs/web build",
+    "start": "node --env-file-if-exists=.env scripts/run-pnpm.mjs --filter @smallwiselabs/web start",
+    "preview": "node --env-file-if-exists=.env scripts/run-pnpm.mjs --filter @smallwiselabs/web preview",
+    "db:generate": "node --env-file-if-exists=.env scripts/run-pnpm.mjs --filter @smallwiselabs/web db:generate",
+    "db:migrate": "node --env-file-if-exists=.env scripts/run-pnpm.mjs --filter @smallwiselabs/web db:migrate",
+    "db:studio": "node --env-file-if-exists=.env scripts/run-pnpm.mjs --filter @smallwiselabs/web db:studio",
+    "db:backup": "node --env-file-if-exists=.env scripts/run-pnpm.mjs --filter @smallwiselabs/web db:backup",
+    "db:migrate:check": "pnpm --filter @smallwiselabs/web db:migrate:check",
+    "worker": "node --env-file-if-exists=.env scripts/run-pnpm.mjs --filter @smallwiselabs/web worker",
+    "doctor": "node scripts/doctor.mjs",
+    "check:toolchain": "node --test scripts/toolchain-contract.test.mjs",
+    "test:tooling": "node --test scripts/ci-browser-helpers.test.mjs scripts/ci-container-build.test.mjs scripts/ci-container-health.test.mjs scripts/compose-deployment.test.mjs scripts/container-maintenance.test.mjs scripts/deployment-smoke.test.mjs scripts/format-changed.test.mjs scripts/isolated-api-smoke.test.mjs scripts/off-host-backup.test.mjs scripts/openai-corpus.test.mjs scripts/playwright-foundation-reporter.test.mjs scripts/vitest-policy-reporter.test.mjs",
+    "check:supply-chain": "node --test scripts/supply-chain-policy.test.mjs && node scripts/supply-chain-policy.mjs",
+    "scan:supply-chain": "node scripts/supply-chain-scan.mjs all",
+    "test:framework-security": "node --test scripts/framework-security-helpers.test.mjs && node scripts/framework-security-smoke.mjs",
+    "ops:readiness": "pnpm --filter @smallwiselabs/web exec tsx ../../scripts/production-readiness.ts",
+    "ops:readiness:strict": "pnpm --filter @smallwiselabs/web exec tsx ../../scripts/production-readiness.ts --strict",
+    "ops:smoke": "node scripts/deployment-smoke.mjs",
+    "openai:corpus": "node scripts/openai-corpus.mjs",
+    "api:smoke": "node scripts/isolated-api-smoke.mjs",
+    "lint": "pnpm --filter @smallwiselabs/web lint",
+    "stylelint": "pnpm --filter @smallwiselabs/web stylelint",
+    "typecheck": "pnpm --filter @smallwiselabs/web typecheck",
+    "test": "pnpm --filter @smallwiselabs/web test",
+    "test:browser": "node scripts/ci-browser-smoke.mjs",
+    "test:container-build": "node scripts/ci-container-build.mjs",
+    "test:container-health": "node scripts/ci-container-health.mjs",
+    "test:runtime": "node scripts/ci-runtime-smoke.mjs",
+    "check": "pnpm run format:check && pnpm run doctor && pnpm run check:toolchain && pnpm run test:tooling && pnpm run check:supply-chain && pnpm run test:framework-security && pnpm run lint && pnpm run stylelint && pnpm run db:migrate:check && pnpm run typecheck && pnpm run test",
+    "verify": "pnpm run check && pnpm run scan:supply-chain && pnpm run build && pnpm run test:runtime && pnpm run test:browser && pnpm run api:smoke && pnpm run test:container-build && pnpm run test:container-health"
+  },
+  "engines": {
+    "node": ">=24.11.0 <25.0.0",
+    "pnpm": "11.1.2"
+  },
+  "browserslist": [
+    "baseline widely available on 2025-05-01"
+  ],
+  "devDependencies": {
+    "@axe-core/playwright": "4.12.1",
+    "@playwright/test": "1.61.1",
+    "prettier": "3.9.5",
+    "yaml": "2.9.0"
+  }
+}

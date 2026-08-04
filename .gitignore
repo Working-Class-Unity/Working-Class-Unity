@@ -1,40 +1,19 @@
-# Nuxt dev/build outputs (from wcu-website)
-wcu-website/.output
-wcu-website/.data
-wcu-website/.nuxt
-wcu-website/.nitro
-wcu-website/.cache
-wcu-website/dist
-
-# Node dependencies
 node_modules
-wcu-website/node_modules
-
-# Logs
-logs
-*.log
-
-# Misc
-.DS_Store
-.fleet
-.idea
-
-# Local env files
+.nuxt
+.output
+.data
+data
+dist
+coverage
+ci-reports
 .env
 .env.*
 !.env.example
-
-# Editor/IDE specific
-.vscode/
-.cursor/
-*.code-workspace
-*.swp
-*.swo
-*~
-
-# Roo AI assistant
-.roo/
-.roomodes
-
-# OS specific
-Thumbs.db
+!.env.production.example
+!.env.build
+*.db
+*.db-shm
+*.db-wal
+*.log
+ops/production-evidence-*.md
+!ops/production-evidence-template.md

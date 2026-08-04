@@ -1,0 +1,2521 @@
+{
+  "version": "6",
+  "dialect": "sqlite",
+  "id": "966f0567-0a79-4bc1-927a-83683b4301b9",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "tables": {
+    "app_settings": {
+      "name": "app_settings",
+      "columns": {
+        "key": {
+          "name": "key",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "value": {
+          "name": "value",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "ai_conversations": {
+      "name": "ai_conversations",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "owner_user_id": {
+          "name": "owner_user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "history_revision": {
+          "name": "history_revision",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "next_sequence": {
+          "name": "next_sequence",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 1
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {
+        "ai_conversations_owner_updated_id_idx": {
+          "name": "ai_conversations_owner_updated_id_idx",
+          "columns": [
+            "owner_user_id",
+            "updated_at",
+            "id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "ai_conversations_owner_user_id_user_id_fk": {
+          "name": "ai_conversations_owner_user_id_user_id_fk",
+          "tableFrom": "ai_conversations",
+          "tableTo": "user",
+          "columnsFrom": [
+            "owner_user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "ai_conversations_identity_check": {
+          "name": "ai_conversations_identity_check",
+          "value": "length(\"ai_conversations\".\"id\") = 52 and substr(\"ai_conversations\".\"id\", 1, 16) = 'ai_conversation_' and length(trim(\"ai_conversations\".\"owner_user_id\")) > 0"
+        },
+        "ai_conversations_sequence_check": {
+          "name": "ai_conversations_sequence_check",
+          "value": "\"ai_conversations\".\"history_revision\" >= 0 and \"ai_conversations\".\"next_sequence\" >= 1"
+        },
+        "ai_conversations_timestamps_check": {
+          "name": "ai_conversations_timestamps_check",
+          "value": "julianday(\"ai_conversations\".\"created_at\") is not null and julianday(\"ai_conversations\".\"updated_at\") is not null and julianday(\"ai_conversations\".\"updated_at\") >= julianday(\"ai_conversations\".\"created_at\")"
+        }
+      }
+    },
+    "ai_generation_attempts": {
+      "name": "ai_generation_attempts",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "conversation_id": {
+          "name": "conversation_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_message_id": {
+          "name": "user_message_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "assistant_message_id": {
+          "name": "assistant_message_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "client_request_id": {
+          "name": "client_request_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "history_revision": {
+          "name": "history_revision",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "usage_bucket_date": {
+          "name": "usage_bucket_date",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'pending'"
+        },
+        "model": {
+          "name": "model",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "provider_request_id": {
+          "name": "provider_request_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "input_tokens": {
+          "name": "input_tokens",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "output_tokens": {
+          "name": "output_tokens",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "reasoning_tokens": {
+          "name": "reasoning_tokens",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "cached_input_tokens": {
+          "name": "cached_input_tokens",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "cache_write_tokens": {
+          "name": "cache_write_tokens",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "error_code": {
+          "name": "error_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "lease_expires_at": {
+          "name": "lease_expires_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "completed_at": {
+          "name": "completed_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {
+        "ai_generation_attempts_conversation_client_request_uidx": {
+          "name": "ai_generation_attempts_conversation_client_request_uidx",
+          "columns": [
+            "conversation_id",
+            "client_request_id"
+          ],
+          "isUnique": true
+        },
+        "ai_generation_attempts_conversation_status_idx": {
+          "name": "ai_generation_attempts_conversation_status_idx",
+          "columns": [
+            "conversation_id",
+            "status"
+          ],
+          "isUnique": false
+        },
+        "ai_generation_attempts_status_lease_idx": {
+          "name": "ai_generation_attempts_status_lease_idx",
+          "columns": [
+            "status",
+            "lease_expires_at"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "ai_generation_attempts_conversation_id_ai_conversations_id_fk": {
+          "name": "ai_generation_attempts_conversation_id_ai_conversations_id_fk",
+          "tableFrom": "ai_generation_attempts",
+          "tableTo": "ai_conversations",
+          "columnsFrom": [
+            "conversation_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "ai_generation_attempts_user_message_id_ai_messages_id_fk": {
+          "name": "ai_generation_attempts_user_message_id_ai_messages_id_fk",
+          "tableFrom": "ai_generation_attempts",
+          "tableTo": "ai_messages",
+          "columnsFrom": [
+            "user_message_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "ai_generation_attempts_assistant_message_id_ai_messages_id_fk": {
+          "name": "ai_generation_attempts_assistant_message_id_ai_messages_id_fk",
+          "tableFrom": "ai_generation_attempts",
+          "tableTo": "ai_messages",
+          "columnsFrom": [
+            "assistant_message_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "ai_generation_attempts_identity_check": {
+          "name": "ai_generation_attempts_identity_check",
+          "value": "length(\"ai_generation_attempts\".\"id\") = 47 and substr(\"ai_generation_attempts\".\"id\", 1, 11) = 'ai_attempt_' and length(trim(\"ai_generation_attempts\".\"conversation_id\")) > 0 and length(trim(\"ai_generation_attempts\".\"user_message_id\")) > 0"
+        },
+        "ai_generation_attempts_request_check": {
+          "name": "ai_generation_attempts_request_check",
+          "value": "length(trim(\"ai_generation_attempts\".\"client_request_id\")) between 1 and 128 and length(trim(\"ai_generation_attempts\".\"model\")) between 1 and 128 and \"ai_generation_attempts\".\"history_revision\" >= 0"
+        },
+        "ai_generation_attempts_bucket_check": {
+          "name": "ai_generation_attempts_bucket_check",
+          "value": "length(\"ai_generation_attempts\".\"usage_bucket_date\") = 10 and date(\"ai_generation_attempts\".\"usage_bucket_date\") is not null and date(\"ai_generation_attempts\".\"usage_bucket_date\") = \"ai_generation_attempts\".\"usage_bucket_date\""
+        },
+        "ai_generation_attempts_status_check": {
+          "name": "ai_generation_attempts_status_check",
+          "value": "\"ai_generation_attempts\".\"status\" in ('pending', 'succeeded', 'failed', 'indeterminate', 'refused', 'cancelled')"
+        },
+        "ai_generation_attempts_provider_metadata_check": {
+          "name": "ai_generation_attempts_provider_metadata_check",
+          "value": "(\"ai_generation_attempts\".\"provider_request_id\" is null or length(trim(\"ai_generation_attempts\".\"provider_request_id\")) between 1 and 512) and (\"ai_generation_attempts\".\"input_tokens\" is null or \"ai_generation_attempts\".\"input_tokens\" >= 0) and (\"ai_generation_attempts\".\"output_tokens\" is null or \"ai_generation_attempts\".\"output_tokens\" >= 0) and (\"ai_generation_attempts\".\"reasoning_tokens\" is null or \"ai_generation_attempts\".\"reasoning_tokens\" >= 0) and (\"ai_generation_attempts\".\"cached_input_tokens\" is null or \"ai_generation_attempts\".\"cached_input_tokens\" >= 0) and (\"ai_generation_attempts\".\"cache_write_tokens\" is null or \"ai_generation_attempts\".\"cache_write_tokens\" >= 0) and (\"ai_generation_attempts\".\"error_code\" is null or (length(\"ai_generation_attempts\".\"error_code\") between 1 and 64 and \"ai_generation_attempts\".\"error_code\" not glob '*[^a-z0-9_-]*'))"
+        },
+        "ai_generation_attempts_lifecycle_check": {
+          "name": "ai_generation_attempts_lifecycle_check",
+          "value": "(\"ai_generation_attempts\".\"status\" = 'pending' and \"ai_generation_attempts\".\"lease_expires_at\" is not null and julianday(\"ai_generation_attempts\".\"lease_expires_at\") is not null and \"ai_generation_attempts\".\"completed_at\" is null and \"ai_generation_attempts\".\"assistant_message_id\" is null and \"ai_generation_attempts\".\"error_code\" is null) or (\"ai_generation_attempts\".\"status\" = 'succeeded' and \"ai_generation_attempts\".\"lease_expires_at\" is null and \"ai_generation_attempts\".\"completed_at\" is not null and julianday(\"ai_generation_attempts\".\"completed_at\") is not null and \"ai_generation_attempts\".\"assistant_message_id\" is not null and \"ai_generation_attempts\".\"error_code\" is null) or (\"ai_generation_attempts\".\"status\" = 'refused' and \"ai_generation_attempts\".\"lease_expires_at\" is null and \"ai_generation_attempts\".\"completed_at\" is not null and julianday(\"ai_generation_attempts\".\"completed_at\") is not null and \"ai_generation_attempts\".\"assistant_message_id\" is not null and \"ai_generation_attempts\".\"error_code\" is not null) or (\"ai_generation_attempts\".\"status\" in ('failed', 'indeterminate', 'cancelled') and \"ai_generation_attempts\".\"lease_expires_at\" is null and \"ai_generation_attempts\".\"completed_at\" is not null and julianday(\"ai_generation_attempts\".\"completed_at\") is not null and \"ai_generation_attempts\".\"assistant_message_id\" is null and \"ai_generation_attempts\".\"error_code\" is not null)"
+        },
+        "ai_generation_attempts_timestamps_check": {
+          "name": "ai_generation_attempts_timestamps_check",
+          "value": "julianday(\"ai_generation_attempts\".\"created_at\") is not null and julianday(\"ai_generation_attempts\".\"updated_at\") is not null and julianday(\"ai_generation_attempts\".\"updated_at\") >= julianday(\"ai_generation_attempts\".\"created_at\") and (\"ai_generation_attempts\".\"lease_expires_at\" is null or julianday(\"ai_generation_attempts\".\"lease_expires_at\") >= julianday(\"ai_generation_attempts\".\"created_at\")) and (\"ai_generation_attempts\".\"completed_at\" is null or julianday(\"ai_generation_attempts\".\"completed_at\") >= julianday(\"ai_generation_attempts\".\"created_at\"))"
+        }
+      }
+    },
+    "ai_generation_leases": {
+      "name": "ai_generation_leases",
+      "columns": {
+        "owner_user_id": {
+          "name": "owner_user_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "attempt_id": {
+          "name": "attempt_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "lease_expires_at": {
+          "name": "lease_expires_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "ai_generation_leases_owner_user_id_user_id_fk": {
+          "name": "ai_generation_leases_owner_user_id_user_id_fk",
+          "tableFrom": "ai_generation_leases",
+          "tableTo": "user",
+          "columnsFrom": [
+            "owner_user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "ai_generation_leases_identity_check": {
+          "name": "ai_generation_leases_identity_check",
+          "value": "length(trim(\"ai_generation_leases\".\"owner_user_id\")) > 0 and length(\"ai_generation_leases\".\"attempt_id\") = 47 and substr(\"ai_generation_leases\".\"attempt_id\", 1, 11) = 'ai_attempt_' and substr(\"ai_generation_leases\".\"attempt_id\", 20, 1) = '-' and substr(\"ai_generation_leases\".\"attempt_id\", 25, 1) = '-' and substr(\"ai_generation_leases\".\"attempt_id\", 26, 1) = '4' and substr(\"ai_generation_leases\".\"attempt_id\", 30, 1) = '-' and substr(\"ai_generation_leases\".\"attempt_id\", 31, 1) in ('8', '9', 'a', 'b') and substr(\"ai_generation_leases\".\"attempt_id\", 35, 1) = '-' and replace(substr(\"ai_generation_leases\".\"attempt_id\", 12), '-', '') not glob '*[^0-9a-f]*'"
+        },
+        "ai_generation_leases_timestamps_check": {
+          "name": "ai_generation_leases_timestamps_check",
+          "value": "julianday(\"ai_generation_leases\".\"lease_expires_at\") is not null and julianday(\"ai_generation_leases\".\"created_at\") is not null and julianday(\"ai_generation_leases\".\"updated_at\") is not null and julianday(\"ai_generation_leases\".\"lease_expires_at\") >= julianday(\"ai_generation_leases\".\"created_at\") and julianday(\"ai_generation_leases\".\"updated_at\") >= julianday(\"ai_generation_leases\".\"created_at\")"
+        }
+      }
+    },
+    "ai_message_file_citations": {
+      "name": "ai_message_file_citations",
+      "columns": {
+        "message_id": {
+          "name": "message_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "ordinal": {
+          "name": "ordinal",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "ai_message_file_citations_message_title_uidx": {
+          "name": "ai_message_file_citations_message_title_uidx",
+          "columns": [
+            "message_id",
+            "title"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "ai_message_file_citations_message_id_ai_messages_id_fk": {
+          "name": "ai_message_file_citations_message_id_ai_messages_id_fk",
+          "tableFrom": "ai_message_file_citations",
+          "tableTo": "ai_messages",
+          "columnsFrom": [
+            "message_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "ai_message_file_citations_message_ordinal_pk": {
+          "columns": [
+            "message_id",
+            "ordinal"
+          ],
+          "name": "ai_message_file_citations_message_ordinal_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "ai_message_file_citations_ordinal_check": {
+          "name": "ai_message_file_citations_ordinal_check",
+          "value": "\"ai_message_file_citations\".\"ordinal\" between 1 and 10"
+        },
+        "ai_message_file_citations_title_check": {
+          "name": "ai_message_file_citations_title_check",
+          "value": "length(\"ai_message_file_citations\".\"title\") between 1 and 512 and \"ai_message_file_citations\".\"title\" = trim(\"ai_message_file_citations\".\"title\") and instr(\"ai_message_file_citations\".\"title\", char(0)) = 0 and \"ai_message_file_citations\".\"title\" not glob ('*[' || char(1) || '-' || char(31) || char(127) || ']*')"
+        }
+      }
+    },
+    "ai_message_web_citations": {
+      "name": "ai_message_web_citations",
+      "columns": {
+        "message_id": {
+          "name": "message_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "ordinal": {
+          "name": "ordinal",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "url": {
+          "name": "url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "start_index": {
+          "name": "start_index",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "end_index": {
+          "name": "end_index",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "ai_message_web_citations_message_url_span_uidx": {
+          "name": "ai_message_web_citations_message_url_span_uidx",
+          "columns": [
+            "message_id",
+            "url",
+            "start_index",
+            "end_index"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "ai_message_web_citations_message_id_ai_messages_id_fk": {
+          "name": "ai_message_web_citations_message_id_ai_messages_id_fk",
+          "tableFrom": "ai_message_web_citations",
+          "tableTo": "ai_messages",
+          "columnsFrom": [
+            "message_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "ai_message_web_citations_message_ordinal_pk": {
+          "columns": [
+            "message_id",
+            "ordinal"
+          ],
+          "name": "ai_message_web_citations_message_ordinal_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "ai_message_web_citations_ordinal_check": {
+          "name": "ai_message_web_citations_ordinal_check",
+          "value": "\"ai_message_web_citations\".\"ordinal\" between 1 and 20"
+        },
+        "ai_message_web_citations_title_check": {
+          "name": "ai_message_web_citations_title_check",
+          "value": "length(\"ai_message_web_citations\".\"title\") between 1 and 512 and \"ai_message_web_citations\".\"title\" = trim(\"ai_message_web_citations\".\"title\") and instr(\"ai_message_web_citations\".\"title\", char(0)) = 0 and \"ai_message_web_citations\".\"title\" not glob ('*[' || char(1) || '-' || char(31) || char(127) || ']*')"
+        },
+        "ai_message_web_citations_url_check": {
+          "name": "ai_message_web_citations_url_check",
+          "value": "length(\"ai_message_web_citations\".\"url\") between 1 and 4096 and \"ai_message_web_citations\".\"url\" = trim(\"ai_message_web_citations\".\"url\") and substr(\"ai_message_web_citations\".\"url\", 1, 8) = 'https://' and instr(\"ai_message_web_citations\".\"url\", char(0)) = 0 and \"ai_message_web_citations\".\"url\" not glob ('*[' || char(1) || '-' || char(31) || char(127) || ']*')"
+        },
+        "ai_message_web_citations_span_check": {
+          "name": "ai_message_web_citations_span_check",
+          "value": "\"ai_message_web_citations\".\"start_index\" >= 0 and \"ai_message_web_citations\".\"start_index\" < \"ai_message_web_citations\".\"end_index\" and \"ai_message_web_citations\".\"end_index\" <= 1000000"
+        }
+      }
+    },
+    "ai_messages": {
+      "name": "ai_messages",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "conversation_id": {
+          "name": "conversation_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "sequence": {
+          "name": "sequence",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "role": {
+          "name": "role",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "content": {
+          "name": "content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {
+        "ai_messages_conversation_sequence_uidx": {
+          "name": "ai_messages_conversation_sequence_uidx",
+          "columns": [
+            "conversation_id",
+            "sequence"
+          ],
+          "isUnique": true
+        },
+        "ai_messages_conversation_created_id_idx": {
+          "name": "ai_messages_conversation_created_id_idx",
+          "columns": [
+            "conversation_id",
+            "created_at",
+            "id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "ai_messages_conversation_id_ai_conversations_id_fk": {
+          "name": "ai_messages_conversation_id_ai_conversations_id_fk",
+          "tableFrom": "ai_messages",
+          "tableTo": "ai_conversations",
+          "columnsFrom": [
+            "conversation_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "ai_messages_identity_check": {
+          "name": "ai_messages_identity_check",
+          "value": "length(\"ai_messages\".\"id\") = 47 and substr(\"ai_messages\".\"id\", 1, 11) = 'ai_message_' and length(trim(\"ai_messages\".\"conversation_id\")) > 0"
+        },
+        "ai_messages_sequence_check": {
+          "name": "ai_messages_sequence_check",
+          "value": "\"ai_messages\".\"sequence\" >= 1"
+        },
+        "ai_messages_role_check": {
+          "name": "ai_messages_role_check",
+          "value": "\"ai_messages\".\"role\" in ('user', 'assistant')"
+        },
+        "ai_messages_content_check": {
+          "name": "ai_messages_content_check",
+          "value": "length(\"ai_messages\".\"content\") between 1 and 1000000"
+        },
+        "ai_messages_timestamp_check": {
+          "name": "ai_messages_timestamp_check",
+          "value": "julianday(\"ai_messages\".\"created_at\") is not null"
+        }
+      }
+    },
+    "ai_usage_buckets": {
+      "name": "ai_usage_buckets",
+      "columns": {
+        "owner_user_id": {
+          "name": "owner_user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "bucket_date": {
+          "name": "bucket_date",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "request_count": {
+          "name": "request_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "input_tokens": {
+          "name": "input_tokens",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "output_tokens": {
+          "name": "output_tokens",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "reasoning_tokens": {
+          "name": "reasoning_tokens",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "cached_input_tokens": {
+          "name": "cached_input_tokens",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "cache_write_tokens": {
+          "name": "cache_write_tokens",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "ai_usage_buckets_owner_user_id_user_id_fk": {
+          "name": "ai_usage_buckets_owner_user_id_user_id_fk",
+          "tableFrom": "ai_usage_buckets",
+          "tableTo": "user",
+          "columnsFrom": [
+            "owner_user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "ai_usage_buckets_owner_date_pk": {
+          "columns": [
+            "owner_user_id",
+            "bucket_date"
+          ],
+          "name": "ai_usage_buckets_owner_date_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "ai_usage_buckets_date_check": {
+          "name": "ai_usage_buckets_date_check",
+          "value": "length(\"ai_usage_buckets\".\"bucket_date\") = 10 and date(\"ai_usage_buckets\".\"bucket_date\") is not null and date(\"ai_usage_buckets\".\"bucket_date\") = \"ai_usage_buckets\".\"bucket_date\""
+        },
+        "ai_usage_buckets_counts_check": {
+          "name": "ai_usage_buckets_counts_check",
+          "value": "\"ai_usage_buckets\".\"request_count\" >= 0 and \"ai_usage_buckets\".\"input_tokens\" >= 0 and \"ai_usage_buckets\".\"output_tokens\" >= 0 and \"ai_usage_buckets\".\"reasoning_tokens\" >= 0 and \"ai_usage_buckets\".\"cached_input_tokens\" >= 0 and \"ai_usage_buckets\".\"cache_write_tokens\" >= 0"
+        },
+        "ai_usage_buckets_timestamps_check": {
+          "name": "ai_usage_buckets_timestamps_check",
+          "value": "julianday(\"ai_usage_buckets\".\"created_at\") is not null and julianday(\"ai_usage_buckets\".\"updated_at\") is not null and julianday(\"ai_usage_buckets\".\"updated_at\") >= julianday(\"ai_usage_buckets\".\"created_at\")"
+        }
+      }
+    },
+    "account": {
+      "name": "account",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "account_id": {
+          "name": "account_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "provider_id": {
+          "name": "provider_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "access_token": {
+          "name": "access_token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "refresh_token": {
+          "name": "refresh_token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "id_token": {
+          "name": "id_token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "access_token_expires_at": {
+          "name": "access_token_expires_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "refresh_token_expires_at": {
+          "name": "refresh_token_expires_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "scope": {
+          "name": "scope",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "password": {
+          "name": "password",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "account_user_id_idx": {
+          "name": "account_user_id_idx",
+          "columns": [
+            "user_id"
+          ],
+          "isUnique": false
+        },
+        "account_provider_account_idx": {
+          "name": "account_provider_account_idx",
+          "columns": [
+            "provider_id",
+            "account_id"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "account_user_id_user_id_fk": {
+          "name": "account_user_id_user_id_fk",
+          "tableFrom": "account",
+          "tableTo": "user",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "session": {
+      "name": "session",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "token": {
+          "name": "token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "ip_address": {
+          "name": "ip_address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "user_agent": {
+          "name": "user_agent",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "active_organization_id": {
+          "name": "active_organization_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "session_token_idx": {
+          "name": "session_token_idx",
+          "columns": [
+            "token"
+          ],
+          "isUnique": true
+        },
+        "session_user_id_idx": {
+          "name": "session_user_id_idx",
+          "columns": [
+            "user_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "session_user_id_user_id_fk": {
+          "name": "session_user_id_user_id_fk",
+          "tableFrom": "session",
+          "tableTo": "user",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "user": {
+      "name": "user",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "email_verified": {
+          "name": "email_verified",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "image": {
+          "name": "image",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "user_email_idx": {
+          "name": "user_email_idx",
+          "columns": [
+            "email"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "verification": {
+      "name": "verification",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "identifier": {
+          "name": "identifier",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "value": {
+          "name": "value",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "verification_identifier_idx": {
+          "name": "verification_identifier_idx",
+          "columns": [
+            "identifier"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "billing_checkout_attempts": {
+      "name": "billing_checkout_attempts",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "billing_customer_id": {
+          "name": "billing_customer_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "plan_key": {
+          "name": "plan_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'family'"
+        },
+        "stripe_price_id": {
+          "name": "stripe_price_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "stripe_session_id": {
+          "name": "stripe_session_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "idempotency_key": {
+          "name": "idempotency_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "state": {
+          "name": "state",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'pending'"
+        },
+        "success_url": {
+          "name": "success_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "cancel_url": {
+          "name": "cancel_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "reuse_until": {
+          "name": "reuse_until",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {
+        "billing_checkout_attempts_organization_id_idx": {
+          "name": "billing_checkout_attempts_organization_id_idx",
+          "columns": [
+            "organization_id"
+          ],
+          "isUnique": false
+        },
+        "billing_checkout_attempts_stripe_session_id_uidx": {
+          "name": "billing_checkout_attempts_stripe_session_id_uidx",
+          "columns": [
+            "stripe_session_id"
+          ],
+          "isUnique": true
+        },
+        "billing_checkout_attempts_idempotency_key_uidx": {
+          "name": "billing_checkout_attempts_idempotency_key_uidx",
+          "columns": [
+            "idempotency_key"
+          ],
+          "isUnique": true
+        },
+        "billing_checkout_attempts_one_open_uidx": {
+          "name": "billing_checkout_attempts_one_open_uidx",
+          "columns": [
+            "organization_id"
+          ],
+          "isUnique": true,
+          "where": "\"billing_checkout_attempts\".\"state\" in ('pending', 'open', 'reconciliation_required')"
+        }
+      },
+      "foreignKeys": {
+        "billing_checkout_attempts_organization_id_organization_id_fk": {
+          "name": "billing_checkout_attempts_organization_id_organization_id_fk",
+          "tableFrom": "billing_checkout_attempts",
+          "tableTo": "organization",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "billing_checkout_attempts_billing_customer_id_billing_customers_id_fk": {
+          "name": "billing_checkout_attempts_billing_customer_id_billing_customers_id_fk",
+          "tableFrom": "billing_checkout_attempts",
+          "tableTo": "billing_customers",
+          "columnsFrom": [
+            "billing_customer_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "billing_checkout_attempts_plan_check": {
+          "name": "billing_checkout_attempts_plan_check",
+          "value": "\"billing_checkout_attempts\".\"plan_key\" = 'family'"
+        },
+        "billing_checkout_attempts_state_check": {
+          "name": "billing_checkout_attempts_state_check",
+          "value": "\"billing_checkout_attempts\".\"state\" in ('pending', 'open', 'completed', 'expired', 'failed', 'reconciliation_required')"
+        },
+        "billing_checkout_attempts_reuse_check": {
+          "name": "billing_checkout_attempts_reuse_check",
+          "value": "\"billing_checkout_attempts\".\"reuse_until\" >= \"billing_checkout_attempts\".\"created_at\""
+        }
+      }
+    },
+    "billing_customers": {
+      "name": "billing_customers",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "stripe_customer_id": {
+          "name": "stripe_customer_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {
+        "billing_customers_organization_id_uidx": {
+          "name": "billing_customers_organization_id_uidx",
+          "columns": [
+            "organization_id"
+          ],
+          "isUnique": true
+        },
+        "billing_customers_stripe_customer_id_uidx": {
+          "name": "billing_customers_stripe_customer_id_uidx",
+          "columns": [
+            "stripe_customer_id"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "billing_customers_organization_id_organization_id_fk": {
+          "name": "billing_customers_organization_id_organization_id_fk",
+          "tableFrom": "billing_customers",
+          "tableTo": "organization",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "billing_events": {
+      "name": "billing_events",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "stripe_event_id": {
+          "name": "stripe_event_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "event_type": {
+          "name": "event_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "provider_created_at": {
+          "name": "provider_created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "processed_at": {
+          "name": "processed_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "billing_events_stripe_event_id_uidx": {
+          "name": "billing_events_stripe_event_id_uidx",
+          "columns": [
+            "stripe_event_id"
+          ],
+          "isUnique": true
+        },
+        "billing_events_event_type_idx": {
+          "name": "billing_events_event_type_idx",
+          "columns": [
+            "event_type"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "billing_events_provider_created_at_check": {
+          "name": "billing_events_provider_created_at_check",
+          "value": "\"billing_events\".\"provider_created_at\" is null or \"billing_events\".\"provider_created_at\" >= 0"
+        }
+      }
+    },
+    "billing_subscriptions": {
+      "name": "billing_subscriptions",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "billing_customer_id": {
+          "name": "billing_customer_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "stripe_subscription_id": {
+          "name": "stripe_subscription_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'none'"
+        },
+        "plan_key": {
+          "name": "plan_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "stripe_price_id": {
+          "name": "stripe_price_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "current_period_start": {
+          "name": "current_period_start",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "current_period_end": {
+          "name": "current_period_end",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "cancel_at_period_end": {
+          "name": "cancel_at_period_end",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "projection_order_ms": {
+          "name": "projection_order_ms",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "projection_event_id": {
+          "name": "projection_event_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "reconciliation_required": {
+          "name": "reconciliation_required",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "reconciliation_reason": {
+          "name": "reconciliation_reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {
+        "billing_subscriptions_organization_id_uidx": {
+          "name": "billing_subscriptions_organization_id_uidx",
+          "columns": [
+            "organization_id"
+          ],
+          "isUnique": true
+        },
+        "billing_subscriptions_customer_id_uidx": {
+          "name": "billing_subscriptions_customer_id_uidx",
+          "columns": [
+            "billing_customer_id"
+          ],
+          "isUnique": true
+        },
+        "billing_subscriptions_stripe_subscription_id_uidx": {
+          "name": "billing_subscriptions_stripe_subscription_id_uidx",
+          "columns": [
+            "stripe_subscription_id"
+          ],
+          "isUnique": true
+        },
+        "billing_subscriptions_status_idx": {
+          "name": "billing_subscriptions_status_idx",
+          "columns": [
+            "status"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "billing_subscriptions_organization_id_organization_id_fk": {
+          "name": "billing_subscriptions_organization_id_organization_id_fk",
+          "tableFrom": "billing_subscriptions",
+          "tableTo": "organization",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "billing_subscriptions_billing_customer_id_billing_customers_id_fk": {
+          "name": "billing_subscriptions_billing_customer_id_billing_customers_id_fk",
+          "tableFrom": "billing_subscriptions",
+          "tableTo": "billing_customers",
+          "columnsFrom": [
+            "billing_customer_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "billing_subscriptions_status_check": {
+          "name": "billing_subscriptions_status_check",
+          "value": "\"billing_subscriptions\".\"status\" in ('none', 'active', 'canceled', 'incomplete', 'incomplete_expired', 'past_due', 'paused', 'trialing', 'unpaid', 'ambiguous')"
+        },
+        "billing_subscriptions_plan_check": {
+          "name": "billing_subscriptions_plan_check",
+          "value": "\"billing_subscriptions\".\"plan_key\" is null or \"billing_subscriptions\".\"plan_key\" = 'family'"
+        },
+        "billing_subscriptions_reconciliation_check": {
+          "name": "billing_subscriptions_reconciliation_check",
+          "value": "(\"billing_subscriptions\".\"reconciliation_required\" = 1 and \"billing_subscriptions\".\"reconciliation_reason\" is not null) or (\"billing_subscriptions\".\"reconciliation_required\" = 0 and \"billing_subscriptions\".\"reconciliation_reason\" is null)"
+        },
+        "billing_subscriptions_none_check": {
+          "name": "billing_subscriptions_none_check",
+          "value": "\"billing_subscriptions\".\"status\" <> 'none' or (\"billing_subscriptions\".\"stripe_subscription_id\" is null and \"billing_subscriptions\".\"plan_key\" is null and \"billing_subscriptions\".\"stripe_price_id\" is null)"
+        }
+      }
+    },
+    "detached_billing_subjects": {
+      "name": "detached_billing_subjects",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "provider": {
+          "name": "provider",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "provider_reference": {
+          "name": "provider_reference",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "provider_customer_reference": {
+          "name": "provider_customer_reference",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "provider_status": {
+          "name": "provider_status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "provider_status_expires_at": {
+          "name": "provider_status_expires_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "provider_event_created_at": {
+          "name": "provider_event_created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "status_updated_at": {
+          "name": "status_updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "retention_purpose": {
+          "name": "retention_purpose",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "retention_policy": {
+          "name": "retention_policy",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "purge_after": {
+          "name": "purge_after",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "detached_billing_subject_provider_reference_uidx": {
+          "name": "detached_billing_subject_provider_reference_uidx",
+          "columns": [
+            "provider",
+            "provider_reference"
+          ],
+          "isUnique": true
+        },
+        "detached_billing_subject_customer_reference_idx": {
+          "name": "detached_billing_subject_customer_reference_idx",
+          "columns": [
+            "provider",
+            "provider_customer_reference"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "detached_billing_subject_retention_purpose_check": {
+          "name": "detached_billing_subject_retention_purpose_check",
+          "value": "\"detached_billing_subjects\".\"retention_purpose\" = 'external_billing_reconciliation'"
+        },
+        "detached_billing_subject_purge_after_check": {
+          "name": "detached_billing_subject_purge_after_check",
+          "value": "\"detached_billing_subjects\".\"purge_after\" is null or \"detached_billing_subjects\".\"purge_after\" >= \"detached_billing_subjects\".\"deleted_at\""
+        },
+        "detached_billing_subject_provider_event_check": {
+          "name": "detached_billing_subject_provider_event_check",
+          "value": "\"detached_billing_subjects\".\"provider_event_created_at\" is null or \"detached_billing_subjects\".\"provider_event_created_at\" >= 0"
+        }
+      }
+    },
+    "files": {
+      "name": "files",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "owner_id": {
+          "name": "owner_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "bucket": {
+          "name": "bucket",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "object_key": {
+          "name": "object_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "original_name": {
+          "name": "original_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "content_type": {
+          "name": "content_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "byte_size": {
+          "name": "byte_size",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "content_md5": {
+          "name": "content_md5",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'pending'"
+        },
+        "upload_expires_at": {
+          "name": "upload_expires_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "files_object_key_idx": {
+          "name": "files_object_key_idx",
+          "columns": [
+            "object_key"
+          ],
+          "isUnique": true
+        },
+        "files_owner_status_created_id_idx": {
+          "name": "files_owner_status_created_id_idx",
+          "columns": [
+            "owner_id",
+            "status",
+            "created_at",
+            "id"
+          ],
+          "isUnique": false
+        },
+        "files_status_upload_expires_id_idx": {
+          "name": "files_status_upload_expires_id_idx",
+          "columns": [
+            "status",
+            "upload_expires_at",
+            "id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "files_owner_id_user_id_fk": {
+          "name": "files_owner_id_user_id_fk",
+          "tableFrom": "files",
+          "tableTo": "user",
+          "columnsFrom": [
+            "owner_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "files_identity_check": {
+          "name": "files_identity_check",
+          "value": "length(trim(\"files\".\"id\")) > 0 and length(trim(\"files\".\"owner_id\")) > 0"
+        },
+        "files_storage_locator_check": {
+          "name": "files_storage_locator_check",
+          "value": "length(trim(\"files\".\"bucket\")) > 0 and length(trim(\"files\".\"object_key\")) > 0 and length(\"files\".\"object_key\") <= 1024"
+        },
+        "files_metadata_check": {
+          "name": "files_metadata_check",
+          "value": "length(trim(\"files\".\"content_type\")) between 1 and 180 and \"files\".\"byte_size\" between 1 and 26214400 and (\"files\".\"original_name\" is null or length(trim(\"files\".\"original_name\")) between 1 and 180)"
+        },
+        "files_status_check": {
+          "name": "files_status_check",
+          "value": "\"files\".\"status\" in ('pending', 'ready', 'deleted')"
+        },
+        "files_content_md5_check": {
+          "name": "files_content_md5_check",
+          "value": "length(\"files\".\"content_md5\") = 24 and substr(\"files\".\"content_md5\", 23, 2) = '==' and substr(\"files\".\"content_md5\", 1, 22) not glob '*[^A-Za-z0-9+/]*' and substr(\"files\".\"content_md5\", 22, 1) in ('A', 'Q', 'g', 'w')"
+        },
+        "files_deletion_state_check": {
+          "name": "files_deletion_state_check",
+          "value": "(\"files\".\"status\" = 'deleted' and \"files\".\"deleted_at\" is not null) or (\"files\".\"status\" in ('pending', 'ready') and \"files\".\"deleted_at\" is null)"
+        },
+        "files_timestamps_check": {
+          "name": "files_timestamps_check",
+          "value": "julianday(\"files\".\"created_at\") is not null and julianday(\"files\".\"updated_at\") is not null and julianday(\"files\".\"upload_expires_at\") is not null and julianday(\"files\".\"updated_at\") >= julianday(\"files\".\"created_at\") and julianday(\"files\".\"upload_expires_at\") >= julianday(\"files\".\"created_at\") and (\"files\".\"deleted_at\" is null or (julianday(\"files\".\"deleted_at\") is not null and julianday(\"files\".\"deleted_at\") >= julianday(\"files\".\"created_at\")))"
+        }
+      }
+    },
+    "job_queue": {
+      "name": "job_queue",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'queued'"
+        },
+        "payload": {
+          "name": "payload",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "attempts": {
+          "name": "attempts",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "max_attempts": {
+          "name": "max_attempts",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 3
+        },
+        "run_after": {
+          "name": "run_after",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "locked_at": {
+          "name": "locked_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "locked_by": {
+          "name": "locked_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "last_error": {
+          "name": "last_error",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {
+        "job_queue_status_run_after_idx": {
+          "name": "job_queue_status_run_after_idx",
+          "columns": [
+            "status",
+            "run_after"
+          ],
+          "isUnique": false
+        },
+        "job_queue_type_idx": {
+          "name": "job_queue_type_idx",
+          "columns": [
+            "type"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "invitation": {
+      "name": "invitation",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "role": {
+          "name": "role",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'pending'"
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(unixepoch('subsecond') * 1000 as integer))"
+        },
+        "inviter_id": {
+          "name": "inviter_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "invitation_organizationId_idx": {
+          "name": "invitation_organizationId_idx",
+          "columns": [
+            "organization_id"
+          ],
+          "isUnique": false
+        },
+        "invitation_email_idx": {
+          "name": "invitation_email_idx",
+          "columns": [
+            "email"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "invitation_organization_id_organization_id_fk": {
+          "name": "invitation_organization_id_organization_id_fk",
+          "tableFrom": "invitation",
+          "tableTo": "organization",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "invitation_inviter_id_user_id_fk": {
+          "name": "invitation_inviter_id_user_id_fk",
+          "tableFrom": "invitation",
+          "tableTo": "user",
+          "columnsFrom": [
+            "inviter_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "member": {
+      "name": "member",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "role": {
+          "name": "role",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'member'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "member_organizationId_idx": {
+          "name": "member_organizationId_idx",
+          "columns": [
+            "organization_id"
+          ],
+          "isUnique": false
+        },
+        "member_userId_idx": {
+          "name": "member_userId_idx",
+          "columns": [
+            "user_id"
+          ],
+          "isUnique": false
+        },
+        "member_one_external_family_uidx": {
+          "name": "member_one_external_family_uidx",
+          "columns": [
+            "user_id"
+          ],
+          "isUnique": true,
+          "where": "\"member\".\"role\" = 'member'"
+        },
+        "member_organization_id_user_id_uidx": {
+          "name": "member_organization_id_user_id_uidx",
+          "columns": [
+            "organization_id",
+            "user_id"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "member_organization_id_organization_id_fk": {
+          "name": "member_organization_id_organization_id_fk",
+          "tableFrom": "member",
+          "tableTo": "organization",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "member_user_id_user_id_fk": {
+          "name": "member_user_id_user_id_fk",
+          "tableFrom": "member",
+          "tableTo": "user",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "member_single_role_check": {
+          "name": "member_single_role_check",
+          "value": "\"member\".\"role\" in ('owner', 'member')"
+        }
+      }
+    },
+    "organization": {
+      "name": "organization",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "slug": {
+          "name": "slug",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "logo": {
+          "name": "logo",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "personal_owner_user_id": {
+          "name": "personal_owner_user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "organization_personal_owner_user_id_unique": {
+          "name": "organization_personal_owner_user_id_unique",
+          "columns": [
+            "personal_owner_user_id"
+          ],
+          "isUnique": true
+        },
+        "organization_slug_uidx": {
+          "name": "organization_slug_uidx",
+          "columns": [
+            "slug"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "organization_personal_owner_user_id_user_id_fk": {
+          "name": "organization_personal_owner_user_id_user_id_fk",
+          "tableFrom": "organization",
+          "tableTo": "user",
+          "columnsFrom": [
+            "personal_owner_user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "projects": {
+      "name": "projects",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "owner_user_id": {
+          "name": "owner_user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {
+        "projects_owner_user_id_idx": {
+          "name": "projects_owner_user_id_idx",
+          "columns": [
+            "owner_user_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "projects_owner_user_id_user_id_fk": {
+          "name": "projects_owner_user_id_user_id_fk",
+          "tableFrom": "projects",
+          "tableTo": "user",
+          "columnsFrom": [
+            "owner_user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    }
+  },
+  "views": {},
+  "enums": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  },
+  "internal": {
+    "indexes": {}
+  }
+}
