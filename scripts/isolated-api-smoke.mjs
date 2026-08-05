@@ -25,6 +25,7 @@ const runPnpm = resolve(root, 'scripts/run-pnpm.mjs')
 const serverEntry = resolve(root, '.output/server/index.mjs')
 const serverPreload = resolve(root, '.output/server/sentry.server.config.mjs')
 const stripeProviderPreload = resolve(root, 'scripts/isolated-stripe-provider-preload.mjs')
+const turnstileProviderPreload = resolve(root, 'scripts/isolated-turnstile-provider-preload.mjs')
 const requireFromApp = createRequire(resolve(root, 'package.json'))
 const inheritedEnvironment = selectEnvironment(process.env, [
   'CI',
@@ -107,6 +108,10 @@ try {
     assert(existsSync(serverEntry), `Production server entry was not built: ${serverEntry}`)
     assert(existsSync(serverPreload), `Production Sentry preload was not built: ${serverPreload}`)
     assert(existsSync(stripeProviderPreload), `Stripe provider preload was not found: ${stripeProviderPreload}`)
+    assert(
+      existsSync(turnstileProviderPreload),
+      `Turnstile provider preload was not found: ${turnstileProviderPreload}`
+    )
     assert(!existsSync(databasePath), 'Production build touched the isolated runtime database.')
 
     await runPhase(
@@ -133,7 +138,7 @@ try {
     serverOutputMonitor = createOutputMonitor('isolated API built server')
     server = spawnManaged(
       process.execPath,
-      ['--import', stripeProviderPreload, '--import', serverPreload, serverEntry],
+      ['--import', stripeProviderPreload, '--import', turnstileProviderPreload, '--import', serverPreload, serverEntry],
       {
         cwd: runtimeCwd,
         env: applicationEnvironment(baseUrl, port),
@@ -205,19 +210,21 @@ function applicationEnvironment(baseUrl, port) {
     NITRO_PRESET: 'node-server',
     NUXT_BETTER_AUTH_SECRET: authSecret,
     NUXT_BETTER_AUTH_URL: baseUrl,
-    NUXT_SOCIAL_PROVIDERS_GOOGLE_ENABLED: 'false',
     NUXT_EMAIL_TRANSPORT: 'capture',
     NUXT_EMAIL_FROM: 'baseline@example.test',
     NUXT_EMAIL_CAPTURE_DIRECTORY: emailCaptureDirectory,
     NUXT_FILES_DRIVER: 'local',
-    NUXT_MODULES_AI_ENABLED: 'false',
-    NUXT_OPENAI_FILE_SEARCH_ENABLED: 'false',
-    NUXT_OPENAI_WEB_SEARCH_ENABLED: 'false',
-    NUXT_MODULES_BILLING_ENABLED: 'true',
-    NUXT_MODULES_FILES_ENABLED: 'true',
-    NUXT_MODULES_JOBS_ENABLED: 'true',
-    NUXT_MODULES_OBSERVABILITY_ENABLED: 'false',
-    NUXT_MODULES_TURNSTILE_ENABLED: 'false',
+    NUXT_OPENAI_API_KEY: 'isolated-openai-key-not-a-provider-credential',
+    NUXT_OPENAI_PROJECT_ID: 'proj_isolated_api_smoke',
+    NUXT_OPENAI_MODEL: 'gpt-5.6-luna',
+    NUXT_OPENAI_FILE_SEARCH_VECTOR_STORE_ID: 'vs_isolated_empty',
+    NUXT_OPENAI_WEB_SEARCH_ALLOWED_DOMAINS: 'example.test',
+    NUXT_CLOUDFLARE_TURNSTILE_SECRET_KEY: 'isolated-turnstile-secret-not-a-provider-credential',
+    NUXT_PUBLIC_TURNSTILE_SITE_KEY: 'isolated-turnstile-site-not-a-provider-credential',
+    NUXT_SENTRY_DSN: 'http://public@127.0.0.1:9/1',
+    NUXT_PUBLIC_SENTRY_DSN: 'http://public@127.0.0.1:9/1',
+    NUXT_SENTRY_TRACES_SAMPLE_RATE: '0',
+    NUXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE: '0',
     NUXT_PUBLIC_APP_NAME: 'Isolated API Smoke',
     NUXT_PUBLIC_APP_URL: baseUrl,
     NUXT_READINESS_TOKEN: readinessToken,
@@ -229,7 +236,8 @@ function applicationEnvironment(baseUrl, port) {
     NUXT_STRIPE_PERSONAL_ANNUAL_PRICE_ID: stripeCatalog.personalAnnualPriceId,
     NUXT_STRIPE_FAMILY_MONTHLY_PRICE_ID: stripeCatalog.familyMonthlyPriceId,
     NUXT_STRIPE_FAMILY_ANNUAL_PRICE_ID: stripeCatalog.familyAnnualPriceId,
-    SWL_ISOLATED_STRIPE_PROVIDER_URL: stripeProviderUrl
+    SWL_ISOLATED_STRIPE_PROVIDER_URL: stripeProviderUrl,
+    SWL_ISOLATED_TURNSTILE_HOSTNAME: new URL(baseUrl).hostname
   }
 }
 
@@ -268,31 +276,9 @@ function assertFixtureRecorded() {
         likeFixture
       ),
       files: count(sqlite, 'select count(*) as count from files'),
-      ownerMemberships: count(
-        sqlite,
-        `select count(*) as count
-         from member
-         join organization on organization.id = member.organization_id
-         where organization.personal_owner_user_id = member.user_id
-           and member.role = 'owner'`
-      ),
-      personalWorkspaces: count(
-        sqlite,
-        'select count(*) as count from organization where personal_owner_user_id is not null'
-      ),
-      projects: count(sqlite, 'select count(*) as count from projects'),
       users: count(sqlite, 'select count(*) as count from user where email like ?', likeFixture)
     }
     assert(counts.users > 0, 'Expected isolated users to be recorded.')
-    assert(
-      counts.personalWorkspaces === counts.users,
-      `Expected one personal workspace per isolated user, received ${counts.personalWorkspaces}.`
-    )
-    assert(
-      counts.ownerMemberships === counts.users,
-      `Expected one personal owner membership per isolated user, received ${counts.ownerMemberships}.`
-    )
-    assert(counts.projects > 0, 'Expected an isolated private project fixture.')
     assert(counts.files >= 1, 'Expected an isolated file metadata fixture.')
     assert(counts.billingEvents === 1, 'Expected one packaged Stripe webhook receipt fixture.')
 

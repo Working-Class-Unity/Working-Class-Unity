@@ -1,5 +1,8 @@
 import { z } from 'zod'
 
+export const aiConversationCreateBodyLimitBytes = 1_024
+export const aiMessageCreateBodyLimitBytes = 200_000
+
 const conversationIdPattern =
   /^ai_conversation_[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 

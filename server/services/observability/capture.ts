@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import { resolveCaptureDiagnostic, type CaptureDiagnosticCode } from '../../../shared/sentry-privacy'
-import { isModuleReady } from '../../utils/module-state'
+import { getAppRuntimeConfig } from '../../utils/runtime'
 
 export type { CaptureDiagnosticCode } from '../../../shared/sentry-privacy'
 
@@ -19,7 +19,7 @@ export async function captureException(error: unknown, code: CaptureDiagnosticCo
     })
   )
 
-  if (!isModuleReady('observability')) return
+  if (!getAppRuntimeConfig().sentryDsn) return
 
   try {
     const Sentry = await import('@sentry/nuxt')

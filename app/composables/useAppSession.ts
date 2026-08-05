@@ -6,20 +6,22 @@ export type AppSessionUser = {
   id: string
   name: string
   email: string
+  image: string | null
 }
 
 export type AppSession = {
   user: AppSessionUser
 }
 
-export function projectAppSession(session: RawSession | null): AppSession | null {
+export function toAppSession(session: RawSession | null): AppSession | null {
   if (!session?.user) return null
 
   return {
     user: {
       id: session.user.id,
       name: session.user.name,
-      email: session.user.email
+      email: session.user.email,
+      image: session.user.image ?? null
     }
   }
 }
@@ -36,7 +38,7 @@ export function useAppSession() {
     key: 'app-session',
     dedupe: 'defer',
     query: import.meta.server ? { disableRefresh: true } : undefined,
-    transform: projectAppSession
+    transform: toAppSession
   })
 
   return appSession

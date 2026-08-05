@@ -8,7 +8,7 @@ import { basename, dirname, isAbsolute, join, relative, resolve } from 'node:pat
 import { fileURLToPath } from 'node:url'
 
 const migrationsFolder = fileURLToPath(new URL('./db/migrations/', import.meta.url))
-const supportedInitializationBaselineCount = 2
+const supportedInitializationBaselineCount = 1
 const packagedApplicationSchemas = new Map()
 
 class DatabaseVerificationError extends Error {}
@@ -344,7 +344,7 @@ function verifyAppDatabaseIdentity(path, label) {
       throw new Error(`${label} must contain a recognized non-empty packaged migration ledger.`)
     }
     if (appliedCount < supportedInitializationBaselineCount) {
-      throw new Error(`${label} must contain the complete supported pre-release initialization baseline.`)
+      throw new Error(`${label} must contain the complete supported initialization baseline.`)
     }
   } finally {
     sqlite.close()

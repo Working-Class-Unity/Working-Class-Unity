@@ -10,9 +10,10 @@ import {
   finalizeAiGenerationAttempt,
   getAiConversationForOwner,
   getAiMessageForOwner,
+  listAiMessageContentsForOwner,
   listAiConversationsForOwner,
   listAiMessagesForOwner,
-  listRecentAiMessagesForOwner,
+  listRecentAiMessageMetadataForOwner,
   reapAndGetAiGenerationAttemptForOwner,
   reserveAiGenerationAttempt,
   type AiConversationCursor,
@@ -26,15 +27,12 @@ import type { AppSession } from '../../utils/auth/require-session'
 import {
   configurationError,
   conflictError,
-  forbiddenError,
   notFoundError,
   upstreamServiceError,
   validationError
 } from '../../utils/errors'
-import { requireModuleReady } from '../../utils/module-state'
 import { getAppRuntimeConfig, type AppRuntimeConfig } from '../../utils/runtime'
 import { captureException } from '../observability/capture'
-import { getBillingStateForConnection } from '../payments/billing-service'
 import { aiPolicy, utf8ByteLength } from './ai-policy'
 import {
   getOpenAIResponsesAdapter,
@@ -46,8 +44,7 @@ import {
 
 const cursorVersion = 1
 const applicationInstructions = 'You are a helpful assistant. Answer the user directly and clearly.'
-const providerMessageStructuralBytes = 32
-const maximumProviderContextRows = Math.floor(aiPolicy.maximumRenderedInputBytes / providerMessageStructuralBytes)
+const historyLimitStatusMessage = 'AI conversation history limit reached. Clear it or start a new conversation.'
 const clientRequestIdPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 
 export type PublicAiConversation = Readonly<{
@@ -88,7 +85,7 @@ export function createAiConversationService(dependencies: AiConversationServiceD
       try {
         const conversation = createAiConversation(dependencies.connection, ownerUserId, {
           maximumCount: aiPolicy.maximumConversationCount,
-          authorize: (connection) => requireAiEntitlement(connection, ownerUserId, dependencies.config),
+          authorize: () => undefined,
           now: now()
         })
         return publicConversation(conversation)
@@ -156,8 +153,6 @@ export function createAiConversationService(dependencies: AiConversationServiceD
       if (!getAiConversationForOwner(dependencies.connection, ownerUserId, conversationId)) {
         throw notFoundError('AI conversation not found')
       }
-      requireAiEntitlement(dependencies.connection, ownerUserId, dependencies.config)
-
       const model = dependencies.config.openai.model
       if (!model) throw configurationError('AI is temporarily unavailable')
       const reservedAt = now()
@@ -170,7 +165,7 @@ export function createAiConversationService(dependencies: AiConversationServiceD
         leaseExpiresAt: new Date(reservedAt.getTime() + aiPolicy.attemptLeaseMs),
         maximumRequestsPerBucket: aiPolicy.dailyProviderAttemptLimit,
         maximumConcurrentAttempts: aiPolicy.maximumConcurrentGenerationsPerUser,
-        authorize: (connection) => requireAiEntitlement(connection, ownerUserId, dependencies.config),
+        authorize: () => undefined,
         now: reservedAt
       })
 
@@ -182,6 +177,7 @@ export function createAiConversationService(dependencies: AiConversationServiceD
       if (reservation.kind === 'existing') {
         return replayExistingAttempt(dependencies.connection, ownerUserId, reservation.attempt, input.content)
       }
+      if (reservation.kind === 'history-limit-exceeded') throw historyLimitError()
 
       let messages: OpenAIVisibleMessage[]
       try {
@@ -264,7 +260,6 @@ export function createAiConversationService(dependencies: AiConversationServiceD
 
 function productionService() {
   const config = getAppRuntimeConfig()
-  requireModuleReady('ai', config)
   return createAiConversationService({
     connection: useDatabase(),
     config,
@@ -305,13 +300,6 @@ export async function createOwnedAiMessage(
   return productionService().createMessage(session.user.id, conversationId, input, signal)
 }
 
-function requireAiEntitlement(connection: DatabaseConnection, ownerUserId: string, config: AppRuntimeConfig) {
-  if (!config.modules.billing.enabled) return
-  if (!getBillingStateForConnection(connection, ownerUserId).entitlement.granted) {
-    throw forbiddenError('AI access requires an active family-plan entitlement')
-  }
-}
-
 function buildProviderContext(
   connection: DatabaseConnection,
   ownerUserId: string,
@@ -319,16 +307,16 @@ function buildProviderContext(
   currentUserMessage: AiMessageProjection,
   instructions: string
 ): OpenAIVisibleMessage[] | null {
-  const recent = listRecentAiMessagesForOwner(connection, ownerUserId, conversationId, maximumProviderContextRows)
-  if (!recent) return null
-  if (recent[0]?.id !== currentUserMessage.id || recent[0].role !== 'user') {
+  const metadata = listRecentAiMessageMetadataForOwner(connection, ownerUserId, conversationId)
+  if (!metadata) return null
+  if (metadata[0]?.id !== currentUserMessage.id || metadata[0].role !== 'user') {
     throw conflictError('AI conversation changed before generation')
   }
 
   let renderedBytes = utf8ByteLength(instructions)
-  const selected: AiMessageProjection[] = []
-  for (const message of recent) {
-    const messageBytes = providerMessageStructuralBytes + utf8ByteLength(message.content)
+  const selected = [] as typeof metadata
+  for (const message of metadata) {
+    const messageBytes = aiPolicy.providerMessageStructuralBytes + message.contentBytes
     if (renderedBytes + messageBytes > aiPolicy.maximumRenderedInputBytes) break
     selected.push(message)
     renderedBytes += messageBytes
@@ -340,7 +328,20 @@ function buildProviderContext(
   if (chronological.at(-1)?.id !== currentUserMessage.id) {
     throw conflictError('AI conversation changed before generation')
   }
-  return chronological.map(({ role, content }) => ({ role, content }))
+  const messages = listAiMessageContentsForOwner(
+    connection,
+    ownerUserId,
+    conversationId,
+    chronological.map(({ id }) => id)
+  )
+  if (!messages) return null
+  if (
+    messages.length !== chronological.length ||
+    messages.some((message, index) => message.role !== chronological[index]!.role)
+  ) {
+    throw conflictError('AI conversation changed before generation')
+  }
+  return messages
 }
 
 function replayExistingAttempt(
@@ -382,8 +383,11 @@ function finalizedResponse(
       throw conflictError('AI conversation was cleared during generation')
     case 'expired':
       throw upstreamServiceError(504, 'AI response timed out')
+    case 'history-limit-exceeded':
+      throw historyLimitError()
     case 'existing':
     case 'finalized': {
+      if (result.attempt.errorCode === 'application_history_limit') throw historyLimitError()
       if (!result.assistantMessage) throw configurationError('AI response state is invalid')
       const userMessage = messageById(
         connection,
@@ -404,6 +408,12 @@ function assertFailureFinalized(result: ReturnType<typeof finalizeAiGenerationAt
   if (result.kind === 'not-found') throw notFoundError('AI conversation not found')
   if (result.kind === 'stale') throw conflictError('AI conversation was cleared during generation')
   if (result.kind === 'expired') throw upstreamServiceError(504, 'AI response timed out')
+  if (
+    result.kind === 'history-limit-exceeded' ||
+    (result.kind === 'existing' && result.attempt.errorCode === 'application_history_limit')
+  ) {
+    throw historyLimitError()
+  }
 }
 
 function terminalAttemptForProviderError(code: OpenAIProviderErrorCode): {
@@ -450,6 +460,7 @@ function providerHttpError(code: OpenAIProviderErrorCode) {
 }
 
 function persistedAttemptHttpError(errorCode: string | null) {
+  if (errorCode === 'application_history_limit') return historyLimitError()
   if (errorCode === 'provider_timeout' || errorCode === 'attempt_lease_expired') {
     return upstreamServiceError(504, 'AI response timed out')
   }
@@ -560,6 +571,10 @@ function decodeCursor(value: string, kind: 'conversation' | 'message'): Record<s
 
 function rateLimitError(statusMessage: string) {
   return createError({ statusCode: 429, statusMessage })
+}
+
+function historyLimitError() {
+  return conflictError(historyLimitStatusMessage)
 }
 
 function isHttpError(error: unknown): boolean {

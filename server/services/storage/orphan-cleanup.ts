@@ -2,13 +2,13 @@ import type { JsonValue } from '../../db/schema'
 import type { DatabaseConnection } from '../../db/connect'
 import {
   deleteCleanedFileMetadata,
+  getEarliestFileUploadExpiry,
   listDeletedFilesReadyForCleanup,
   listExpiredPendingFiles,
   listTrackedObjectKeys,
   markExpiredPendingFileDeleted
 } from '../../db/repositories/files'
-import { requireModuleReady } from '../../utils/module-state'
-import { fileCleanupMaxAttempts, fileCleanupSchedulingMarginMs } from './file-service'
+import { fileCleanupMaxAttempts, fileCleanupSchedulingMarginMs } from './file-policy'
 import { FILE_MANAGED_OBJECT_PREFIX } from './file-object-keys'
 import {
   assertFileBucketMatchesStorage,
@@ -42,8 +42,6 @@ export type FileCleanupPayload = Readonly<{
 }>
 
 export async function cleanupOrphanedFileObjects(connection: DatabaseConnection, payload: JsonValue = {}) {
-  requireModuleReady('files')
-  requireModuleReady('jobs')
   const storage = useObjectStorage()
   try {
     return await cleanupOrphanedFileObjectsForConnection(connection, payload, { storage })
@@ -81,6 +79,15 @@ export async function cleanupOrphanedFileObjectsForConnection(
       if (await markExpiredPendingFileDeleted(connection, file.id, safeCapabilityCutoff, now.toISOString()))
         claimed += 1
     }
+    if (expired.length < fileCleanupPageSize) {
+      const earliestPendingExpiry = getEarliestFileUploadExpiry(connection, 'pending')
+      if (earliestPendingExpiry) {
+        scheduleFilesCleanupRoot(
+          connection,
+          new Date(Date.parse(earliestPendingExpiry) + fileCleanupSchedulingMarginMs).toISOString()
+        )
+      }
+    }
     await enqueueNext({ phase: expired.length === fileCleanupPageSize ? phase : 'deleted-metadata' })
     return { phase, claimedExpiredPendingFiles: claimed, deletedObjects: 0, nextScheduled: true }
   }
@@ -105,6 +112,15 @@ export async function cleanupOrphanedFileObjectsForConnection(
       }
     }
     if (firstDeletionError) throw firstDeletionError
+    if (deleted.length < fileCleanupPageSize) {
+      const earliestDeletedExpiry = getEarliestFileUploadExpiry(connection, 'deleted')
+      if (earliestDeletedExpiry) {
+        scheduleFilesCleanupRoot(
+          connection,
+          new Date(Date.parse(earliestDeletedExpiry) + fileCleanupSchedulingMarginMs).toISOString()
+        )
+      }
+    }
     await enqueueNext({ phase: deleted.length === fileCleanupPageSize ? phase : 'reconcile-v1' })
     return {
       phase,
@@ -218,6 +234,10 @@ export function enqueueCleanupForConnection(
   payload: FileCleanupPayload,
   runAfter?: string
 ) {
+  if (payload.phase === undefined && payload.cursor === undefined) {
+    scheduleFilesCleanupRoot(connection, runAfter ?? null)
+    return
+  }
   if (runAfter) {
     connection.sqlite
       .prepare(
@@ -229,6 +249,10 @@ export function enqueueCleanupForConnection(
   connection.sqlite
     .prepare("insert into job_queue (type, payload, max_attempts) values ('files.cleanup-orphans', ?, ?)")
     .run(JSON.stringify(payload), fileCleanupMaxAttempts)
+}
+
+export function scheduleFilesCleanupRoot(connection: DatabaseConnection, runAfter: string | null) {
+  return connection.sqlite.transaction(() => scheduleFilesCleanupRootInTransaction(connection, runAfter)).immediate()
 }
 
 /**
@@ -249,38 +273,63 @@ export function ensureFileReconciliationSafetyJob(
         .get(fileStorageBindingSettingKey)
       if (!binding) return 'unbound' as const
 
-      const existing = connection.sqlite
-        .prepare(
-          `select status, run_after as runAfter from job_queue
-           where type = 'files.cleanup-orphans'
-             and payload = '{}'
-             and (
-               status = 'running'
-               or (
-                 status = 'queued'
-                 and attempts < max_attempts
-                 and (run_after is null or run_after <= ?)
-               )
-             )
-           limit 1`
-        )
-        .get(runAfter) as { status: 'queued' | 'running'; runAfter: string | null } | undefined
-      if (existing) {
-        return existing.status === 'queued' &&
-          existing.runAfter &&
-          Date.parse(existing.runAfter) > now.getTime() + 1_000
-          ? ('covered-future' as const)
-          : ('covered-active' as const)
-      }
-
-      connection.sqlite
-        .prepare(
-          "insert into job_queue (type, payload, max_attempts, run_after) values ('files.cleanup-orphans', '{}', ?, ?)"
-        )
-        .run(fileCleanupMaxAttempts, runAfter)
-      return 'scheduled' as const
+      const scheduled = scheduleFilesCleanupRootInTransaction(connection, runAfter)
+      if (scheduled.changed) return 'scheduled' as const
+      return scheduled.runAfter && Date.parse(scheduled.runAfter) > now.getTime() + 1_000
+        ? ('covered-future' as const)
+        : ('covered-active' as const)
     })
     .immediate()
+}
+
+function scheduleFilesCleanupRootInTransaction(connection: DatabaseConnection, runAfter: string | null) {
+  const existing = connection.sqlite
+    .prepare(
+      `select id, run_after as runAfter
+       from job_queue
+       where type = 'files.cleanup-orphans'
+         and payload = '{}'
+         and status = 'queued'
+         and attempts < max_attempts
+       order by (run_after is not null), run_after, id
+       limit 1`
+    )
+    .get() as { id: number; runAfter: string | null } | undefined
+
+  if (!existing) {
+    connection.sqlite
+      .prepare(
+        "insert into job_queue (type, payload, max_attempts, run_after) values ('files.cleanup-orphans', '{}', ?, ?)"
+      )
+      .run(fileCleanupMaxAttempts, runAfter)
+    return { changed: true, runAfter }
+  }
+
+  const coalesced =
+    connection.sqlite
+      .prepare(
+        `delete from job_queue
+         where id = (
+           select id
+           from job_queue
+           where type = 'files.cleanup-orphans'
+             and payload = '{}'
+             and status = 'queued'
+             and attempts < max_attempts
+             and id <> ?
+           order by (run_after is not null), run_after, id
+           limit 1
+         )`
+      )
+      .run(existing.id).changes === 1
+  if (existing.runAfter === null || (runAfter !== null && existing.runAfter <= runAfter)) {
+    return { changed: coalesced, runAfter: existing.runAfter }
+  }
+
+  connection.sqlite
+    .prepare('update job_queue set run_after = ?, updated_at = CURRENT_TIMESTAMP where id = ?')
+    .run(runAfter, existing.id)
+  return { changed: true, runAfter }
 }
 
 function assertFilesUseStorage(

@@ -25,24 +25,6 @@ useHead(() => ({
         <NuxtLink class="secondary-button action-link" to="/login">{{ t('navigation.login') }}</NuxtLink>
       </div>
     </section>
-
-    <section class="home-features" :aria-label="t('home.featuresLabel')">
-      <article class="panel feature-panel">
-        <p class="eyebrow">{{ t('home.features.passwordless.eyebrow') }}</p>
-        <h2>{{ t('home.features.passwordless.title') }}</h2>
-        <p>{{ t('home.features.passwordless.description') }}</p>
-      </article>
-      <article class="panel feature-panel">
-        <p class="eyebrow">{{ t('home.features.private.eyebrow') }}</p>
-        <h2>{{ t('home.features.private.title') }}</h2>
-        <p>{{ t('home.features.private.description') }}</p>
-      </article>
-      <article class="panel feature-panel">
-        <p class="eyebrow">{{ t('home.features.adapt.eyebrow') }}</p>
-        <h2>{{ t('home.features.adapt.title') }}</h2>
-        <p>{{ t('home.features.adapt.description') }}</p>
-      </article>
-    </section>
   </AppPage>
 </template>
 
@@ -84,29 +66,8 @@ useHead(() => ({
     text-decoration: none;
   }
 
-  .home-features {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--space-4);
-  }
-
-  .feature-panel {
-    padding: var(--space-5);
-  }
-
-  .feature-panel h2 {
-    margin-top: var(--space-2);
-    font-size: 1.35rem;
-  }
-
-  .feature-panel p:last-child {
-    margin: var(--space-3) 0 0;
-    color: var(--color-text-muted);
-  }
-
   @media (width <= 900px) {
-    .hero-panel,
-    .home-features {
+    .hero-panel {
       grid-template-columns: 1fr;
     }
   }

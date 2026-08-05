@@ -12,8 +12,21 @@ const serviceNames = ['migrate', 'web', 'worker', 'backup-runner']
 const databaseServiceNames = ['web', 'worker', 'backup-runner']
 const sourceCommit = '0123456789abcdef0123456789abcdef01234567'
 const composeProjectName = 'baseline-compose-test'
-const backupEmptyEnvironmentName = 'BASELINE_BACKUP_ENV_EMPTY'
-const backupEmptyEnvironmentExpression = '${BASELINE_BACKUP_ENV_EMPTY:-}'
+const clearedEnvironmentName = 'WCU_CLEARED_ENVIRONMENT'
+const clearedEnvironmentExpression = '${WCU_CLEARED_ENVIRONMENT:-}'
+const applicationSecretNames = [
+  'NUXT_READINESS_TOKEN',
+  'NUXT_BETTER_AUTH_SECRET',
+  'NUXT_EMAIL_RESEND_API_KEY',
+  'NUXT_STRIPE_SECRET_KEY',
+  'NUXT_STRIPE_WEBHOOK_SECRET',
+  'NUXT_CLOUDFLARE_R2_ACCESS_KEY_ID',
+  'NUXT_CLOUDFLARE_R2_SECRET_ACCESS_KEY',
+  'NUXT_OPENAI_API_KEY',
+  'NUXT_CLOUDFLARE_TURNSTILE_SECRET_KEY',
+  'NUXT_SENTRY_DSN',
+  'NUXT_OBSERVABILITY_TEST_TOKEN'
+]
 const backupEnvironmentNames = [
   'BACKUP_R2_ACCOUNT_ID',
   'BACKUP_R2_BUCKET',
@@ -33,17 +46,26 @@ const requiredEnvironmentNames = [
   'NUXT_READINESS_TOKEN',
   'NUXT_BETTER_AUTH_SECRET',
   'NUXT_BETTER_AUTH_URL',
-  'NUXT_SOCIAL_PROVIDERS_GOOGLE_ENABLED',
   'NUXT_EMAIL_TRANSPORT',
   'NUXT_EMAIL_FROM',
-  'NUXT_MODULES_BILLING_ENABLED',
-  'NUXT_MODULES_FILES_ENABLED',
-  'NUXT_MODULES_AI_ENABLED',
-  'NUXT_MODULES_TURNSTILE_ENABLED',
-  'NUXT_MODULES_OBSERVABILITY_ENABLED',
-  'NUXT_MODULES_JOBS_ENABLED',
-  'NUXT_OPENAI_FILE_SEARCH_ENABLED',
-  'NUXT_OPENAI_WEB_SEARCH_ENABLED'
+  'NUXT_STRIPE_SECRET_KEY',
+  'NUXT_STRIPE_WEBHOOK_SECRET',
+  'NUXT_STRIPE_PORTAL_CONFIGURATION_ID',
+  'NUXT_STRIPE_PERSONAL_WEEKLY_PRICE_ID',
+  'NUXT_STRIPE_PERSONAL_MONTHLY_PRICE_ID',
+  'NUXT_STRIPE_PERSONAL_ANNUAL_PRICE_ID',
+  'NUXT_STRIPE_FAMILY_MONTHLY_PRICE_ID',
+  'NUXT_STRIPE_FAMILY_ANNUAL_PRICE_ID',
+  'NUXT_FILES_DRIVER',
+  'NUXT_OPENAI_API_KEY',
+  'NUXT_OPENAI_PROJECT_ID',
+  'NUXT_OPENAI_MODEL',
+  'NUXT_OPENAI_FILE_SEARCH_VECTOR_STORE_ID',
+  'NUXT_OPENAI_WEB_SEARCH_ALLOWED_DOMAINS',
+  'NUXT_CLOUDFLARE_TURNSTILE_SECRET_KEY',
+  'NUXT_PUBLIC_TURNSTILE_SITE_KEY',
+  'NUXT_SENTRY_DSN',
+  'NUXT_PUBLIC_SENTRY_DSN'
 ]
 
 test('Coolify builds one commit-qualified image for every application role', () => {
@@ -63,7 +85,7 @@ test('Coolify builds one commit-qualified image for every application role', () 
 })
 
 test('required Coolify variables have no placeholder defaults', () => {
-  const requiredEntries = Object.entries(services.migrate.environment).filter(
+  const requiredEntries = Object.entries(services.web.environment).filter(
     ([, value]) => typeof value === 'string' && value.includes(':?')
   )
   assert.deepEqual(requiredEntries.map(([name]) => name).sort(), requiredEnvironmentNames.toSorted())
@@ -72,14 +94,14 @@ test('required Coolify variables have no placeholder defaults', () => {
   }
 })
 
-test('backup is an explicit profile with fail-closed runtime configuration', () => {
+test('backup is unconditional with fail-closed runtime configuration', () => {
   const backupRunner = services['backup-runner']
-  assert.deepEqual(backupRunner.profiles, ['backup'])
+  assert(!Object.hasOwn(backupRunner, 'profiles'))
   assert.equal(backupRunner.init, true)
   for (const name of backupEnvironmentNames) {
-    assert.equal(backupRunner.environment[name], '${' + name + '-}')
+    assert.equal(backupRunner.environment[name], '${' + name + ':?}')
     for (const serviceName of ['migrate', 'web', 'worker']) {
-      assert.equal(services[serviceName].environment[name], backupEmptyEnvironmentExpression)
+      assert.equal(services[serviceName].environment[name], clearedEnvironmentExpression)
     }
   }
   assert.deepEqual(backupRunner.command.slice(0, 2), ['sh', '-ec'])
@@ -87,21 +109,18 @@ test('backup is an explicit profile with fail-closed runtime configuration', () 
   assert.match(backupRunner.command[2], /exec sleep infinity/)
 })
 
-test('rendered Compose selects backup only when its profile is enabled', () => {
-  const defaultCompose = renderedCompose()
-  const backupCompose = renderedCompose({
-    COMPOSE_PROFILES: 'backup',
-    ...validBackupEnvironment
-  })
+test('rendered Compose requires configured backup and always includes it', () => {
+  assert.throws(
+    () => renderedCompose(),
+    /BACKUP_R2_(?:ACCOUNT_ID|BUCKET|ENDPOINT|ACCESS_KEY_ID|SECRET_ACCESS_KEY).*required variable.*missing a value/i
+  )
+  const configuredCompose = renderedCompose(validBackupEnvironment)
 
-  assert.deepEqual(Object.keys(defaultCompose.services).sort(), ['migrate', 'web', 'worker'])
-  assert.deepEqual(Object.keys(backupCompose.services).sort(), serviceNames.toSorted())
+  assert.deepEqual(Object.keys(configuredCompose.services).sort(), serviceNames.toSorted())
 
-  for (const rendered of [defaultCompose, backupCompose]) {
-    for (const service of Object.values(rendered.services)) {
-      assert.equal(service.image, `${composeProjectName}_app:${sourceCommit}`)
-      assert.equal(service.pull_policy, 'never')
-    }
+  for (const service of Object.values(configuredCompose.services)) {
+    assert.equal(service.image, `${composeProjectName}_app:${sourceCommit}`)
+    assert.equal(service.pull_policy, 'never')
   }
 })
 
@@ -111,9 +130,8 @@ test('service environment overrides Coolify shared env-file backup credentials',
   const overridePath = resolve(directory, 'coolify-compose.yml')
   const runtimeEnvironment = {
     ...Object.fromEntries(requiredEnvironmentNames.map((name) => [name, `test-${name.toLowerCase()}`])),
+    ...Object.fromEntries(applicationSecretNames.map((name) => [name, `private-${name.toLowerCase()}`])),
     SOURCE_COMMIT: sourceCommit,
-    COMPOSE_PROFILES: 'backup',
-    [backupEmptyEnvironmentName]: '',
     ...validBackupEnvironment
   }
 
@@ -151,14 +169,17 @@ test('service environment overrides Coolify shared env-file backup credentials',
       )
     )
 
-    for (const serviceName of serviceNames) {
-      assert.equal(rendered.services[serviceName].environment[backupEmptyEnvironmentName], '')
-    }
     for (const name of backupEnvironmentNames) {
       for (const serviceName of ['migrate', 'web', 'worker']) {
         assert.equal(rendered.services[serviceName].environment[name], '')
       }
       assert.equal(rendered.services['backup-runner'].environment[name], validBackupEnvironment[name])
+    }
+    for (const name of applicationSecretNames) {
+      assert.equal(rendered.services.migrate.environment[name], '')
+      assert.equal(rendered.services['backup-runner'].environment[name], '')
+      assert.equal(rendered.services.web.environment[name], runtimeEnvironment[name])
+      assert.equal(rendered.services.worker.environment[name], runtimeEnvironment[name])
     }
   } finally {
     rmSync(directory, { recursive: true, force: true })
@@ -182,11 +203,39 @@ test('one-shot migration gates every long-lived database service', () => {
     assert.deepEqual(services[serviceName].depends_on, {
       migrate: { condition: 'service_completed_successfully' }
     })
-    for (const [name, value] of Object.entries(services.migrate.environment)) {
-      if (serviceName === 'backup-runner' && backupEnvironmentNames.includes(name)) continue
-      assert.equal(services[serviceName].environment[name], value)
-    }
     assert.deepEqual(services[serviceName].volumes, services.migrate.volumes)
+  }
+})
+
+test('one-shot operators do not receive application provider credentials', () => {
+  for (const name of applicationSecretNames) {
+    assert.equal(services.migrate.environment[name], clearedEnvironmentExpression)
+    assert.equal(services['backup-runner'].environment[name], clearedEnvironmentExpression)
+  }
+  assert.equal(services.migrate.environment.NUXT_DATABASE_URL, 'file:/app/data/app.db')
+  assert.equal(services['backup-runner'].environment.NUXT_DATABASE_URL, 'file:/app/data/app.db')
+})
+
+test('Coolify-cleared values use only the reserved unset indirection', () => {
+  for (const name of applicationSecretNames) {
+    assert.equal(compose['x-cleared-application-secrets'][name], clearedEnvironmentExpression)
+  }
+  for (const name of backupEnvironmentNames) {
+    assert.equal(services.migrate.environment[name], clearedEnvironmentExpression)
+    assert.equal(services.web.environment[name], clearedEnvironmentExpression)
+    assert.equal(services.worker.environment[name], clearedEnvironmentExpression)
+  }
+
+  const reservedValue = 'reserved-value-must-never-be-configured'
+  const rendered = renderedCompose({ [clearedEnvironmentName]: reservedValue, ...validBackupEnvironment })
+  for (const name of applicationSecretNames) {
+    assert.equal(rendered.services.migrate.environment[name], reservedValue)
+    assert.equal(rendered.services['backup-runner'].environment[name], reservedValue)
+  }
+  for (const name of backupEnvironmentNames) {
+    assert.equal(rendered.services.migrate.environment[name], reservedValue)
+    assert.equal(rendered.services.web.environment[name], reservedValue)
+    assert.equal(rendered.services.worker.environment[name], reservedValue)
   }
 })
 
@@ -220,7 +269,6 @@ function renderedCompose(overrides = {}) {
     ...Object.fromEntries(requiredEnvironmentNames.map((name) => [name, `test-${name.toLowerCase()}`])),
     ...Object.fromEntries(backupEnvironmentNames.map((name) => [name, ''])),
     SOURCE_COMMIT: sourceCommit,
-    COMPOSE_PROFILES: '',
     ...overrides
   }
 
@@ -235,7 +283,7 @@ function renderedCompose(overrides = {}) {
 
 function cleanComposeEnvironment() {
   const environment = { ...process.env }
-  for (const name of [...backupEnvironmentNames, backupEmptyEnvironmentName, 'COMPOSE_PROFILES', 'SOURCE_COMMIT']) {
+  for (const name of [...backupEnvironmentNames, ...applicationSecretNames, clearedEnvironmentName, 'SOURCE_COMMIT']) {
     delete environment[name]
   }
   return environment

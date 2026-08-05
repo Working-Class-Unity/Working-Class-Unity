@@ -6,16 +6,8 @@ import * as schema from '../../db/schema'
 import type { TransactionalEmailSender } from '../../services/email'
 import type { AppRuntimeConfig } from '../runtime'
 import { createAccountDeletionUserOptions, disabledAccountDeletionAuthPaths } from './account-deletion'
-import { createWorkspaceOrganizationPlugin, disabledOrganizationAuthPaths } from './organization'
-import { createMagicLinkDelivery, disabledPasswordAuthPaths } from './passwordless'
+import { createAuthenticationBeforeHook, createMagicLinkDelivery, disabledNonMagicLinkAuthPaths } from './passwordless'
 import { createBetterAuthSecurityOptions } from './security'
-import {
-  createAuthenticationBeforeHook,
-  createSocialDatabaseHooks,
-  createSocialProviders,
-  disabledSocialAuthPaths,
-  socialAccountOptions
-} from './social'
 
 export function createAuthentication(
   config: AppRuntimeConfig,
@@ -29,23 +21,13 @@ export function createAuthentication(
       schema,
       // Better Auth supplies an async adapter callback, while better-sqlite3's
       // documented transaction functions are synchronous and reject promises.
-      // The migration therefore owns personal-organization atomicity in the user
-      // INSERT statement instead of enabling an incompatible adapter wrapper.
       transaction: false
     }),
-    account: socialAccountOptions,
     user: createAccountDeletionUserOptions(database),
-    databaseHooks: createSocialDatabaseHooks(),
-    disabledPaths: [
-      ...disabledPasswordAuthPaths,
-      ...disabledSocialAuthPaths,
-      ...disabledOrganizationAuthPaths,
-      ...disabledAccountDeletionAuthPaths
-    ],
+    disabledPaths: [...disabledNonMagicLinkAuthPaths, ...disabledAccountDeletionAuthPaths],
     emailAndPassword: {
       enabled: false
     },
-    socialProviders: createSocialProviders(config),
     verification: {
       storeInDatabase: true
     },
@@ -53,7 +35,6 @@ export function createAuthentication(
       before: createAuthenticationBeforeHook(config)
     },
     plugins: [
-      createWorkspaceOrganizationPlugin(database),
       magicLink({
         expiresIn: 300,
         storeToken: 'hashed',

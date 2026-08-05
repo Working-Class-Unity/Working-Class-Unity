@@ -1,6 +1,5 @@
-import { isInvitationReturnPath } from './invitation-path'
-
 export const authenticatedAppPath = '/app' as const
+export const displayNameMaxLength = 100
 
 export const authEntryPaths = {
   login: '/login',
@@ -10,12 +9,10 @@ export const authEntryPaths = {
 export type AuthEntryIntent = keyof typeof authEntryPaths
 export type AuthCallbackParameter = 'callbackURL' | 'newUserCallbackURL' | 'errorCallbackURL'
 
-export function resolveAuthCallbacks(intent: AuthEntryIntent, returnTo: unknown) {
-  const successPath = isInvitationReturnPath(returnTo) ? returnTo : authenticatedAppPath
-
+export function resolveAuthCallbacks(intent: AuthEntryIntent) {
   return {
-    callbackURL: successPath,
-    newUserCallbackURL: successPath,
+    callbackURL: authenticatedAppPath,
+    newUserCallbackURL: authenticatedAppPath,
     errorCallbackURL: authEntryPaths[intent]
   } as const
 }
@@ -27,5 +24,5 @@ export function isAllowedAuthCallback(parameter: AuthCallbackParameter, value: u
     return value === authEntryPaths.login || value === authEntryPaths.signup
   }
 
-  return value === authenticatedAppPath || isInvitationReturnPath(value)
+  return value === authenticatedAppPath
 }

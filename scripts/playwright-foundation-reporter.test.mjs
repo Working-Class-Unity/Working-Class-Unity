@@ -41,7 +41,8 @@ test('actual Playwright config retains completion wiring and required viewports'
     BROWSER_SERVER_ENTRY: '/tmp/browser-server-entry.mjs',
     BROWSER_SERVER_PRELOAD: '/tmp/browser-server-preload.mjs',
     BROWSER_SERVER_STDERR_PATH: '/tmp/browser-server-stderr.log',
-    BROWSER_SERVER_STDOUT_PATH: '/tmp/browser-server-stdout.log'
+    BROWSER_SERVER_STDOUT_PATH: '/tmp/browser-server-stdout.log',
+    BROWSER_TURNSTILE_PROVIDER_PRELOAD: '/tmp/browser-turnstile-provider-preload.mjs'
   }
   const previous = Object.fromEntries(Object.keys(environment).map((name) => [name, process.env[name]]))
   Object.assign(process.env, environment)

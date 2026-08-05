@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { isPublicModuleReady } from '#shared/module-states'
 import { turnstileTokenSchema, type TurnstileAction } from '#shared/turnstile'
 
 type ChallengeState = 'loading' | 'verified' | 'failure'
@@ -44,9 +43,7 @@ const emit = defineEmits<{
 }>()
 const config = useRuntimeConfig()
 const { t } = useI18n()
-const turnstileReady = isPublicModuleReady(config.public.moduleStates, 'turnstile')
 const siteKey = computed(() => config.public.turnstileSiteKey)
-const enabled = computed(() => turnstileReady && Boolean(siteKey.value))
 const container = ref<HTMLElement | null>(null)
 const challengeState = ref<ChallengeState>('loading')
 const statusMessage = computed(() => {
@@ -57,11 +54,7 @@ const statusMessage = computed(() => {
 let widgetId: string | undefined
 let unmounted = false
 
-onMounted(async () => {
-  if (!enabled.value) return
-
-  await prepareWidget()
-})
+onMounted(prepareWidget)
 
 onBeforeUnmount(() => {
   unmounted = true
@@ -74,6 +67,11 @@ onBeforeUnmount(() => {
 
 async function prepareWidget() {
   setLoading()
+
+  if (!siteKey.value) {
+    setFailure()
+    return
+  }
 
   try {
     await loadTurnstileScript()
@@ -178,7 +176,7 @@ defineExpose({ reset })
 </script>
 
 <template>
-  <div v-if="enabled" class="turnstile-challenge" :aria-label="t('security.check.label')">
+  <div class="turnstile-challenge" :aria-label="t('security.check.label')">
     <div ref="container" class="turnstile-widget" />
     <p class="turnstile-status" :data-state="challengeState" :role="challengeState === 'failure' ? 'alert' : 'status'">
       {{ statusMessage }}

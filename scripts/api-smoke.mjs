@@ -1,5 +1,5 @@
 import { readdirSync, readFileSync, rmSync } from 'node:fs'
-import { createHash } from 'node:crypto'
+import { createHash, randomUUID } from 'node:crypto'
 import { createRequire } from 'node:module'
 import { isAbsolute, join } from 'node:path'
 
@@ -41,7 +41,6 @@ const checks = [
       for (const path of [
         '/api/workspaces',
         '/api/workspaces/not-a-workspace',
-        '/api/workspaces/not-a-workspace/projects',
         '/api/workspaces/not-a-workspace/invitations',
         '/api/workspaces/not-a-workspace/members'
       ]) {
@@ -61,9 +60,9 @@ const checks = [
     }
   },
   {
-    name: 'user project creation authenticates before parsing',
+    name: 'private file upload initiation authenticates before parsing',
     run: async () => {
-      const response = await requestWithCookies('/api/projects', {
+      const response = await requestWithCookies('/api/files/uploads', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: '{malformed'
@@ -80,11 +79,11 @@ const checks = [
     }
   },
   {
-    name: 'private project route enforces authenticated user ownership',
+    name: 'private identity route follows the authenticated user',
     run: async () => {
       const ownerJar = new Map()
       const otherJar = new Map()
-      const suffix = nextFixtureSuffix('private-project')
+      const suffix = nextFixtureSuffix('private-identity')
       const ownerEmail = `owner-${suffix}@example.com`
       const owner = await signUpSmokeUser(ownerJar, ownerEmail, 'Smoke Owner')
       const other = await signUpSmokeUser(otherJar, `other-${suffix}@example.com`, 'Smoke Other')
@@ -97,11 +96,6 @@ const checks = [
       assertMinimalMeProjection(ownerMe, owner.user)
       assertMinimalMeProjection(otherMe, other.user)
       assert(ownerMe.user.id !== otherMe.user.id, 'expected each authenticated caller to receive its own identity')
-      assert(
-        JSON.stringify(ownerMe.modules) === JSON.stringify(otherMe.modules),
-        'expected public module readiness to be independent of caller identity'
-      )
-
       const appEntry = await requestWithCookies('/app', { redirect: 'manual' }, ownerJar)
       assert(appEntry.status === 200, `expected authenticated /app shell 200, received ${appEntry.status}`)
       assert(appEntry.headers.get('cache-control') === 'private, no-store', 'expected /app to disable shared caching')
@@ -110,59 +104,6 @@ const checks = [
       assert(appHtml.includes(owner.user.email), 'expected /app shell to render the authenticated user email')
       assert(!appHtml.includes('/w/'), 'expected /app shell to avoid visible workspace routing')
       assert(!/workspace|capabilit(?:y|ies)/i.test(appHtml), 'expected /app shell to omit workspace authority details')
-
-      const projectCollectionPath = '/api/projects'
-      const callerOwnedTenancy = await requestWithCookies(
-        projectCollectionPath,
-        {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({
-            name: 'Untrusted API Smoke Project',
-            ownerUserId: owner.user.id
-          })
-        },
-        ownerJar
-      )
-      assert(
-        callerOwnedTenancy.status === 400,
-        `expected caller-owned tenancy 400, received ${callerOwnedTenancy.status}`
-      )
-
-      const created = await requestJson(
-        projectCollectionPath,
-        {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({
-            name: 'Private API Smoke Project'
-          })
-        },
-        ownerJar
-      )
-      assert(!('ownerId' in created.project), 'expected project response to omit ownerId')
-      assert(!('ownerUserId' in created.project), 'expected project response to omit ownerUserId')
-      assert(!('organizationId' in created.project), 'expected project response to omit organizationId')
-      assert(!('slug' in created.project), 'expected project response to omit the retired slug')
-
-      const listed = await requestJson(projectCollectionPath, {}, ownerJar)
-      assert(
-        listed.projects?.some((project) => project.id === created.project.id),
-        'expected user project list to include the created project'
-      )
-
-      const projectPath = `${projectCollectionPath}/${created.project.id}`
-      const anonymousResponse = await requestWithCookies(projectPath)
-
-      assert(anonymousResponse.status === 401, `expected anonymous 401, received ${anonymousResponse.status}`)
-
-      const forbiddenResponse = await requestWithCookies(projectPath, {}, otherJar)
-
-      assert(forbiddenResponse.status === 404, `expected concealed foreign 404, received ${forbiddenResponse.status}`)
-
-      const authorized = await requestJson(projectPath, {}, ownerJar)
-
-      assert(authorized.project?.id === created.project.id, 'expected owner to read private project')
 
       const signOutResponse = await requestWithCookies(
         '/api/auth/sign-out',
@@ -183,9 +124,7 @@ const checks = [
     }
   },
   {
-    name: 'private AI collection follows the authenticated module boundary',
-    moduleId: 'ai',
-    disabledProbe: { path: '/api/ai/conversations' },
+    name: 'private AI collection requires authentication',
     run: async () => {
       const response = await requestWithCookies('/api/ai/conversations')
       assert(response.status === 401, `expected anonymous AI collection 401, received ${response.status}`)
@@ -193,11 +132,6 @@ const checks = [
   },
   {
     name: 'private file flow stores metadata and protects downloads',
-    moduleId: 'files',
-    disabledProbe: {
-      path: '/api/files/uploads',
-      init: { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{malformed' }
-    },
     run: async () => {
       const ownerJar = new Map()
       const otherJar = new Map()
@@ -298,8 +232,6 @@ const checks = [
   },
   {
     name: 'packaged Stripe webhook preserves the signed raw body at the canonical route',
-    moduleId: 'billing',
-    disabledProbe: { path: '/api/account/billing' },
     run: async () => {
       const suffix = nextFixtureSuffix('billing')
       const event = {
@@ -354,20 +286,9 @@ export async function runIsolatedApiSmoke(options) {
 
   try {
     const failures = []
-    const baselineProjection = await requestJson('/api/baseline')
-    const moduleStates = baselineProjection.modules ?? {}
-    for (const moduleId of ['billing', 'files']) {
-      assert(moduleStates[moduleId] === 'ready', `isolated mutating fixture requires ready ${moduleId}`)
-    }
 
     for (const check of checks) {
       try {
-        if (check.moduleId && moduleStates[check.moduleId] !== 'ready') {
-          const response = await requestWithCookies(check.disabledProbe.path, check.disabledProbe.init)
-          await assertModuleDisabled(response, check.moduleId)
-          console.log(`ok - ${check.name} (disabled boundary)`)
-          continue
-        }
         await check.run()
         console.log(`ok - ${check.name}`)
       } catch (error) {
@@ -391,17 +312,10 @@ export async function runIsolatedApiSmoke(options) {
   }
 }
 
-async function assertModuleDisabled(response, moduleId) {
-  const body = await response.json().catch(() => null)
-  assert(response.status === 404, `expected disabled 404, received ${response.status}`)
-  assert(body?.data?.code === 'MODULE_DISABLED', 'expected stable MODULE_DISABLED response code')
-  assert(body?.data?.module === moduleId, `expected disabled ${moduleId} response`)
-}
-
 function assertMinimalMeProjection(body, expectedUser) {
   assert(
-    JSON.stringify(Object.keys(body).sort()) === JSON.stringify(['modules', 'user']),
-    'expected /api/me to expose only user identity and module readiness'
+    JSON.stringify(Object.keys(body).sort()) === JSON.stringify(['user']),
+    'expected /api/me to expose only user identity'
   )
   assert(
     JSON.stringify(Object.keys(body.user ?? {}).sort()) === JSON.stringify(['email', 'id', 'image', 'name']),
@@ -411,7 +325,6 @@ function assertMinimalMeProjection(body, expectedUser) {
   assert(body.user.name === expectedUser.name, 'expected /api/me user name to match the authenticated caller')
   assert(body.user.email === expectedUser.email, 'expected /api/me user email to match the authenticated caller')
   assert(body.user.image === expectedUser.image, 'expected /api/me user image to match the authenticated caller')
-  assert(body.modules && typeof body.modules === 'object' && !Array.isArray(body.modules), 'expected module readiness')
 }
 
 async function requestJson(path, init, cookieJar) {
@@ -429,7 +342,10 @@ async function signUpSmokeUser(cookieJar, email, name) {
     '/api/auth/sign-in/magic-link',
     {
       method: 'POST',
-      headers: { 'content-type': 'application/json' },
+      headers: {
+        'content-type': 'application/json',
+        'x-turnstile-token': `isolated-turnstile-${randomUUID()}`
+      },
       body: JSON.stringify({
         name,
         email,

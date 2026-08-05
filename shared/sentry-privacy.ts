@@ -9,13 +9,9 @@ export const captureDiagnosticDefinitions = {
     component: 'worker',
     operation: 'execute-job'
   },
-  'family-member-notification-failed': {
-    component: 'family-membership',
-    operation: 'notify-removal'
-  },
-  'family-lifecycle-notification-failed': {
-    component: 'family-membership',
-    operation: 'notify-lifecycle'
+  'billing-operation-failed': {
+    component: 'billing',
+    operation: 'provider-operation'
   },
   'observability-test-error': {
     component: 'observability',
@@ -24,10 +20,6 @@ export const captureDiagnosticDefinitions = {
   'openai-response-failed': {
     component: 'openai',
     operation: 'create-response'
-  },
-  'stripe-webhook-processing-failed': {
-    component: 'stripe-webhook',
-    operation: 'process-webhook'
   }
 } as const
 

@@ -25,10 +25,7 @@ const open = ref(false)
 const triggerElement = ref<HTMLButtonElement | null>(null)
 const isSigningOut = ref(false)
 const signOutError = ref('')
-const identityName = computed(() => props.user.name.trim() || t('account.menu.personalAccount'))
-const triggerLabel = computed(() =>
-  t('account.menu.triggerLabel', { identity: props.user.name.trim() || props.user.email })
-)
+const triggerLabel = computed(() => t('account.menu.triggerLabel', { identity: props.user.name }))
 const nuxtUseId = () => useId()
 const menuContentStyle = {
   minWidth: '0',
@@ -94,7 +91,7 @@ async function signOut(event: Event) {
         @close-auto-focus="restoreTriggerFocus"
       >
         <DropdownMenuLabel class="account-menu-identity">
-          <strong>{{ identityName }}</strong>
+          <strong>{{ props.user.name }}</strong>
           <span>{{ props.user.email }}</span>
         </DropdownMenuLabel>
 

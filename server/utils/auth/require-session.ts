@@ -2,9 +2,7 @@ import { getRequestHeaders, type H3Event } from 'h3'
 import { unauthorizedError } from '../errors'
 import { auth, type BetterAuthSession } from './index'
 
-export type AppSession = BetterAuthSession & {
-  roles?: string[]
-}
+export type AppSession = BetterAuthSession
 
 export async function getOptionalSession(event: H3Event): Promise<AppSession | null> {
   return auth.api.getSession({

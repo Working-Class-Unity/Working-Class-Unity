@@ -1,11 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { captureException } from '../server/services/observability/capture'
 
-const moduleReady = vi.hoisted(() => vi.fn())
+const runtimeConfig = vi.hoisted(() => vi.fn())
 const sentryCapture = vi.hoisted(() => vi.fn())
 
-vi.mock('../server/utils/module-state', () => ({
-  isModuleReady: moduleReady
+vi.mock('../server/utils/runtime', () => ({
+  getAppRuntimeConfig: runtimeConfig
 }))
 
 vi.mock('@sentry/nuxt', () => ({
@@ -26,7 +26,7 @@ const canaries = {
 } as const
 
 beforeEach(() => {
-  moduleReady.mockReset()
+  runtimeConfig.mockReset()
   sentryCapture.mockReset()
 })
 
@@ -35,8 +35,8 @@ afterEach(() => {
 })
 
 describe('safe local observability diagnostics', () => {
-  it('emits only reviewed metadata for a disabled provider', async () => {
-    moduleReady.mockReturnValue(false)
+  it('emits only reviewed metadata without local provider configuration', async () => {
+    runtimeConfig.mockReturnValue({ sentryDsn: '' })
     const error = privateError()
     const stderr = vi.spyOn(console, 'error').mockImplementation(() => undefined)
     const stdout = vi.spyOn(console, 'log').mockImplementation(() => undefined)

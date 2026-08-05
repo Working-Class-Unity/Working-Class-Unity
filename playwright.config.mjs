@@ -7,6 +7,7 @@ if (!baseURL) {
 const runtimeCwd = requiredEnvironment('BROWSER_RUNTIME_CWD')
 const serverEntry = requiredEnvironment('BROWSER_SERVER_ENTRY')
 const serverPreload = requiredEnvironment('BROWSER_SERVER_PRELOAD')
+const turnstileProviderPreload = requiredEnvironment('BROWSER_TURNSTILE_PROVIDER_PRELOAD')
 const serverStderrPath = requiredEnvironment('BROWSER_SERVER_STDERR_PATH')
 const serverStdoutPath = requiredEnvironment('BROWSER_SERVER_STDOUT_PATH')
 
@@ -26,14 +27,15 @@ export default defineConfig({
   reporter: [['line'], ['./scripts/playwright-foundation-reporter.mjs']],
   webServer: {
     command:
-      'umask 077; exec "$BROWSER_NODE_EXECUTABLE" --import "$BROWSER_SERVER_PRELOAD" "$BROWSER_SERVER_ENTRY" >"$BROWSER_SERVER_STDOUT_PATH" 2>"$BROWSER_SERVER_STDERR_PATH"',
+      'umask 077; exec "$BROWSER_NODE_EXECUTABLE" --import "$BROWSER_TURNSTILE_PROVIDER_PRELOAD" --import "$BROWSER_SERVER_PRELOAD" "$BROWSER_SERVER_ENTRY" >"$BROWSER_SERVER_STDOUT_PATH" 2>"$BROWSER_SERVER_STDERR_PATH"',
     cwd: runtimeCwd,
     env: {
       BROWSER_NODE_EXECUTABLE: process.execPath,
       BROWSER_SERVER_ENTRY: serverEntry,
       BROWSER_SERVER_PRELOAD: serverPreload,
       BROWSER_SERVER_STDERR_PATH: serverStderrPath,
-      BROWSER_SERVER_STDOUT_PATH: serverStdoutPath
+      BROWSER_SERVER_STDOUT_PATH: serverStdoutPath,
+      BROWSER_TURNSTILE_PROVIDER_PRELOAD: turnstileProviderPreload
     },
     gracefulShutdown: {
       signal: 'SIGTERM',

@@ -29,7 +29,6 @@ test('Docker build accepts every optional Coolify build secret without changing 
     .split('\n')
     .find((line) => line.startsWith('RUN ') && line.includes('npm run pnpm -- run build'))
   const secretNames = [
-    'NUXT_MODULES_OBSERVABILITY_ENABLED',
     'SENTRY_AUTH_TOKEN',
     'SENTRY_ORG',
     'SENTRY_PROJECT',
@@ -44,7 +43,6 @@ test('Docker build accepts every optional Coolify build secret without changing 
     secretNames.map((name) => `--mount=type=secret,id=${name},env=BUILD_SECRET_${name},required=false`)
   )
   assert.deepEqual(dockerfile.match(/^ARG [A-Z_]+(?:=.*)?$/gm), [
-    'ARG NUXT_MODULES_OBSERVABILITY_ENABLED=false',
     'ARG SENTRY_ORG',
     'ARG SENTRY_PROJECT',
     'ARG SENTRY_RELEASE',
@@ -52,7 +50,7 @@ test('Docker build accepts every optional Coolify build secret without changing 
     'ARG SENTRY_UPLOAD_CACHE_BUST=disabled'
   ])
   assert.doesNotMatch(dockerfile, /^ARG SENTRY_AUTH_TOKEN(?:=|$)/m)
-  assert.doesNotMatch(dockerfile, /^ENV (?:NUXT_MODULES_OBSERVABILITY_ENABLED|SENTRY_AUTH_TOKEN)(?:=|\s)/m)
+  assert.doesNotMatch(dockerfile, /^ENV SENTRY_AUTH_TOKEN(?:=|\s)/m)
 
   const bridgeCommand = buildInstruction
     .replace(/^RUN (?:--mount=type=secret,[^\s]+\s+)+/, '')
@@ -61,7 +59,6 @@ test('Docker build accepts every optional Coolify build secret without changing 
     const result = spawnSync('/bin/sh', ['-c', bridgeCommand], {
       encoding: 'utf8',
       env: {
-        NUXT_MODULES_OBSERVABILITY_ENABLED: 'false',
         PATH: process.env.PATH,
         SENTRY_UPLOAD_CACHE_BUST: 'disabled',
         ...env
@@ -77,9 +74,7 @@ test('Docker build accepts every optional Coolify build secret without changing 
     return Object.fromEntries(secretNames.map((name) => [name, observed[name]]))
   }
   const argValues = Object.fromEntries(secretNames.map((name) => [name, `arg-${name}`]))
-  argValues.NUXT_MODULES_OBSERVABILITY_ENABLED = 'true'
   const secretValues = Object.fromEntries(secretNames.map((name) => [name, `secret-${name}`]))
-  secretValues.NUXT_MODULES_OBSERVABILITY_ENABLED = 'false'
   const emptyBuildSecrets = Object.fromEntries(secretNames.map((name) => [`BUILD_SECRET_${name}`, '']))
   const buildSecrets = Object.fromEntries(secretNames.map((name) => [`BUILD_SECRET_${name}`, secretValues[name]]))
 
@@ -92,7 +87,6 @@ test('Docker build accepts every optional Coolify build secret without changing 
       SENTRY_URL: ''
     }),
     {
-      NUXT_MODULES_OBSERVABILITY_ENABLED: 'false',
       SENTRY_AUTH_TOKEN: '',
       SENTRY_ORG: '',
       SENTRY_PROJECT: '',

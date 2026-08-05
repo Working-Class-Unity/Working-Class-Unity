@@ -5,9 +5,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { createApp, defineEventHandler, toNodeListener } from 'h3'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
-import { runtimeModuleIds } from '../shared/modules'
 import {
-  areRuntimeModulesHealthy,
   evaluateReadiness,
   isReadinessAuthorizationValid,
   probeSqliteReadiness,
@@ -31,11 +29,9 @@ afterAll(() => {
 
 describe('liveness boundary', () => {
   it('returns an exact empty 204 response without cache storage', async () => {
-    const moduleBoundary = (await import('../server/middleware/01-module-boundary')).default
     const crossOrigin = (await import('../server/middleware/02-cross-origin')).default
     const handler = (await import('../server/api/live.get')).default
     const app = createApp()
-    app.use(moduleBoundary)
     app.use(crossOrigin)
     app.use(handler)
     const server = createServer(toNodeListener(app))
@@ -79,7 +75,7 @@ describe('protected readiness boundary', () => {
 
     for (const response of [readinessUnauthorizedResponse, readinessReadyResponse, readinessUnavailableResponse]) {
       expect(Object.isFrozen(response)).toBe(true)
-      expect(JSON.stringify(response)).not.toMatch(/database|sqlite|module|provider|token|duration|path/i)
+      expect(JSON.stringify(response)).not.toMatch(/database|sqlite|provider|token|duration|path/i)
     }
   })
 
@@ -116,13 +112,6 @@ describe('protected readiness boundary', () => {
     expect(probeDatabase).toHaveBeenCalledExactlyOnceWith(config.databaseUrl)
   })
 
-  it('treats manifest-defined disabled and ready modules as healthy without reading provider config', () => {
-    for (const enabled of [false, true]) {
-      const config = providerGuardedConfig(enabled)
-      expect(areRuntimeModulesHealthy(config)).toBe(true)
-    }
-  })
-
   it('uses a fresh read-only SQLite probe and fails closed without creating a missing database', () => {
     const databasePath = join(temporaryDirectory, 'ready.db')
     const setup = new Database(databasePath)
@@ -138,22 +127,9 @@ describe('protected readiness boundary', () => {
   })
 })
 
-function testConfig(enabled = false): AppRuntimeConfig {
+function testConfig(): AppRuntimeConfig {
   return {
     readinessToken,
-    databaseUrl: 'file:/tmp/readiness-test.db',
-    modules: Object.fromEntries(runtimeModuleIds.map((moduleId) => [moduleId, { enabled }]))
+    databaseUrl: 'file:/tmp/readiness-test.db'
   } as unknown as AppRuntimeConfig
-}
-
-function providerGuardedConfig(enabled: boolean): AppRuntimeConfig {
-  const config = testConfig(enabled) as unknown as Record<string, unknown>
-  return new Proxy(config, {
-    get(target, property, receiver) {
-      if (!['readinessToken', 'databaseUrl', 'modules'].includes(String(property))) {
-        throw new Error(`Readiness accessed optional provider configuration: ${String(property)}`)
-      }
-      return Reflect.get(target, property, receiver)
-    }
-  }) as unknown as AppRuntimeConfig
 }

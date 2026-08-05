@@ -1,6 +1,5 @@
 import { dirname, join, resolve } from 'node:path'
 import { resolveSqlitePath } from '../../db/connect'
-import { requireModuleReady } from '../../utils/module-state'
 import { getAppRuntimeConfig } from '../../utils/runtime'
 import type { FileReconciliationPrefix } from './file-object-keys'
 import { LocalObjectStorage } from './local-object-storage'
@@ -33,7 +32,6 @@ export type StoredObjectPage = Readonly<{
 }>
 
 export function useObjectStorage(): ObjectStorage {
-  requireModuleReady('files')
   const config = getAppRuntimeConfig()
 
   if (config.files.driver === 'r2') {

@@ -5,6 +5,7 @@ import {
   cleanupDisposableState,
   createCleanupCoordinator,
   remainingTimeout,
+  reservePort,
   runManaged,
   selectEnvironment,
   stopManaged
@@ -21,7 +22,8 @@ const rawServerStdout = join(sandbox, 'server-stdout.log')
 const rawServerStderr = join(sandbox, 'server-stderr.log')
 const serverEntry = resolve(root, '.output/server/index.mjs')
 const serverPreload = resolve(root, '.output/server/sentry.server.config.mjs')
-const browserPort = 4173
+const turnstileProviderPreload = resolve(root, 'scripts/isolated-turnstile-provider-preload.mjs')
+const browserPort = await reservePort()
 const buildName = 'Build Sentinel - Must Not Render'
 const buildUrl = 'https://build-sentinel.invalid'
 const runtimeName = 'Runtime Browser Baseline'
@@ -30,8 +32,6 @@ const runtimeSentryRelease = 'runtime-sentry-release'
 const buildReadinessCanary = 'ci-only-build-readiness-canary-must-not-render'
 const runtimeSecret = 'ci-only-runtime-browser-secret-32-bytes-minimum'
 const runtimeReadinessToken = 'ci-only-runtime-readiness-token-32-bytes-minimum'
-const runtimeGoogleClientId = 'ci-only-disabled-google-id.apps.googleusercontent.com'
-const runtimeGoogleClientSecret = 'ci-only-disabled-google-secret-not-a-credential'
 const runtimeStripeSecret = 'rk_test_ci_only_runtime_browser_stripe_secret'
 const runtimeStripeWebhookSecret = 'whsec_ci_only_runtime_browser_webhook_secret'
 const runtimeStripeCatalog = {
@@ -43,14 +43,7 @@ const runtimeStripeCatalog = {
   familyAnnualPriceId: 'price_ci_runtime_family_annual'
 }
 const browserAuthEmailMarker = 'ci-only-browser-auth-recipient'
-const bearerEmailSubjects = new Set(['Your sign-in link', 'Workspace invitation'])
-const linklessBillingEmailSubjects = new Set([
-  'Your subscription payment needs attention',
-  'Family access may change',
-  'Family access is scheduled to end',
-  'Your Family membership ended',
-  'Account deletion is waiting for billing cancellation'
-])
+const bearerEmailSubjects = new Set(['Your sign-in link'])
 const maxCaptureFileBytes = 65_536
 const maxCaptureFiles = 64
 const maxCaptureTotalBytes = 1_048_576
@@ -101,6 +94,9 @@ await coordinator.run(async () => {
     if (!existsSync(serverPreload)) {
       throw new Error(`Production Sentry preload was not built: ${serverPreload}`)
     }
+    if (!existsSync(turnstileProviderPreload)) {
+      throw new Error(`Turnstile provider preload was not found: ${turnstileProviderPreload}`)
+    }
 
     const migrationEnv = databaseEnvironment(databasePath)
     await runPhase('runtime migration', 'pnpm', ['run', 'db:migrate'], migrationEnv, 60_000)
@@ -128,9 +124,8 @@ await coordinator.run(async () => {
       BROWSER_RUNTIME_APP_URL: baseUrl,
       BROWSER_RUNTIME_AUTH_SECRET: runtimeSecret,
       BROWSER_RUNTIME_DATABASE_PATH: databasePath,
-      BROWSER_RUNTIME_GOOGLE_CLIENT_ID: runtimeGoogleClientId,
-      BROWSER_RUNTIME_GOOGLE_CLIENT_SECRET: runtimeGoogleClientSecret,
       BROWSER_RUNTIME_READINESS_TOKEN: runtimeReadinessToken,
+      BROWSER_RUNTIME_SENTRY_ORIGIN: 'https://sentry.browser.invalid',
       BROWSER_RUNTIME_SENTRY_RELEASE: runtimeSentryRelease,
       BROWSER_RUNTIME_STRIPE_SECRET: runtimeStripeSecret,
       BROWSER_RUNTIME_STRIPE_WEBHOOK_SECRET: runtimeStripeWebhookSecret,
@@ -141,6 +136,7 @@ await coordinator.run(async () => {
       BROWSER_SERVER_PRELOAD: serverPreload,
       BROWSER_SERVER_STDERR_PATH: rawServerStderr,
       BROWSER_SERVER_STDOUT_PATH: rawServerStdout,
+      BROWSER_TURNSTILE_PROVIDER_PRELOAD: turnstileProviderPreload,
       PLAYWRIGHT_OUTPUT_DIR: playwrightOutput
     }
     browserDiagnosticsSafe = false
@@ -206,19 +202,25 @@ function applicationEnvironment({ appName, appUrl, databasePath: selectedDatabas
     NUXT_PUBLIC_APP_URL: appUrl,
     NUXT_BETTER_AUTH_SECRET: secret,
     NUXT_BETTER_AUTH_URL: appUrl,
-    NUXT_SOCIAL_PROVIDERS_GOOGLE_ENABLED: 'false',
-    NUXT_SOCIAL_PROVIDERS_GOOGLE_CLIENT_ID: runtimeGoogleClientId,
-    NUXT_SOCIAL_PROVIDERS_GOOGLE_CLIENT_SECRET: runtimeGoogleClientSecret,
     NUXT_EMAIL_CAPTURE_DIRECTORY: emailCaptureDirectory,
     NUXT_EMAIL_FROM: 'baseline@example.test',
     NUXT_EMAIL_TRANSPORT: 'capture',
     NUXT_READINESS_TOKEN: runtimeReadinessToken,
+    NUXT_FILES_DRIVER: 'local',
+    NUXT_OPENAI_API_KEY: 'browser-openai-key-not-a-provider-credential',
+    NUXT_OPENAI_PROJECT_ID: 'proj_browser_smoke',
+    NUXT_OPENAI_MODEL: 'gpt-5.6-luna',
+    NUXT_OPENAI_FILE_SEARCH_VECTOR_STORE_ID: 'vs_browser_empty',
+    NUXT_OPENAI_WEB_SEARCH_ALLOWED_DOMAINS: 'example.test',
+    NUXT_CLOUDFLARE_TURNSTILE_SECRET_KEY: 'isolated-turnstile-browser-secret-not-a-provider-credential',
+    NUXT_PUBLIC_TURNSTILE_SITE_KEY: 'isolated-turnstile-browser-site-not-a-provider-credential',
+    SWL_ISOLATED_TURNSTILE_HOSTNAME: new URL(appUrl).hostname,
+    NUXT_SENTRY_DSN: 'http://public@127.0.0.1:9/1',
+    NUXT_PUBLIC_SENTRY_DSN: 'https://public@sentry.browser.invalid/1',
+    NUXT_SENTRY_TRACES_SAMPLE_RATE: '0',
     NUXT_PUBLIC_SENTRY_ENVIRONMENT: 'runtime-browser',
     NUXT_PUBLIC_SENTRY_RELEASE: runtimeSentryRelease,
     NUXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE: '0.125',
-    ...disabledModuleEnvironment(),
-    NUXT_MODULES_BILLING_ENABLED: 'true',
-    NUXT_MODULES_JOBS_ENABLED: 'true',
     NUXT_STRIPE_SECRET_KEY: runtimeStripeSecret,
     NUXT_STRIPE_WEBHOOK_SECRET: runtimeStripeWebhookSecret,
     NUXT_STRIPE_PORTAL_CONFIGURATION_ID: runtimeStripeCatalog.portalConfigurationId,
@@ -251,19 +253,6 @@ function databaseEnvironment(selectedDatabasePath) {
     CI: 'true',
     NODE_ENV: 'production',
     NUXT_DATABASE_URL: `file:${selectedDatabasePath}`
-  }
-}
-
-function disabledModuleEnvironment() {
-  return {
-    NUXT_MODULES_BILLING_ENABLED: 'false',
-    NUXT_MODULES_FILES_ENABLED: 'false',
-    NUXT_MODULES_AI_ENABLED: 'false',
-    NUXT_OPENAI_FILE_SEARCH_ENABLED: 'false',
-    NUXT_OPENAI_WEB_SEARCH_ENABLED: 'false',
-    NUXT_MODULES_TURNSTILE_ENABLED: 'false',
-    NUXT_MODULES_OBSERVABILITY_ENABLED: 'false',
-    NUXT_MODULES_JOBS_ENABLED: 'false'
   }
 }
 
@@ -366,8 +355,6 @@ function createOutputMonitor(label) {
     buildReadinessCanary,
     runtimeSecret,
     runtimeReadinessToken,
-    runtimeGoogleClientId,
-    runtimeGoogleClientSecret,
     runtimeStripeSecret,
     runtimeStripeWebhookSecret,
     ...Object.values(runtimeStripeCatalog),
@@ -460,9 +447,6 @@ function capturedBrowserSecrets({ allowEmpty = false } = {}) {
         const token = url.searchParams.get('token')
         if (!token) throw new Error()
         secrets.push(path, recipient, url.href, token)
-      } else if (linklessBillingEmailSubjects.has(subject)) {
-        if (/https?:\/\//.test(text) || /https?:\/\//.test(html)) throw new Error()
-        secrets.push(path, recipient)
       } else {
         throw new Error()
       }

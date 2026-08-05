@@ -1,6 +1,5 @@
 import { createHmac, timingSafeEqual } from 'node:crypto'
 import { forbiddenError } from '../../utils/errors'
-import { requireModuleReady } from '../../utils/module-state'
 import { getAppRuntimeConfig } from '../../utils/runtime'
 
 const tokenVersion = 'v2'
@@ -50,14 +49,12 @@ export function verifyFileDownloadToken(token: string): FileDownloadTokenPayload
 }
 
 function createFileCapabilityToken(payload: FileCapabilityPayload) {
-  requireModuleReady('files')
   assertCapabilityPayload(payload)
   const body = Buffer.from(JSON.stringify({ version: tokenVersion, ...payload })).toString('base64url')
   return `${body}.${sign(body)}`
 }
 
 function verifyFileCapabilityToken(token: string): FileCapabilityPayload {
-  requireModuleReady('files')
   const [body, signature, extra] = token.split('.')
   if (!body || !signature || extra || !safeEqual(signature, sign(body))) throw invalidTokenError()
 

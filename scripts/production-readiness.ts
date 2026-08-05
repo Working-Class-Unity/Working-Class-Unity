@@ -2,8 +2,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { parseEnv } from 'node:util'
-import { moduleManifest, runtimeModuleIds } from '../shared/modules'
-import { evaluateModuleStates, evaluateRuntimeEnvironment, type RuntimeConfigIssue } from '../server/utils/runtime'
+import { evaluateRuntimeEnvironment, type RuntimeConfigIssue } from '../server/utils/runtime'
 
 const args = new Set(process.argv.slice(2))
 const repositoryRoot = fileURLToPath(new URL('../', import.meta.url))
@@ -15,40 +14,19 @@ const environment = {
   ...process.env
 }
 const evaluation = evaluateRuntimeEnvironment(environment)
-const moduleStates = evaluateModuleStates(evaluation)
 const platformIssues = validatePlatformEnvironment(environment)
-const issues = [
-  ...platformIssues,
-  ...evaluation.coreIssues,
-  ...runtimeModuleIds.flatMap((moduleId) => evaluation.moduleIssues[moduleId])
-]
+const issues = [...platformIssues, ...evaluation.issues]
 
 console.log('\nBuild and platform controls')
 printIssues(platformIssues, platformIssues.length ? 'invalid' : 'ok', 'NODE_ENV and NITRO_PRESET are configured')
 
-console.log('\nApp runtime core')
-printIssues(evaluation.coreIssues, evaluation.coreIssues.length ? 'invalid' : 'ok', 'core runtime config is complete')
-
-for (const moduleId of runtimeModuleIds) {
-  console.log(`\n${moduleManifest[moduleId].label} runtime module`)
-  const moduleIssues = evaluation.moduleIssues[moduleId]
-  if (moduleStates[moduleId] === 'incomplete' && moduleIssues.length) {
-    printIssues(moduleIssues, 'invalid', '')
-  } else if (moduleStates[moduleId] === 'incomplete') {
-    console.log('[invalid] enabled module state could not be normalized')
-  } else if (moduleStates[moduleId] === 'ready') {
-    console.log('[ok] ready (enabled and configuration-complete)')
-  } else {
-    console.log('[ok] disabled (healthy; provider calls and module mutations are gated)')
-  }
-}
+console.log('\nApp runtime')
+printIssues(evaluation.issues, evaluation.issues.length ? 'invalid' : 'ok', 'runtime config is complete')
 
 console.log('\nOptional build-only Sentry controls')
 const sentryUploadKeys = ['SENTRY_AUTH_TOKEN', 'SENTRY_ORG', 'SENTRY_PROJECT'] as const
 const configuredSentryUploadKeys = sentryUploadKeys.filter((name) => hasExactValue(environment[name]))
-if (environment.NUXT_MODULES_OBSERVABILITY_ENABLED !== 'true') {
-  console.log('[optional] inactive because Observability is disabled; no source maps will be generated')
-} else if (configuredSentryUploadKeys.length === sentryUploadKeys.length) {
+if (configuredSentryUploadKeys.length === sentryUploadKeys.length) {
   console.log('[ok] complete token/organization/project tuple; client source-map upload is eligible')
 } else if (configuredSentryUploadKeys.length) {
   console.log('[attention] incomplete token/organization/project tuple; no source maps will be generated')

@@ -1,20 +1,7 @@
 <script setup lang="ts">
-import { isPublicModuleReady, moduleDisabledCode } from '#shared/module-states'
-
 type TestStatus = 'idle' | 'validating' | 'captured' | 'missing-token' | 'failed'
 
-const config = useRuntimeConfig()
 const { t } = useI18n()
-const observabilityReady = isPublicModuleReady(config.public.moduleStates, 'observability')
-
-if (!observabilityReady) {
-  throw createError({
-    status: 404,
-    statusText: 'Page Not Found',
-    fatal: import.meta.client,
-    data: { code: moduleDisabledCode, module: 'observability' }
-  })
-}
 
 const status = ref<TestStatus>('idle')
 const detail = ref(t('observability.preparing'))

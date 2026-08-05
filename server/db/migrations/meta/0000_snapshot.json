@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "966f0567-0a79-4bc1-927a-83683b4301b9",
+  "id": "c0496553-e2e1-4e9d-a774-5961c68e3d6d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "app_settings": {
@@ -1029,13 +1029,6 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
-        },
-        "active_organization_id": {
-          "name": "active_organization_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
         }
       },
       "indexes": {
@@ -1112,6 +1105,14 @@
           "notNull": false,
           "autoincrement": false
         },
+        "role": {
+          "name": "role",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'user'"
+        },
         "created_at": {
           "name": "created_at",
           "type": "integer",
@@ -1139,7 +1140,16 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
-      "checkConstraints": {}
+      "checkConstraints": {
+        "user_name_check": {
+          "name": "user_name_check",
+          "value": "\"user\".\"name\" = trim(\"user\".\"name\") and length(\"user\".\"name\") between 1 and 100"
+        },
+        "user_role_check": {
+          "name": "user_role_check",
+          "value": "\"user\".\"role\" in ('user', 'admin')"
+        }
+      }
     },
     "verification": {
       "name": "verification",
@@ -1201,6 +1211,192 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
+    "billing_account_deletion_requests": {
+      "name": "billing_account_deletion_requests",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "purchaser_user_id": {
+          "name": "purchaser_user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "billing_subscription_id": {
+          "name": "billing_subscription_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "billing_customer_id": {
+          "name": "billing_customer_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "expected_stripe_subscription_id": {
+          "name": "expected_stripe_subscription_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "expected_stripe_customer_id": {
+          "name": "expected_stripe_customer_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "captured_billing_revision": {
+          "name": "captured_billing_revision",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "state": {
+          "name": "state",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'pending'"
+        },
+        "reason": {
+          "name": "reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "cancellation_confirmed_at": {
+          "name": "cancellation_confirmed_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "revision": {
+          "name": "revision",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {
+        "billing_account_deletion_requests_purchaser_user_id_uidx": {
+          "name": "billing_account_deletion_requests_purchaser_user_id_uidx",
+          "columns": [
+            "purchaser_user_id"
+          ],
+          "isUnique": true
+        },
+        "billing_account_deletion_requests_subscription_id_uidx": {
+          "name": "billing_account_deletion_requests_subscription_id_uidx",
+          "columns": [
+            "billing_subscription_id"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "billing_account_deletion_requests_purchaser_user_id_user_id_fk": {
+          "name": "billing_account_deletion_requests_purchaser_user_id_user_id_fk",
+          "tableFrom": "billing_account_deletion_requests",
+          "tableTo": "user",
+          "columnsFrom": [
+            "purchaser_user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "billing_account_deletion_requests_billing_subscription_id_billing_subscriptions_id_fk": {
+          "name": "billing_account_deletion_requests_billing_subscription_id_billing_subscriptions_id_fk",
+          "tableFrom": "billing_account_deletion_requests",
+          "tableTo": "billing_subscriptions",
+          "columnsFrom": [
+            "billing_subscription_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "billing_account_deletion_requests_billing_customer_id_billing_customers_id_fk": {
+          "name": "billing_account_deletion_requests_billing_customer_id_billing_customers_id_fk",
+          "tableFrom": "billing_account_deletion_requests",
+          "tableTo": "billing_customers",
+          "columnsFrom": [
+            "billing_customer_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "billing_account_deletion_requests_state_check": {
+          "name": "billing_account_deletion_requests_state_check",
+          "value": "\"billing_account_deletion_requests\".\"state\" in ('pending', 'reconciliation_required', 'cancellation_confirmed')"
+        },
+        "billing_account_deletion_requests_id_check": {
+          "name": "billing_account_deletion_requests_id_check",
+          "value": "length(trim(\"billing_account_deletion_requests\".\"id\")) between 1 and 128"
+        },
+        "billing_account_deletion_requests_reason_check": {
+          "name": "billing_account_deletion_requests_reason_check",
+          "value": "(\"billing_account_deletion_requests\".\"state\" = 'reconciliation_required' and \"billing_account_deletion_requests\".\"reason\" is not null and length(trim(\"billing_account_deletion_requests\".\"reason\")) between 1 and 128) or (\"billing_account_deletion_requests\".\"state\" <> 'reconciliation_required' and \"billing_account_deletion_requests\".\"reason\" is null)"
+        },
+        "billing_account_deletion_requests_confirmation_check": {
+          "name": "billing_account_deletion_requests_confirmation_check",
+          "value": "(\"billing_account_deletion_requests\".\"state\" = 'cancellation_confirmed' and \"billing_account_deletion_requests\".\"cancellation_confirmed_at\" is not null) or (\"billing_account_deletion_requests\".\"state\" <> 'cancellation_confirmed' and \"billing_account_deletion_requests\".\"cancellation_confirmed_at\" is null)"
+        },
+        "billing_account_deletion_requests_reference_check": {
+          "name": "billing_account_deletion_requests_reference_check",
+          "value": "(((\"billing_account_deletion_requests\".\"billing_customer_id\" is null and \"billing_account_deletion_requests\".\"expected_stripe_customer_id\" is null) or (\"billing_account_deletion_requests\".\"billing_customer_id\" is not null and \"billing_account_deletion_requests\".\"expected_stripe_customer_id\" is not null and length(trim(\"billing_account_deletion_requests\".\"expected_stripe_customer_id\")) between 1 and 255 and \"billing_account_deletion_requests\".\"expected_stripe_customer_id\" glob 'cus_*')) and ((\"billing_account_deletion_requests\".\"billing_subscription_id\" is null and \"billing_account_deletion_requests\".\"expected_stripe_subscription_id\" is null) or (\"billing_account_deletion_requests\".\"billing_subscription_id\" is not null and \"billing_account_deletion_requests\".\"expected_stripe_subscription_id\" is not null and length(trim(\"billing_account_deletion_requests\".\"expected_stripe_subscription_id\")) between 1 and 255 and \"billing_account_deletion_requests\".\"expected_stripe_subscription_id\" glob 'sub_*')))"
+        },
+        "billing_account_deletion_requests_revision_check": {
+          "name": "billing_account_deletion_requests_revision_check",
+          "value": "\"billing_account_deletion_requests\".\"captured_billing_revision\" >= 0 and \"billing_account_deletion_requests\".\"revision\" >= 0"
+        }
+      }
+    },
     "billing_checkout_attempts": {
       "name": "billing_checkout_attempts",
       "columns": {
@@ -1211,8 +1407,8 @@
           "notNull": true,
           "autoincrement": false
         },
-        "organization_id": {
-          "name": "organization_id",
+        "purchaser_user_id": {
+          "name": "purchaser_user_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -1230,8 +1426,14 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false,
-          "default": "'family'"
+          "autoincrement": false
+        },
+        "cadence": {
+          "name": "cadence",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
         },
         "stripe_price_id": {
           "name": "stripe_price_id",
@@ -1301,10 +1503,10 @@
         }
       },
       "indexes": {
-        "billing_checkout_attempts_organization_id_idx": {
-          "name": "billing_checkout_attempts_organization_id_idx",
+        "billing_checkout_attempts_purchaser_user_id_idx": {
+          "name": "billing_checkout_attempts_purchaser_user_id_idx",
           "columns": [
-            "organization_id"
+            "purchaser_user_id"
           ],
           "isUnique": false
         },
@@ -1325,24 +1527,24 @@
         "billing_checkout_attempts_one_open_uidx": {
           "name": "billing_checkout_attempts_one_open_uidx",
           "columns": [
-            "organization_id"
+            "purchaser_user_id"
           ],
           "isUnique": true,
           "where": "\"billing_checkout_attempts\".\"state\" in ('pending', 'open', 'reconciliation_required')"
         }
       },
       "foreignKeys": {
-        "billing_checkout_attempts_organization_id_organization_id_fk": {
-          "name": "billing_checkout_attempts_organization_id_organization_id_fk",
+        "billing_checkout_attempts_purchaser_user_id_user_id_fk": {
+          "name": "billing_checkout_attempts_purchaser_user_id_user_id_fk",
           "tableFrom": "billing_checkout_attempts",
-          "tableTo": "organization",
+          "tableTo": "user",
           "columnsFrom": [
-            "organization_id"
+            "purchaser_user_id"
           ],
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
+          "onDelete": "restrict",
           "onUpdate": "no action"
         },
         "billing_checkout_attempts_billing_customer_id_billing_customers_id_fk": {
@@ -1362,13 +1564,17 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {
-        "billing_checkout_attempts_plan_check": {
-          "name": "billing_checkout_attempts_plan_check",
-          "value": "\"billing_checkout_attempts\".\"plan_key\" = 'family'"
+        "billing_checkout_attempts_offering_check": {
+          "name": "billing_checkout_attempts_offering_check",
+          "value": "((\"billing_checkout_attempts\".\"plan_key\" = 'personal' and \"billing_checkout_attempts\".\"cadence\" in ('weekly', 'monthly', 'annual')) or (\"billing_checkout_attempts\".\"plan_key\" = 'family' and \"billing_checkout_attempts\".\"cadence\" in ('monthly', 'annual')))"
         },
         "billing_checkout_attempts_state_check": {
           "name": "billing_checkout_attempts_state_check",
           "value": "\"billing_checkout_attempts\".\"state\" in ('pending', 'open', 'completed', 'expired', 'failed', 'reconciliation_required')"
+        },
+        "billing_checkout_attempts_price_check": {
+          "name": "billing_checkout_attempts_price_check",
+          "value": "\"billing_checkout_attempts\".\"stripe_price_id\" glob 'price_*'"
         },
         "billing_checkout_attempts_reuse_check": {
           "name": "billing_checkout_attempts_reuse_check",
@@ -1386,8 +1592,8 @@
           "notNull": true,
           "autoincrement": false
         },
-        "organization_id": {
-          "name": "organization_id",
+        "purchaser_user_id": {
+          "name": "purchaser_user_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -1418,10 +1624,10 @@
         }
       },
       "indexes": {
-        "billing_customers_organization_id_uidx": {
-          "name": "billing_customers_organization_id_uidx",
+        "billing_customers_purchaser_user_id_uidx": {
+          "name": "billing_customers_purchaser_user_id_uidx",
           "columns": [
-            "organization_id"
+            "purchaser_user_id"
           ],
           "isUnique": true
         },
@@ -1434,23 +1640,32 @@
         }
       },
       "foreignKeys": {
-        "billing_customers_organization_id_organization_id_fk": {
-          "name": "billing_customers_organization_id_organization_id_fk",
+        "billing_customers_purchaser_user_id_user_id_fk": {
+          "name": "billing_customers_purchaser_user_id_user_id_fk",
           "tableFrom": "billing_customers",
-          "tableTo": "organization",
+          "tableTo": "user",
           "columnsFrom": [
-            "organization_id"
+            "purchaser_user_id"
           ],
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
+          "onDelete": "restrict",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
-      "checkConstraints": {}
+      "checkConstraints": {
+        "billing_customers_id_check": {
+          "name": "billing_customers_id_check",
+          "value": "length(trim(\"billing_customers\".\"id\")) between 1 and 128"
+        },
+        "billing_customers_stripe_id_check": {
+          "name": "billing_customers_stripe_id_check",
+          "value": "\"billing_customers\".\"stripe_customer_id\" glob 'cus_*'"
+        }
+      }
     },
     "billing_events": {
       "name": "billing_events",
@@ -1517,6 +1732,261 @@
         }
       }
     },
+    "billing_subscription_transitions": {
+      "name": "billing_subscription_transitions",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "purchaser_user_id": {
+          "name": "purchaser_user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "billing_subscription_id": {
+          "name": "billing_subscription_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "kind": {
+          "name": "kind",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "source_plan_key": {
+          "name": "source_plan_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "source_cadence": {
+          "name": "source_cadence",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "target_plan_key": {
+          "name": "target_plan_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "target_cadence": {
+          "name": "target_cadence",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "effective_at": {
+          "name": "effective_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "stripe_subscription_schedule_id": {
+          "name": "stripe_subscription_schedule_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "stripe_pending_invoice_id": {
+          "name": "stripe_pending_invoice_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "stripe_pending_update_expires_at": {
+          "name": "stripe_pending_update_expires_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "idempotency_key": {
+          "name": "idempotency_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "captured_billing_revision": {
+          "name": "captured_billing_revision",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "state": {
+          "name": "state",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'pending'"
+        },
+        "state_reason": {
+          "name": "state_reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "revision": {
+          "name": "revision",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {
+        "billing_subscription_transitions_purchaser_user_id_idx": {
+          "name": "billing_subscription_transitions_purchaser_user_id_idx",
+          "columns": [
+            "purchaser_user_id"
+          ],
+          "isUnique": false
+        },
+        "billing_subscription_transitions_subscription_id_idx": {
+          "name": "billing_subscription_transitions_subscription_id_idx",
+          "columns": [
+            "billing_subscription_id"
+          ],
+          "isUnique": false
+        },
+        "billing_subscription_transitions_idempotency_key_uidx": {
+          "name": "billing_subscription_transitions_idempotency_key_uidx",
+          "columns": [
+            "idempotency_key"
+          ],
+          "isUnique": true
+        },
+        "billing_subscription_transitions_schedule_id_uidx": {
+          "name": "billing_subscription_transitions_schedule_id_uidx",
+          "columns": [
+            "stripe_subscription_schedule_id"
+          ],
+          "isUnique": true
+        },
+        "billing_subscription_transitions_pending_invoice_id_uidx": {
+          "name": "billing_subscription_transitions_pending_invoice_id_uidx",
+          "columns": [
+            "stripe_pending_invoice_id"
+          ],
+          "isUnique": true
+        },
+        "billing_subscription_transitions_one_open_uidx": {
+          "name": "billing_subscription_transitions_one_open_uidx",
+          "columns": [
+            "purchaser_user_id"
+          ],
+          "isUnique": true,
+          "where": "\"billing_subscription_transitions\".\"state\" in ('pending', 'action_required', 'scheduled', 'reconciliation_required')"
+        }
+      },
+      "foreignKeys": {
+        "billing_subscription_transitions_purchaser_user_id_user_id_fk": {
+          "name": "billing_subscription_transitions_purchaser_user_id_user_id_fk",
+          "tableFrom": "billing_subscription_transitions",
+          "tableTo": "user",
+          "columnsFrom": [
+            "purchaser_user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "billing_subscription_transitions_billing_subscription_id_billing_subscriptions_id_fk": {
+          "name": "billing_subscription_transitions_billing_subscription_id_billing_subscriptions_id_fk",
+          "tableFrom": "billing_subscription_transitions",
+          "tableTo": "billing_subscriptions",
+          "columnsFrom": [
+            "billing_subscription_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "billing_subscription_transitions_kind_check": {
+          "name": "billing_subscription_transitions_kind_check",
+          "value": "\"billing_subscription_transitions\".\"kind\" in ('cadence_change', 'personal_to_family', 'family_to_personal')"
+        },
+        "billing_subscription_transitions_state_check": {
+          "name": "billing_subscription_transitions_state_check",
+          "value": "\"billing_subscription_transitions\".\"state\" in ('pending', 'action_required', 'scheduled', 'reconciliation_required', 'applied', 'failed', 'canceled')"
+        },
+        "billing_subscription_transitions_source_offering_check": {
+          "name": "billing_subscription_transitions_source_offering_check",
+          "value": "((\"billing_subscription_transitions\".\"source_plan_key\" = 'personal' and \"billing_subscription_transitions\".\"source_cadence\" in ('weekly', 'monthly', 'annual')) or (\"billing_subscription_transitions\".\"source_plan_key\" = 'family' and \"billing_subscription_transitions\".\"source_cadence\" in ('monthly', 'annual')))"
+        },
+        "billing_subscription_transitions_target_offering_check": {
+          "name": "billing_subscription_transitions_target_offering_check",
+          "value": "((\"billing_subscription_transitions\".\"target_plan_key\" = 'personal' and \"billing_subscription_transitions\".\"target_cadence\" in ('weekly', 'monthly', 'annual')) or (\"billing_subscription_transitions\".\"target_plan_key\" = 'family' and \"billing_subscription_transitions\".\"target_cadence\" in ('monthly', 'annual')))"
+        },
+        "billing_subscription_transitions_semantics_check": {
+          "name": "billing_subscription_transitions_semantics_check",
+          "value": "(\"billing_subscription_transitions\".\"kind\" = 'cadence_change' and \"billing_subscription_transitions\".\"source_plan_key\" = \"billing_subscription_transitions\".\"target_plan_key\" and \"billing_subscription_transitions\".\"source_cadence\" <> \"billing_subscription_transitions\".\"target_cadence\") or (\"billing_subscription_transitions\".\"kind\" = 'personal_to_family' and \"billing_subscription_transitions\".\"source_plan_key\" = 'personal' and \"billing_subscription_transitions\".\"target_plan_key\" = 'family') or (\"billing_subscription_transitions\".\"kind\" = 'family_to_personal' and \"billing_subscription_transitions\".\"source_plan_key\" = 'family' and \"billing_subscription_transitions\".\"target_plan_key\" = 'personal')"
+        },
+        "billing_subscription_transitions_timing_check": {
+          "name": "billing_subscription_transitions_timing_check",
+          "value": "\"billing_subscription_transitions\".\"kind\" = 'personal_to_family' or \"billing_subscription_transitions\".\"effective_at\" is not null"
+        },
+        "billing_subscription_transitions_provider_reference_check": {
+          "name": "billing_subscription_transitions_provider_reference_check",
+          "value": "\"billing_subscription_transitions\".\"kind\" = 'personal_to_family' or \"billing_subscription_transitions\".\"stripe_pending_update_expires_at\" is null"
+        },
+        "billing_subscription_transitions_reason_check": {
+          "name": "billing_subscription_transitions_reason_check",
+          "value": "\"billing_subscription_transitions\".\"state_reason\" is null or length(trim(\"billing_subscription_transitions\".\"state_reason\")) between 1 and 128"
+        },
+        "billing_subscription_transitions_revision_check": {
+          "name": "billing_subscription_transitions_revision_check",
+          "value": "\"billing_subscription_transitions\".\"captured_billing_revision\" >= 0 and \"billing_subscription_transitions\".\"revision\" >= 0"
+        }
+      }
+    },
     "billing_subscriptions": {
       "name": "billing_subscriptions",
       "columns": {
@@ -1527,8 +1997,8 @@
           "notNull": true,
           "autoincrement": false
         },
-        "organization_id": {
-          "name": "organization_id",
+        "purchaser_user_id": {
+          "name": "purchaser_user_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -1548,6 +2018,13 @@
           "notNull": false,
           "autoincrement": false
         },
+        "stripe_subscription_item_id": {
+          "name": "stripe_subscription_item_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "status": {
           "name": "status",
           "type": "text",
@@ -1558,6 +2035,13 @@
         },
         "plan_key": {
           "name": "plan_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "cadence": {
+          "name": "cadence",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -1592,6 +2076,34 @@
           "autoincrement": false,
           "default": false
         },
+        "grace_invoice_id": {
+          "name": "grace_invoice_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "grace_started_at": {
+          "name": "grace_started_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "grace_ends_at": {
+          "name": "grace_ends_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "last_verified_at": {
+          "name": "last_verified_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "projection_order_ms": {
           "name": "projection_order_ms",
           "type": "integer",
@@ -1622,6 +2134,14 @@
           "notNull": false,
           "autoincrement": false
         },
+        "revision": {
+          "name": "revision",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
         "created_at": {
           "name": "created_at",
           "type": "text",
@@ -1640,10 +2160,10 @@
         }
       },
       "indexes": {
-        "billing_subscriptions_organization_id_uidx": {
-          "name": "billing_subscriptions_organization_id_uidx",
+        "billing_subscriptions_purchaser_user_id_uidx": {
+          "name": "billing_subscriptions_purchaser_user_id_uidx",
           "columns": [
-            "organization_id"
+            "purchaser_user_id"
           ],
           "isUnique": true
         },
@@ -1661,6 +2181,20 @@
           ],
           "isUnique": true
         },
+        "billing_subscriptions_stripe_subscription_item_id_uidx": {
+          "name": "billing_subscriptions_stripe_subscription_item_id_uidx",
+          "columns": [
+            "stripe_subscription_item_id"
+          ],
+          "isUnique": true
+        },
+        "billing_subscriptions_grace_invoice_id_uidx": {
+          "name": "billing_subscriptions_grace_invoice_id_uidx",
+          "columns": [
+            "grace_invoice_id"
+          ],
+          "isUnique": true
+        },
         "billing_subscriptions_status_idx": {
           "name": "billing_subscriptions_status_idx",
           "columns": [
@@ -1670,17 +2204,17 @@
         }
       },
       "foreignKeys": {
-        "billing_subscriptions_organization_id_organization_id_fk": {
-          "name": "billing_subscriptions_organization_id_organization_id_fk",
+        "billing_subscriptions_purchaser_user_id_user_id_fk": {
+          "name": "billing_subscriptions_purchaser_user_id_user_id_fk",
           "tableFrom": "billing_subscriptions",
-          "tableTo": "organization",
+          "tableTo": "user",
           "columnsFrom": [
-            "organization_id"
+            "purchaser_user_id"
           ],
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
+          "onDelete": "restrict",
           "onUpdate": "no action"
         },
         "billing_subscriptions_billing_customer_id_billing_customers_id_fk": {
@@ -1704,9 +2238,13 @@
           "name": "billing_subscriptions_status_check",
           "value": "\"billing_subscriptions\".\"status\" in ('none', 'active', 'canceled', 'incomplete', 'incomplete_expired', 'past_due', 'paused', 'trialing', 'unpaid', 'ambiguous')"
         },
-        "billing_subscriptions_plan_check": {
-          "name": "billing_subscriptions_plan_check",
-          "value": "\"billing_subscriptions\".\"plan_key\" is null or \"billing_subscriptions\".\"plan_key\" = 'family'"
+        "billing_subscriptions_offering_check": {
+          "name": "billing_subscriptions_offering_check",
+          "value": "(\"billing_subscriptions\".\"plan_key\" is null and \"billing_subscriptions\".\"cadence\" is null) or (\"billing_subscriptions\".\"plan_key\" is not null and \"billing_subscriptions\".\"cadence\" is not null and ((\"billing_subscriptions\".\"plan_key\" = 'personal' and \"billing_subscriptions\".\"cadence\" in ('weekly', 'monthly', 'annual')) or (\"billing_subscriptions\".\"plan_key\" = 'family' and \"billing_subscriptions\".\"cadence\" in ('monthly', 'annual'))))"
+        },
+        "billing_subscriptions_grace_check": {
+          "name": "billing_subscriptions_grace_check",
+          "value": "(\"billing_subscriptions\".\"grace_invoice_id\" is null and \"billing_subscriptions\".\"grace_started_at\" is null and \"billing_subscriptions\".\"grace_ends_at\" is null) or (\"billing_subscriptions\".\"grace_invoice_id\" is not null and \"billing_subscriptions\".\"grace_started_at\" is not null and \"billing_subscriptions\".\"grace_ends_at\" is not null and \"billing_subscriptions\".\"grace_ends_at\" > \"billing_subscriptions\".\"grace_started_at\")"
         },
         "billing_subscriptions_reconciliation_check": {
           "name": "billing_subscriptions_reconciliation_check",
@@ -1714,7 +2252,11 @@
         },
         "billing_subscriptions_none_check": {
           "name": "billing_subscriptions_none_check",
-          "value": "\"billing_subscriptions\".\"status\" <> 'none' or (\"billing_subscriptions\".\"stripe_subscription_id\" is null and \"billing_subscriptions\".\"plan_key\" is null and \"billing_subscriptions\".\"stripe_price_id\" is null)"
+          "value": "\"billing_subscriptions\".\"status\" <> 'none' or (\"billing_subscriptions\".\"stripe_subscription_id\" is null and \"billing_subscriptions\".\"stripe_subscription_item_id\" is null and \"billing_subscriptions\".\"plan_key\" is null and \"billing_subscriptions\".\"cadence\" is null and \"billing_subscriptions\".\"stripe_price_id\" is null and \"billing_subscriptions\".\"current_period_start\" is null and \"billing_subscriptions\".\"current_period_end\" is null and \"billing_subscriptions\".\"cancel_at_period_end\" = 0 and \"billing_subscriptions\".\"grace_invoice_id\" is null and \"billing_subscriptions\".\"grace_started_at\" is null and \"billing_subscriptions\".\"grace_ends_at\" is null)"
+        },
+        "billing_subscriptions_revision_check": {
+          "name": "billing_subscriptions_revision_check",
+          "value": "\"billing_subscriptions\".\"revision\" >= 0"
         }
       }
     },
@@ -1828,9 +2370,17 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {
+        "detached_billing_subject_provider_check": {
+          "name": "detached_billing_subject_provider_check",
+          "value": "\"detached_billing_subjects\".\"provider\" = 'stripe'"
+        },
         "detached_billing_subject_retention_purpose_check": {
           "name": "detached_billing_subject_retention_purpose_check",
           "value": "\"detached_billing_subjects\".\"retention_purpose\" = 'external_billing_reconciliation'"
+        },
+        "detached_billing_subject_retention_policy_check": {
+          "name": "detached_billing_subject_retention_policy_check",
+          "value": "\"detached_billing_subjects\".\"retention_policy\" = 'stripe_billing_lifecycle'"
         },
         "detached_billing_subject_purge_after_check": {
           "name": "detached_billing_subject_purge_after_check",
@@ -2127,382 +2677,6 @@
         }
       },
       "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "invitation": {
-      "name": "invitation",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "organization_id": {
-          "name": "organization_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "email": {
-          "name": "email",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "role": {
-          "name": "role",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "status": {
-          "name": "status",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'pending'"
-        },
-        "expires_at": {
-          "name": "expires_at",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "(cast(unixepoch('subsecond') * 1000 as integer))"
-        },
-        "inviter_id": {
-          "name": "inviter_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        }
-      },
-      "indexes": {
-        "invitation_organizationId_idx": {
-          "name": "invitation_organizationId_idx",
-          "columns": [
-            "organization_id"
-          ],
-          "isUnique": false
-        },
-        "invitation_email_idx": {
-          "name": "invitation_email_idx",
-          "columns": [
-            "email"
-          ],
-          "isUnique": false
-        }
-      },
-      "foreignKeys": {
-        "invitation_organization_id_organization_id_fk": {
-          "name": "invitation_organization_id_organization_id_fk",
-          "tableFrom": "invitation",
-          "tableTo": "organization",
-          "columnsFrom": [
-            "organization_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "invitation_inviter_id_user_id_fk": {
-          "name": "invitation_inviter_id_user_id_fk",
-          "tableFrom": "invitation",
-          "tableTo": "user",
-          "columnsFrom": [
-            "inviter_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "member": {
-      "name": "member",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "organization_id": {
-          "name": "organization_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "role": {
-          "name": "role",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'member'"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        }
-      },
-      "indexes": {
-        "member_organizationId_idx": {
-          "name": "member_organizationId_idx",
-          "columns": [
-            "organization_id"
-          ],
-          "isUnique": false
-        },
-        "member_userId_idx": {
-          "name": "member_userId_idx",
-          "columns": [
-            "user_id"
-          ],
-          "isUnique": false
-        },
-        "member_one_external_family_uidx": {
-          "name": "member_one_external_family_uidx",
-          "columns": [
-            "user_id"
-          ],
-          "isUnique": true,
-          "where": "\"member\".\"role\" = 'member'"
-        },
-        "member_organization_id_user_id_uidx": {
-          "name": "member_organization_id_user_id_uidx",
-          "columns": [
-            "organization_id",
-            "user_id"
-          ],
-          "isUnique": true
-        }
-      },
-      "foreignKeys": {
-        "member_organization_id_organization_id_fk": {
-          "name": "member_organization_id_organization_id_fk",
-          "tableFrom": "member",
-          "tableTo": "organization",
-          "columnsFrom": [
-            "organization_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "member_user_id_user_id_fk": {
-          "name": "member_user_id_user_id_fk",
-          "tableFrom": "member",
-          "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {
-        "member_single_role_check": {
-          "name": "member_single_role_check",
-          "value": "\"member\".\"role\" in ('owner', 'member')"
-        }
-      }
-    },
-    "organization": {
-      "name": "organization",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "slug": {
-          "name": "slug",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "logo": {
-          "name": "logo",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "metadata": {
-          "name": "metadata",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "personal_owner_user_id": {
-          "name": "personal_owner_user_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        }
-      },
-      "indexes": {
-        "organization_personal_owner_user_id_unique": {
-          "name": "organization_personal_owner_user_id_unique",
-          "columns": [
-            "personal_owner_user_id"
-          ],
-          "isUnique": true
-        },
-        "organization_slug_uidx": {
-          "name": "organization_slug_uidx",
-          "columns": [
-            "slug"
-          ],
-          "isUnique": true
-        }
-      },
-      "foreignKeys": {
-        "organization_personal_owner_user_id_user_id_fk": {
-          "name": "organization_personal_owner_user_id_user_id_fk",
-          "tableFrom": "organization",
-          "tableTo": "user",
-          "columnsFrom": [
-            "personal_owner_user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "restrict",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "projects": {
-      "name": "projects",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "owner_user_id": {
-          "name": "owner_user_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "CURRENT_TIMESTAMP"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "CURRENT_TIMESTAMP"
-        }
-      },
-      "indexes": {
-        "projects_owner_user_id_idx": {
-          "name": "projects_owner_user_id_idx",
-          "columns": [
-            "owner_user_id"
-          ],
-          "isUnique": false
-        }
-      },
-      "foreignKeys": {
-        "projects_owner_user_id_user_id_fk": {
-          "name": "projects_owner_user_id_user_id_fk",
-          "tableFrom": "projects",
-          "tableTo": "user",
-          "columnsFrom": [
-            "owner_user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "restrict",
-          "onUpdate": "no action"
-        }
-      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}

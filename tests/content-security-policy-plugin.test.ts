@@ -22,11 +22,15 @@ describe('browser provider CSP plugin', () => {
     runtimeMocks.getAppRuntimeConfig.mockReset()
   })
 
-  it('registers the documented hook and extends only the enabled provider directives', async () => {
+  it('registers the documented hook and unconditionally extends the provider directives', async () => {
     runtimeMocks.getAppRuntimeConfig.mockReturnValue({
-      modules: {
-        observability: { enabled: true },
-        turnstile: { enabled: true }
+      files: { driver: 'r2' },
+      cloudflare: {
+        accountId: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+        r2: {
+          bucket: 'private-files',
+          endpoint: 'https://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.r2.cloudflarestorage.com'
+        }
       },
       public: { sentryDsn: 'https://public-key@o123.ingest.sentry.io/456' }
     })
@@ -52,7 +56,11 @@ describe('browser provider CSP plugin', () => {
 
     expect(routeRules['/**']?.headers?.contentSecurityPolicy).toEqual({
       ...base,
-      'connect-src': ["'self'", 'https://o123.ingest.sentry.io'],
+      'connect-src': [
+        "'self'",
+        'https://o123.ingest.sentry.io',
+        'https://private-files.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.r2.cloudflarestorage.com'
+      ],
       'frame-src': ['https://challenges.cloudflare.com'],
       'script-src': ["'self'", "'strict-dynamic'", "'nonce-{{nonce}}'", 'https://challenges.cloudflare.com']
     })

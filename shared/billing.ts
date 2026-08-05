@@ -8,9 +8,23 @@ export const billingOfferingKeys = Object.freeze([
   'family.annual'
 ] as const)
 
+export const stripeSubscriptionStatuses = Object.freeze([
+  'active',
+  'canceled',
+  'incomplete',
+  'incomplete_expired',
+  'past_due',
+  'paused',
+  'trialing',
+  'unpaid'
+] as const)
+export const billingSnapshotStatuses = Object.freeze(['none', ...stripeSubscriptionStatuses, 'ambiguous'] as const)
+
 export type BillingPlan = (typeof billingPlans)[number]
 export type BillingCadence = (typeof billingCadences)[number]
 export type BillingOfferingKey = (typeof billingOfferingKeys)[number]
+export type StripeSubscriptionStatus = (typeof stripeSubscriptionStatuses)[number]
+export type BillingSnapshotStatus = (typeof billingSnapshotStatuses)[number]
 
 export type BillingOfferingDefinition = Readonly<{
   key: BillingOfferingKey
@@ -24,42 +38,28 @@ function deriveOfferingDefinition(key: BillingOfferingKey): BillingOfferingDefin
 }
 
 export const billingOfferingDefinitions = Object.freeze(billingOfferingKeys.map(deriveOfferingDefinition))
-
-const billingOfferingDefinitionByKey = new Map(
-  billingOfferingDefinitions.map((definition) => [definition.key, definition] as const)
-)
+const offeringByKey = new Map(billingOfferingDefinitions.map((offering) => [offering.key, offering] as const))
 
 export function isBillingOfferingKey(value: string): value is BillingOfferingKey {
-  return billingOfferingDefinitionByKey.has(value as BillingOfferingKey)
+  return offeringByKey.has(value as BillingOfferingKey)
 }
 
 export function getBillingOffering(value: string): BillingOfferingDefinition | null {
-  return billingOfferingDefinitionByKey.get(value as BillingOfferingKey) ?? null
+  return offeringByKey.get(value as BillingOfferingKey) ?? null
 }
 
-export type BillingRelationship = 'independent' | 'manager' | 'member'
-export type BillingEntitlementSource = 'personal' | 'manager' | 'family' | null
 export type BillingSubscriptionState =
   'none' | 'active' | 'grace' | 'suspended' | 'terminal' | 'reconciliation_required'
-export type BillingEntitlementState = BillingSubscriptionState
 export type BillingTransitionKind = 'cadence_change' | 'personal_to_family' | 'family_to_personal'
 export type BillingTransitionState = 'pending' | 'action_required' | 'scheduled' | 'reconciliation_required'
 
-export type BillingAccountState = Readonly<{
+export type BillingStripePurchaserState = Readonly<{
   catalog: readonly BillingOfferingDefinition[]
-  relationship: Readonly<{
-    kind: BillingRelationship
-  }>
-  entitlement: Readonly<{
-    granted: boolean
-    source: BillingEntitlementSource
-    state: BillingEntitlementState
-    plan: BillingPlan | null
-    cadence: BillingCadence | null
-  }>
+  deletionPending: boolean
   subscription: Readonly<{
     provider: 'Stripe'
     state: BillingSubscriptionState
+    offering: BillingOfferingKey | null
     plan: BillingPlan | null
     cadence: BillingCadence | null
     currentPeriodEnd: string | null
@@ -73,30 +73,10 @@ export type BillingAccountState = Readonly<{
     effectiveAt: string | null
     state: BillingTransitionState
   }> | null
-  seats: Readonly<{
-    accepted: number
-    reserved: number
-    capacity: number
-  }> | null
-  members:
-    | readonly Readonly<{
-        reference: string
-        name: string
-        email: string
-      }>[]
-    | null
   capabilities: Readonly<{
     canCheckout: boolean
     canChange: boolean
     canManage: boolean
     canReconcile: boolean
-    canLeaveFamily: boolean
-    canCreateFamilyInvitation: boolean
-    canResendFamilyInvitation: boolean
-    canAcceptFamilyInvitation: boolean
-    canAddFamilyMember: boolean
-    canRemoveFamilyMember: boolean
   }>
 }>
-
-export const familyPlanKey = 'family' as const satisfies BillingPlan

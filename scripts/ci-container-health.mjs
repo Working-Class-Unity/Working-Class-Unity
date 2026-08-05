@@ -16,31 +16,35 @@ const objectValue = `object-${randomBytes(8).toString('hex')}`
 const knownGoodBackup = '/app/data/backups/container-known-good.db'
 const corruptBackup = '/app/data/backups/container-corrupt.db'
 const applicationEnvironment = {
+  CI: 'true',
   NUXT_DATABASE_URL: 'file:/app/data/app.db',
   NUXT_READINESS_TOKEN: readinessToken,
   NUXT_BETTER_AUTH_SECRET: authSecret,
   NUXT_BETTER_AUTH_URL: 'http://127.0.0.1:3000',
-  NUXT_SOCIAL_PROVIDERS_GOOGLE_ENABLED: 'false',
-  NUXT_EMAIL_TRANSPORT: 'smtp',
+  NUXT_EMAIL_TRANSPORT: 'resend',
   NUXT_EMAIL_FROM: 'baseline@example.test',
-  NUXT_EMAIL_SMTP_HOST: 'smtp.example.test',
-  NUXT_EMAIL_SMTP_PORT: '465',
-  NUXT_EMAIL_SMTP_SECURITY: 'tls',
-  NUXT_EMAIL_SMTP_USERNAME: 'container-ci-user',
-  NUXT_EMAIL_SMTP_PASSWORD: 'container-ci-password-not-a-credential',
+  NUXT_EMAIL_RESEND_API_KEY: 're_container_health_not_a_provider_credential',
   NUXT_PUBLIC_APP_URL: 'http://127.0.0.1:3000',
-  NUXT_MODULES_BILLING_ENABLED: 'false',
-  NUXT_MODULES_FILES_ENABLED: 'false',
-  NUXT_MODULES_AI_ENABLED: 'false',
-  NUXT_OPENAI_FILE_SEARCH_ENABLED: 'false',
-  NUXT_OPENAI_WEB_SEARCH_ENABLED: 'false',
-  NUXT_MODULES_TURNSTILE_ENABLED: 'false',
-  NUXT_MODULES_OBSERVABILITY_ENABLED: 'true',
+  NUXT_STRIPE_SECRET_KEY: 'rk_test_container_health_not_a_provider_credential',
+  NUXT_STRIPE_WEBHOOK_SECRET: 'whsec_container_health_not_a_provider_credential',
+  NUXT_STRIPE_PORTAL_CONFIGURATION_ID: 'bpc_container_health',
+  NUXT_STRIPE_PERSONAL_WEEKLY_PRICE_ID: 'price_container_personal_weekly',
+  NUXT_STRIPE_PERSONAL_MONTHLY_PRICE_ID: 'price_container_personal_monthly',
+  NUXT_STRIPE_PERSONAL_ANNUAL_PRICE_ID: 'price_container_personal_annual',
+  NUXT_STRIPE_FAMILY_MONTHLY_PRICE_ID: 'price_container_family_monthly',
+  NUXT_STRIPE_FAMILY_ANNUAL_PRICE_ID: 'price_container_family_annual',
+  NUXT_FILES_DRIVER: 'local',
+  NUXT_OPENAI_API_KEY: 'container-openai-key-not-a-provider-credential',
+  NUXT_OPENAI_PROJECT_ID: 'proj_container_health',
+  NUXT_OPENAI_MODEL: 'gpt-5.6-luna',
+  NUXT_OPENAI_FILE_SEARCH_VECTOR_STORE_ID: 'vs_container_empty',
+  NUXT_OPENAI_WEB_SEARCH_ALLOWED_DOMAINS: 'example.test',
+  NUXT_CLOUDFLARE_TURNSTILE_SECRET_KEY: 'container-turnstile-secret-not-a-provider-credential',
+  NUXT_PUBLIC_TURNSTILE_SITE_KEY: 'container-turnstile-site-not-a-provider-credential',
   NUXT_SENTRY_DSN: 'http://public@127.0.0.1:9/1',
   NUXT_PUBLIC_SENTRY_DSN: 'http://public@127.0.0.1:9/1',
   NUXT_SENTRY_TRACES_SAMPLE_RATE: '0',
-  NUXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE: '0',
-  NUXT_MODULES_JOBS_ENABLED: 'false'
+  NUXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE: '0'
 }
 const maintenanceEnvironment = {
   NUXT_DATABASE_URL: applicationEnvironment.NUXT_DATABASE_URL
@@ -84,13 +88,13 @@ async function run() {
   })
   const freshMigration = await runMaintenance(['migrate', '--confirm-app-stopped'], 'fresh named-volume migration')
   assert(
-    freshMigration.stdout.includes('4 newly applied; 4/4 current; pre-migration backup not required'),
-    'Fresh migration did not report the exact four-entry package and no-backup boundary'
+    freshMigration.stdout.includes('1 newly applied; 1/1 current; pre-migration backup not required'),
+    'Fresh migration did not report the exact one-entry package and no-backup boundary'
   )
   const repeatMigration = await runMaintenance(['migrate', '--confirm-app-stopped'], 'repeat named-volume migration')
   assert(
-    repeatMigration.stdout.includes('0 newly applied; 4/4 current; pre-migration backup written as'),
-    'Repeat migration did not report the exact four-entry package and verified pre-migration backup'
+    repeatMigration.stdout.includes('0 newly applied; 1/1 current; pre-migration backup written as'),
+    'Repeat migration did not report the exact one-entry package and verified pre-migration backup'
   )
   await runOffHostFailure(['backup'], {
     label: 'credential-free off-host backup operator'

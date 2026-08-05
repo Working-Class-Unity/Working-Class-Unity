@@ -2,19 +2,12 @@ import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
-import { assertFamilyAccountActionsJourney } from './family-account-actions-journey.mjs'
-import { assertFamilyBillingJourney } from './family-billing-journey.mjs'
 import { assertIdentityAccountJourney } from './identity-account-journey.mjs'
-import { assertWorkspaceInvitationJourney } from './invitation-journey.mjs'
-import { assertPrivateProjectJourney, assertRealProjectSuccessJourney } from './private-project-journey.mjs'
-import { assertProjectBoundaryJourney } from './project-boundary-journey.mjs'
 
 const runtimeName = requiredEnvironment('BROWSER_RUNTIME_APP_NAME')
 const runtimeUrl = requiredEnvironment('BROWSER_RUNTIME_APP_URL')
 const runtimeAuthSecret = requiredEnvironment('BROWSER_RUNTIME_AUTH_SECRET')
 const runtimeDatabase = requiredEnvironment('BROWSER_RUNTIME_DATABASE_PATH')
-const runtimeGoogleClientId = requiredEnvironment('BROWSER_RUNTIME_GOOGLE_CLIENT_ID')
-const runtimeGoogleClientSecret = requiredEnvironment('BROWSER_RUNTIME_GOOGLE_CLIENT_SECRET')
 const runtimeReadinessToken = requiredEnvironment('BROWSER_RUNTIME_READINESS_TOKEN')
 const buildName = requiredEnvironment('BROWSER_BUILD_APP_NAME')
 const buildUrl = requiredEnvironment('BROWSER_BUILD_APP_URL')
@@ -25,19 +18,80 @@ const runtimeStripeSecret = requiredEnvironment('BROWSER_RUNTIME_STRIPE_SECRET')
 const runtimeStripeWebhookSecret = requiredEnvironment('BROWSER_RUNTIME_STRIPE_WEBHOOK_SECRET')
 const authEmailMarker = requiredEnvironment('BROWSER_AUTH_EMAIL_MARKER')
 const emailCaptureDirectory = requiredEnvironment('BROWSER_EMAIL_CAPTURE_DIRECTORY')
+const runtimeSentryOrigin = requiredEnvironment('BROWSER_RUNTIME_SENTRY_ORIGIN')
+const turnstileOrigin = 'https://challenges.cloudflare.com'
+const turnstileScriptUrl = `${turnstileOrigin}/turnstile/v0/api.js?render=explicit`
+const sentryEnvelopePath = '/api/1/envelope/'
 const maxCaptureFileBytes = 65_536
 const maxCaptureFiles = 64
 const intentionalManifestNavigations = new WeakMap()
-const expectedModuleStates = {
-  ai: 'disabled',
-  billing: 'ready',
-  files: 'disabled',
-  jobs: 'ready',
-  observability: 'disabled',
-  turnstile: 'disabled'
+
+if (new URL(runtimeSentryOrigin).origin !== runtimeSentryOrigin) {
+  throw new Error('BROWSER_RUNTIME_SENTRY_ORIGIN must be an exact origin')
 }
 
-test('home presents the personal foundation and preserves client navigation', async ({ page }) => {
+test.beforeEach(async ({ context }) => {
+  await context.route(`${turnstileOrigin}/**`, async (route) => {
+    if (route.request().method() !== 'GET' || route.request().url() !== turnstileScriptUrl) {
+      throw new Error('The Turnstile browser fixture received an unexpected request')
+    }
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/javascript',
+      body: isolatedTurnstileBrowserSource
+    })
+  })
+  await context.route(`${runtimeSentryOrigin}/**`, async (route) => {
+    const request = route.request()
+    const url = new URL(request.url())
+    if (request.method() !== 'POST' || url.origin !== runtimeSentryOrigin || url.pathname !== sentryEnvelopePath) {
+      throw new Error('The Sentry browser fixture received an unexpected request')
+    }
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      headers: { 'access-control-allow-origin': new URL(runtimeUrl).origin },
+      body: '{}'
+    })
+  })
+})
+
+const isolatedTurnstileBrowserSource = `
+(() => {
+  const widgets = new Map()
+  let nextWidgetId = 0
+  const complete = (widgetId) => queueMicrotask(() => {
+    const options = widgets.get(widgetId)
+    if (options) options.callback('isolated-turnstile-' + crypto.randomUUID())
+  })
+
+  window.turnstile = Object.freeze({
+    render(container, options) {
+      if (
+        !(container instanceof HTMLElement) ||
+        !String(options?.sitekey || '').startsWith('isolated-turnstile-') ||
+        options?.action !== 'auth_magic_link' ||
+        typeof options?.callback !== 'function'
+      ) {
+        throw new Error('Invalid isolated Turnstile widget configuration')
+      }
+      const widgetId = 'isolated-turnstile-widget-' + String(++nextWidgetId)
+      widgets.set(widgetId, options)
+      complete(widgetId)
+      return widgetId
+    },
+    reset(widgetId) {
+      if (!widgets.has(widgetId)) throw new Error('Unknown isolated Turnstile widget')
+      complete(widgetId)
+    },
+    remove(widgetId) {
+      widgets.delete(widgetId)
+    }
+  })
+})()
+`
+
+test('home presents the WCU foundation and preserves client navigation', async ({ page }) => {
   const observations = observePage(page)
   await page.route(
     `${runtimeUrl}/`,
@@ -53,8 +107,12 @@ test('home presents the personal foundation and preserves client navigation', as
   )
   const response = await page.goto('/')
   await assertContentSecurityPolicy(page, response, observations)
-  await expect(page.getByRole('heading', { name: 'A simple, private place to begin.' })).toBeVisible()
-  await expect(page.getByText('Your data stays yours', { exact: true })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Welcome to Working Class Unity.' })).toBeVisible()
+  await expect(
+    page.getByText('The WCU website is being rebuilt. Create an account or log in with an email magic link.', {
+      exact: true
+    })
+  ).toBeVisible()
   await expect(page.locator('.brand')).toContainText(runtimeName)
   await expect(page.locator('.brand')).toHaveAttribute('aria-current', 'page')
   await expect(page).toHaveTitle('Home')
@@ -63,9 +121,11 @@ test('home presents the personal foundation and preserves client navigation', as
   await assertAccessibleWithoutOverflow(page)
 
   const skipLink = page.getByRole('link', { name: 'Skip to main content' })
+  const primaryNavigation = page.getByRole('navigation', { name: 'Primary' })
   await assertMinimumTargetSize(page.locator('.brand'))
-  await assertMinimumTargetSize(page.getByRole('link', { name: 'App', exact: true }))
-  await assertMinimumTargetSize(page.getByRole('link', { name: 'Get started', exact: true }))
+  await assertMinimumTargetSize(primaryNavigation.getByRole('link', { name: 'Log in', exact: true }))
+  await assertMinimumTargetSize(primaryNavigation.getByRole('link', { name: 'Sign up', exact: true }))
+  await assertMinimumTargetSize(page.getByRole('link', { name: 'Create account', exact: true }))
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.keyboard.press('Tab')
   await expect(skipLink).toBeFocused()
@@ -78,11 +138,15 @@ test('home presents the personal foundation and preserves client navigation', as
   await expect(page.locator('#main-content')).toBeFocused()
 
   const timeOrigin = await page.evaluate(() => performance.timeOrigin)
-  await page.getByRole('link', { name: 'Get started', exact: true }).click()
+  await page.getByRole('link', { name: 'Create account', exact: true }).click()
   await expect(page).toHaveURL(/\/signup$/)
   await expect(page.getByRole('heading', { name: 'Create your account' })).toBeVisible()
+  await expect(page.getByRole('textbox', { name: 'Display name', exact: true })).toBeVisible()
   await expect(page.getByRole('link', { name: 'Sign up', exact: true })).toHaveAttribute('aria-current', 'page')
   await expect(page).toHaveTitle('Sign up')
+  await expect(page.getByLabel('Security check')).toBeVisible()
+  await expect(page.locator(`script[src="${turnstileScriptUrl}"]`)).toHaveCount(1)
+  await expect(page.getByText('Security check complete.', { exact: true })).toBeVisible()
   expect(await page.evaluate(() => performance.timeOrigin)).toBe(timeOrigin)
   await page.setViewportSize({ width: 320, height: 800 })
   await assertNoHorizontalOverflow(page)
@@ -94,7 +158,7 @@ test('home presents the personal foundation and preserves client navigation', as
   await assertCleanPage(page, observations)
 })
 
-test('login is accessible before and after requesting a magic link', async ({ page }, testInfo) => {
+test('login is accessible before and after requesting a magic link', async ({ page }) => {
   test.setTimeout(35_000)
   const observations = observePage(page)
   await page.goto('/login')
@@ -103,92 +167,45 @@ test('login is accessible before and after requesting a magic link', async ({ pa
   await expect(page).toHaveTitle('Log in')
   await assertRuntimePublicConfig(page)
   const emailInput = page.getByRole('textbox', { name: 'Email', exact: true })
+  const displayNameInput = page.getByRole('textbox', { name: 'Display name', exact: true })
+  await expect(displayNameInput).toBeVisible()
   await expect(emailInput).toBeVisible()
   await expect(page.locator('input[type="password"]')).toHaveCount(0)
   await expect(page.locator('.mode-tabs')).toHaveCount(0)
   await expect(page.getByRole('button', { name: 'Continue with Google' })).toHaveCount(0)
   await expect(page.getByRole('button', { name: /^Account menu for / })).toHaveCount(0)
-  await expect(page.getByLabel('Security check')).toHaveCount(0)
-  await expect(page.locator('script[src*="challenges.cloudflare.com/turnstile"]')).toHaveCount(0)
+  await expect(page.getByLabel('Security check')).toBeVisible()
+  await expect(page.locator(`script[src="${turnstileScriptUrl}"]`)).toHaveCount(1)
+  await expect(page.getByText('Security check complete.', { exact: true })).toBeVisible()
   const submitButton = page.getByRole('button', { name: 'Send email link' })
   await expect(submitButton).toBeEnabled()
   await assertMinimumTargetSize(emailInput)
+  await assertMinimumTargetSize(displayNameInput)
   await assertMinimumTargetSize(submitButton)
   await assertControlBoundaryContrast(emailInput)
   await assertAccessibleWithoutOverflow(page)
 
+  await displayNameInput.fill('Browser Login')
   await emailInput.fill('browser.magic-link@example.test')
   await submitButton.click()
   await expect(page.locator('#login-form-status[role="status"]')).toHaveText(
     'If you can receive email at that address, a sign-in link is on its way.'
   )
+  await expect(page.getByText('Security check complete.', { exact: true })).toBeVisible()
   await expect(page.locator('input[type="password"]')).toHaveCount(0)
   await expect(page.locator('.mode-tabs')).toHaveCount(0)
   await assertAccessibleWithoutOverflow(page)
   await assertCleanPage(page, observations)
-
-  await assertEnabledGoogleSignInHandoff(page.context())
-  await assertSignedInAccountMenuAndGoogleUnlink(page.context(), testInfo.project.name)
 })
 
-test('identity, account, billing, invitation, and project journeys stay accessible', async ({
-  context,
-  page
-}, testInfo) => {
-  test.setTimeout(120_000)
+test('identity and account journeys stay accessible', async ({ context, page }) => {
+  test.setTimeout(60_000)
   await assertIdentityAccountJourney(context, {
     assertAccessibleWithoutOverflow,
     assertCleanPage,
     fulfillJson,
-    observePage,
-    removeExpectedHttpFailure
+    observePage
   })
-  await assertFamilyAccountActionsJourney(context, {
-    assertAccessibleWithoutOverflow,
-    assertNoHorizontalOverflow,
-    assertCleanPage,
-    fulfillJson,
-    observePage,
-    removeExpectedHttpFailure
-  })
-  await assertFamilyBillingJourney(
-    context,
-    {
-      assertAccessibleWithoutOverflow,
-      assertNoHorizontalOverflow,
-      assertCleanPage,
-      fulfillJson,
-      observePage,
-      removeExpectedHttpFailure,
-      removeExpectedConsoleFailures
-    },
-    testInfo.project.name
-  )
-  await assertWorkspaceInvitationJourney(context, {
-    assertAccessibleWithoutOverflow,
-    assertCleanPage,
-    fulfillJson,
-    observePage,
-    removeExpectedHttpFailure
-  })
-  if (testInfo.project.name === 'desktop-chromium') {
-    await assertPrivateProjectJourney(context, {
-      assertAccessibleWithoutOverflow,
-      assertNoHorizontalOverflow,
-      assertCleanPage,
-      fulfillJson,
-      observePage,
-      removeExpectedHttpFailure
-    })
-    await assertProjectBoundaryJourney(context, {
-      assertAccessibleWithoutOverflow,
-      assertCleanPage,
-      fulfillJson,
-      observePage,
-      removeExpectedHttpFailure
-    })
-  }
-
   const retiredAuthResponse = await page.goto('/auth')
   expect(retiredAuthResponse?.status()).toBe(404)
   await expect(page.getByRole('heading', { name: 'Page not found' })).toBeVisible()
@@ -196,10 +213,10 @@ test('identity, account, billing, invitation, and project journeys stay accessib
   await expect(page.getByText('Browser Social User', { exact: true })).toHaveCount(0)
 })
 
-test('signed-out private routes reach login before project data is requested', async ({ page }) => {
+test('signed-out private routes reach login before private data is requested', async ({ page }) => {
   const observations = observePage(page)
 
-  for (const path of ['/app', '/app/projects', '/app/projects/project_private']) {
+  for (const path of ['/app', '/account']) {
     const response = await page.goto(path)
     expect(response?.status()).toBe(200)
     await expect(page).toHaveURL(/\/login$/)
@@ -208,8 +225,6 @@ test('signed-out private routes reach login before project data is requested', a
   }
 
   expect(observations.sameOriginRequests.some((request) => request.includes('/api/me'))).toBe(false)
-  expect(observations.sameOriginRequests.some((request) => request.includes('/api/projects'))).toBe(false)
-  await expect(page.getByRole('link', { name: 'Projects', exact: true })).toHaveCount(0)
   expect(observations.sameOriginRequests.some((request) => request.includes('/w/'))).toBe(false)
   expect(observations.sameOriginRequests.some((request) => request.includes('/api/workspaces'))).toBe(false)
   await assertAccessibleWithoutOverflow(page)
@@ -219,22 +234,28 @@ test('signed-out private routes reach login before project data is requested', a
 const privateBrowserTest = test.extend({ screenshot: 'off', trace: 'off', video: 'off' })
 
 privateBrowserTest(
-  'real magic-link login reaches initial and hydrated app and account views',
+  'real magic-link signup preserves the display name through app and account views',
   async ({ page }, testInfo) => {
     testInfo.setTimeout(45_000)
     const observations = observePage(page)
     const project = testInfo.project.name.replaceAll(/[^a-z0-9]/gi, '-').toLowerCase()
     const email = `browser.login+${project}.${authEmailMarker}@example.test`
+    const displayName = `Browser ${testInfo.project.name}`
     const clientAddress = testInfo.project.name === 'desktop-chromium' ? '192.0.2.10' : '192.0.2.11'
 
     await page.setExtraHTTPHeaders({ 'cf-connecting-ip': clientAddress })
 
-    await page.goto('/login')
+    await page.goto('/signup')
     await page.waitForLoadState('networkidle')
     const manifestUrl = await nuxtManifestUrl(page)
+    await page.getByRole('textbox', { name: 'Display name', exact: true }).fill(displayName)
     await page.getByRole('textbox', { name: 'Email', exact: true }).fill(email)
-    await page.getByRole('button', { name: 'Send email link' }).click()
-    await expect(page.locator('#login-form-status[role="status"]')).toBeVisible()
+    await expect(page.getByText('Security check complete.', { exact: true })).toBeVisible()
+    const sendEmailLink = page.getByRole('button', { name: 'Send email link' })
+    await expect(sendEmailLink).toBeEnabled()
+    await sendEmailLink.click()
+    await expect(page.locator('#signup-form-status[role="status"]')).toBeVisible()
+    await expect(page.getByText('Security check complete.', { exact: true })).toBeVisible()
 
     let magicLink
     await expect
@@ -250,12 +271,13 @@ privateBrowserTest(
     expect(appResponse.status()).toBe(200)
     expect(appResponse.url()).toBe(`${runtimeUrl}/app`)
     expect(appResponse.headers()['cache-control']).toBe('private, no-store')
-    expect(appHtml.includes('Your private app is ready.'), 'initial app HTML contains the personal shell').toBe(true)
+    expect(appHtml.includes('Your WCU account is ready.'), 'initial app HTML contains the WCU shell').toBe(true)
     expect(appHtml.includes(email), 'initial app HTML contains the authenticated identity').toBe(true)
+    expect(appHtml.includes(displayName), 'initial app HTML contains the required display name').toBe(true)
     expect(appHtml.includes('/w/'), 'initial app HTML excludes visible workspace navigation').toBe(false)
     expect(appHtml.includes('activeOrganizationId'), 'initial app HTML excludes active-organization state').toBe(false)
-    await expect(page.getByText('Your app', { exact: true })).toBeVisible()
-    await expect(page.getByRole('heading', { name: /Welcome back/ })).toBeVisible()
+    await expect(page.getByText('Your WCU account is ready.', { exact: true })).toBeVisible()
+    await expect(page.getByRole('heading', { name: `Welcome back, ${displayName}` })).toBeVisible()
     await expect(page.getByText(`Signed in as ${email}`, { exact: true })).toBeVisible()
     await expect(page.getByRole('button', { name: /^Account menu for / })).toBeVisible()
     await expect(page.getByText(/workspace/i)).toHaveCount(0)
@@ -270,7 +292,6 @@ privateBrowserTest(
     await page.waitForLoadState('networkidle')
 
     if (testInfo.project.name === 'desktop-chromium') {
-      await assertRealProjectSuccessJourney(page, { assertAccessibleWithoutOverflow }, project)
       const signedInHomeResponse = await gotoForInitialResponse(page, '/', manifestUrl)
       if (!signedInHomeResponse) throw new Error('Signed-in home navigation did not return a document response')
       const signedInHomeHtml = await signedInHomeResponse.text()
@@ -289,18 +310,18 @@ privateBrowserTest(
       expect(entryResponse.status()).toBe(200)
       expect(entryResponse.url()).toBe(`${runtimeUrl}/app`)
       expect(
-        (await entryResponse.text()).includes('Your private app is ready.'),
-        `signed-in ${signedInEntry} continues to the personal app`
+        (await entryResponse.text()).includes('Your WCU account is ready.'),
+        `signed-in ${signedInEntry} continues to the WCU app`
       ).toBe(true)
       await expect(page.getByText(`Signed in as ${email}`, { exact: true })).toBeVisible()
       await page.waitForLoadState('networkidle')
     }
 
-    const accountResponse = await gotoForInitialResponse(page, '/account', manifestUrl)
+    const accountResponse = await gotoForInitialResponse(page, '/account?checkout=success', manifestUrl)
     if (!accountResponse) throw new Error('Account navigation did not return a document response')
     const accountHtml = await accountResponse.text()
     expect(accountResponse.status()).toBe(200)
-    expect(accountResponse.url()).toBe(`${runtimeUrl}/account`)
+    expect(accountResponse.url()).toBe(`${runtimeUrl}/account?checkout=success`)
     expect(accountResponse.headers()['cache-control']).toBe('private, no-store')
     expect(
       {
@@ -316,28 +337,15 @@ privateBrowserTest(
     ).toBe(false)
     await expect(page.getByRole('heading', { name: 'Account', exact: true, level: 1 })).toBeVisible()
     await expect(page.getByText(email, { exact: true })).toBeVisible()
+    await expect(page.getByText(displayName, { exact: true })).toBeVisible()
     await expect(page.getByRole('button', { name: /^Account menu for / })).toBeVisible()
     await page.waitForLoadState('networkidle')
 
-    const billingStateResponsePromise = page.waitForResponse((response) => {
-      const url = new URL(response.url())
-      return response.request().method() === 'GET' && url.pathname === '/api/account/billing'
-    })
     const deletionAccountResponse = await gotoForInitialResponse(page, '/account', manifestUrl)
     if (!deletionAccountResponse) throw new Error('Deletion navigation did not return an account document response')
     expect(deletionAccountResponse.status()).toBe(200)
     expect(deletionAccountResponse.url()).toBe(`${runtimeUrl}/account`)
-    const billingStateResponse = await billingStateResponsePromise
-    expect(billingStateResponse.status()).toBe(200)
-    const billingState = await billingStateResponse.json()
-    expect(billingState.relationship).toEqual({ kind: 'independent' })
-    expect(billingState.seats).toBeNull()
-    expect(billingState.members).toBeNull()
     await page.waitForFunction(() => window.useNuxtApp?.().isHydrating === false)
-    await expect(page.getByRole('heading', { name: 'Billing', exact: true, level: 2 })).toBeVisible()
-    await expect(page.getByRole('link', { name: 'View billing', exact: true })).toBeVisible()
-    await expect(page.locator('#family-access')).toHaveCount(0)
-    await expect(page.getByRole('heading', { name: 'Share access', exact: true })).toHaveCount(0)
     await page.getByRole('textbox', { name: 'Type DELETE to confirm' }).fill('DELETE')
     const deleteAccount = page.getByRole('button', { name: 'Delete account', exact: true })
     await expect(deleteAccount).toBeEnabled()
@@ -359,34 +367,20 @@ privateBrowserTest(
   }
 )
 
-test('disabled observability route returns a not-found boundary without provider calls', async ({ page }) => {
+test('observability route is active without sending a missing token', async ({ page }) => {
   const observations = observePage(page)
-  const observabilityResponse = await page.goto('/observability-client-test#token=disabled-token-must-not-be-sent')
-  expect(observabilityResponse?.status()).toBe(404)
-  expect(await observabilityResponse?.text()).toContain('MODULE_DISABLED')
-  await expect(page).toHaveURL(/#token=disabled-token-must-not-be-sent$/)
-  await expect(page.getByRole('main')).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Module unavailable' })).toBeVisible()
-  await expect(page.getByText('MODULE_DISABLED', { exact: true })).toBeVisible()
-  await expect(page).toHaveTitle(`Module unavailable | ${runtimeName}`)
+  const observabilityResponse = await page.goto('/observability-client-test')
+  expect(observabilityResponse?.status()).toBe(200)
+  await expect(page.getByRole('heading', { name: 'Client Event Test' })).toBeVisible()
+  await expect(page.getByText('Missing token hash.', { exact: true })).toBeVisible()
+  await expect(page).toHaveTitle('Observability test')
   await expect(page.locator('script[src*="challenges.cloudflare.com/turnstile"]')).toHaveCount(0)
   await assertAccessibleWithoutOverflow(page)
-  expect(observations.sameOriginRequests.filter((request) => request.includes('/api/auth'))).toEqual([])
+  expect(observations.sameOriginRequests.filter((request) => request.includes('/api/auth'))).toEqual([
+    `GET ${runtimeUrl}/api/auth/get-session`
+  ])
   expect(observations.sameOriginRequests.filter((request) => request.includes('/api/account/billing'))).toEqual([])
   expect(observations.sameOriginRequests.filter((request) => request.includes('/api/observability'))).toEqual([])
-  const expectedNotFoundResponses = observations.errorResponses.filter(
-    (response) => response.includes('GET 404') && response.includes('/observability-client-test')
-  )
-  expect(expectedNotFoundResponses).toHaveLength(1)
-  const expectedNotFoundConsole = observations.console.filter(
-    (message) =>
-      message === 'error: Failed to load resource: the server responded with a status of 404 (Module disabled)'
-  )
-  expect(expectedNotFoundConsole).toHaveLength(1)
-  observations.errorResponses = observations.errorResponses.filter(
-    (response) => !expectedNotFoundResponses.includes(response)
-  )
-  observations.console = observations.console.filter((message) => !expectedNotFoundConsole.includes(message))
   await assertCleanPage(page, observations)
 })
 
@@ -440,17 +434,17 @@ async function assertContentSecurityPolicy(page, response, observations) {
   expect(headers['content-security-policy-report-only']).toBeUndefined()
   expect(normalizedContentSecurityPolicy(policy)).toEqual({
     'base-uri': ["'none'"],
-    'connect-src': ["'self'"],
+    'connect-src': ["'self'", runtimeSentryOrigin].sort(),
     'default-src': ["'none'"],
     'font-src': ["'self'", 'data:'].sort(),
     'form-action': ["'self'"],
     'frame-ancestors': ["'none'"],
-    'frame-src': ["'none'"],
+    'frame-src': [turnstileOrigin],
     'img-src': ["'self'", 'data:'].sort(),
     'manifest-src': ["'self'"],
     'media-src': ["'self'"],
     'object-src': ["'none'"],
-    'script-src': ["'self'", "'strict-dynamic'", `'nonce-${nonce}'`].sort(),
+    'script-src': ["'self'", "'strict-dynamic'", `'nonce-${nonce}'`, turnstileOrigin].sort(),
     'script-src-attr': ["'none'"],
     'style-src': ["'self'", `'nonce-${nonce}'`].sort(),
     'style-src-attr': ["'unsafe-inline'"],
@@ -541,14 +535,9 @@ async function assertRuntimePublicConfig(page) {
   expect(configSource).not.toContain(runtimeReadinessToken)
   expect(configSource).not.toContain(buildReadinessToken)
   expect(configSource).not.toContain(runtimeDatabase)
-  expect(configSource).not.toContain(runtimeGoogleClientId)
-  expect(configSource).not.toContain(runtimeGoogleClientSecret)
   expect(configSource).not.toContain(runtimeStripeSecret)
   expect(configSource).not.toContain(runtimeStripeWebhookSecret)
-
-  for (const [moduleId, state] of Object.entries(expectedModuleStates)) {
-    expect(configSource).toContain(`${moduleId}:${JSON.stringify(state)}`)
-  }
+  expect(configSource).not.toContain('moduleStates')
 }
 
 async function runtimeConfigSource(page) {
@@ -567,379 +556,12 @@ async function nuxtManifestUrl(page) {
   return new URL(`/_nuxt/builds/meta/${encodeURIComponent(buildId)}.json`, runtimeUrl).href
 }
 
-async function assertEnabledGoogleSignInHandoff(context) {
-  const page = await context.newPage()
-  const observations = observePage(page)
-  let signInBody
-
-  try {
-    await page.route('**/api/baseline', (route) =>
-      fulfillJson(route, {
-        socialProviders: { google: 'ready' }
-      })
-    )
-    await page.route('**/api/auth/get-session', (route) => fulfillJson(route, null))
-    await page.route('**/api/auth/sign-in/social', async (route) => {
-      signInBody = route.request().postDataJSON()
-      await fulfillJson(route, { redirect: false, url: null })
-    })
-
-    await page.goto('/')
-    await page.waitForFunction(() => window.useNuxtApp?.().isHydrating === false)
-    await page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'Log in', exact: true }).click()
-    await expect(page).toHaveURL(/\/login$/)
-    const googleButton = page.getByRole('button', { name: 'Continue with Google' })
-    await expect(googleButton).toBeVisible()
-    await googleButton.click()
-    await expect
-      .poll(() => signInBody)
-      .toEqual({
-        provider: 'google',
-        callbackURL: '/app',
-        newUserCallbackURL: '/app',
-        errorCallbackURL: '/login'
-      })
-    await expect(googleButton).toBeEnabled()
-    await assertAccessibleWithoutOverflow(page)
-    await assertCleanPage(page, observations)
-  } finally {
-    await page.close()
-  }
-}
-
-async function assertSignedInAccountMenuAndGoogleUnlink(context, projectName) {
-  const page = await context.newPage()
-  const observations = observePage(page)
-  const now = new Date().toISOString()
-  const userName = 'Browser Social User With A Deliberately Long Personal Name'
-  const userEmail = 'browser.social.with.a.long.address@example.test'
-  const organizationSentinel = 'joined-family-plan-must-not-enter-hydration'
-  const sessionTokenSentinel = 'browser-session-token-must-not-enter-hydration'
-  const userFieldSentinel = 'browser-user-image-must-not-enter-hydration'
-  let unlinkBody
-  let peerPage
-  let peerObservations
-  const signOutRequests = []
-  let accountLinked = true
-  let sessionActive = true
-  let releaseFailedSignOut
-  const failedSignOutGate = new Promise((resolve) => {
-    releaseFailedSignOut = resolve
-  })
-  const fulfillSession = (route) => {
-    if (!sessionActive) return fulfillJson(route, null)
-    return fulfillJson(route, {
-      session: {
-        id: 'browser-social-session',
-        token: sessionTokenSentinel,
-        userId: 'browser-social-user',
-        createdAt: now,
-        updatedAt: now,
-        expiresAt: new Date(Date.now() + 60_000).toISOString(),
-        ipAddress: null,
-        userAgent: null,
-        activeOrganizationId: organizationSentinel
-      },
-      user: {
-        id: 'browser-social-user',
-        name: userName,
-        email: userEmail,
-        emailVerified: true,
-        image: userFieldSentinel,
-        createdAt: now,
-        updatedAt: now
-      }
-    })
-  }
-
-  try {
-    await page.route('**/api/baseline', (route) =>
-      fulfillJson(route, {
-        socialProviders: { google: 'ready' }
-      })
-    )
-    await page.route('**/api/auth/get-session', fulfillSession)
-    await page.route('**/api/auth/list-accounts', (route) =>
-      fulfillJson(
-        route,
-        accountLinked
-          ? [
-              {
-                id: 'browser-google-account',
-                providerId: 'google',
-                accountId: 'browser-google-subject',
-                userId: 'browser-social-user',
-                scopes: ['openid', 'email'],
-                createdAt: now,
-                updatedAt: now
-              }
-            ]
-          : []
-      )
-    )
-    await page.route('**/api/invitations', (route) => fulfillJson(route, { invitations: [] }))
-    await page.route('**/api/auth/unlink-account', async (route) => {
-      unlinkBody = route.request().postDataJSON()
-      accountLinked = false
-      await fulfillJson(route, { status: true })
-    })
-    await page.route('**/api/auth/sign-out', async (route) => {
-      signOutRequests.push({
-        method: route.request().method(),
-        body: route.request().postDataJSON()
-      })
-
-      if (signOutRequests.length === 1) {
-        await failedSignOutGate
-        await route.fulfill({
-          status: 503,
-          contentType: 'application/json',
-          body: JSON.stringify({ message: 'Temporary sign-out failure' })
-        })
-        return
-      }
-
-      sessionActive = false
-      await fulfillJson(route, { success: true })
-    })
-
-    await page.goto('/')
-    const namedTrigger = page.getByRole('button', { name: `Account menu for ${userName}` })
-    const trigger = page.locator('.account-menu-trigger')
-    const accountItem = page.getByRole('menuitem', { name: 'Account', exact: true })
-    const shareItem = page.getByRole('menuitem', { name: 'Share access', exact: true })
-    const signOutItem = page.getByRole('menuitem', { name: 'Sign out', exact: true })
-    const menu = page.getByRole('menu')
-
-    await expect(namedTrigger).toBeVisible()
-    await expect(trigger).toHaveAttribute('aria-label', `Account menu for ${userName}`)
-    await expect(trigger).toHaveAttribute('aria-expanded', 'false')
-    await assertMinimumTargetSize(trigger)
-    await trigger.focus()
-    await expect(trigger).toBeFocused()
-    await assertVisibleFocusIndicator(page, trigger)
-
-    await page.keyboard.press('Enter')
-    await expect(menu).toBeVisible()
-    await expect(trigger).toHaveAttribute('aria-expanded', 'true')
-    await expect(accountItem).toBeFocused()
-    await expect(accountItem).toHaveAttribute('href', '/account')
-    await expect(shareItem).toHaveCount(0)
-    expect(await accountItem.evaluate((element) => element.tagName)).toBe('A')
-    expect(await signOutItem.evaluate((element) => element.tagName)).toBe('BUTTON')
-    await assertMinimumTargetSize(accountItem)
-    await assertMinimumTargetSize(signOutItem)
-    await page.keyboard.press('Escape')
-    await expect(menu).toBeHidden()
-    await expect(trigger).toBeFocused()
-
-    await page.keyboard.press('Space')
-    await expect(accountItem).toBeFocused()
-    await page.keyboard.press('Escape')
-    await expect(trigger).toBeFocused()
-
-    await page.keyboard.press('ArrowDown')
-    await expect(accountItem).toBeFocused()
-    await page.keyboard.press('ArrowDown')
-    await expect(signOutItem).toBeFocused()
-    await page.keyboard.press('ArrowUp')
-    await expect(accountItem).toBeFocused()
-    await page.keyboard.press('Escape')
-    await expect(trigger).toBeFocused()
-
-    await trigger.click()
-    await expect(menu).toBeVisible()
-    await expect(menu).toContainText(userName)
-    await expect(menu).toContainText(userEmail)
-    await expect(menu).not.toContainText(/workspace|organization|role|capabilit/i)
-    expect((await page.content()).includes(organizationSentinel), 'organization state is absent from hydration').toBe(
-      false
-    )
-    expect((await page.content()).includes('activeOrganizationId'), 'organization field is absent from hydration').toBe(
-      false
-    )
-    expect((await page.content()).includes(sessionTokenSentinel), 'session token is absent from hydration').toBe(false)
-    expect((await page.content()).includes(userFieldSentinel), 'unused user fields are absent from hydration').toBe(
-      false
-    )
-    await assertAccountMenuFitsViewport(page, menu)
-    await assertAccessibleWithoutOverflow(page)
-
-    const viewport = page.viewportSize()
-    expect(viewport, 'browser project has a viewport').not.toBeNull()
-    await page.mouse.click(viewport.width - 4, viewport.height - 4)
-    await expect(menu).toBeHidden()
-    await expect(trigger).toBeFocused()
-
-    if (projectName === 'desktop-chromium') {
-      await page.setViewportSize({ width: 640, height: 900 })
-      await page.evaluate(() => {
-        document.documentElement.style.fontSize = '200%'
-      })
-      await trigger.click()
-      await expect(menu).toBeVisible()
-      await assertAccountMenuFitsViewport(page, menu)
-      await assertNoHorizontalOverflow(page)
-      await page.keyboard.press('Escape')
-      await page.evaluate(() => {
-        document.documentElement.style.removeProperty('font-size')
-      })
-      await page.setViewportSize({ width: 1280, height: 900 })
-    }
-
-    await trigger.click()
-    await accountItem.click()
-    await expect(page).toHaveURL(/\/account$/)
-    await expect(menu).toBeHidden()
-    await expect(page.getByText(userName, { exact: true })).toBeVisible()
-
-    await expect(page.getByText('Google is linked as a sign-in method for this app.', { exact: true })).toBeVisible()
-    const unlinkButton = page.getByRole('button', { name: 'Remove Google sign-in' })
-    await expect(unlinkButton).toBeEnabled()
-    await unlinkButton.click()
-    await expect.poll(() => unlinkBody).toEqual({ providerId: 'google', accountId: 'browser-google-subject' })
-    await expect(
-      page.getByText('No Google account is linked. Email sign-in remains available.', { exact: true })
-    ).toBeVisible()
-    await expect(
-      page.getByText(
-        'Google sign-in removed from this app. Email sign-in remains available. This does not revoke access in Google.',
-        { exact: true }
-      )
-    ).toBeVisible()
-    await expect(unlinkButton).toHaveCount(0)
-    await expect(
-      page.getByText(
-        "To add Google, log out and continue with Google using this account's same verified email address.",
-        { exact: true }
-      )
-    ).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Connect Google' })).toHaveCount(0)
-    expect(observations.sameOriginRequests.some((request) => request.includes('/api/auth/link-social'))).toBe(false)
-    expect(observations.sameOriginRequests.some((request) => request.includes('/api/auth/sign-in/social'))).toBe(false)
-
-    await trigger.click()
-    await signOutItem.focus()
-    await page.keyboard.press('Enter')
-    await expect.poll(() => signOutRequests).toEqual([{ method: 'POST', body: {} }])
-    await expect(page.getByRole('menuitem', { name: 'Signing out...' })).toHaveAttribute('aria-disabled', 'true')
-    await expect(page.getByRole('menuitem', { name: 'Signing out...' })).toBeFocused()
-    await page.keyboard.press('Enter')
-    await expect(signOutRequests).toHaveLength(1)
-    releaseFailedSignOut()
-    await expect(page.getByRole('alert')).toHaveText(
-      'We could not confirm that you were signed out. Your session may still be active. Please try again.'
-    )
-    await expect(menu).toBeVisible()
-    await expect(menu.getByText(userName, { exact: true })).toBeVisible()
-    await expect(page.getByRole('menuitem', { name: 'Sign out', exact: true })).toBeEnabled()
-    await expect(page.getByRole('menuitem', { name: 'Sign out', exact: true })).toBeFocused()
-
-    const expectedFailure = observations.errorResponses.find(
-      (response) => response.includes('POST 503') && response.includes('/api/auth/sign-out')
-    )
-    expect(expectedFailure, 'the deliberate sign-out failure was observed').toBeDefined()
-    observations.errorResponses = observations.errorResponses.filter((response) => response !== expectedFailure)
-    const expectedConsoleFailure = observations.console.find(
-      (message) =>
-        message === 'error: Failed to load resource: the server responded with a status of 503 (Service Unavailable)'
-    )
-    expect(expectedConsoleFailure, 'Chromium reported the deliberate sign-out failure').toBeDefined()
-    observations.console = observations.console.filter((message) => message !== expectedConsoleFailure)
-
-    if (projectName === 'desktop-chromium') {
-      peerPage = await context.newPage()
-      peerObservations = observePage(peerPage)
-      await peerPage.route('**/api/auth/get-session', fulfillSession)
-      await peerPage.route('**/api/me', (route) =>
-        fulfillJson(route, {
-          user: { id: 'browser-social-user', name: userName, email: userEmail, image: null },
-          modules: expectedModuleStates
-        })
-      )
-      await peerPage.goto('/')
-      await expect(peerPage.getByRole('button', { name: `Account menu for ${userName}` })).toBeVisible()
-      await peerPage.getByRole('link', { name: 'App', exact: true }).click()
-      await expect(peerPage.getByText(`Signed in as ${userEmail}`, { exact: true })).toBeVisible()
-      await peerPage.waitForLoadState('networkidle')
-    }
-
-    await page.getByRole('menuitem', { name: 'Sign out', exact: true }).click()
-    await expect
-      .poll(() => signOutRequests)
-      .toEqual([
-        { method: 'POST', body: {} },
-        { method: 'POST', body: {} }
-      ])
-    await expect.poll(() => new URL(page.url()).pathname).toBe('/login')
-    await expect.poll(() => new URL(page.url()).searchParams.get('status')).toBe('signed-out')
-    await expect(page.getByRole('heading', { name: 'Log in' })).toBeVisible()
-    await expect(page.getByText('You are signed out.', { exact: true })).toBeVisible()
-    await expect(page.getByText(userName, { exact: true })).toHaveCount(0)
-    await expect(page.getByRole('button', { name: /^Account menu for / })).toHaveCount(0)
-    if (peerPage) {
-      await expect(peerPage).toHaveURL(/\/login$/)
-      await expect(peerPage.getByText(userEmail, { exact: true })).toHaveCount(0)
-      await expect(peerPage.getByRole('button', { name: /^Account menu for / })).toHaveCount(0)
-      await assertAccessibleWithoutOverflow(peerPage)
-      await assertCleanPage(peerPage, peerObservations)
-    }
-    await assertAccessibleWithoutOverflow(page)
-    await assertCleanPage(page, observations)
-  } finally {
-    await peerPage?.close()
-    await page.close()
-  }
-}
-
-async function assertAccountMenuFitsViewport(page, menu) {
-  const align = await menu.getAttribute('data-align')
-  await expect
-    .poll(
-      async () => {
-        const box = await menu.boundingBox()
-        const viewport = page.viewportSize()
-        if (!box || !viewport) return null
-
-        return {
-          leftOverflow: Math.max(0, -box.x),
-          topOverflow: Math.max(0, -box.y),
-          rightOverflow: Math.max(0, box.x + box.width - viewport.width),
-          bottomOverflow: Math.max(0, box.y + box.height - viewport.height)
-        }
-      },
-      { message: `account menu settles within the viewport (data-align=${align ?? 'unset'})` }
-    )
-    .toEqual({ leftOverflow: 0, topOverflow: 0, rightOverflow: 0, bottomOverflow: 0 })
-}
-
 async function fulfillJson(route, value) {
   await route.fulfill({
     status: 200,
     contentType: 'application/json',
     body: JSON.stringify(value)
   })
-}
-
-function removeExpectedHttpFailure(observations, method, status, path, count = 1, removeConsole = true) {
-  const responses = observations.errorResponses.filter(
-    (entry) => entry.includes(`${method} ${status}`) && entry.includes(path)
-  )
-  expect(responses).toHaveLength(count)
-  observations.errorResponses = observations.errorResponses.filter((entry) => !responses.includes(entry))
-
-  if (!removeConsole) return
-  removeExpectedConsoleFailures(observations, status, count)
-}
-
-function removeExpectedConsoleFailures(observations, status, count) {
-  for (let index = 0; index < count; index += 1) {
-    const consoleFailureIndex = observations.console.findIndex((entry) =>
-      new RegExp(`Failed to load resource: the server responded with a status of ${status}\\b`).test(entry)
-    )
-    expect(consoleFailureIndex).toBeGreaterThanOrEqual(0)
-    observations.console.splice(consoleFailureIndex, 1)
-  }
 }
 
 async function assertAccessibleWithoutOverflow(page) {
@@ -1036,6 +658,7 @@ function observePage(page) {
     observations.pageErrors.push(error.message)
   })
   page.on('requestfailed', (request) => {
+    if (isIsolatedBrowserProviderRequest(request)) return
     if (isExpectedManifestNavigationAbort(page, request)) return
     observations.failedRequests.push(
       `${request.method()} ${request.url()}: ${request.failure()?.errorText ?? 'failed'}`
@@ -1049,6 +672,7 @@ function observePage(page) {
   })
   page.on('request', (request) => {
     const url = request.url()
+    if (isIsolatedBrowserProviderRequest(request)) return
     if (/^(?:data|blob|about):/i.test(url)) {
       return
     }
@@ -1064,6 +688,14 @@ function observePage(page) {
   })
 
   return observations
+}
+
+function isIsolatedBrowserProviderRequest(request) {
+  if (request.method() === 'GET' && request.url() === turnstileScriptUrl) return true
+  if (request.method() !== 'POST') return false
+
+  const url = new URL(request.url())
+  return url.origin === runtimeSentryOrigin && url.pathname === sentryEnvelopePath
 }
 
 async function gotoForInitialResponse(page, url, manifestUrl) {

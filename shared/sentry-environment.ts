@@ -15,8 +15,6 @@ export type SentryServerPreloadConfiguration = Readonly<{
 export function resolveSentryServerPreloadConfiguration(
   environment: RuntimeEnvironment
 ): SentryServerPreloadConfiguration | undefined {
-  if (environment.NUXT_MODULES_OBSERVABILITY_ENABLED !== 'true') return undefined
-
   const dsn = exactHttpUrl(environment.NUXT_SENTRY_DSN)
   const publicDsn = exactHttpUrl(environment.NUXT_PUBLIC_SENTRY_DSN)
   const tracesSampleRate = optionalSampleRate(environment.NUXT_SENTRY_TRACES_SAMPLE_RATE)

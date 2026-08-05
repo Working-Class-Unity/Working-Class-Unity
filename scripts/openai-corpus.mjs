@@ -13,9 +13,9 @@ export const OPENAI_CORPUS_MAX_FILE_BYTES = 50 * 1_024 * 1_024
 export const OPENAI_CORPUS_MAX_TOTAL_BYTES = 500 * 1_024 * 1_024
 
 const MAX_JSON_BYTES = 1_024 * 1_024
-const MARKER_KEY = 'swl_managed_by'
-const MARKER_VALUE = 'swl-file-search-corpus-v1'
-const RECEIPT_KEY = 'swl_receipt_id'
+const MARKER_KEY = 'wcu_managed_by'
+const MARKER_VALUE = 'wcu-file-search-corpus-v1'
+const RECEIPT_KEY = 'wcu_receipt_id'
 const CONTROL = /\p{C}/u
 const VISIBLE = /^[\x21-\x7e]+$/
 const STORE_ID = /^vs_[A-Za-z0-9_-]{1,200}$/

@@ -4,9 +4,9 @@ import { getAppRuntimeConfig } from '../utils/runtime'
 const sentryWasPreloadedBeforeApplication = Boolean(Sentry.getClient())
 
 export default defineNitroPlugin(() => {
-  const config = getAppRuntimeConfig()
+  getAppRuntimeConfig()
 
-  if (config.modules.observability.enabled && !sentryWasPreloadedBeforeApplication) {
+  if (process.env.NODE_ENV === 'production' && !sentryWasPreloadedBeforeApplication) {
     throw new Error('Sentry must be preloaded before the production application starts')
   }
 })

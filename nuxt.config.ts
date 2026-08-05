@@ -1,31 +1,11 @@
 import { defineNuxtConfig } from 'nuxt/config'
-import { runtimeModuleIds } from './shared/modules'
 import { createBaseContentSecurityPolicy } from './shared/content-security-policy'
 import { assertSafeBetterAuthBuildEnvironment } from './server/utils/runtime'
 
 const isProduction = process.env.NODE_ENV === 'production'
-const observabilityEnabled = process.env.NUXT_MODULES_OBSERVABILITY_ENABLED === 'true'
 const sentryUploadEnabled =
   isProduction &&
-  observabilityEnabled &&
   ['SENTRY_AUTH_TOKEN', 'SENTRY_ORG', 'SENTRY_PROJECT'].every((key) => hasExactBuildValue(process.env[key]))
-const forbiddenPublicModuleStateBuildKeys = [
-  'NUXT_PUBLIC_MODULE_STATES',
-  'NITRO_PUBLIC_MODULE_STATES',
-  ...runtimeModuleIds.flatMap((moduleId) => {
-    const suffix = moduleId.toUpperCase()
-    return [`NUXT_PUBLIC_MODULE_STATES_${suffix}`, `NITRO_PUBLIC_MODULE_STATES_${suffix}`]
-  })
-]
-const presentPublicModuleStateBuildKeys = forbiddenPublicModuleStateBuildKeys.filter(
-  (key) => process.env[key] !== undefined
-)
-
-if (presentPublicModuleStateBuildKeys.length) {
-  throw new Error(
-    `Public module states are server-derived and cannot be supplied at build time: ${presentPublicModuleStateBuildKeys.join(', ')}`
-  )
-}
 
 assertSafeBetterAuthBuildEnvironment(process.env)
 
@@ -80,32 +60,13 @@ export default defineNuxtConfig({
       secret: '',
       url: ''
     },
-    socialProviders: {
-      google: {
-        enabled: '',
-        clientId: '',
-        clientSecret: ''
-      }
-    },
     email: {
       transport: '',
       from: '',
       captureDirectory: '',
-      smtp: {
-        host: '',
-        port: '',
-        security: '',
-        username: '',
-        password: ''
+      resend: {
+        apiKey: ''
       }
-    },
-    modules: {
-      billing: { enabled: '' },
-      files: { enabled: '' },
-      ai: { enabled: '' },
-      turnstile: { enabled: '' },
-      observability: { enabled: '' },
-      jobs: { enabled: '' }
     },
     stripe: {
       secretKey: '',
@@ -125,11 +86,9 @@ export default defineNuxtConfig({
       projectId: '',
       model: '',
       fileSearch: {
-        enabled: '',
         vectorStoreId: ''
       },
       webSearch: {
-        enabled: '',
         allowedDomains: ''
       }
     },
@@ -153,21 +112,13 @@ export default defineNuxtConfig({
       }
     },
     public: {
-      appName: 'SmallWiseLabs Base App',
+      appName: 'Working Class Unity',
       appUrl: '',
       sentryDsn: '',
       sentryEnvironment: '',
       sentryRelease: '',
       sentryTracesSampleRate: '0.05',
-      turnstileSiteKey: '',
-      moduleStates: {
-        billing: 'disabled',
-        files: 'disabled',
-        ai: 'disabled',
-        turnstile: 'disabled',
-        observability: 'disabled',
-        jobs: 'disabled'
-      }
+      turnstileSiteKey: ''
     }
   },
   nitro: {
@@ -193,16 +144,6 @@ export default defineNuxtConfig({
   },
   routeRules: {
     '/_nuxt/**': { headers: { 'cache-control': 'public, max-age=31536000, immutable' } },
-    '/invite/**': {
-      headers: {
-        'cache-control': 'private, no-store'
-      },
-      security: {
-        headers: {
-          referrerPolicy: 'no-referrer'
-        }
-      }
-    },
     '/app': {
       headers: {
         'cache-control': 'private, no-store'
@@ -214,11 +155,6 @@ export default defineNuxtConfig({
       }
     },
     '/account': {
-      headers: {
-        'cache-control': 'private, no-store'
-      }
-    },
-    '/account/billing': {
       headers: {
         'cache-control': 'private, no-store'
       }
@@ -236,7 +172,6 @@ export default defineNuxtConfig({
     '/api/**': { cache: false },
     '/api/live': { cache: false },
     '/api/ready': { cache: false },
-    '/api/baseline': { cache: { maxAge: 60 } },
     '/api/auth/**': { cache: false },
     '/api/ai/**': { cache: false },
     '/api/account/billing/**': { cache: false },

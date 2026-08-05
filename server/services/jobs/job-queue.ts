@@ -4,7 +4,8 @@ import type { DatabaseConnection } from '../../db/connect'
 import { jobQueue, type JsonValue } from '../../db/schema'
 import { captureException } from '../observability/capture'
 
-export type JobHandler = (payload: JsonValue) => Promise<void>
+export type JobPayload = JsonValue
+export type JobHandler = (payload: JobPayload) => Promise<void>
 
 export const maxStoredJobDiagnosticBytes = 256
 export const jobDiagnosticCodes = Object.freeze({

@@ -108,8 +108,8 @@ test('prepare uses the pinned SDK against only the official origin and writes a 
   }
   const createRequest = provider.requests.find(({ method, path }) => method === 'POST' && path === '/v1/vector_stores')
   assert.deepEqual(createRequest.json.metadata, {
-    swl_managed_by: 'swl-file-search-corpus-v1',
-    swl_receipt_id: markerUuid
+    wcu_managed_by: 'wcu-file-search-corpus-v1',
+    wcu_receipt_id: markerUuid
   })
 })
 
@@ -458,7 +458,7 @@ function createOpenAIFake({ failAttachmentAt, inProgressRetrievals = 0, listPage
       storeMetadata = request.json.metadata
       return jsonResponse(
         returnUnownedStore
-          ? { ...vectorStore('completed'), metadata: { swl_managed_by: 'someone-else' } }
+          ? { ...vectorStore('completed'), metadata: { wcu_managed_by: 'someone-else' } }
           : vectorStore('completed')
       )
     }

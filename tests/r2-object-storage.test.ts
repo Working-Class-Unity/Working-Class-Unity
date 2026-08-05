@@ -9,6 +9,7 @@ import {
   R2_UPLOAD_EXPIRY_SECONDS,
   normalizeCloudflareR2Endpoint,
   normalizeR2BucketName,
+  r2BrowserRequestOrigin,
   type R2ObjectStorageConfig,
   type R2ObjectStorageOptions
 } from '../server/services/storage/r2-object-storage'
@@ -37,6 +38,13 @@ describe('Cloudflare R2 endpoint and managed-key boundary', () => {
     expect(normalizeCloudflareR2Endpoint(`https://${accountId}.fedramp.r2.cloudflarestorage.com`, accountId)).toBe(
       `https://${accountId}.fedramp.r2.cloudflarestorage.com`
     )
+    expect(
+      r2BrowserRequestOrigin({
+        accountId,
+        bucket: 'private-files',
+        endpoint: `https://${accountId}.eu.r2.cloudflarestorage.com`
+      })
+    ).toBe(`https://private-files.${accountId}.eu.r2.cloudflarestorage.com`)
 
     for (const endpoint of [
       `http://${accountId}.r2.cloudflarestorage.com`,

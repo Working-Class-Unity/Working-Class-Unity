@@ -15,33 +15,32 @@ afterEach(() => {
 })
 
 describe('production Sentry preload invariant', () => {
-  it('fails startup when Observability is enabled without an early Sentry client', async () => {
-    const plugin = await loadPlugin({ observabilityEnabled: true, preloaded: false })
+  it('fails production startup without an early Sentry client', async () => {
+    const plugin = await loadPlugin({ nodeEnvironment: 'production', preloaded: false })
     expect(() => plugin()).toThrow('Sentry must be preloaded before the production application starts')
   })
 
   it('allows startup after Sentry was preloaded', async () => {
-    const plugin = await loadPlugin({ observabilityEnabled: true, preloaded: true })
+    const plugin = await loadPlugin({ nodeEnvironment: 'production', preloaded: true })
     expect(() => plugin()).not.toThrow()
   })
 
-  it('remains inert when Observability is disabled', async () => {
-    const plugin = await loadPlugin({ observabilityEnabled: false, preloaded: false })
+  it('does not require the production preload outside production', async () => {
+    const plugin = await loadPlugin({ nodeEnvironment: 'test', preloaded: false })
     expect(() => plugin()).not.toThrow()
   })
 })
 
 async function loadPlugin({
-  observabilityEnabled,
+  nodeEnvironment,
   preloaded
 }: {
-  observabilityEnabled: boolean
+  nodeEnvironment: string
   preloaded: boolean
 }): Promise<() => void> {
+  vi.stubEnv('NODE_ENV', nodeEnvironment)
   mocks.getClient.mockReturnValue(preloaded ? {} : undefined)
-  mocks.getAppRuntimeConfig.mockReturnValue({
-    modules: { observability: { enabled: observabilityEnabled } }
-  })
+  mocks.getAppRuntimeConfig.mockReturnValue({})
   vi.stubGlobal('defineNitroPlugin', (plugin: () => void) => plugin)
 
   return (await import('../server/plugins/01-observability-preload')).default as () => void

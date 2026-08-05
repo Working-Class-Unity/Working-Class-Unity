@@ -1,8 +1,6 @@
 import Database from 'better-sqlite3'
 import { createHash, timingSafeEqual } from 'node:crypto'
-import { moduleManifest, runtimeModuleIds } from '../../shared/modules'
 import { resolveSqlitePath } from '../db/connect'
-import { getModuleState } from './module-state'
 import type { AppRuntimeConfig } from './runtime'
 
 const bearerPrefix = 'Bearer '
@@ -27,8 +25,7 @@ type DatabaseProbe = (databaseUrl: string) => boolean
 
 /**
  * App-owned readiness policy: authenticate the private probe before touching a
- * dependency, treat manifest-defined disabled/ready module states as healthy,
- * and avoid calling optional providers from the request path.
+ * dependency and avoid calling providers from the request path.
  */
 export function evaluateReadiness(
   authorization: string | undefined,
@@ -39,7 +36,7 @@ export function evaluateReadiness(
     return readinessUnauthorizedResponse
   }
 
-  if (!areRuntimeModulesHealthy(config) || !probeDatabase(config.databaseUrl)) {
+  if (!probeDatabase(config.databaseUrl)) {
     return readinessUnavailableResponse
   }
 
@@ -59,13 +56,6 @@ export function isReadinessAuthorizationValid(authorization: string | undefined,
   const expectedDigest = createHash('sha256').update(expectedToken, 'utf8').digest()
 
   return timingSafeEqual(presentedDigest, expectedDigest)
-}
-
-export function areRuntimeModulesHealthy(config: AppRuntimeConfig): boolean {
-  return runtimeModuleIds.every((moduleId) => {
-    const state = getModuleState(moduleId, config)
-    return moduleManifest[moduleId].health[state] === 'healthy'
-  })
 }
 
 /**

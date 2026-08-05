@@ -22,13 +22,11 @@ import { promisify } from 'node:util'
 const execFileAsync = promisify(execFile)
 const require = createRequire(import.meta.url)
 const Database = require('../node_modules/better-sqlite3')
-const { drizzle } = require('../node_modules/drizzle-orm/better-sqlite3')
-const { migrate } = require('../node_modules/drizzle-orm/better-sqlite3/migrator')
 const entry = resolve('server/maintenance.mjs')
 const migrationsFolder = resolve('server/db/migrations')
 const runPnpm = resolve('scripts/run-pnpm.mjs')
 const stoppedApp = '--confirm-app-stopped'
-const finalMigrationCount = 4
+const finalMigrationCount = 1
 
 test('maintenance rejects missing configuration, relative paths, and unknown commands', async () => {
   const missing = await runProcess(['migrate', stoppedApp], { NUXT_DATABASE_URL: undefined })
@@ -54,13 +52,13 @@ test('fresh and repeat migrations are idempotent and back up existing state', as
 
   const fresh = await runMaintenance(databasePath, ['migrate', stoppedApp])
   assert.equal(fresh.code, 0)
-  assert.match(fresh.stdout, /4 newly applied; 4\/4 current; pre-migration backup not required/)
+  assert.match(fresh.stdout, /1 newly applied; 1\/1 current; pre-migration backup not required/)
   assert.equal(fresh.stderr, '')
 
   writeSetting(databasePath, 'migration-sentinel', 'preserved')
   const repeat = await runMaintenance(databasePath, ['migrate', stoppedApp])
   assert.equal(repeat.code, 0)
-  assert.match(repeat.stdout, /0 newly applied; 4\/4 current; pre-migration backup written as app-pre-migrate-/)
+  assert.match(repeat.stdout, /0 newly applied; 1\/1 current; pre-migration backup written as app-pre-migrate-/)
   assert.equal(readSetting(databasePath, 'migration-sentinel'), 'preserved')
   assert.equal(readdirSync(join(sandbox, 'backups')).filter((name) => name.includes('pre-migrate')).length, 1)
 
@@ -69,8 +67,7 @@ test('fresh and repeat migrations are idempotent and back up existing state', as
     const migrations = sqlite.prepare('select count(*) as count from __drizzle_migrations').get()
     assert.equal(migrations.count, finalMigrationCount)
     assert.equal(
-      sqlite.prepare("select count(*) as count from sqlite_master where type = 'table' and name = 'projects'").get()
-        .count,
+      sqlite.prepare("select count(*) as count from sqlite_master where type = 'table' and name = 'files'").get().count,
       1
     )
   } finally {
@@ -95,7 +92,7 @@ test('verification rejects a changed packaged index', async (t) => {
   assert.match(result.stderr, /does not exactly match the packaged migration prefix: missing index:session_token_idx/)
 })
 
-test('same-named weakened authority triggers cannot be verified, backed up, or restored', async (t) => {
+test('same-named weakened purchaser-authority triggers cannot be verified, backed up, or restored', async (t) => {
   const sandbox = disposableDirectory(t)
   const weakenedDirectory = join(sandbox, 'weakened')
   const weakenedDatabasePath = join(weakenedDirectory, 'app.db')
@@ -106,9 +103,9 @@ test('same-named weakened authority triggers cannot be verified, backed up, or r
   const weakened = new Database(weakenedDatabasePath)
   try {
     weakened.exec(`
-      drop trigger member_family_capacity_before_insert;
-      create trigger member_family_capacity_before_insert
-      before insert on member
+      drop trigger billing_checkout_customer_purchaser_insert;
+      create trigger billing_checkout_customer_purchaser_insert
+      before insert on billing_checkout_attempts
       begin
         select 1;
       end;
@@ -124,7 +121,7 @@ test('same-named weakened authority triggers cannot be verified, backed up, or r
     assert.equal(result.code, 1)
     assert.match(
       result.stderr,
-      /does not exactly match the packaged migration prefix: changed trigger:member_family_capacity_before_insert/
+      /does not exactly match the packaged migration prefix: changed trigger:billing_checkout_customer_purchaser_insert/
     )
     assert.deepEqual(readFileSync(weakenedDatabasePath), weakenedBytes)
     assert.equal(readSetting(weakenedDatabasePath, 'weakened-trigger-sentinel'), 'preserved')
@@ -145,7 +142,7 @@ test('same-named weakened authority triggers cannot be verified, backed up, or r
   assert.equal(restore.code, 1)
   assert.match(
     restore.stderr,
-    /does not exactly match the packaged migration prefix: changed trigger:member_family_capacity_before_insert/
+    /does not exactly match the packaged migration prefix: changed trigger:billing_checkout_customer_purchaser_insert/
   )
   assert.deepEqual(readFileSync(liveDatabasePath), liveBytes)
   assert.deepEqual(readFileSync(restoreInputPath), restoreInputBytes)
@@ -214,36 +211,7 @@ test('migration rejects a drifted current ledger before backup or mutation', asy
   assert(!existsSync(join(sandbox, 'backups')))
 })
 
-test('migration rejects an incomplete internal baseline before backup or mutation', async (t) => {
-  const sandbox = disposableDirectory(t)
-  const databasePath = join(sandbox, 'app.db')
-  createRelationalBaselineOnlyDatabase(databasePath, sandbox)
-
-  const partial = new Database(databasePath)
-  try {
-    partial
-      .prepare('insert into user (id, name, email, email_verified, created_at, updated_at) values (?, ?, ?, 1, 1, 1)')
-      .run('partial-user', 'Partial User', 'partial@example.test')
-  } finally {
-    partial.close()
-  }
-
-  const result = await runMaintenance(databasePath, ['migrate', stoppedApp])
-  assert.equal(result.code, 1)
-  assert.match(result.stderr, /must contain the complete supported pre-release initialization baseline/)
-  assert(!existsSync(join(sandbox, 'backups')))
-
-  const unchanged = new Database(databasePath, { readonly: true })
-  try {
-    assert.equal(unchanged.prepare('select count(*) as count from __drizzle_migrations').get().count, 1)
-    assert.equal(unchanged.prepare('select count(*) as count from user').get().count, 1)
-    assert.equal(unchanged.prepare('select count(*) as count from organization').get().count, 0)
-  } finally {
-    unchanged.close()
-  }
-})
-
-test('the documented migration command uses maintenance for relative URLs and rejects incomplete state', async (t) => {
+test('the documented migration command uses maintenance for relative URLs and rejects an empty ledger', async (t) => {
   const sandbox = disposableDirectory(t)
   const freshDatabasePath = join(sandbox, 'fresh.db')
   const appDirectory = resolve('.')
@@ -251,20 +219,7 @@ test('the documented migration command uses maintenance for relative URLs and re
 
   const fresh = await runPublicMigration(freshRelativeUrl)
   assert.equal(fresh.code, 0, fresh.stderr)
-  assert.match(fresh.stdout, /4 newly applied; 4\/4 current/)
-
-  const incompleteDatabasePath = join(sandbox, 'incomplete.db')
-  createRelationalBaselineOnlyDatabase(incompleteDatabasePath, sandbox)
-  const incomplete = await runPublicMigration(`file:${incompleteDatabasePath}`)
-  assert.equal(incomplete.code, 1)
-  assert.match(incomplete.stderr, /must contain the complete supported pre-release initialization baseline/)
-
-  const unchanged = new Database(incompleteDatabasePath, { readonly: true })
-  try {
-    assert.equal(unchanged.prepare('select count(*) as count from __drizzle_migrations').get().count, 1)
-  } finally {
-    unchanged.close()
-  }
+  assert.match(fresh.stdout, /1 newly applied; 1\/1 current/)
 
   const failedFirstDatabasePath = join(sandbox, 'failed-first.db')
   const failedFirst = new Database(failedFirstDatabasePath)
@@ -304,7 +259,7 @@ test('a failed first initialization rolls back and requires manual disposal befo
   cpSync(entry, fixtureEntry)
   cpSync(migrationsFolder, fixtureMigrations, { recursive: true })
   appendFileSync(
-    join(fixtureMigrations, '0001_runtime_invariants.sql'),
+    join(fixtureMigrations, '0000_wcu_initial.sql'),
     '\n--> statement-breakpoint\nselect * from injected_missing_migration_table;\n'
   )
 
@@ -573,26 +528,15 @@ test('valid restore replaces healthy state from a current-baseline backup', asyn
     assert.equal(sqlite.prepare("select name from user where id = 'restore-user'").get().name, 'Restore User')
     assert.equal(sqlite.prepare("select count(*) as count from account where user_id = 'restore-user'").get().count, 1)
     assert.equal(
-      sqlite.prepare("select count(*) as count from organization where personal_owner_user_id = 'restore-user'").get()
-        .count,
-      1
+      sqlite.prepare("select purchaser_user_id from billing_customers where id = 'restore-customer'").get()
+        .purchaser_user_id,
+      'restore-user'
     )
-    assert.equal(
-      sqlite.prepare("select count(*) as count from member where user_id = 'restore-user' and role = 'owner'").get()
-        .count,
-      1
-    )
-    assert.equal(
-      sqlite.prepare("select count(*) as count from invitation where id = 'restore-invitation'").get().count,
-      1
-    )
-    assert.equal(
-      sqlite.prepare("select name from projects where id = 'restore-project'").get().name,
-      'Restored project'
-    )
-    assert.equal(
-      sqlite.prepare("select status from billing_subscriptions where id = 'restore-subscription'").get().status,
-      'active'
+    assert.deepEqual(
+      sqlite
+        .prepare("select purchaser_user_id, status from billing_subscriptions where id = 'restore-subscription'")
+        .get(),
+      { purchaser_user_id: 'restore-user', status: 'active' }
     )
     assert.equal(
       sqlite.prepare("select count(*) as count from detached_billing_subjects where id = 'restore-tombstone'").get()
@@ -778,48 +722,22 @@ function writeRestoreDomainFixture(databasePath) {
         1784200000000,
         1784200000000
       )
-    const organizationId = sqlite
-      .prepare("select id from organization where personal_owner_user_id = 'restore-user'")
-      .get().id
     sqlite
       .prepare(
-        'insert into invitation (id, organization_id, email, role, status, expires_at, created_at, inviter_id) values (?, ?, ?, ?, ?, ?, ?, ?)'
+        'insert into billing_customers (id, purchaser_user_id, stripe_customer_id, created_at, updated_at) values (?, ?, ?, ?, ?)'
       )
-      .run(
-        'restore-invitation',
-        organizationId,
-        'invitee@example.test',
-        'member',
-        'pending',
-        1884200000000,
-        1784200000000,
-        'restore-user'
-      )
-    sqlite
-      .prepare('insert into projects (id, name, owner_user_id, created_at, updated_at) values (?, ?, ?, ?, ?)')
-      .run(
-        'restore-project',
-        'Restored project',
-        'restore-user',
-        '2026-07-16T12:00:00.000Z',
-        '2026-07-16T12:00:00.000Z'
-      )
-    sqlite
-      .prepare(
-        'insert into billing_customers (id, organization_id, stripe_customer_id, created_at, updated_at) values (?, ?, ?, ?, ?)'
-      )
-      .run('restore-customer', organizationId, 'cus_restore', '2026-07-16T12:00:00.000Z', '2026-07-16T12:00:00.000Z')
+      .run('restore-customer', 'restore-user', 'cus_restore', '2026-07-16T12:00:00.000Z', '2026-07-16T12:00:00.000Z')
     sqlite
       .prepare(
         `insert into billing_subscriptions (
-          id, organization_id, billing_customer_id, stripe_subscription_id, stripe_subscription_item_id,
+          id, purchaser_user_id, billing_customer_id, stripe_subscription_id, stripe_subscription_item_id,
           status, plan_key, cadence, stripe_price_id, current_period_start, current_period_end,
           created_at, updated_at
         ) values (?, ?, ?, ?, ?, 'active', 'family', 'monthly', ?, ?, ?, ?, ?)`
       )
       .run(
         'restore-subscription',
-        organizationId,
+        'restore-user',
         'restore-customer',
         'sub_restore',
         'si_restore',
@@ -929,32 +847,11 @@ function mutateRestoreDomainFixture(databasePath) {
     sqlite.prepare("delete from account where user_id = 'restore-user'").run()
     sqlite.prepare("delete from session where user_id = 'restore-user'").run()
     sqlite.prepare("delete from verification where identifier = 'restore-verification'").run()
-    sqlite.prepare("delete from invitation where id = 'restore-invitation'").run()
-    sqlite.prepare("delete from projects where id = 'restore-project'").run()
     sqlite.prepare("delete from billing_customers where id = 'restore-customer'").run()
     sqlite.prepare("delete from detached_billing_subjects where id = 'restore-tombstone'").run()
     sqlite.prepare("delete from files where id = 'restore-file'").run()
     sqlite.prepare('delete from ai_conversations where id = ?').run(restoreConversationId)
     sqlite.prepare("delete from ai_usage_buckets where owner_user_id = 'restore-user'").run()
-  } finally {
-    sqlite.close()
-  }
-}
-
-function createRelationalBaselineOnlyDatabase(databasePath, sandbox) {
-  const partialMigrations = join(sandbox, 'relational-baseline-only')
-  const partialMeta = join(partialMigrations, 'meta')
-  mkdirSync(partialMeta, { recursive: true })
-  const journal = JSON.parse(readFileSync(join(migrationsFolder, 'meta', '_journal.json'), 'utf8'))
-  const firstEntry = journal.entries[0]
-  assert(firstEntry, 'expected the generated relational baseline migration')
-  writeFileSync(join(partialMeta, '_journal.json'), JSON.stringify({ ...journal, entries: [firstEntry] }))
-  cpSync(join(migrationsFolder, `${firstEntry.tag}.sql`), join(partialMigrations, `${firstEntry.tag}.sql`))
-
-  const sqlite = new Database(databasePath)
-  try {
-    sqlite.pragma('foreign_keys = ON')
-    migrate(drizzle({ client: sqlite }), { migrationsFolder: partialMigrations })
   } finally {
     sqlite.close()
   }

@@ -9,12 +9,12 @@ import {
 
 describe('app-owned authentication routes', () => {
   it('resolves ordinary login and signup intent to the personal app with an intent-specific error route', () => {
-    expect(resolveAuthCallbacks('login', undefined)).toEqual({
+    expect(resolveAuthCallbacks('login')).toEqual({
       callbackURL: '/app',
       newUserCallbackURL: '/app',
       errorCallbackURL: '/login'
     })
-    expect(resolveAuthCallbacks('signup', '/billing')).toEqual({
+    expect(resolveAuthCallbacks('signup')).toEqual({
       callbackURL: '/app',
       newUserCallbackURL: '/app',
       errorCallbackURL: '/signup'
@@ -23,44 +23,12 @@ describe('app-owned authentication routes', () => {
     expect(authEntryPaths).toEqual({ login: '/login', signup: '/signup' })
   })
 
-  it('preserves only an exact opaque invitation path for successful login or signup', () => {
-    const invitationPath = '/invite/Invite_123-opaque'
-
-    expect(resolveAuthCallbacks('login', invitationPath)).toEqual({
-      callbackURL: invitationPath,
-      newUserCallbackURL: invitationPath,
-      errorCallbackURL: '/login'
-    })
-    expect(resolveAuthCallbacks('signup', invitationPath)).toEqual({
-      callbackURL: invitationPath,
-      newUserCallbackURL: invitationPath,
-      errorCallbackURL: '/signup'
-    })
-
-    for (const returnTo of [
-      '/invite/',
-      '/invite/id/extra',
-      '/invite/id?next=/billing',
-      '/invite/id#fragment',
-      '//hostile.example.test/invite/id',
-      'https://hostile.example.test/invite/id',
-      7,
-      null
-    ]) {
-      expect(resolveAuthCallbacks('login', returnTo), String(returnTo)).toEqual({
-        callbackURL: '/app',
-        newUserCallbackURL: '/app',
-        errorCallbackURL: '/login'
-      })
-    }
-  })
-
   it('applies distinct allowlists to success and error callback parameters', () => {
     const successParameters = ['callbackURL', 'newUserCallbackURL'] as const satisfies readonly AuthCallbackParameter[]
 
     for (const parameter of successParameters) {
       expect(isAllowedAuthCallback(parameter, '/app')).toBe(true)
-      expect(isAllowedAuthCallback(parameter, '/invite/Abc_123-xyz')).toBe(true)
+      expect(isAllowedAuthCallback(parameter, '/invite/Abc_123-xyz')).toBe(false)
       expect(isAllowedAuthCallback(parameter, '/login')).toBe(false)
       expect(isAllowedAuthCallback(parameter, '/signup')).toBe(false)
     }

@@ -61,19 +61,19 @@ describe('Nuxt build policy', () => {
   })
 
   it('disables Nitro environment expansion in the evaluated Nuxt config', async () => {
-    const config = await loadNuxtConfig({ observabilityEnabled: false, sentryAuthToken: '' })
+    const config = await loadNuxtConfig({ sentryAuthToken: '' })
     expect(config.nitro?.experimental?.envExpansion).toBe(false)
   })
 
   it('adopts Nuxt 5 defaults while retaining the reviewed Nitro autoimport contract', async () => {
-    const config = await loadNuxtConfig({ observabilityEnabled: false, sentryAuthToken: '' })
+    const config = await loadNuxtConfig({ sentryAuthToken: '' })
 
     expect(config.future?.compatibilityVersion).toBe(5)
     expect(config.experimental?.nitroAutoImports).toBe(true)
   })
 
   it('delegates only fully expressible standard protections to nuxt-security', async () => {
-    const config = await loadNuxtConfig({ observabilityEnabled: false, sentryAuthToken: '' })
+    const config = await loadNuxtConfig({ sentryAuthToken: '' })
 
     expect(config.security).toMatchObject({
       allowedMethodsRestricter: false,
@@ -118,7 +118,6 @@ describe('Nuxt build policy', () => {
       try {
         await loadNuxtConfig({
           environment: { [key]: sentinel },
-          observabilityEnabled: false,
           sentryAuthToken: ''
         })
       } catch (error) {
@@ -139,14 +138,12 @@ describe('Nuxt build policy', () => {
   )
 
   it.each([
-    { label: 'disabled module', observabilityEnabled: false, token: 'token', org: 'org', project: 'project' },
-    { label: 'missing token', observabilityEnabled: true, token: '', org: 'org', project: 'project' },
-    { label: 'missing organization', observabilityEnabled: true, token: 'token', org: '', project: 'project' },
-    { label: 'missing project', observabilityEnabled: true, token: 'token', org: 'org', project: '' },
-    { label: 'non-exact token', observabilityEnabled: true, token: ' token ', org: 'org', project: 'project' }
-  ])('generates no source maps for $label', async ({ observabilityEnabled, org, project, token }) => {
+    { label: 'missing token', token: '', org: 'org', project: 'project' },
+    { label: 'missing organization', token: 'token', org: '', project: 'project' },
+    { label: 'missing project', token: 'token', org: 'org', project: '' },
+    { label: 'non-exact token', token: ' token ', org: 'org', project: 'project' }
+  ])('generates no source maps for $label', async ({ org, project, token }) => {
     const config = await loadNuxtConfig({
-      observabilityEnabled,
       sentryAuthToken: token,
       sentryOrg: org,
       sentryProject: project
@@ -158,7 +155,6 @@ describe('Nuxt build policy', () => {
 
   it('uses the official fatal client-only upload lifecycle only for complete production configuration', async () => {
     const config = await loadNuxtConfig({
-      observabilityEnabled: true,
       sentryAuthToken: 'test-token',
       sentryOrg: 'test-org',
       sentryProject: 'test-project'
@@ -176,13 +172,11 @@ describe('Nuxt build policy', () => {
 
 async function loadNuxtConfig({
   environment = {},
-  observabilityEnabled,
   sentryAuthToken,
   sentryOrg = '',
   sentryProject = ''
 }: {
   environment?: Readonly<Record<string, string>>
-  observabilityEnabled: boolean
   sentryAuthToken: string
   sentryOrg?: string
   sentryProject?: string
@@ -190,7 +184,6 @@ async function loadNuxtConfig({
   for (const key of forbiddenBetterAuthBuildFallbacks) vi.stubEnv(key, undefined)
   for (const [key, value] of Object.entries(environment)) vi.stubEnv(key, value)
   vi.stubEnv('NODE_ENV', 'production')
-  vi.stubEnv('NUXT_MODULES_OBSERVABILITY_ENABLED', String(observabilityEnabled))
   vi.stubEnv('SENTRY_AUTH_TOKEN', sentryAuthToken)
   vi.stubEnv('SENTRY_ORG', sentryOrg)
   vi.stubEnv('SENTRY_PROJECT', sentryProject)

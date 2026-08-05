@@ -10,8 +10,10 @@ import { fileURLToPath } from 'node:url'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { DatabaseConnection } from '../server/db/connect'
 import * as schema from '../server/db/schema'
+import { aiConversationCreateBodyLimitBytes, aiMessageCreateBodyLimitBytes } from '../server/services/ai/ai-validation'
 import { OpenAIProviderError } from '../server/services/ai/openai'
 import type { AppRuntimeConfig } from '../server/utils/runtime'
+import { requestWithChunkedBody, requestWithDeclaredBody } from './helpers/http-request'
 
 const databaseMocks = vi.hoisted(() => ({ useDatabase: vi.fn() }))
 const sessionMocks = vi.hoisted(() => ({ requireSession: vi.fn() }))
@@ -35,7 +37,6 @@ vi.mock('../server/services/ai/openai', async (importOriginal) => ({
 const migrationsFolder = fileURLToPath(new URL('../server/db/migrations/', import.meta.url))
 const currentUserId = 'user-ai-http-current'
 const otherUserId = 'user-ai-http-other'
-const sharedFamilyId = 'organization-ai-http-shared'
 const missingConversationId = 'ai_conversation_00000000-0000-4000-8000-000000000000'
 const firstClientRequestId = '11111111-1111-4111-8111-111111111111'
 
@@ -50,7 +51,6 @@ beforeAll(async () => {
   vi.stubGlobal('useRuntimeConfig', () => runtimeMocks.getAppRuntimeConfig())
 
   const [
-    moduleBoundary,
     conversationList,
     conversationCreate,
     conversationRead,
@@ -59,7 +59,6 @@ beforeAll(async () => {
     messageCreate,
     messageClear
   ] = await Promise.all([
-    import('../server/middleware/01-module-boundary').then((module) => module.default),
     import('../server/api/ai/conversations/index.get').then((module) => module.default),
     import('../server/api/ai/conversations/index.post').then((module) => module.default),
     import('../server/api/ai/conversations/[conversationId].get').then((module) => module.default),
@@ -78,7 +77,7 @@ beforeAll(async () => {
     .post('/api/ai/conversations/:conversationId/messages', messageCreate as EventHandler)
     .delete('/api/ai/conversations/:conversationId/messages', messageClear as EventHandler)
 
-  server = createServer(toNodeListener(createApp().use(moduleBoundary).use(router)))
+  server = createServer(toNodeListener(createApp().use(router)))
   await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve))
   const address = server.address()
   if (!address || typeof address === 'string') throw new TypeError('Expected a TCP test address')
@@ -92,7 +91,7 @@ beforeEach(() => {
   cleanupFixture = fixture.cleanup
   currentSession = sessionFor(currentUserId)
   databaseMocks.useDatabase.mockReturnValue(connection)
-  runtimeMocks.getAppRuntimeConfig.mockReturnValue(runtimeConfig(true))
+  runtimeMocks.getAppRuntimeConfig.mockReturnValue(runtimeConfig())
   sessionMocks.requireSession.mockImplementation(async () => currentSession)
   providerMocks.getOpenAIResponsesAdapter.mockReturnValue({ createResponse: providerMocks.createResponse })
   providerMocks.createResponse.mockResolvedValue({
@@ -142,7 +141,7 @@ describe('private AI conversation HTTP boundary', () => {
 
     for (const body of [
       { ownerUserId: currentUserId },
-      { organizationId: sharedFamilyId },
+      { organizationId: 'caller-organization' },
       { model: 'caller-model' },
       { provider: 'openai' }
     ]) {
@@ -249,7 +248,7 @@ describe('private AI conversation HTTP boundary', () => {
     expect((await fetch(`${baseUrl}/api/ai/conversations/${created.conversation.id}`)).status).toBe(404)
   })
 
-  it('conceals same-family foreign conversations exactly like missing conversations', async () => {
+  it('conceals foreign-user conversations exactly like missing conversations', async () => {
     const created = await createConversation()
     currentSession = sessionFor(otherUserId)
 
@@ -382,20 +381,58 @@ describe('private AI conversation HTTP boundary', () => {
     expect(providerMocks.createResponse).not.toHaveBeenCalled()
   })
 
-  it('conceals disabled AI without credentials before auth, parsing, database, or provider work', async () => {
-    runtimeMocks.getAppRuntimeConfig.mockReturnValue(runtimeConfig(false))
-    databaseMocks.useDatabase.mockClear()
-    sessionMocks.requireSession.mockClear()
+  it('authenticates before applying body limits and rejects declared or streamed overflow', async () => {
+    sessionMocks.requireSession.mockRejectedValueOnce(
+      createError({ statusCode: 401, statusMessage: 'Authentication required' })
+    )
+    const anonymous = await requestWithDeclaredBody(
+      new URL('/api/ai/conversations', baseUrl),
+      aiConversationCreateBodyLimitBytes + 1,
+      [],
+      { endRequest: false, headers: { 'content-type': 'application/json' } }
+    )
+    expect(anonymous.status).toBe(401)
 
-    const response = await request('/api/ai/conversations', 'POST', '{')
-    const body = await response.text()
-    expect(response.status).toBe(404)
-    expect(body).toContain('MODULE_DISABLED')
-    expect(sessionMocks.requireSession).not.toHaveBeenCalled()
+    const oversizedConversation = emptyConversationBodyWithByteLength(aiConversationCreateBodyLimitBytes + 1)
+    const declaredConversation = await requestWithDeclaredBody(
+      new URL('/api/ai/conversations', baseUrl),
+      oversizedConversation.byteLength,
+      [],
+      { endRequest: false, headers: { 'content-type': 'application/json' } }
+    )
+    expectPayloadTooLarge(declaredConversation)
+    const chunkedConversation = await requestWithChunkedBody(
+      new URL('/api/ai/conversations', baseUrl),
+      [
+        oversizedConversation.subarray(0, aiConversationCreateBodyLimitBytes),
+        oversizedConversation.subarray(aiConversationCreateBodyLimitBytes)
+      ],
+      { endRequest: false, headers: { 'content-type': 'application/json' } }
+    )
+    expectPayloadTooLarge(chunkedConversation)
+
+    const created = await createConversation()
+    vi.clearAllMocks()
+    const oversizedMessage = aiMessageBodyWithByteLength(aiMessageCreateBodyLimitBytes + 1)
+    const declaredMessage = await requestWithDeclaredBody(
+      new URL(`/api/ai/conversations/${created.conversation.id}/messages`, baseUrl),
+      oversizedMessage.byteLength,
+      [],
+      { endRequest: false, headers: { 'content-type': 'application/json' } }
+    )
+    expectPayloadTooLarge(declaredMessage)
+    const chunkedMessage = await requestWithChunkedBody(
+      new URL(`/api/ai/conversations/${created.conversation.id}/messages`, baseUrl),
+      [
+        oversizedMessage.subarray(0, aiMessageCreateBodyLimitBytes),
+        oversizedMessage.subarray(aiMessageCreateBodyLimitBytes)
+      ],
+      { endRequest: false, headers: { 'content-type': 'application/json' } }
+    )
+    expectPayloadTooLarge(chunkedMessage)
     expect(databaseMocks.useDatabase).not.toHaveBeenCalled()
     expect(providerMocks.getOpenAIResponsesAdapter).not.toHaveBeenCalled()
-    expect(providerMocks.createResponse).not.toHaveBeenCalled()
-  })
+  }, 15_000)
 })
 
 type PublicConversationJson = {
@@ -438,38 +475,19 @@ function request(path: string, method: string, body?: string, headers?: Record<s
 function sessionFor(userId: string) {
   return {
     user: { id: userId, name: userId, email: `${userId}@example.test`, image: null },
-    session: { id: `session-${userId}`, userId, activeOrganizationId: sharedFamilyId }
+    session: { id: `session-${userId}`, userId }
   }
 }
 
-function runtimeConfig(aiEnabled: boolean): AppRuntimeConfig {
+function runtimeConfig(): AppRuntimeConfig {
   return {
     betterAuth: { secret: 'ai-http-test-secret-with-at-least-thirty-two-bytes', url: 'https://app.example.test' },
-    modules: {
-      billing: { enabled: false },
-      files: { enabled: false },
-      ai: { enabled: aiEnabled },
-      turnstile: { enabled: false },
-      observability: { enabled: false },
-      jobs: { enabled: false }
-    },
     openai: {
-      apiKey: aiEnabled ? 'fake-openai-key-never-sent' : '',
-      projectId: aiEnabled ? 'fake-openai-project' : '',
-      model: aiEnabled ? 'gpt-5.6-luna' : '',
-      fileSearch: { enabled: false, vectorStoreId: '' },
-      webSearch: { enabled: false, allowedDomains: [] }
-    },
-    public: {
-      appUrl: 'https://app.example.test',
-      moduleStates: {
-        billing: 'disabled',
-        files: 'disabled',
-        ai: aiEnabled ? 'ready' : 'disabled',
-        turnstile: 'disabled',
-        observability: 'disabled',
-        jobs: 'disabled'
-      }
+      apiKey: 'fake-openai-key-never-sent',
+      projectId: 'fake-openai-project',
+      model: 'gpt-5.6-luna',
+      fileSearch: { vectorStoreId: 'vs_test_deployment_corpus' },
+      webSearch: { allowedDomains: ['reference.test'] }
     }
   } as unknown as AppRuntimeConfig
 }
@@ -480,23 +498,10 @@ function createFixture(): { connection: DatabaseConnection; cleanup: () => void 
   const sqlite = new Database(databasePath)
   sqlite.pragma('foreign_keys = ON')
   migrate(drizzle({ client: sqlite }), { migrationsFolder })
-  sqlite.exec('drop trigger if exists user_personal_organization_after_insert')
   const fixtureConnection = { sqlite, db: drizzle({ client: sqlite, schema }), databasePath }
 
   insertUser(sqlite, currentUserId)
   insertUser(sqlite, otherUserId)
-  sqlite
-    .prepare('insert into organization (id, name, slug, created_at, personal_owner_user_id) values (?, ?, ?, 1, ?)')
-    .run(sharedFamilyId, 'Shared family', 'shared-ai-http-family', currentUserId)
-  sqlite
-    .prepare('insert into organization (id, name, slug, created_at, personal_owner_user_id) values (?, ?, ?, 1, ?)')
-    .run('organization-ai-http-other', 'Other personal family', 'other-ai-http-family', otherUserId)
-  sqlite
-    .prepare('insert into member (id, organization_id, user_id, role, created_at) values (?, ?, ?, ?, 1)')
-    .run('member-ai-http-current', sharedFamilyId, currentUserId, 'owner')
-  sqlite
-    .prepare('insert into member (id, organization_id, user_id, role, created_at) values (?, ?, ?, ?, 1)')
-    .run('member-ai-http-other', sharedFamilyId, otherUserId, 'member')
 
   return {
     connection: fixtureConnection,
@@ -505,6 +510,23 @@ function createFixture(): { connection: DatabaseConnection; cleanup: () => void 
       rmSync(directory, { recursive: true, force: true })
     }
   }
+}
+
+function emptyConversationBodyWithByteLength(byteLength: number): Buffer {
+  const body = '{}'
+  return Buffer.from(`${body}${' '.repeat(byteLength - Buffer.byteLength(body))}`)
+}
+
+function aiMessageBodyWithByteLength(byteLength: number): Buffer {
+  const content = `private-${'a'.repeat(31_992)}`
+  const encoded = Buffer.from(JSON.stringify({ clientRequestId: firstClientRequestId, content }))
+  if (encoded.byteLength > byteLength) throw new Error('AI message exceeds requested test size')
+  return Buffer.concat([encoded, Buffer.alloc(byteLength - encoded.byteLength, 0x20)])
+}
+
+function expectPayloadTooLarge(response: { body: string; status: number }): void {
+  expect(response.status).toBe(413)
+  expect(JSON.parse(response.body)).toMatchObject({ statusCode: 413, statusMessage: 'Payload Too Large' })
 }
 
 function insertUser(sqlite: InstanceType<typeof Database>, id: string) {

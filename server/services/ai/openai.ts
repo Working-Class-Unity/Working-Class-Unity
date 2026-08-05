@@ -16,8 +16,8 @@ import OpenAI, {
 import { isIP } from 'node:net'
 import { domainToASCII } from 'node:url'
 import type { Response, ResponseCreateParamsNonStreaming, ResponseUsage } from 'openai/resources/responses/responses'
-import { requireModuleReady } from '../../utils/module-state'
 import { getAppRuntimeConfig, type AppRuntimeConfig } from '../../utils/runtime'
+import { aiPolicy } from './ai-policy'
 
 export const OPENAI_API_BASE_URL = 'https://api.openai.com/v1'
 export const OPENAI_MAX_OUTPUT_TOKENS = 4_096
@@ -29,8 +29,6 @@ export const OPENAI_WEB_CITATION_URL_MAX_LENGTH = 4_096
 export const OPENAI_WEB_SEARCH_CONTEXT_SIZE = 'medium'
 
 const maxInstructionsBytes = 32_000
-const maxRenderedInputBytes = 200_000
-const renderedMessageStructuralBytes = 32
 const maxRetryAfterMs = 24 * 60 * 60 * 1_000
 const safetyIdentifierPattern = /^[A-Za-z0-9_-]{16,64}$/
 const visibleAsciiPattern = /^[\x21-\x7e]+$/
@@ -183,27 +181,21 @@ export function createOpenAIResponsesAdapter(
         prompt_cache_options: { mode: 'explicit' }
       }
       request.safety_identifier = normalizedInput.safetyIdentifier
-      const tools: NonNullable<ResponseCreateParamsNonStreaming['tools']> = []
-      if (fileSearch) {
-        tools.push({
+      request.tools = [
+        {
           type: 'file_search',
           vector_store_ids: [fileSearch.vectorStoreId],
           max_num_results: OPENAI_FILE_SEARCH_MAX_RESULTS
-        })
-      }
-      if (webSearch) {
-        tools.push({
+        },
+        {
           type: 'web_search',
           filters: { allowed_domains: [...webSearch.allowedDomains] },
           search_context_size: OPENAI_WEB_SEARCH_CONTEXT_SIZE
-        })
-      }
-      if (tools.length) {
-        request.tools = tools
-        request.tool_choice = 'auto'
-        request.parallel_tool_calls = false
-        request.max_tool_calls = 1
-      }
+        }
+      ]
+      request.tool_choice = 'auto'
+      request.parallel_tool_calls = false
+      request.max_tool_calls = 1
 
       try {
         const response = await client.responses.create(request, {
@@ -212,10 +204,7 @@ export function createOpenAIResponsesAdapter(
           timeout: normalizedInput.timeoutMs,
           ...(normalizedInput.signal ? { signal: normalizedInput.signal } : {})
         })
-        return normalizeResponse(response, model, {
-          fileSearchEnabled: Boolean(fileSearch),
-          webSearchAllowedDomains: webSearch?.allowedDomains ?? null
-        })
+        return normalizeResponse(response, model, webSearch.allowedDomains)
       } catch (error) {
         throw normalizeProviderError(error)
       }
@@ -224,7 +213,6 @@ export function createOpenAIResponsesAdapter(
 }
 
 export function getOpenAIResponsesAdapter(config: AppRuntimeConfig = getAppRuntimeConfig()): OpenAIResponsesAdapter {
-  requireModuleReady('ai', config)
   productionAdapter ??= createOpenAIResponsesAdapter(config.openai)
   return productionAdapter
 }
@@ -245,8 +233,8 @@ function normalizeInput(input: OpenAIResponseInput): NormalizedOpenAIResponseInp
     if ((message.role !== 'user' && message.role !== 'assistant') || !message.content.trim()) {
       throw new OpenAIProviderError('invalid_request')
     }
-    renderedInputBytes += renderedMessageStructuralBytes + Buffer.byteLength(message.content, 'utf8')
-    if (renderedInputBytes > maxRenderedInputBytes) {
+    renderedInputBytes += aiPolicy.providerMessageStructuralBytes + Buffer.byteLength(message.content, 'utf8')
+    if (renderedInputBytes > aiPolicy.maximumRenderedInputBytes) {
       throw new OpenAIProviderError('invalid_request')
     }
     return { role: message.role, content: message.content }
@@ -276,10 +264,7 @@ function normalizeInput(input: OpenAIResponseInput): NormalizedOpenAIResponseInp
 function normalizeResponse(
   response: OpenAIResponseEnvelope,
   expectedModel: string,
-  capabilities: Readonly<{
-    fileSearchEnabled: boolean
-    webSearchAllowedDomains: readonly string[] | null
-  }>
+  webSearchAllowedDomains: readonly string[]
 ): OpenAIResponseResult {
   const requestId = normalizeRequestId(response._request_id)
 
@@ -302,15 +287,12 @@ function normalizeResponse(
   const fileSearchCalls = response.output.filter((item) => item.type === 'file_search_call')
   const webSearchCalls = response.output.filter((item) => item.type === 'web_search_call')
   if (
-    (!capabilities.fileSearchEnabled && fileSearchCalls.length) ||
-    (!capabilities.webSearchAllowedDomains && webSearchCalls.length) ||
     fileSearchCalls.length + webSearchCalls.length > 1 ||
     fileSearchCalls.length > 1 ||
     webSearchCalls.length > 1 ||
     fileSearchCalls.some((call) => call.status !== 'completed') ||
     webSearchCalls.some(
-      (call) =>
-        call.status !== 'completed' || !isSupportedWebSearchAction(call.action, capabilities.webSearchAllowedDomains!)
+      (call) => call.status !== 'completed' || !isSupportedWebSearchAction(call.action, webSearchAllowedDomains)
     )
   ) {
     throw new OpenAIProviderError('invalid_response', { requestId })
@@ -339,23 +321,26 @@ function normalizeResponse(
     throw new OpenAIProviderError('invalid_response', { requestId })
   }
 
+  const text = textParts.map((part) => part.text).join('')
+  const refusal = refusalParts.join('\n')
+  const visibleOutput = textParts.length ? text : refusal
+  if (!visibleOutput.trim() || Buffer.byteLength(visibleOutput, 'utf8') > aiPolicy.maximumAssistantMessageBytes) {
+    throw new OpenAIProviderError('invalid_response', { requestId })
+  }
+
   const annotations = textParts.flatMap((part) => part.annotations)
   const citations = normalizeCitations(textParts, annotations, {
     requestId,
     fileSearchCallCount: fileSearchCalls.length,
     webSearchCallCount: webSearchCalls.length,
-    webSearchAllowedDomains: capabilities.webSearchAllowedDomains
+    webSearchAllowedDomains
   })
 
   const usage = normalizeUsage(response.usage, requestId)
-  const text = textParts.map((part) => part.text).join('')
   if (textParts.length) {
-    if (!text.trim()) throw new OpenAIProviderError('invalid_response', { requestId })
     return Object.freeze({ kind: 'text', text, citations, model: expectedModel, requestId, usage })
   }
 
-  const refusal = refusalParts.join('\n')
-  if (!refusal.trim() || text) throw new OpenAIProviderError('invalid_response', { requestId })
   return Object.freeze({ kind: 'refusal', text: refusal, citations: [], model: expectedModel, requestId, usage })
 }
 
@@ -401,7 +386,7 @@ function normalizeCitations(
     requestId: string | undefined
     fileSearchCallCount: number
     webSearchCallCount: number
-    webSearchAllowedDomains: readonly string[] | null
+    webSearchAllowedDomains: readonly string[]
   }>
 ): OpenAICitation[] {
   const fileAnnotations: Record<string, unknown>[] = []
@@ -464,11 +449,11 @@ function normalizeFileCitations(
 function normalizeWebCitations(
   textParts: ReadonlyArray<Readonly<{ text: string }>>,
   annotations: readonly Record<string, unknown>[],
-  allowedDomains: readonly string[] | null,
+  allowedDomains: readonly string[],
   requestId: string | undefined
 ): OpenAIWebCitation[] {
   if (!annotations.length) return []
-  if (!allowedDomains || textParts.length !== 1) {
+  if (textParts.length !== 1) {
     throw new OpenAIProviderError('invalid_response', { requestId })
   }
 
@@ -677,17 +662,13 @@ function requireAllowedModel(value: string): 'gpt-5.6-luna' {
   return value
 }
 
-function normalizeFileSearchConfig(
-  config: OpenAIAdapterConfig['fileSearch']
-): Readonly<{ vectorStoreId: string }> | null {
-  if (!config.enabled) return null
+function normalizeFileSearchConfig(config: OpenAIAdapterConfig['fileSearch']): Readonly<{ vectorStoreId: string }> {
   return { vectorStoreId: requireConfiguredValue(config.vectorStoreId) }
 }
 
 function normalizeWebSearchConfig(
   config: OpenAIAdapterConfig['webSearch']
-): Readonly<{ allowedDomains: readonly string[] }> | null {
-  if (!config.enabled) return null
+): Readonly<{ allowedDomains: readonly string[] }> {
   if (!Array.isArray(config.allowedDomains) || config.allowedDomains.length < 1 || config.allowedDomains.length > 100) {
     throw new OpenAIProviderError('provider_configuration')
   }

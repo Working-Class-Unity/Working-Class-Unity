@@ -1,7 +1,9 @@
-import { index, integer, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core'
+import { sql } from 'drizzle-orm'
+import { check, index, integer, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core'
 
 const authTimestamp = (name: string) => integer(name, { mode: 'timestamp' }).notNull()
 const optionalAuthTimestamp = (name: string) => integer(name, { mode: 'timestamp' })
+export const userRoles = ['user', 'admin'] as const
 
 export const user = sqliteTable(
   'user',
@@ -11,10 +13,15 @@ export const user = sqliteTable(
     email: text('email').notNull(),
     emailVerified: integer('email_verified', { mode: 'boolean' }).notNull().default(false),
     image: text('image'),
+    role: text('role', { enum: userRoles }).notNull().default('user'),
     createdAt: authTimestamp('created_at'),
     updatedAt: authTimestamp('updated_at')
   },
-  (table) => [uniqueIndex('user_email_idx').on(table.email)]
+  (table) => [
+    uniqueIndex('user_email_idx').on(table.email),
+    check('user_name_check', sql`${table.name} = trim(${table.name}) and length(${table.name}) between 1 and 100`),
+    check('user_role_check', sql`${table.role} in ('user', 'admin')`)
+  ]
 )
 
 export const session = sqliteTable(
@@ -29,8 +36,7 @@ export const session = sqliteTable(
     userAgent: text('user_agent'),
     userId: text('user_id')
       .notNull()
-      .references(() => user.id, { onDelete: 'cascade' }),
-    activeOrganizationId: text('active_organization_id')
+      .references(() => user.id, { onDelete: 'cascade' })
   },
   (table) => [uniqueIndex('session_token_idx').on(table.token), index('session_user_id_idx').on(table.userId)]
 )
@@ -74,6 +80,7 @@ export const verification = sqliteTable(
 )
 
 export type User = typeof user.$inferSelect
+export type UserRole = (typeof userRoles)[number]
 export type Session = typeof session.$inferSelect
 export type Account = typeof account.$inferSelect
 export type Verification = typeof verification.$inferSelect

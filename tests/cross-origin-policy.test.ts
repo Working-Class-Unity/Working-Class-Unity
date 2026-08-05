@@ -3,7 +3,6 @@ import { existsSync, readdirSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { createApp, createError, defineEventHandler, getRequestHeader, toNodeListener, type EventHandler } from 'h3'
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
-import { runtimeModuleIds } from '../shared/modules'
 import {
   crossOriginRequestBlockedCode,
   isCommandOriginAllowed,
@@ -32,8 +31,6 @@ afterAll(() => {
 describe('app command origin policy', () => {
   it('protects every unsafe app API family while keeping safe and non-API requests out of scope', () => {
     for (const [method, pathname] of [
-      ['POST', '/api/invitations'],
-      ['PATCH', '/api/projects/project_1'],
       ['POST', '/api/files/uploads'],
       ['PUT', '/api/files/file_1/content'],
       ['POST', '/api/files/file_1/complete'],
@@ -42,7 +39,6 @@ describe('app command origin policy', () => {
       ['POST', '/api/ai/conversations/ai_conversation_1/messages'],
       ['DELETE', '/api/ai/conversations/ai_conversation_1/messages'],
       ['DELETE', '/api/ai/conversations/ai_conversation_1'],
-      ['POST', '/api/account/family/leave'],
       ['POST', '/api/account/billing/checkout'],
       ['DELETE', '/api/account']
     ]) {
@@ -50,16 +46,16 @@ describe('app command origin policy', () => {
     }
 
     for (const method of ['POST', 'PUT', 'PATCH', 'DELETE', 'BREW']) {
-      expect(requiresCommandOriginPolicy(method, '/api/projects')).toBe(true)
-      expect(requiresCommandOriginPolicy(method.toLowerCase(), '/api/projects/project_1')).toBe(true)
+      expect(requiresCommandOriginPolicy(method, '/api/ai/conversations')).toBe(true)
+      expect(requiresCommandOriginPolicy(method.toLowerCase(), '/api/ai/conversations/ai_conversation_1')).toBe(true)
     }
 
     for (const method of ['GET', 'HEAD', 'OPTIONS']) {
-      expect(requiresCommandOriginPolicy(method, '/api/projects')).toBe(false)
+      expect(requiresCommandOriginPolicy(method, '/api/ai/conversations')).toBe(false)
     }
 
-    expect(requiresCommandOriginPolicy('POST', '/projects')).toBe(false)
-    expect(requiresCommandOriginPolicy('POST', '/api-example/projects')).toBe(false)
+    expect(requiresCommandOriginPolicy('POST', '/ai/conversations')).toBe(false)
+    expect(requiresCommandOriginPolicy('POST', '/api-example/ai/conversations')).toBe(false)
   })
 
   it('keeps unsafe app commands out of non-API Nitro routes that the policy does not cover', () => {
@@ -113,10 +109,10 @@ describe('app command origin policy', () => {
     for (const signals of [
       { origin: appOrigin },
       { secFetchSite: 'same-origin' },
-      { referer: `${appOrigin}/projects/project_1?tab=activity` },
-      { origin: appOrigin, referer: `${appOrigin}/projects`, secFetchSite: 'same-origin' },
+      { referer: `${appOrigin}/app?panel=ai` },
+      { origin: appOrigin, referer: `${appOrigin}/app`, secFetchSite: 'same-origin' },
       { origin: appOrigin, secFetchSite: 'future-value' },
-      { referer: `${appOrigin}/projects`, secFetchSite: 'future-value' }
+      { referer: `${appOrigin}/app`, secFetchSite: 'future-value' }
     ]) {
       expect(isCommandOriginAllowed(signals, appUrl), JSON.stringify(signals)).toBe(true)
     }
@@ -151,7 +147,7 @@ describe('app command origin policy', () => {
 
     try {
       const hostileOrigin = 'https://sensitive-attacker.invalid'
-      const rejected = await request(server, '/api/projects', {
+      const rejected = await request(server, '/api/ai/conversations', {
         method: 'POST',
         headers: { origin: hostileOrigin, cookie: 'session=must-not-authorize-hostile-origin' }
       })
@@ -164,7 +160,7 @@ describe('app command origin policy', () => {
       expect(rejectedBody).not.toContain(hostileOrigin)
       expect(reached).not.toHaveBeenCalled()
 
-      const allowed = await request(server, '/api/projects', {
+      const allowed = await request(server, '/api/ai/conversations', {
         method: 'POST',
         headers: { origin: appOrigin, 'sec-fetch-site': 'same-origin' }
       })
@@ -187,8 +183,6 @@ describe('app command origin policy', () => {
 
     try {
       for (const [family, method, pathname, sourceHeaders] of [
-        ['family-plan invitation', 'POST', '/api/invitations', { origin: 'https://attacker.invalid' }],
-        ['project', 'PATCH', '/api/projects/project_1', { origin: 'https://attacker.invalid' }],
         ['file upload initiation', 'POST', '/api/files/uploads', { origin: 'https://attacker.invalid' }],
         ['local file content upload', 'PUT', '/api/files/file_1/content?token=opaque', {}],
         ['file completion', 'POST', '/api/files/file_1/complete', { origin: 'https://attacker.invalid' }],
@@ -212,11 +206,10 @@ describe('app command origin policy', () => {
           '/api/ai/conversations/ai_conversation_1',
           { origin: 'https://attacker.invalid' }
         ],
-        ['family self-leave', 'POST', '/api/account/family/leave', { origin: 'https://attacker.invalid' }],
         ['billing', 'POST', '/api/account/billing/checkout', { origin: 'https://attacker.invalid' }],
         ['prospective app-account lifecycle', 'DELETE', '/api/account', { origin: 'https://attacker.invalid' }],
-        ['encoded API segment', 'POST', '/%61pi/projects', { origin: 'https://attacker.invalid' }],
-        ['partially encoded API segment without source signals', 'POST', '/a%70i/projects', {}],
+        ['encoded API segment', 'POST', '/%61pi/ai/conversations', { origin: 'https://attacker.invalid' }],
+        ['partially encoded API segment without source signals', 'POST', '/a%70i/ai/conversations', {}],
         ['encoded exemption neighbor', 'POST', '/%61pi/webhooks/%73tripes', { origin: 'https://attacker.invalid' }]
       ]) {
         const response = await request(server, pathname, {
@@ -341,58 +334,13 @@ describe('app command origin policy', () => {
       await closeServer(server)
     }
   })
-
-  it('keeps the numbered disabled-module boundary ahead of command-origin rejection', async () => {
-    const config = testConfig()
-    vi.spyOn(runtime, 'getAppRuntimeConfig').mockReturnValue(config)
-    vi.stubGlobal('useRuntimeConfig', () => config)
-    const moduleBoundary = (await import('../server/middleware/01-module-boundary')).default
-    const crossOrigin = (await import('../server/middleware/02-cross-origin')).default
-    const server = await startServer([moduleBoundary, crossOrigin, defineEventHandler(() => ({ reached: true }))])
-
-    try {
-      for (const pathname of ['/api/account/billing/checkout', '/%61pi/account/billing/%63heckout']) {
-        const response = await request(server, pathname, { method: 'POST' })
-        const body = await response.text()
-
-        expect(response.status, pathname).toBe(404)
-        expect(body, pathname).toContain('MODULE_DISABLED')
-        expect(body, pathname).not.toContain(crossOriginRequestBlockedCode)
-      }
-    } finally {
-      await closeServer(server)
-    }
-  })
-
-  it('conceals the disabled billing page before a route handler can render it', async () => {
-    const config = testConfig()
-    vi.spyOn(runtime, 'getAppRuntimeConfig').mockReturnValue(config)
-    vi.stubGlobal('useRuntimeConfig', () => config)
-    const moduleBoundary = (await import('../server/middleware/01-module-boundary')).default
-    const server = await startServer([moduleBoundary, defineEventHandler(() => ({ reached: true }))])
-
-    try {
-      for (const pathname of ['/account/billing', '/%61ccount/%62illing']) {
-        const response = await request(server, pathname)
-        const body = await response.text()
-
-        expect(response.status, pathname).toBe(404)
-        expect(body, pathname).toContain('MODULE_DISABLED')
-        expect(body, pathname).not.toContain('reached')
-      }
-    } finally {
-      await closeServer(server)
-    }
-  })
 })
 
 function testConfig(): AppRuntimeConfig {
   return {
     public: {
-      appUrl,
-      moduleStates: Object.fromEntries(runtimeModuleIds.map((moduleId) => [moduleId, 'disabled']))
-    },
-    modules: Object.fromEntries(runtimeModuleIds.map((moduleId) => [moduleId, { enabled: false }]))
+      appUrl
+    }
   } as unknown as AppRuntimeConfig
 }
 

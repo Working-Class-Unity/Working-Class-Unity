@@ -1,12 +1,10 @@
 import { randomUUID } from 'node:crypto'
+import { aiPolicy, utf8ByteLength } from '../../services/ai/ai-policy'
 import type { DatabaseConnection } from '../connect'
 import type { AiGenerationAttemptStatus, AiMessageRole } from '../schema'
 
 const defaultPageSize = 50
 const maximumPageSize = 100
-// The 200,000-byte rendered-input budget can contain at most this many rows
-// after reserving the service's minimum 32-byte structural charge per message.
-const maximumAiContextRows = 6_250
 const maximumFileCitationsPerMessage = 10
 const maximumWebCitationsPerMessage = 20
 const maximumFileCitationTitleCharacters = 512
@@ -59,6 +57,19 @@ export type AiMessageWebCitationProjection = Readonly<{
 export type AiMessageCitationProjection = AiMessageFileCitationProjection | AiMessageWebCitationProjection
 
 type AiMessageRow = Omit<AiMessageProjection, 'citations'>
+
+export type AiMessageMetadataProjection = Readonly<{
+  id: string
+  sequence: number
+  role: AiMessageRole
+  contentBytes: number
+  createdAt: string
+}>
+
+export type AiMessageContentProjection = Readonly<{
+  role: AiMessageRole
+  content: string
+}>
 
 type AiMessageFileCitationRow = Readonly<{
   messageId: string
@@ -131,6 +142,7 @@ export type ReserveAiGenerationAttemptResult =
   | Readonly<{ kind: 'not-found' }>
   | Readonly<{ kind: 'quota-exceeded'; usage: AiUsageBucketProjection }>
   | Readonly<{ kind: 'concurrency-exceeded' }>
+  | Readonly<{ kind: 'history-limit-exceeded' }>
   | Readonly<{
       kind: 'existing'
       conversation: AiConversationProjection
@@ -149,7 +161,7 @@ export type ReserveAiGenerationAttemptResult =
 export type FinalizeAiGenerationAttemptStatus = Exclude<AiGenerationAttemptStatus, 'pending'>
 
 export type FinalizeAiGenerationAttemptResult =
-  | Readonly<{ kind: 'not-found' | 'stale' | 'expired' }>
+  | Readonly<{ kind: 'not-found' | 'stale' | 'expired' | 'history-limit-exceeded' }>
   | Readonly<{
       kind: 'existing' | 'finalized'
       conversation: AiConversationProjection
@@ -329,31 +341,49 @@ export function listAiMessagesForOwner(
   }
 }
 
-/**
- * Reads a bounded newest-first suffix solely for provider-context assembly.
- * Public transcript pagination remains independent and has no storage ceiling.
- */
-export function listRecentAiMessagesForOwner(
+export function listRecentAiMessageMetadataForOwner(
+  connection: DatabaseConnection,
+  ownerUserId: string,
+  conversationId: string
+): AiMessageMetadataProjection[] | null {
+  if (!conversationForOwner(connection, ownerUserId, conversationId)) return null
+
+  return connection.sqlite
+    .prepare(
+      `select id, sequence, role, octet_length(content) as contentBytes, created_at as createdAt
+       from ai_messages
+       where conversation_id = ?
+       order by sequence desc
+       limit ${aiPolicy.maximumRetainedMessages}`
+    )
+    .all(conversationId) as AiMessageMetadataProjection[]
+}
+
+export function listAiMessageContentsForOwner(
   connection: DatabaseConnection,
   ownerUserId: string,
   conversationId: string,
-  limit: number
-): AiMessageProjection[] | null {
+  messageIds: readonly string[]
+): AiMessageContentProjection[] | null {
   if (!conversationForOwner(connection, ownerUserId, conversationId)) return null
-  if (!Number.isSafeInteger(limit) || limit < 1 || limit > maximumAiContextRows) {
-    throw new RangeError(`AI context message limit must be between 1 and ${maximumAiContextRows}`)
+  if (
+    !Array.isArray(messageIds) ||
+    messageIds.length < 1 ||
+    messageIds.length > aiPolicy.maximumRetainedMessages ||
+    new Set(messageIds).size !== messageIds.length
+  ) {
+    throw new RangeError(`AI context must select between 1 and ${aiPolicy.maximumRetainedMessages} unique messages`)
   }
 
-  const messages = connection.sqlite
+  const placeholders = messageIds.map(() => '?').join(', ')
+  return connection.sqlite
     .prepare(
-      `select id, sequence, role, content, created_at as createdAt
+      `select role, content
        from ai_messages
-       where conversation_id = ?
-       order by sequence desc, id desc
-       limit ?`
+       where conversation_id = ? and id in (${placeholders})
+       order by sequence asc`
     )
-    .all(conversationId, limit) as AiMessageRow[]
-  return hydrateMessageCitations(connection, messages)
+    .all(conversationId, ...messageIds) as AiMessageContentProjection[]
 }
 
 export function getAiGenerationAttemptForOwner(
@@ -458,6 +488,15 @@ export function reserveAiGenerationAttempt(
         return { kind: 'quota-exceeded', usage: currentUsage }
       }
 
+      const retainedHistory = retainedHistoryForConversation(connection, conversation.id)
+      if (
+        retainedHistory.messageCount + 2 > aiPolicy.maximumRetainedMessages ||
+        retainedHistory.contentBytes + utf8ByteLength(input.content) + aiPolicy.maximumAssistantMessageBytes >
+          aiPolicy.maximumRetainedContentBytes
+      ) {
+        return { kind: 'history-limit-exceeded' }
+      }
+
       const messageId = `ai_message_${randomUUID()}`
       const attemptId = `ai_attempt_${randomUUID()}`
       connection.sqlite
@@ -515,7 +554,14 @@ export function reserveAiGenerationAttempt(
       return {
         kind: 'reserved',
         conversation: requireConversationForOwner(connection, ownerUserId, conversation.id),
-        userMessage: requireMessageForConversation(connection, conversation.id, messageId),
+        userMessage: {
+          id: messageId,
+          sequence: conversation.nextSequence,
+          role: 'user',
+          content: input.content,
+          createdAt,
+          citations: []
+        },
         attempt: requireAttemptById(connection, attemptId),
         usage: requireUsageBucketForOwner(connection, ownerUserId, input.usageBucketDate)
       }
@@ -546,14 +592,19 @@ export function finalizeAiGenerationAttempt(
   if (!Number.isSafeInteger(input.historyRevision) || input.historyRevision < 0) {
     throw new RangeError('AI history revision must be a non-negative safe integer')
   }
+  const assistantContentBytes = utf8ByteLength(input.assistantContent ?? '')
   if (input.status === 'succeeded') {
-    if (!input.assistantContent?.length || input.assistantContent.length > 1_000_000 || input.errorCode) {
+    if (
+      !input.assistantContent?.length ||
+      assistantContentBytes > aiPolicy.maximumAssistantMessageBytes ||
+      input.errorCode
+    ) {
       throw new TypeError('A successful AI attempt requires bounded assistant content and no error code')
     }
   } else if (input.status === 'refused') {
     if (
       !input.assistantContent?.length ||
-      input.assistantContent.length > 1_000_000 ||
+      assistantContentBytes > aiPolicy.maximumAssistantMessageBytes ||
       !input.errorCode ||
       !safeAttemptErrorCodePattern.test(input.errorCode)
     ) {
@@ -625,6 +676,33 @@ export function finalizeAiGenerationAttempt(
 
       let assistantMessage: AiMessageProjection | null = null
       if (input.status === 'succeeded' || input.status === 'refused') {
+        const retainedHistory = retainedHistoryForConversation(connection, conversation.id)
+        if (
+          retainedHistory.messageCount + 1 > aiPolicy.maximumRetainedMessages ||
+          retainedHistory.contentBytes + assistantContentBytes > aiPolicy.maximumRetainedContentBytes
+        ) {
+          finishAttemptWithoutAssistant(connection, attempt.id, {
+            status: 'failed',
+            errorCode: 'application_history_limit',
+            providerRequestId,
+            inputTokens,
+            outputTokens,
+            reasoningTokens,
+            cachedInputTokens,
+            cacheWriteTokens,
+            completedAt
+          })
+          addUsageTokens(connection, ownerUserId, attempt.usageBucketDate, {
+            inputTokens,
+            outputTokens,
+            reasoningTokens,
+            cachedInputTokens,
+            cacheWriteTokens,
+            updatedAt: completedAt
+          })
+          return { kind: 'history-limit-exceeded' }
+        }
+
         const assistantMessageId = `ai_message_${randomUUID()}`
         connection.sqlite
           .prepare(
@@ -807,6 +885,24 @@ function addUsageTokens(
   if (updated.changes !== 1) throw new Error('AI usage bucket is missing while finalizing an attempt')
 }
 
+function retainedHistoryForConversation(
+  connection: DatabaseConnection,
+  conversationId: string
+): Readonly<{ messageCount: number; contentBytes: number }> {
+  return connection.sqlite
+    .prepare(
+      `select count(*) as messageCount, coalesce(sum(contentBytes), 0) as contentBytes
+       from (
+         select octet_length(content) as contentBytes
+         from ai_messages
+         where conversation_id = ?
+         order by sequence desc
+         limit ${aiPolicy.maximumRetainedMessages + 1}
+       )`
+    )
+    .get(conversationId) as { messageCount: number; contentBytes: number }
+}
+
 function conversationForOwner(
   connection: DatabaseConnection,
   ownerUserId: string,
@@ -890,7 +986,7 @@ function hydrateMessageCitations(
   messages: readonly AiMessageRow[]
 ): AiMessageProjection[] {
   if (!messages.length) return []
-  if (messages.length > maximumAiContextRows) {
+  if (messages.length > maximumPageSize) {
     throw new RangeError('AI citation hydration exceeded its bounded message count')
   }
 

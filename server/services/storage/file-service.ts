@@ -1,19 +1,20 @@
-import { randomUUID } from 'node:crypto'
 import type { Readable } from 'node:stream'
+import { createError } from 'h3'
 import type { DatabaseConnection } from '../../db/connect'
 import type { CreateFileUploadRequest, FileMetadata } from '../../db/schema'
 import { contentTypeSchema } from '../../db/schema'
 import {
-  createPendingFile,
+  admitPendingFileUpload,
+  FileUploadInitiationRateLimitError,
   getFileForOwner,
   listFilesForOwner,
   markFileReady,
+  PendingFileUploadLimitError,
   type FileListCursor
 } from '../../db/repositories/files'
 import { useDatabase } from '../../db/client'
 import type { AppSession } from '../../utils/auth/require-session'
 import { conflictError, notFoundError, upstreamServiceError, validationError } from '../../utils/errors'
-import { requireModuleReady } from '../../utils/module-state'
 import {
   createFileDownloadToken,
   createFileUploadToken,
@@ -21,7 +22,7 @@ import {
   verifyFileUploadToken,
   type FileUploadTokenPayload
 } from './file-tokens'
-import { objectKeyForFileId } from './file-object-keys'
+import { fileCleanupSchedulingMarginMs, fileDownloadTokenTtlMs } from './file-policy'
 import {
   assertFileBucketMatchesStorage,
   assertFileStorageBinding,
@@ -29,11 +30,14 @@ import {
 } from './file-storage-binding'
 import { LocalObjectAlreadyExistsError, LocalObjectIntegrityError } from './local-object-storage'
 import { destroyObjectStorage, headStoredObject, useObjectStorage, type ObjectStorage } from './object-storage'
+import { scheduleFilesCleanupRoot } from './orphan-cleanup'
 
-export const fileUploadTokenTtlMs = 15 * 60 * 1000
-export const fileDownloadTokenTtlMs = 60 * 1000
-export const fileCleanupSchedulingMarginMs = 60 * 1000
-export const fileCleanupMaxAttempts = 2_147_483_647
+export {
+  fileCleanupMaxAttempts,
+  fileCleanupSchedulingMarginMs,
+  fileDownloadTokenTtlMs,
+  fileUploadTokenTtlMs
+} from './file-policy'
 
 export type PublicFile = Readonly<{
   id: string
@@ -46,7 +50,6 @@ export type PublicFile = Readonly<{
 }>
 
 export async function listOwnedFiles(session: AppSession, options: Readonly<{ cursor?: string; limit?: number }> = {}) {
-  requireModuleReady('files')
   const connection = useDatabase()
   const page = await listFilesForOwner(connection, session.user.id, {
     cursor: options.cursor ? decodeFileListCursor(options.cursor) : undefined,
@@ -67,7 +70,6 @@ export async function listOwnedFiles(session: AppSession, options: Readonly<{ cu
 }
 
 export async function getOwnedFileMetadata(session: AppSession, fileId: string) {
-  requireModuleReady('files')
   const connection = useDatabase()
   const file = await requireOwnedFile(connection, session.user.id, fileId)
   const storage = useObjectStorage()
@@ -80,7 +82,6 @@ export async function getOwnedFileMetadata(session: AppSession, fileId: string) 
 }
 
 export async function createFileUploadTarget(session: AppSession, input: CreateFileUploadRequest) {
-  requireModuleReady('files')
   const storage = useObjectStorage()
   try {
     return await createFileUploadTargetForConnection(useDatabase(), storage, session.user.id, input)
@@ -97,22 +98,29 @@ export async function createFileUploadTargetForConnection(
   options: Readonly<{ signingDate?: Date; now?: () => Date }> = {}
 ) {
   const clock = options.now ?? (() => new Date())
-  const signingDate = options.signingDate ?? clock()
   assertFileStorageIdentity(connection, storage, storage.bucketName)
-  const fileId = `file_${randomUUID()}`
-  const objectKey = objectKeyForFileId(fileId)
-  const uploadExpiresAt = new Date(signingDate.getTime() + fileUploadTokenTtlMs).toISOString()
-  const file = await createPendingFile(connection, {
-    id: fileId,
-    ownerId,
-    bucket: storage.bucketName,
-    objectKey,
-    originalName: input.filename,
-    contentType: input.contentType,
-    byteSize: input.byteSize,
-    contentMd5: input.contentMd5,
-    uploadExpiresAt
-  })
+  let file: ReturnType<typeof admitPendingFileUpload>
+  try {
+    file = admitPendingFileUpload(
+      connection,
+      {
+        ownerId,
+        bucket: storage.bucketName,
+        originalName: input.filename,
+        contentType: input.contentType,
+        byteSize: input.byteSize,
+        contentMd5: input.contentMd5
+      },
+      { now: () => options.signingDate ?? clock() }
+    )
+  } catch (error) {
+    if (error instanceof PendingFileUploadLimitError) throw conflictError('File upload limit reached')
+    if (error instanceof FileUploadInitiationRateLimitError) {
+      throw createError({ statusCode: 429, statusMessage: 'File upload initiation rate limit reached' })
+    }
+    throw error
+  }
+  const signingDate = new Date(file.createdAt)
 
   try {
     if (storage.kind === 'r2') {
@@ -131,7 +139,7 @@ export async function createFileUploadTargetForConnection(
         throw new Error('R2 upload capability expiry does not match persisted state')
       }
       const response = { file: publicFile(file), upload: requests.upload, head: requests.head }
-      enqueueFileCleanupAt(
+      scheduleFilesCleanupRoot(
         connection,
         new Date(Date.parse(file.uploadExpiresAt) + fileCleanupSchedulingMarginMs).toISOString()
       )
@@ -158,7 +166,7 @@ export async function createFileUploadTargetForConnection(
         }
       }
     }
-    enqueueFileCleanupAt(
+    scheduleFilesCleanupRoot(
       connection,
       new Date(Date.parse(file.uploadExpiresAt) + fileCleanupSchedulingMarginMs).toISOString()
     )
@@ -178,7 +186,6 @@ export async function putFileUploadContent(
   body: AsyncIterable<Uint8Array>,
   headers: Readonly<{ contentType?: string; contentMd5?: string; contentLength?: string }>
 ) {
-  requireModuleReady('files')
   const storage = useObjectStorage()
   try {
     return await putVerifiedFileUploadContent(
@@ -268,7 +275,6 @@ export async function putVerifiedFileUploadContent(
 }
 
 export async function completeFileUpload(session: AppSession, fileId: string) {
-  requireModuleReady('files')
   const storage = useObjectStorage()
   try {
     return await completeFileUploadForConnection(useDatabase(), storage, session.user.id, fileId)
@@ -302,7 +308,6 @@ export async function completeFileUploadForConnection(
 }
 
 export async function createPrivateFileDownload(session: AppSession, fileId: string) {
-  requireModuleReady('files')
   const storage = useObjectStorage()
   try {
     return await createPrivateFileDownloadForConnection(useDatabase(), storage, session.user.id, fileId)
@@ -354,7 +359,6 @@ export async function getLocalFileDownload(
   fileId: string,
   token: string
 ): Promise<{ file: PublicFile; body: Readable; byteSize: number }> {
-  requireModuleReady('files')
   const payload = verifyFileDownloadToken(token)
   if (payload.fileId !== fileId || payload.ownerId !== session.user.id) throw notFoundError('File download not found')
   const storage = useObjectStorage()
@@ -375,8 +379,6 @@ export async function getLocalFileDownload(
 }
 
 export async function deleteOwnedFile(session: AppSession, fileId: string) {
-  requireModuleReady('files')
-  requireModuleReady('jobs')
   const storage = useObjectStorage()
   try {
     const deleted = deleteOwnedFileAndScheduleCleanup(useDatabase(), storage, session.user.id, fileId)
@@ -414,7 +416,7 @@ export function deleteOwnedFileAndScheduleCleanup(
       const runAfter = new Date(
         Math.max(now.getTime(), Date.parse(file.uploadExpiresAt) + fileCleanupSchedulingMarginMs)
       ).toISOString()
-      enqueueFileCleanupAt(connection, runAfter)
+      scheduleFilesCleanupRoot(connection, runAfter)
       return true
     })
     .immediate()
@@ -481,14 +483,6 @@ function assertFileStorageIdentity(connection: DatabaseConnection, storage: Obje
     if (error instanceof FileStorageBindingError) throw storageUnavailableError()
     throw error
   }
-}
-
-function enqueueFileCleanupAt(connection: DatabaseConnection, runAfter: string) {
-  connection.sqlite
-    .prepare(
-      "insert into job_queue (type, payload, max_attempts, run_after) values ('files.cleanup-orphans', '{}', ?, ?)"
-    )
-    .run(fileCleanupMaxAttempts, runAfter)
 }
 
 function storageUnavailableError() {

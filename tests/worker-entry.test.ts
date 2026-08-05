@@ -9,16 +9,16 @@ import { dirname, join } from 'node:path'
 import { promisify } from 'node:util'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
-import { familyJoinRecoveryJobType } from '../server/db/repositories/family-join'
-import { familyInvitationExpirationJobType } from '../server/services/jobs/family-invitation-expiration'
-import { billingAccountDeletionCancellationJobType } from '../server/services/payments/billing-account-deletion-job'
-import { billingDetachedSubscriptionCancellationJobType } from '../server/services/payments/billing-detached-subscription-cancellation'
-import {
-  billingFamilyLifecycleSignalJobType,
-  hashBillingFamilyLifecycleEpisodeKey
-} from '../server/services/payments/billing-family-lifecycle-signal'
-import { billingReconciliationSafetyJobType } from '../server/services/payments/billing-reconciliation-safety'
-import { billingWebhookReconciliationJobType } from '../server/services/payments/billing-webhook-reference'
+import { billingStripeJobTypes } from '../server/services/payments/stripe/jobs'
+
+const [
+  billingAccountDeletionCancellationJobType,
+  billingDetachedSubscriptionCancellationJobType,
+  billingWebhookReconciliationJobType,
+  billingReconciliationSafetyJobType,
+  billingTransitionConvergenceJobType,
+  billingNotificationDeliveryJobType
+] = billingStripeJobTypes
 
 const execFileAsync = promisify(execFile)
 const migrationsFolder = fileURLToPath(new URL('../server/db/migrations/', import.meta.url))
@@ -28,58 +28,14 @@ const workerPreload = fileURLToPath(new URL('../worker-sentry.server.config.ts',
 const webRoot = fileURLToPath(new URL('..', import.meta.url))
 
 describe('worker entry', () => {
-  it.each(['SIGTERM', 'SIGINT'] as const)(
-    'stays inert without providers or SQLite until %s when Jobs is disabled',
-    async (signal) => {
-      const directory = mkdtempSync(join(tmpdir(), 'swl-worker-disabled-'))
-      const databasePath = join(directory, 'unopened-database', 'worker.db')
-      let worker: RunningWorker | undefined
-
-      try {
-        worker = startWorker(databasePath, {
-          NUXT_MODULES_JOBS_ENABLED: 'false',
-          NUXT_MODULES_OBSERVABILITY_ENABLED: 'true',
-          NUXT_PUBLIC_SENTRY_DSN: 'https://public@example.ingest.sentry.io/2',
-          NUXT_SENTRY_DSN: 'https://server@example.ingest.sentry.io/1'
-        })
-        await waitForWorkerOutput(worker, 'Worker idle: jobs module is disabled\n')
-        await new Promise((resolve) => setTimeout(resolve, 250))
-        expect(worker.child.exitCode).toBe(null)
-        expect(worker.child.signalCode).toBe(null)
-        expect(existsSync(dirname(databasePath))).toBe(false)
-
-        expect(worker.child.kill(signal)).toBe(true)
-        await expect(withTimeout(worker.exited, 10_000, `Idle worker did not stop after ${signal}`)).resolves.toEqual({
-          code: 0,
-          signal: null
-        })
-        expect(worker.stderr).toBe('')
-        expect(worker.stdout).toBe(
-          'Worker idle: jobs module is disabled\n' +
-            `Worker received ${signal}; stopping idle worker\n` +
-            'Worker stopped\n'
-        )
-        expect(existsSync(dirname(databasePath))).toBe(false)
-      } finally {
-        await forceStopWorker(worker)
-        rmSync(directory, { recursive: true, force: true })
-      }
-    },
-    40_000
-  )
-
-  it('fails before opening SQLite when Observability is enabled without the Sentry preload', async () => {
+  it('fails before opening SQLite in production without the Sentry preload', async () => {
     const directory = mkdtempSync(join(tmpdir(), 'swl-worker-preload-'))
     const databasePath = join(directory, 'unopened-database', 'worker.db')
 
     try {
       const execution = execFileAsync(process.execPath, ['--import', tsxImport, workerEntry], {
         cwd: webRoot,
-        env: workerEnvironment(databasePath, {
-          NUXT_MODULES_OBSERVABILITY_ENABLED: 'true',
-          NUXT_PUBLIC_SENTRY_DSN: 'https://public@example.ingest.sentry.io/2',
-          NUXT_SENTRY_DSN: 'https://server@example.ingest.sentry.io/1'
-        }),
+        env: workerEnvironment(databasePath),
         encoding: 'utf8',
         timeout: 30_000
       })
@@ -109,13 +65,7 @@ describe('worker entry', () => {
       mkdirSync(dirname(objectPath), { recursive: true })
       writeFileSync(objectPath, 'orphaned worker fixture')
 
-      worker = startWorker(databasePath, {
-        NUXT_MODULES_FILES_ENABLED: 'true',
-        NUXT_FILES_DRIVER: 'local',
-        NUXT_MODULES_OBSERVABILITY_ENABLED: 'true',
-        NUXT_PUBLIC_SENTRY_DSN: 'https://public@example.ingest.sentry.io/2',
-        NUXT_SENTRY_DSN: 'https://server@example.ingest.sentry.io/1'
-      })
+      worker = startWorker(databasePath)
 
       expect(await waitForCompletedJob(sqlite, jobId)).toEqual(completedOnce)
       const cleanupJobs = await waitForFileCleanupConvergence(sqlite, objectPath)
@@ -141,7 +91,7 @@ describe('worker entry', () => {
     }
   }, 40_000)
 
-  it('registers the billing cancellation handler only when Billing is ready', async () => {
+  it('registers every Billing job handler', async () => {
     const directory = mkdtempSync(join(tmpdir(), 'swl-worker-billing-deletion-'))
     const databasePath = join(directory, 'worker.db')
     let sqlite: InstanceType<typeof Database> | undefined
@@ -164,24 +114,22 @@ describe('worker entry', () => {
         insertJob(sqlite, billingDetachedSubscriptionCancellationJobType, {
           subjectId: 'missing_detached_subject'
         }),
-        insertJob(sqlite, billingFamilyLifecycleSignalJobType, {
-          action: 'coverage_ended',
-          billingSubscriptionId: 'missing_subscription',
-          billingTransitionId: null,
-          episodeKey: hashBillingFamilyLifecycleEpisodeKey('evt_missing')
-        }),
-        insertJob(sqlite, familyInvitationExpirationJobType, { cursor: null }),
-        insertJob(sqlite, familyJoinRecoveryJobType, { attemptId: 'missing_attempt' }),
         insertJob(sqlite, billingReconciliationSafetyJobType, { cursor: null, cycleStartedAt }),
         insertJob(sqlite, billingWebhookReconciliationJobType, {
           eventId: 'evt_worker_duplicate',
           eventType: 'customer.subscription.updated',
           eventCreatedAt: 1,
           objectId: 'sub_worker_duplicate'
+        }),
+        insertJob(sqlite, billingTransitionConvergenceJobType, { transitionId: 'missing_transition' }),
+        insertJob(sqlite, billingNotificationDeliveryJobType, {
+          notificationKey: 'b'.repeat(64),
+          kind: 'payment_attention',
+          purchaserUserId: 'missing_user',
+          authorityReference: null
         })
       ]
       worker = startWorker(databasePath, {
-        NUXT_MODULES_BILLING_ENABLED: 'true',
         NUXT_STRIPE_SECRET_KEY: 'rk_test_worker_entry',
         NUXT_STRIPE_WEBHOOK_SECRET: 'whsec_worker_entry',
         NUXT_STRIPE_PORTAL_CONFIGURATION_ID: 'bpc_worker_entry',
@@ -262,18 +210,6 @@ function startWorker(databasePath: string, overrides: Record<string, string> = {
   child.stdout?.on('data', (chunk: string) => (worker.stdout += chunk))
   child.stderr?.on('data', (chunk: string) => (worker.stderr += chunk))
   return worker
-}
-
-async function waitForWorkerOutput(worker: RunningWorker, output: string) {
-  const deadline = Date.now() + 10_000
-  while (!worker.stdout.includes(output) && Date.now() < deadline) {
-    await new Promise((resolve) => setTimeout(resolve, 25))
-  }
-  if (!worker.stdout.includes(output)) {
-    throw new Error(
-      `Worker did not produce expected output: stdout=${JSON.stringify(worker.stdout)} stderr=${JSON.stringify(worker.stderr)}`
-    )
-  }
 }
 
 async function waitForCompletedJob(sqlite: InstanceType<typeof Database>, jobId: number) {
@@ -362,20 +298,29 @@ function workerEnvironment(databasePath: string, overrides: Record<string, strin
     NUXT_DATABASE_URL: `file:${databasePath}`,
     NUXT_READINESS_TOKEN: 'worker-entry-readiness-value-at-least-thirty-two-chars',
     NUXT_BETTER_AUTH_SECRET: 'worker-entry-auth-value-at-least-thirty-two-chars',
-    NUXT_BETTER_AUTH_URL: 'https://worker.example.test',
-    NUXT_SOCIAL_PROVIDERS_GOOGLE_ENABLED: 'false',
+    NUXT_BETTER_AUTH_URL: 'http://127.0.0.1:3000',
     NUXT_EMAIL_TRANSPORT: 'capture',
     NUXT_EMAIL_FROM: 'Worker Test <worker@example.test>',
     NUXT_EMAIL_CAPTURE_DIRECTORY: join(dirname(databasePath), 'email'),
-    NUXT_PUBLIC_APP_URL: 'https://worker.example.test',
-    NUXT_MODULES_BILLING_ENABLED: 'false',
-    NUXT_MODULES_FILES_ENABLED: 'false',
-    NUXT_MODULES_AI_ENABLED: 'false',
-    NUXT_OPENAI_FILE_SEARCH_ENABLED: 'false',
-    NUXT_OPENAI_WEB_SEARCH_ENABLED: 'false',
-    NUXT_MODULES_TURNSTILE_ENABLED: 'false',
-    NUXT_MODULES_OBSERVABILITY_ENABLED: 'false',
-    NUXT_MODULES_JOBS_ENABLED: 'true',
+    NUXT_PUBLIC_APP_URL: 'http://127.0.0.1:3000',
+    NUXT_STRIPE_SECRET_KEY: 'rk_test_worker_entry',
+    NUXT_STRIPE_WEBHOOK_SECRET: 'whsec_worker_entry',
+    NUXT_STRIPE_PORTAL_CONFIGURATION_ID: 'bpc_worker_entry',
+    NUXT_STRIPE_PERSONAL_WEEKLY_PRICE_ID: 'price_worker_personal_weekly',
+    NUXT_STRIPE_PERSONAL_MONTHLY_PRICE_ID: 'price_worker_personal_monthly',
+    NUXT_STRIPE_PERSONAL_ANNUAL_PRICE_ID: 'price_worker_personal_annual',
+    NUXT_STRIPE_FAMILY_MONTHLY_PRICE_ID: 'price_worker_family_monthly',
+    NUXT_STRIPE_FAMILY_ANNUAL_PRICE_ID: 'price_worker_family_annual',
+    NUXT_FILES_DRIVER: 'local',
+    NUXT_OPENAI_API_KEY: 'worker-openai-key-not-a-provider-credential',
+    NUXT_OPENAI_PROJECT_ID: 'proj_worker_entry',
+    NUXT_OPENAI_MODEL: 'gpt-5.6-luna',
+    NUXT_OPENAI_FILE_SEARCH_VECTOR_STORE_ID: 'vs_worker_empty',
+    NUXT_OPENAI_WEB_SEARCH_ALLOWED_DOMAINS: 'example.test',
+    NUXT_CLOUDFLARE_TURNSTILE_SECRET_KEY: 'worker-turnstile-secret-not-a-provider-credential',
+    NUXT_PUBLIC_TURNSTILE_SITE_KEY: 'worker-turnstile-site-not-a-provider-credential',
+    NUXT_SENTRY_DSN: 'https://server@example.ingest.sentry.io/1',
+    NUXT_PUBLIC_SENTRY_DSN: 'https://public@example.ingest.sentry.io/2',
     ...overrides
   }
 }

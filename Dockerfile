@@ -11,7 +11,6 @@ RUN npm run bootstrap
 
 FROM node:24-bookworm-slim AS build
 WORKDIR /app
-ARG NUXT_MODULES_OBSERVABILITY_ENABLED=false
 ARG SENTRY_ORG
 ARG SENTRY_PROJECT
 ARG SENTRY_RELEASE
@@ -26,15 +25,13 @@ RUN test ! -e /app/.env.container-canary \
   && test ! -e /app/.env \
   && test ! -e /app/.git \
   && test ! -e /app/data
-RUN --mount=type=secret,id=NUXT_MODULES_OBSERVABILITY_ENABLED,env=BUILD_SECRET_NUXT_MODULES_OBSERVABILITY_ENABLED,required=false \
-  --mount=type=secret,id=SENTRY_AUTH_TOKEN,env=BUILD_SECRET_SENTRY_AUTH_TOKEN,required=false \
+RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN,env=BUILD_SECRET_SENTRY_AUTH_TOKEN,required=false \
   --mount=type=secret,id=SENTRY_ORG,env=BUILD_SECRET_SENTRY_ORG,required=false \
   --mount=type=secret,id=SENTRY_PROJECT,env=BUILD_SECRET_SENTRY_PROJECT,required=false \
   --mount=type=secret,id=SENTRY_RELEASE,env=BUILD_SECRET_SENTRY_RELEASE,required=false \
   --mount=type=secret,id=SENTRY_URL,env=BUILD_SECRET_SENTRY_URL,required=false \
   --mount=type=secret,id=SENTRY_UPLOAD_CACHE_BUST,env=BUILD_SECRET_SENTRY_UPLOAD_CACHE_BUST,required=false \
-  export NUXT_MODULES_OBSERVABILITY_ENABLED="${BUILD_SECRET_NUXT_MODULES_OBSERVABILITY_ENABLED:-$NUXT_MODULES_OBSERVABILITY_ENABLED}" \
-  SENTRY_AUTH_TOKEN="${BUILD_SECRET_SENTRY_AUTH_TOKEN:-}" \
+  export SENTRY_AUTH_TOKEN="${BUILD_SECRET_SENTRY_AUTH_TOKEN:-}" \
   SENTRY_ORG="${BUILD_SECRET_SENTRY_ORG:-$SENTRY_ORG}" \
   SENTRY_PROJECT="${BUILD_SECRET_SENTRY_PROJECT:-$SENTRY_PROJECT}" \
   SENTRY_UPLOAD_CACHE_BUST="${BUILD_SECRET_SENTRY_UPLOAD_CACHE_BUST:-$SENTRY_UPLOAD_CACHE_BUST}" \

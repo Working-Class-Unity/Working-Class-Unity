@@ -334,6 +334,12 @@ export function normalizeCloudflareR2Endpoint(endpoint: string, accountId: strin
   return url.origin
 }
 
+export function r2BrowserRequestOrigin(config: Pick<R2ObjectStorageConfig, 'accountId' | 'bucket' | 'endpoint'>) {
+  const endpoint = new URL(normalizeCloudflareR2Endpoint(config.endpoint, config.accountId))
+  endpoint.hostname = `${normalizeR2BucketName(config.bucket)}.${endpoint.hostname}`
+  return endpoint.origin
+}
+
 export function normalizeR2BucketName(bucket: string) {
   if (!/^[a-z0-9](?:[a-z0-9-]{1,61}[a-z0-9])$/.test(bucket)) {
     throw new Error('R2 bucket must use its 3-63 character lowercase alphanumeric and hyphen name')

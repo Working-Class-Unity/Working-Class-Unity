@@ -5,6 +5,7 @@ import Database from 'better-sqlite3'
 import { drizzle } from 'drizzle-orm/better-sqlite3'
 import { describe, expect, it } from 'vitest'
 import * as schema from '../server/db/schema'
+import { createAccountDeletionUserOptions } from '../server/utils/auth/account-deletion'
 
 const redirectSchemas = [
   ['OIDC provider', oidcProvider({ loginPage: '/login' }).endpoints.registerOAuthApplication.options.body],
@@ -35,6 +36,7 @@ describe('Better Auth advisory and adapter compatibility', () => {
           provider: 'sqlite',
           schema
         }),
+        user: createAccountDeletionUserOptions({ sqlite, db: database, databasePath: ':memory:' }),
         disabledPaths: ['/sign-up/email', '/sign-in/email'],
         emailAndPassword: {
           enabled: false
@@ -57,6 +59,9 @@ describe('Better Auth advisory and adapter compatibility', () => {
       expect(context.adapter).toBeDefined()
       expect(context.options.emailAndPassword?.enabled).toBe(false)
       expect(context.options.verification?.storeInDatabase).toBe(true)
+      expect(context.options.user?.additionalFields).toMatchObject({
+        role: { type: ['user', 'admin'], required: false, defaultValue: 'user', input: false }
+      })
       expect(context.options.disabledPaths).toEqual(expect.arrayContaining(['/sign-up/email', '/sign-in/email']))
       expect(context.options.plugins?.find((plugin) => plugin.id === 'magic-link')?.options).toMatchObject({
         expiresIn: 300,

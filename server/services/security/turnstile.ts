@@ -40,13 +40,6 @@ type SiteverifyAttempt = Readonly<{ kind: 'non-2xx' }> | Readonly<{ kind: 'respo
 export async function verifyTurnstileToken(input: VerifyTurnstileTokenInput) {
   const config = input.config ?? getAppRuntimeConfig()
 
-  if (!config.modules.turnstile.enabled) {
-    return {
-      configured: false,
-      success: true
-    }
-  }
-
   const expectedHostname = configuredTurnstileHostname(config)
   const token = turnstileTokenSchema.safeParse(input.token)
   if (!token.success) throw turnstileChallengeRejected()

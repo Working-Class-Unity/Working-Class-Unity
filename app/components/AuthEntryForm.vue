@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { resolveAuthCallbacks, type AuthEntryIntent } from '#shared/auth-routes'
-import { isPublicModuleReady } from '#shared/module-states'
+import { displayNameMaxLength, resolveAuthCallbacks, type AuthEntryIntent } from '#shared/auth-routes'
 import { turnstileActions, turnstileHeaderName } from '#shared/turnstile'
 import { authClient } from '~/lib/auth-client'
 
@@ -14,9 +13,9 @@ const props = defineProps<{
 }>()
 
 const route = useRoute()
-const config = useRuntimeConfig()
 const { t } = useI18n()
-const { data: baseline, error: baselineError } = await useFetch('/api/baseline')
+const displayName = ref('')
+const displayNameError = ref('')
 const email = ref('')
 const emailInput = ref<HTMLInputElement | null>(null)
 const turnstileChallenge = ref<TurnstileChallengeHandle | null>(null)
@@ -25,8 +24,6 @@ const fieldError = ref('')
 const formError = ref(route.query.error === undefined ? '' : t('auth.errors.authenticationFailed'))
 const formSuccess = ref(route.query.status === 'signed-out' ? t('auth.status.signedOut') : '')
 const isSubmitting = ref(false)
-const isSigningInWithGoogle = ref(false)
-const requiresTurnstile = isPublicModuleReady(config.public.moduleStates, 'turnstile')
 
 const copy = computed(() =>
   props.intent === 'login'
@@ -41,11 +38,17 @@ const copy = computed(() =>
         intro: t('auth.signup.introduction')
       }
 )
-const callbacks = computed(() => resolveAuthCallbacks(props.intent, route.query.returnTo))
-const googleReady = computed(() => baseline.value?.socialProviders.google === 'ready')
+const callbacks = computed(() => resolveAuthCallbacks(props.intent))
+const displayNameInputId = computed(() => `${props.intent}-display-name`)
+const displayNameErrorId = computed(() => `${props.intent}-display-name-error`)
+const displayNameHelpId = computed(() => `${props.intent}-display-name-help`)
 const emailInputId = computed(() => `${props.intent}-email`)
 const fieldErrorId = computed(() => `${props.intent}-email-error`)
 const formStatusId = computed(() => `${props.intent}-form-status`)
+
+watch(displayName, () => {
+  displayNameError.value = ''
+})
 
 watch(email, () => {
   fieldError.value = ''
@@ -54,6 +57,7 @@ watch(email, () => {
 async function submitAuth() {
   formError.value = ''
   formSuccess.value = ''
+  displayNameError.value = ''
   fieldError.value = ''
 
   if (!validateAuthForm()) {
@@ -61,7 +65,7 @@ async function submitAuth() {
     return
   }
 
-  if (requiresTurnstile && !turnstileToken.value) {
+  if (!turnstileToken.value) {
     formError.value = t('auth.errors.securityRequired')
     return
   }
@@ -70,14 +74,13 @@ async function submitAuth() {
 
   try {
     const request = {
+      name: displayName.value,
       email: email.value,
       ...callbacks.value
     }
-    const result = requiresTurnstile
-      ? await authClient.signIn.magicLink(request, {
-          headers: { [turnstileHeaderName]: turnstileToken.value }
-        })
-      : await authClient.signIn.magicLink(request)
+    const result = await authClient.signIn.magicLink(request, {
+      headers: { [turnstileHeaderName]: turnstileToken.value }
+    })
 
     if (result.error) {
       formError.value = t('auth.errors.emailLink')
@@ -85,46 +88,30 @@ async function submitAuth() {
     }
 
     formSuccess.value = t('auth.status.emailLinkSent')
+    displayName.value = ''
     email.value = ''
   } catch {
     formError.value = t('auth.errors.emailLink')
   } finally {
-    if (requiresTurnstile) turnstileChallenge.value?.reset()
+    turnstileChallenge.value?.reset()
     isSubmitting.value = false
   }
 }
 
-async function signInWithGoogle() {
-  if (!googleReady.value || isSigningInWithGoogle.value) return
-
-  formError.value = ''
-  formSuccess.value = ''
-  isSigningInWithGoogle.value = true
-
-  try {
-    const result = await authClient.signIn.social({
-      provider: 'google',
-      ...callbacks.value
-    })
-
-    if (result.error) {
-      formError.value = t('auth.errors.google')
-    }
-  } catch {
-    formError.value = t('auth.errors.google')
-  } finally {
-    isSigningInWithGoogle.value = false
-  }
-}
-
 function validateAuthForm() {
+  if (!displayName.value.trim()) {
+    displayNameError.value = t('auth.displayName.required')
+  } else if (displayName.value.length > displayNameMaxLength) {
+    displayNameError.value = t('auth.displayName.tooLong', { max: displayNameMaxLength })
+  }
+
   if (!email.value.trim()) {
     fieldError.value = t('auth.email.required')
   } else if (emailInput.value && !emailInput.value.validity.valid) {
     fieldError.value = t('common.emailInvalid')
   }
 
-  return !fieldError.value
+  return !displayNameError.value && !fieldError.value
 }
 </script>
 
@@ -149,6 +136,27 @@ function validateAuthForm() {
       novalidate
       @submit.prevent="submitAuth"
     >
+      <div class="form-field">
+        <label :for="displayNameInputId">{{ t('auth.displayName.label') }}</label>
+        <!-- eslint-disable vue/html-self-closing -->
+        <input
+          :id="displayNameInputId"
+          v-model.trim="displayName"
+          name="name"
+          type="text"
+          autocomplete="name"
+          :maxlength="displayNameMaxLength"
+          :aria-describedby="displayNameError ? `${displayNameHelpId} ${displayNameErrorId}` : displayNameHelpId"
+          :aria-invalid="displayNameError ? 'true' : undefined"
+          required
+        />
+        <!-- eslint-enable vue/html-self-closing -->
+        <small :id="displayNameHelpId">{{ t('auth.displayName.help') }}</small>
+        <small v-if="displayNameError" :id="displayNameErrorId" class="field-error">
+          {{ displayNameError }}
+        </small>
+      </div>
+
       <label class="form-field" :for="emailInputId">
         <span>{{ t('common.email') }}</span>
         <!-- eslint-disable vue/html-self-closing -->
@@ -187,28 +195,10 @@ function validateAuthForm() {
         </template>
       </i18n-t>
 
-      <button class="primary-button" type="submit" :disabled="isSubmitting || (requiresTurnstile && !turnstileToken)">
+      <button class="primary-button" type="submit" :disabled="isSubmitting || !turnstileToken">
         {{ isSubmitting ? t('auth.email.sending') : t('auth.email.submit') }}
       </button>
     </form>
-
-    <section class="social-auth" aria-labelledby="social-auth-title">
-      <div>
-        <h2 id="social-auth-title">{{ t('auth.social.title') }}</h2>
-        <p v-if="googleReady">{{ t('auth.social.googleReady') }}</p>
-        <p v-else-if="baselineError">{{ t('auth.social.providerUnavailable') }}</p>
-        <p v-else>{{ t('auth.social.googleNotConfigured') }}</p>
-      </div>
-      <button
-        v-if="googleReady"
-        class="secondary-button social-auth-button"
-        type="button"
-        :disabled="isSigningInWithGoogle"
-        @click="signInWithGoogle"
-      >
-        {{ isSigningInWithGoogle ? t('auth.social.openingGoogle') : t('auth.social.continueWithGoogle') }}
-      </button>
-    </section>
   </section>
 </template>
 
@@ -227,29 +217,9 @@ function validateAuthForm() {
     color: var(--color-text-muted);
   }
 
-  .auth-form,
-  .social-auth {
+  .auth-form {
     display: grid;
     gap: var(--space-3);
-  }
-
-  .social-auth {
-    border-top: 1px solid var(--color-border);
-    padding-top: var(--space-4);
-  }
-
-  .social-auth h2 {
-    margin: 0;
-    font-size: 1rem;
-  }
-
-  .social-auth p {
-    margin: var(--space-1) 0 0;
-    color: var(--color-text-muted);
-  }
-
-  .social-auth-button {
-    width: 100%;
   }
 
   .legal-acknowledgment {

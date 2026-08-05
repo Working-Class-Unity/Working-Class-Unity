@@ -8,19 +8,21 @@ export function createAccountDeletionUserOptions(
   connection: DatabaseConnection
 ): NonNullable<BetterAuthOptions['user']> {
   return {
+    additionalFields: {
+      role: {
+        type: ['user', 'admin'],
+        required: false,
+        defaultValue: 'user',
+        input: false
+      }
+    },
     deleteUser: {
       enabled: true,
       beforeDelete: async (user) => {
-        deleteAccountAtomically(
-          connection,
-          {
-            id: user.id,
-            email: user.email
-          },
-          {
-            requireBillingProof: true
-          }
-        )
+        deleteAccountAtomically(connection, {
+          id: user.id,
+          email: user.email
+        })
       }
     }
   }

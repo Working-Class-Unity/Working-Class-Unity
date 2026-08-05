@@ -1,7 +1,12 @@
-import { getValidatedRouterParams, readValidatedBody, setHeader, setResponseStatus } from 'h3'
+import { getValidatedRouterParams, setHeader, setResponseStatus } from 'h3'
 import { createOwnedAiMessage } from '../../../../../services/ai/ai-conversation-service'
-import { aiConversationParamsSchema, createAiMessageSchema } from '../../../../../services/ai/ai-validation'
+import {
+  aiConversationParamsSchema,
+  aiMessageCreateBodyLimitBytes,
+  createAiMessageSchema
+} from '../../../../../services/ai/ai-validation'
 import { requireSession } from '../../../../../utils/auth/require-session'
+import { readValidatedBodyWithByteLimit } from '../../../../../utils/request-body'
 import { validateWithZod } from '../../../../../utils/validation'
 
 export default defineEventHandler(async (event) => {
@@ -20,8 +25,9 @@ export default defineEventHandler(async (event) => {
       event,
       validateWithZod(aiConversationParamsSchema, 'Invalid AI conversation route parameters')
     )
-    const body = await readValidatedBody(
+    const body = await readValidatedBodyWithByteLimit(
       event,
+      aiMessageCreateBodyLimitBytes,
       validateWithZod(createAiMessageSchema, 'Invalid AI message create request')
     )
     if (controller.signal.aborted) return

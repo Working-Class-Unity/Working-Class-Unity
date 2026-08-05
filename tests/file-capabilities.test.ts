@@ -15,8 +15,7 @@ const contentMd5 = 'ndTkYSaMgDT1yFZOFVxnpg=='
 
 beforeEach(() => {
   vi.spyOn(runtime, 'getAppRuntimeConfig').mockReturnValue({
-    betterAuth: { secret: capabilitySecret },
-    modules: { files: { enabled: true } }
+    betterAuth: { secret: capabilitySecret }
   } as AppRuntimeConfig)
 })
 

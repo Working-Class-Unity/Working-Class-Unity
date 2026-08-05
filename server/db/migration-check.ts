@@ -6,26 +6,45 @@ import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { verifySqliteIntegrityAndForeignKeys } from './connect'
 
-const tempDir = mkdtempSync(join(tmpdir(), 'swl-migration-check-'))
+const tempDir = mkdtempSync(join(tmpdir(), 'wcu-migration-check-'))
 const databasePath = join(tempDir, 'app.db')
 const migrationsFolder = resolve('server/db/migrations')
 const sqlite = new Database(databasePath)
-const expectedMigrationTags = [
-  '0000_pre_release_baseline',
-  '0001_runtime_invariants',
-  '0002_stripe_subscription_persistence',
-  '0003_stripe_subscription_invariants'
+const expectedMigrationTags = ['0000_wcu_initial'] as const
+const expectedRuntimeTables = [
+  'account',
+  'ai_conversations',
+  'ai_generation_attempts',
+  'ai_generation_leases',
+  'ai_message_file_citations',
+  'ai_message_web_citations',
+  'ai_messages',
+  'ai_usage_buckets',
+  'app_settings',
+  'billing_account_deletion_requests',
+  'billing_checkout_attempts',
+  'billing_customers',
+  'billing_events',
+  'billing_subscription_transitions',
+  'billing_subscriptions',
+  'detached_billing_subjects',
+  'files',
+  'job_queue',
+  'session',
+  'user',
+  'verification'
 ] as const
-const rebuiltAuthorityTriggers = [
-  'member_external_family_authority_before_insert',
-  'member_external_family_authority_before_update',
-  'billing_checkout_external_family_authority_before_insert',
-  'billing_checkout_external_family_authority_before_update',
-  'billing_subscription_external_family_authority_before_insert',
-  'billing_subscription_external_family_authority_before_update',
-  'member_current_family_manager_authority_before_insert',
-  'family_join_open_subscription_correlation_before_update',
-  'family_join_open_customer_correlation_before_update'
+const expectedBillingTriggers = [
+  'billing_checkout_customer_purchaser_insert',
+  'billing_checkout_customer_purchaser_update',
+  'billing_deletion_references_insert',
+  'billing_deletion_references_update',
+  'billing_subscription_customer_purchaser_insert',
+  'billing_subscription_customer_purchaser_update',
+  'billing_subscription_offering_reconciliation_insert',
+  'billing_subscription_offering_reconciliation_update',
+  'billing_transition_subscription_purchaser_insert',
+  'billing_transition_subscription_purchaser_update'
 ] as const
 
 try {
@@ -46,7 +65,7 @@ try {
   requireCurrentRuntimeSchema('Repeat migration')
   verifySqliteIntegrityAndForeignKeys(sqlite, 'Repeat migration', fail)
 
-  console.log('Fresh and repeat four-entry migration check passed with 30 runtime triggers.')
+  console.log('Fresh and repeat WCU initial migration check passed with 21 tables and 10 Billing triggers.')
 } finally {
   sqlite.close()
   rmSync(tempDir, { recursive: true, force: true })
@@ -73,25 +92,49 @@ function requireCurrentMigrationPackage() {
 }
 
 function requireCurrentRuntimeSchema(label: string) {
+  const tableNames = (
+    sqlite
+      .prepare(
+        "select name from sqlite_master where type = 'table' and name not like 'sqlite_%' and name <> '__drizzle_migrations' order by name"
+      )
+      .all() as Array<{ name: string }>
+  ).map(({ name }) => name)
+  if (JSON.stringify(tableNames) !== JSON.stringify(expectedRuntimeTables)) {
+    fail(`${label} produced tables ${JSON.stringify(tableNames)}; expected ${JSON.stringify(expectedRuntimeTables)}.`)
+  }
+
   const triggerNames = (
     sqlite.prepare("select name from sqlite_master where type = 'trigger' order by name").all() as Array<{
       name: string
     }>
   ).map(({ name }) => name)
-  if (triggerNames.length !== 30) {
-    fail(`${label} produced ${triggerNames.length} runtime triggers; expected 30.`)
+  if (JSON.stringify(triggerNames) !== JSON.stringify(expectedBillingTriggers)) {
+    fail(
+      `${label} produced triggers ${JSON.stringify(triggerNames)}; expected ${JSON.stringify(expectedBillingTriggers)}.`
+    )
   }
-  for (const trigger of rebuiltAuthorityTriggers) {
-    if (!triggerNames.includes(trigger)) fail(`${label} did not restore ${trigger}.`)
+
+  const userColumns = sqlite.prepare("pragma table_info('user')").all() as Array<{
+    name: string
+    notnull: number
+    dflt_value: string | null
+  }>
+  const roleColumn = userColumns.find(({ name }) => name === 'role')
+  if (!roleColumn || roleColumn.notnull !== 1 || roleColumn.dflt_value !== "'user'") {
+    fail(`${label} did not create the required default-user role column.`)
   }
 
   for (const table of [
+    'billing_account_deletion_requests',
+    'billing_checkout_attempts',
+    'billing_customers',
     'billing_subscription_transitions',
-    'family_join_attempts',
-    'billing_account_deletion_requests'
+    'billing_subscriptions'
   ]) {
-    const row = sqlite.prepare("select name from sqlite_master where type = 'table' and name = ?").get(table)
-    if (!row) fail(`${label} did not create ${table}.`)
+    const columns = sqlite.prepare(`pragma table_info('${table}')`).all() as Array<{ name: string }>
+    if (!columns.some(({ name }) => name === 'purchaser_user_id')) {
+      fail(`${label} did not create ${table}.purchaser_user_id.`)
+    }
   }
   const temporaryTables = sqlite
     .prepare("select name from sqlite_master where type = 'table' and name like '\\_\\_new\\_%' escape '\\'")

@@ -54,7 +54,7 @@ beforeEach(() => {
   migrate(db, { migrationsFolder })
   connection = { sqlite, db, databasePath: ':memory:' }
   productionMocks.useDatabase.mockReturnValue(connection)
-  productionMocks.getAppRuntimeConfig.mockReturnValue(runtimeConfig(false))
+  productionMocks.getAppRuntimeConfig.mockReturnValue(runtimeConfig())
   productionMocks.getOpenAIResponsesAdapter.mockReturnValue(successfulProvider())
 })
 
@@ -222,57 +222,36 @@ describe('private AI conversation service', () => {
     expect(JSON.stringify(created)).not.toContain('request_provider_web_normalized')
   })
 
-  it('keeps same-family conversations private and checks billing entitlement before provider work', async () => {
-    insertUser(connection, 'family-owner', 'family-owner@example.test')
-    insertUser(connection, 'family-member', 'family-member@example.test')
-    const family = connection.sqlite
-      .prepare("select id from organization where personal_owner_user_id = 'family-owner'")
-      .get() as { id: string }
-    connection.sqlite
-      .prepare(
-        `insert into member (id, organization_id, user_id, role, created_at)
-         values (?, ?, 'family-member', 'member', ?)`
-      )
-      .run(`member_${randomUUID()}`, family.id, fixedNow.getTime())
+  it('lets every account use AI while keeping conversations private between users', async () => {
+    insertUser(connection, 'first-owner', 'first-owner@example.test')
+    insertUser(connection, 'second-owner', 'second-owner@example.test')
+    const createResponse = vi
+      .fn<OpenAIResponsesAdapter['createResponse']>()
+      .mockResolvedValue(successfulResult('A private response.'))
+    const service = makeService({ provider: () => ({ createResponse }) })
+    const firstConversation = service.createConversation('first-owner')
 
-    const provider = vi.fn(() => neverProvider())
-    const unmetered = makeService({ provider })
-    const conversation = unmetered.createConversation('family-owner')
-
-    expect(unmetered.listConversations('family-member')).toEqual({ conversations: [], nextCursor: null })
-    expect(() => unmetered.getConversation('family-member', conversation.id)).toThrow(
+    expect(service.listConversations('second-owner')).toEqual({ conversations: [], nextCursor: null })
+    expect(() => service.getConversation('second-owner', firstConversation.id)).toThrow(
       expect.objectContaining({ statusCode: 404 })
     )
     await expect(
-      unmetered.createMessage('family-member', conversation.id, {
+      service.createMessage('second-owner', firstConversation.id, {
         clientRequestId: randomUUID(),
-        content: 'Family entitlement is not data access.'
+        content: 'A foreign conversation is not data access.'
       })
     ).rejects.toMatchObject({ statusCode: 404 })
-
-    const metered = makeService({ provider, config: runtimeConfig(true) })
-    expect(() => metered.createConversation('family-owner')).toThrow(expect.objectContaining({ statusCode: 403 }))
-    await expect(
-      metered.createMessage('family-owner', conversation.id, {
-        clientRequestId: randomUUID(),
-        content: 'No paid entitlement exists.'
-      })
-    ).rejects.toMatchObject({ statusCode: 403 })
-    expect(provider).not.toHaveBeenCalled()
     expect(connection.sqlite.prepare('select count(*) as count from ai_messages').get()).toEqual({ count: 0 })
 
-    seedActiveFamilySubscription(connection, family.id)
-    const entitledProvider = vi.fn(() => successfulProvider())
-    const entitled = makeService({ provider: entitledProvider, config: runtimeConfig(true) })
-    const memberConversation = entitled.createConversation('family-member')
+    const secondConversation = service.createConversation('second-owner')
     await expect(
-      entitled.createMessage('family-member', memberConversation.id, {
+      service.createMessage('second-owner', secondConversation.id, {
         clientRequestId: randomUUID(),
-        content: 'Inherited entitlement permits use but keeps this conversation private.'
+        content: 'Every authenticated account may use its own private AI conversation.'
       })
     ).resolves.toMatchObject({ replayed: false })
-    expect(entitledProvider).toHaveBeenCalledOnce()
-    expect(() => entitled.getConversation('family-owner', memberConversation.id)).toThrow(
+    expect(createResponse).toHaveBeenCalledOnce()
+    expect(() => service.getConversation('first-owner', secondConversation.id)).toThrow(
       expect.objectContaining({ statusCode: 404 })
     )
   })
@@ -316,6 +295,158 @@ describe('private AI conversation service', () => {
     expect([...firstPage.messages, ...secondPage.messages].map((message) => message.sequence)).toEqual(
       Array.from({ length: 122 }, (_, index) => index + 1)
     )
+  })
+
+  it('admits one final retained turn, rejects full and legacy histories without writes, and preserves replay', async () => {
+    insertUser(connection, 'row-limit-owner', 'row-limit-owner@example.test')
+    const createResponse = vi
+      .fn<OpenAIResponsesAdapter['createResponse']>()
+      .mockResolvedValue(successfulResult('The final retained assistant message.'))
+    const service = makeService({ provider: () => ({ createResponse }) })
+    const conversation = service.createConversation('row-limit-owner')
+    seedTranscript(connection, conversation.id, 254)
+    const clientRequestId = randomUUID()
+
+    const completed = await service.createMessage('row-limit-owner', conversation.id, {
+      clientRequestId,
+      content: 'This complete turn reaches exactly 256 retained messages.'
+    })
+    expect(conversationState(connection, 'row-limit-owner', conversation.id)).toMatchObject({
+      messages: 256,
+      attempts: 1,
+      leases: 0,
+      requestCount: 1,
+      nextSequence: 257
+    })
+    await expect(
+      service.createMessage('row-limit-owner', conversation.id, {
+        clientRequestId,
+        content: 'This complete turn reaches exactly 256 retained messages.'
+      })
+    ).resolves.toEqual({ ...completed, replayed: true })
+    expect(createResponse).toHaveBeenCalledOnce()
+
+    const beforeFullRejection = conversationState(connection, 'row-limit-owner', conversation.id)
+    await expect(
+      service.createMessage('row-limit-owner', conversation.id, {
+        clientRequestId: randomUUID(),
+        content: 'A full transcript cannot grow.'
+      })
+    ).rejects.toMatchObject({
+      statusCode: 409,
+      statusMessage: 'AI conversation history limit reached. Clear it or start a new conversation.'
+    })
+    expect(conversationState(connection, 'row-limit-owner', conversation.id)).toEqual(beforeFullRejection)
+    expect(createResponse).toHaveBeenCalledOnce()
+
+    const legacy = service.createConversation('row-limit-owner')
+    seedTranscript(connection, legacy.id, 257)
+    expect(conversationState(connection, 'row-limit-owner', legacy.id).messages).toBe(257)
+    const beforeLegacyRejection = conversationState(connection, 'row-limit-owner', legacy.id)
+    await expect(
+      service.createMessage('row-limit-owner', legacy.id, {
+        clientRequestId: randomUUID(),
+        content: 'Legacy excess remains readable but cannot grow.'
+      })
+    ).rejects.toMatchObject({ statusCode: 409 })
+    expect(conversationState(connection, 'row-limit-owner', legacy.id)).toEqual(beforeLegacyRejection)
+
+    service.clearConversation('row-limit-owner', legacy.id)
+    await expect(
+      service.createMessage('row-limit-owner', legacy.id, {
+        clientRequestId: randomUUID(),
+        content: 'Clearing restores retained-history capacity.'
+      })
+    ).resolves.toMatchObject({ replayed: false })
+    expect(createResponse).toHaveBeenCalledTimes(2)
+  })
+
+  it('uses exact SQLite UTF-8 bytes for the 2,000,000-byte retained ceiling', async () => {
+    insertUser(connection, 'byte-limit-owner', 'byte-limit-owner@example.test')
+    insertUser(connection, 'byte-overflow-owner', 'byte-overflow-owner@example.test')
+    const exactExistingContent = `${'é'.repeat(967_999)}x`
+    const overflowExistingContent = `${exactExistingContent}y`
+    const exactAssistantContent = '🙂'.repeat(16_000)
+    expect(Buffer.byteLength(exactExistingContent, 'utf8')).toBe(1_935_999)
+    expect(Buffer.byteLength(overflowExistingContent, 'utf8')).toBe(1_936_000)
+    expect(Buffer.byteLength(exactAssistantContent, 'utf8')).toBe(64_000)
+
+    const createResponse = vi
+      .fn<OpenAIResponsesAdapter['createResponse']>()
+      .mockResolvedValue(successfulResult(exactAssistantContent))
+    const service = makeService({ provider: () => ({ createResponse }) })
+    const exact = service.createConversation('byte-limit-owner')
+    seedMessages(connection, exact.id, [{ role: 'user', content: exactExistingContent }])
+
+    await expect(
+      service.createMessage('byte-limit-owner', exact.id, {
+        clientRequestId: randomUUID(),
+        content: 'x'
+      })
+    ).resolves.toMatchObject({ response: { assistantMessage: { content: exactAssistantContent } } })
+    expect(
+      connection.sqlite
+        .prepare(
+          `select count(*) as count, coalesce(sum(octet_length(content)), 0) as contentBytes
+           from ai_messages where conversation_id = ?`
+        )
+        .get(exact.id)
+    ).toEqual({ count: 3, contentBytes: 2_000_000 })
+
+    const overflow = service.createConversation('byte-overflow-owner')
+    seedMessages(connection, overflow.id, [{ role: 'user', content: overflowExistingContent }])
+    const beforeOverflow = conversationState(connection, 'byte-overflow-owner', overflow.id)
+    await expect(
+      service.createMessage('byte-overflow-owner', overflow.id, {
+        clientRequestId: randomUUID(),
+        content: 'x'
+      })
+    ).rejects.toMatchObject({ statusCode: 409 })
+    expect(conversationState(connection, 'byte-overflow-owner', overflow.id)).toEqual(beforeOverflow)
+    expect(createResponse).toHaveBeenCalledOnce()
+  })
+
+  it('terminalizes a defensive retained-history race as an idempotent safe conflict', async () => {
+    insertUser(connection, 'history-race-owner', 'history-race-owner@example.test')
+    let conversationId = ''
+    const createResponse = vi.fn<OpenAIResponsesAdapter['createResponse']>().mockImplementation(async () => {
+      const conversation = connection.sqlite
+        .prepare('select next_sequence as nextSequence from ai_conversations where id = ?')
+        .get(conversationId) as { nextSequence: number }
+      connection.sqlite.transaction(() => {
+        connection.sqlite
+          .prepare(
+            `insert into ai_messages (id, conversation_id, sequence, role, content, created_at)
+             values (?, ?, ?, 'assistant', 'Concurrent retained row.', ?)`
+          )
+          .run(`ai_message_${randomUUID()}`, conversationId, conversation.nextSequence, fixedNow.toISOString())
+        connection.sqlite
+          .prepare('update ai_conversations set next_sequence = next_sequence + 1 where id = ?')
+          .run(conversationId)
+      })()
+      return successfulResult('This provider response no longer fits.')
+    })
+    const service = makeService({ provider: () => ({ createResponse }) })
+    conversationId = service.createConversation('history-race-owner').id
+    seedTranscript(connection, conversationId, 254)
+    const clientRequestId = randomUUID()
+    const content = 'A concurrent retained row consumes the reserved assistant slot.'
+
+    await expect(
+      service.createMessage('history-race-owner', conversationId, { clientRequestId, content })
+    ).rejects.toMatchObject({ statusCode: 409 })
+    expect(
+      connection.sqlite
+        .prepare(
+          `select status, error_code as errorCode, assistant_message_id as assistantMessageId
+           from ai_generation_attempts where client_request_id = ?`
+        )
+        .get(clientRequestId)
+    ).toEqual({ status: 'failed', errorCode: 'application_history_limit', assistantMessageId: null })
+    await expect(
+      service.createMessage('history-race-owner', conversationId, { clientRequestId, content })
+    ).rejects.toMatchObject({ statusCode: 409 })
+    expect(createResponse).toHaveBeenCalledOnce()
   })
 
   it('enforces the persisted daily quota and one active generation without hidden provider calls', async () => {
@@ -456,7 +587,7 @@ describe('private AI conversation service', () => {
       .mockImplementation(() => deferredResponse.promise)
     const service = createAiConversationService({
       connection,
-      config: runtimeConfig(false),
+      config: runtimeConfig(),
       provider: () => ({ createResponse }),
       capture: vi.fn().mockResolvedValue(undefined),
       now: () => currentTime
@@ -656,8 +787,8 @@ describe('private AI conversation service', () => {
     }
 
     const noModelConfig = {
-      ...runtimeConfig(false),
-      openai: { ...runtimeConfig(false).openai, model: '' }
+      ...runtimeConfig(),
+      openai: { ...runtimeConfig().openai, model: '' }
     } as AppRuntimeConfig
     const noModel = makeService({ provider, config: noModelConfig })
     await expect(
@@ -974,7 +1105,7 @@ describe('private AI conversation service', () => {
     let currentTime = fixedNow
     const expiringSuccess = createAiConversationService({
       connection,
-      config: runtimeConfig(false),
+      config: runtimeConfig(),
       provider: () => ({
         async createResponse() {
           currentTime = new Date(fixedNow.getTime() + 91_000)
@@ -1033,7 +1164,7 @@ describe('private AI conversation service', () => {
     currentTime = fixedNow
     const expiringFailure = createAiConversationService({
       connection,
-      config: runtimeConfig(false),
+      config: runtimeConfig(),
       provider: () => ({
         async createResponse() {
           currentTime = new Date(fixedNow.getTime() + 91_000)
@@ -1082,30 +1213,22 @@ function makeService(
 ) {
   return createAiConversationService({
     connection,
-    config: runtimeConfig(false),
+    config: runtimeConfig(),
     capture: vi.fn().mockResolvedValue(undefined),
     now: () => fixedNow,
     ...overrides
   })
 }
 
-function runtimeConfig(billingEnabled: boolean) {
+function runtimeConfig() {
   return {
     betterAuth: { secret: 'test-better-auth-secret-at-least-32-characters' },
-    modules: {
-      ai: { enabled: true },
-      billing: { enabled: billingEnabled },
-      files: { enabled: false },
-      jobs: { enabled: false },
-      observability: { enabled: false },
-      turnstile: { enabled: false }
-    },
     openai: {
       apiKey: 'test-openai-api-key',
       projectId: 'test-openai-project',
       model: 'gpt-5.6-luna',
-      fileSearch: { enabled: false, vectorStoreId: '' },
-      webSearch: { enabled: false, allowedDomains: [] }
+      fileSearch: { vectorStoreId: 'vs_test_deployment_corpus' },
+      webSearch: { allowedDomains: ['example.test'] }
     }
   } as unknown as AppRuntimeConfig
 }
@@ -1203,29 +1326,28 @@ function seedMessages(
   })()
 }
 
-function encodedCursor(value: Record<string, unknown>) {
-  return Buffer.from(JSON.stringify(value)).toString('base64url')
+function conversationState(target: DatabaseConnection, ownerUserId: string, conversationId: string) {
+  return target.sqlite
+    .prepare(
+      `select next_sequence as nextSequence, updated_at as updatedAt,
+              (select count(*) from ai_messages where conversation_id = ai_conversations.id) as messages,
+              (select count(*) from ai_generation_attempts where conversation_id = ai_conversations.id) as attempts,
+              (select count(*) from ai_generation_leases where owner_user_id = ?) as leases,
+              coalesce((select sum(request_count) from ai_usage_buckets where owner_user_id = ?), 0) as requestCount
+       from ai_conversations where id = ?`
+    )
+    .get(ownerUserId, ownerUserId, conversationId) as {
+    messages: number
+    attempts: number
+    leases: number
+    requestCount: number
+    nextSequence: number
+    updatedAt: string
+  }
 }
 
-function seedActiveFamilySubscription(target: DatabaseConnection, organizationId: string) {
-  target.sqlite
-    .prepare(
-      `insert into billing_customers (id, organization_id, stripe_customer_id, created_at, updated_at)
-       values ('billing_customer_ai_entitlement', ?, 'cus_ai_entitlement', ?, ?)`
-    )
-    .run(organizationId, fixedNow.toISOString(), fixedNow.toISOString())
-  target.sqlite
-    .prepare(
-      `insert into billing_subscriptions (
-         id, organization_id, billing_customer_id, stripe_subscription_id, stripe_subscription_item_id,
-         status, plan_key, cadence, stripe_price_id, current_period_start, current_period_end, created_at, updated_at
-       ) values (
-         'billing_subscription_ai_entitlement', ?, 'billing_customer_ai_entitlement',
-         'sub_ai_entitlement', 'si_ai_entitlement', 'active', 'family', 'monthly', 'price_ai_entitlement',
-         '2026-07-01T00:00:00.000Z', '2026-08-01T00:00:00.000Z', ?, ?
-       )`
-    )
-    .run(organizationId, fixedNow.toISOString(), fixedNow.toISOString())
+function encodedCursor(value: Record<string, unknown>) {
+  return Buffer.from(JSON.stringify(value)).toString('base64url')
 }
 
 function deferred<Value>() {

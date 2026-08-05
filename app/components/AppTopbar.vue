@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { projectAppSession } from '~/composables/useAppSession'
+import { toAppSession } from '~/composables/useAppSession'
 import { authClient } from '~/lib/auth-client'
 
 const route = useRoute()
@@ -19,7 +19,7 @@ if (clientSession) {
       if (state.isPending || state.isRefetching || state.error) return
 
       const currentUserId = session.value?.user.id ?? null
-      const nextSession = projectAppSession(state.data)
+      const nextSession = toAppSession(state.data)
       const identityChanged = Boolean(currentUserId && currentUserId !== (nextSession?.user.id ?? null))
 
       session.value = nextSession
@@ -34,8 +34,8 @@ function signedOut() {
   session.value = null
 }
 
-function currentPage(path: string, includeChildren = false) {
-  return route.path === path || (includeChildren && route.path.startsWith(`${path}/`)) ? 'page' : undefined
+function currentPage(path: string) {
+  return route.path === path ? 'page' : undefined
 }
 </script>
 
@@ -51,9 +51,8 @@ function currentPage(path: string, includeChildren = false) {
       <span>{{ $config.public.appName }}</span>
     </NuxtLink>
     <nav class="topbar-nav" :aria-label="t('navigation.primaryLabel')">
-      <NuxtLink to="/app" :aria-current="currentPage('/app')">{{ t('navigation.app') }}</NuxtLink>
-      <NuxtLink v-if="session?.user" to="/app/projects" :aria-current="currentPage('/app/projects', true)">
-        {{ t('navigation.projects') }}
+      <NuxtLink v-if="session?.user" to="/app" :aria-current="currentPage('/app')">
+        {{ t('navigation.app') }}
       </NuxtLink>
       <template v-if="!session?.user">
         <NuxtLink to="/login" :aria-current="currentPage('/login')">{{ t('navigation.login') }}</NuxtLink>

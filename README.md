@@ -1,177 +1,91 @@
-# SmallWiseLabs Base App
+# Working Class Unity
 
-> **Repairs in progress; not fork-ready.** The [2026-07-09 audit](docs/audits/2026-07-09/README.md) remains the historical finding record, and the [canonical baseline contract](docs/baseline/README.md) is authoritative for target behavior. R-006 through R-011 establish the validated runtime, module, security, health, container-maintenance, and isolated-test boundaries. R-012 through R-016 are preserved implementation history; R-017 replaces their custom membership authority with Better Auth Organization, while R-019C separates that invisible family membership from user-owned private data. [ADR 0015](docs/adr/0015-final-pre-release-database-rebaseline.md)/#151 establishes the preserved two-entry starting prefix and permanently returns later schema work to forward-only migrations; #169 adds the current Stripe persistence/invariant pair for four entries total. R-024A supplies the original family billing boundary, and #169 expands it to Stripe Personal/Family subscriptions. R-022 completes private projects, R-025 completes local/R2 Files, R-026 completes private direct-OpenAI conversations, #148/#149 add optional File/Web Search, and R-029S-R removes Local Search/FTS. Real hosted email, Google, Stripe, R2, OpenAI, and other provider certification still blocks deployment and fork readiness.
+This branch is the standalone rebuild of the Working Class Unity website. It starts from a
+reviewed Baseline snapshot without importing Baseline's Git ancestry, then removes the Baseline
+product model that WCU does not need.
 
-This is a practical Nuxt 4 baseline for SmallWiseLabs projects. It is a single Nuxt/Nitro application at repository root, with SQLite, Drizzle, app-owned provider adapters, Sentry hooks, and a Docker target suitable for Coolify on a DigitalOcean Droplet.
+The rebuild is a pre-launch foundation. It deliberately has only a minimal interface; WCU will not
+launch it until the application UI is designed and the hosted integrations are certified.
 
-## Stack
+## Current foundation
 
-- Vue 3 and Nuxt 4 for the web application and server shell.
-- Nitro and h3 for API handlers and deployment portability.
-- SQLite with Drizzle ORM and Drizzle Kit for the first production database.
-- Better Auth passwordless identity and an invisible Organization-backed family-plan membership group, with a database-backed magic-link flow and independently configurable Google sign-in.
-- Exact `reka-ui@2.10.1` primitives behind one app-owned account/family action menu; primary navigation remains native links.
-- Provider-neutral transactional email through local capture or authenticated SMTP with Nodemailer.
-- Persistent local Files plus Cloudflare R2, and optional direct OpenAI Responses through the official SDK, behind narrow server adapters.
-- Sentry via the official `@sentry/nuxt` module.
-- Stripe through the official exact `stripe@22.3.1` server SDK; the application owns the five-offering Personal/Family policy, transitions, and minimized SQLite projection.
-- Responsive web first; the baseline includes no installable PWA, service worker, or offline shell.
+- Nuxt 4, Vue 3, Nitro, SQLite, and Drizzle in one root application package.
+- Open registration through email magic links only.
+- Private accounts with a display name, optional avatar, and an operator-assigned `user | admin`
+  role. New accounts are non-members; membership authorization comes later.
+- Private, user-owned file storage through local storage or Cloudflare R2.
+- Private, user-owned OpenAI conversations with deployment-owned File Search and allowlisted Web
+  Search available to the server. Private R2 files are not automatically indexed into OpenAI.
+- Purchaser-owned Stripe Billing. The final one-membership/two-price WCU catalog is deferred until
+  the rest of the foundation is complete.
+- Resend transactional email, SQLite-backed jobs, Sentry observability, and separate R2 database
+  backups.
+- A Docker/Coolify deployment shape with one web process, one worker, a migration gate, and an
+  off-host backup process.
 
-## Repository Shape
+Family workspaces, generic Projects, invitations, social login, passwords, and runtime product
+switches are not part of WCU.
 
-- The repository root contains the production Nuxt application.
-- Root scripts are stable entry points for humans, agents, and local verification.
+The rebuild decisions and exact source boundary are recorded in
+[`docs/wcu-rebuild-provenance.md`](docs/wcu-rebuild-provenance.md). Agent working rules are in
+[`AGENTS.md`](AGENTS.md).
 
-## Local Start
+## Local development
 
-Use Node.js 24.11.0 or newer within the Node 24 line. If you use `nvm`, `nvm use` reads the repository's `.nvmrc`.
-The portable commands below require only the npm bundled with Node; they do not
-require Corepack or a globally installed pnpm. The runner reads the exact
-`pnpm@11.1.2` pin from `package.json` and obtains that version through `npm exec`.
+Use Node 24 and the exact `pnpm@11.1.2` package manager pinned in `package.json`. The repository
+runner can obtain the pinned pnpm version without a global install.
 
 ```bash
 nvm use
-node scripts/supply-chain-scan.mjs all
-npm run bootstrap
-npm run pnpm -- run db:generate
-npm run pnpm -- run db:migrate
-npm run pnpm -- run db:migrate:check
-npm run pnpm -- run dev
+cp .env.example .env
+node scripts/run-pnpm.mjs install --frozen-lockfile
+node scripts/run-pnpm.mjs run db:migrate
+node scripts/run-pnpm.mjs run dev
 ```
 
-If `pnpm --version` reports exactly `11.1.2`, ordinary commands such as
-`pnpm run dev` are equivalent. Do not use another Node major or pnpm version.
+If Node 24 is already active, the `nvm use` line is unnecessary. Review `.env.example` rather
+than copying its local-only values into a deployed environment. Local and test email uses the
+private capture transport; production uses Resend.
 
-`pnpm run db:migrate:check` applies committed migrations to a temporary SQLite database, verifies required tables/triggers/columns, and checks SQLite integrity.
-`pnpm run db:migrate` is the supported local migration entry point. Stop the app first; the command resolves the local relative SQLite URL, then delegates to the same fail-closed maintenance validator and final verifier used by the packaged runtime. Raw `drizzle-kit migrate` is not a supported operator path because it bypasses those database-identity and recovery checks.
-Run `pnpm run worker` from a second shell to start the long-lived SQLite-backed background worker; stop it with `SIGINT` or `SIGTERM`.
-Run `pnpm run db:backup` before risky local migrations; it delegates to the hardened maintenance entry, writes a timestamped SQLite backup to `data/backups` by default, and verifies integrity, foreign keys, the exact migration ledger, and packaged schema. When selected, production routine backups use the separately credentialed packaged R2 operator and policy in [the off-host backup runbook](ops/backup-runbook.md); only the enabled runner receives non-empty credential values, and ordinary app startup does not open a backup provider connection.
-
-Copy `.env.example` to the repository-root `.env` or export equivalent variables. Root `dev`, `start`, `preview`, database maintenance, and worker scripts load that optional file with Node 24 while preserving already-exported environment values. The isolated API smoke deliberately does not load `.env`. `NUXT_READINESS_TOKEN` is required server-only configuration; the committed local sample is rejected in production. Transactional email is also core: the local template selects `capture`, while production selects a complete authenticated `smtp` configuration. Every module flag is explicit. A `false` flag is a healthy disabled state: exclusive routes return stable `404 MODULE_DISABLED`, direct service/worker boundaries perform no provider or module mutation work, and client UI uses only the server-derived public state projection.
-
-Google is independently disabled by default with `NUXT_SOCIAL_PROVIDERS_GOOGLE_ENABLED=false` and then needs no credentials. Enabling it requires both documented client values before startup. Local tests use deterministic provider doubles; a real Google Cloud client, consent screen, callback, unlink/relink, and grant-revocation evidence remain R-033 staging work.
-
-The local capture directory is resolved from the web server's working directory; the committed default writes below `data/email-capture`. Each private JSON file contains the recipient and complete bearer authentication or invitation URL. Do not commit, log, share, or retain capture files unnecessarily. Capture is rejected in deployed production; `CI=true` permits it only for production-mode test processes and must never be configured on a deployed app.
-
-See `docs/prerequisites.md` for the account, tool, knowledge, and environment checklist. See `docs/cloudflare.md` for DNS, cache, WAF, Turnstile, and R2 baseline notes; [ADR 0016](docs/adr/0016-private-r2-sqlite-backups.md) and [the backup runbook](ops/backup-runbook.md) own private database backups. See `docs/openai.md` for the direct Responses boundary, `docs/observability.md` for Sentry setup, `docs/mobile.md` for responsive-web and native-escalation guidance, and `docs/ai-guardrails.md` for agent task shape and verification rules.
-
-## Language readiness
-
-The baseline currently ships one catalog-backed locale (`en`, document language `en-US`, direction `ltr`) with unprefixed routes and no selector, negotiation, cookie, user preference, or database field. A second locale is a reviewed product and security change; follow the canonical requirements in [the CSS and interface guide](docs/baseline/css-and-interface.md#language-and-locale-readiness).
-
-## Checks
-
-The no-Corepack/no-global-pnpm verification entry point is:
+The app and worker share one SQLite database, so run the worker in another terminal when testing
+queued work:
 
 ```bash
-npm run verify:pinned
+node scripts/run-pnpm.mjs run worker
 ```
 
-With pnpm 11.1.2 already available, the individual checks remain:
+## Verification
+
+The main local checks are:
 
 ```bash
-pnpm run doctor
-pnpm run check:toolchain
-pnpm run test:tooling
-pnpm run check:supply-chain
-pnpm run scan:supply-chain
-pnpm run test:framework-security
-pnpm run lint
-pnpm run stylelint
-pnpm run db:migrate:check
-pnpm run typecheck
-pnpm run test
-pnpm run build
-pnpm run start
+node scripts/run-pnpm.mjs run db:migrate:check
+node scripts/run-pnpm.mjs run typecheck
+node scripts/run-pnpm.mjs run lint
+node scripts/run-pnpm.mjs run stylelint
+node scripts/run-pnpm.mjs run test
+node scripts/run-pnpm.mjs run build
 ```
 
-`pnpm run doctor` uses Git's effective ignore rules to ensure representative local environment, SQLite, log, and filled production-evidence artifacts remain protected by the repository `.gitignore`. `pnpm run check` runs formatting, doctor, the exact toolchain contract, local tooling and supply-chain policy tests, the disposable Nuxt framework-security fixture, lint, Stylelint, fresh migration verification, typecheck, and the ordinary Vitest suite. `pnpm run verify` adds the network-backed supply-chain scan, production build, built-runtime, browser, isolated API, and disposable Docker checks. Stylelint owns maintained CSS/Vue rules; rendered CSS and accessibility outcomes belong to Playwright. See the [verification and operations guide](docs/baseline/verification-and-operations.md).
+`npm run verify:pinned` runs the complete pinned verification pipeline, including tooling,
+supply-chain, runtime, browser, API, and container checks. Network-backed provider certification is
+separate: deterministic tests do not prove that WCU's Resend, Stripe, OpenAI, R2, Sentry, or
+Coolify credentials and hosted configuration are correct.
 
-`pnpm run scan:supply-chain` downloads the exact checksum-pinned OSV-Scanner and Gitleaks releases, proves Gitleaks detects a runtime-only redacted canary, scans reachable Git history, evaluates every pnpm lockfile package against short-lived tuple-specific vulnerability exceptions, and verifies npm-registry signatures with pnpm. Run its dependency-free Node entry point, `node scripts/supply-chain-scan.mjs all`, before the first application dependency install in a clean checkout. It sends dependency names, versions, and file hashes to OSV/deps.dev, but it does not upload source or retain secret material. The command requires network access; `pnpm run check:supply-chain` is the network-free manifest, lock-integrity, exception, and scanner-pin contract.
+## Database and deployment
 
-`pnpm run test:framework-security` verifies fixture timeout/cleanup helpers, proves the resolved Nuxt/Vue/router packages match the exact app manifest pins, then starts a generated Nuxt `4.5.0` development fixture and checks route-rule middleware case parity plus safe and unsafe `NuxtLink`/`navigateTo` behavior. The fixture lives in a disposable temporary directory and never becomes an application route.
+The rebuild assumes a fresh pre-launch database. Its single initial migration is the complete WCU
+schema; it is not an upgrade path for the legacy WCU site or a Baseline database. Do not point the
+rebuild at either existing database.
 
-The focused Better Auth compatibility suite owns the fixed OIDC/MCP redirect-validator security regressions and one real disposable-SQLite adapter/magic-link composition. Focused passwordless cases exercise production `createAuthentication` through its public HTTP handler, the configured Drizzle adapter, the complete migration set, a temporary `better-sqlite3` database, and a fake sender only at the external email boundary. The social-auth and Organization-provisioning suites remain the primary owners for their separate provider and provisioning guarantees.
+Production is intended for Coolify with private runtime configuration, a persistent `/app/data`
+volume, and the migration service completing before web or worker startup. Credentials are not
+committed and are intentionally deferred in this branch. The existing WCU domains and subdomains
+remain an external DNS/cutover concern; this branch does not recreate the old site's integrations.
 
-`pnpm run test:runtime` builds the app and runs representative packaged pre-listen rejections, public liveness, protected ready/not-ready behavior, one encoded hostile-project origin canary, and read-only deployment checks under database/provider state observers. Focused real-H3 and service tests own the broader configuration, origin, Stripe signature, event-ordering, reconciliation, and projection matrices. `pnpm run api:smoke` retains the narrower canonical route/config/raw-body/official-signature composition and duplicate-receipt canary. Local signed fixtures do not claim Stripe sandbox or live-provider certification.
+## Imported documentation
 
-Pinned `nuxt-security@2.6.0` is the sole owner of standard browser-security headers, enforced CSP, per-response nonces, emitted-asset SRI, and `X-Powered-By` removal; the previous custom header middleware is deleted. Its generic CORS, CSRF, rate-limit, request-size, XSS-body, and method middleware is disabled where Better Auth or application-specific controls are stricter. Focused Vitest owns evaluated configuration and exact provider-source projection, Playwright owns final CSP/nonces/blocking/hydration/SRI, the invitation journey owns `no-referrer`, and deployment smoke checks effective header presence. See [ADR 0007](docs/adr/0007-nuxt-security-ownership-and-csp.md).
-
-The focused worker suites own the standalone `server/worker.ts` boundary, continuous polling and shutdown behavior, retry/final-failure outcomes, lease fencing, and bounded diagnostic codes. Under explicit production-mode test configuration, child processes prove the Jobs-disabled command remains inert without creating the database directory and exits cleanly on `SIGTERM` or `SIGINT`, while the Jobs-ready worker drains Files cleanup before shutdown. Real migrated SQLite cases prove Files-disabled attempt preservation and stale reclaim/token fencing.
-
-The built-runtime runner retains the production-build, poisoned-build, pre-listen, telemetry-sink, migration, health-transition, packaged origin canary, deployment-no-write, output-secrecy, and ordinary-cleanup boundaries. It no longer starts a second all-disabled server or repeats module, rendered-runtime-configuration, passwordless, social, origin, webhook, worker, retired-health, fixture-equality, or whole-sandbox database-inventory evidence. Focused Vitest owns ordinary semantics. Playwright owns the production-rendered public runtime-versus-build boundary, one disabled-Observability representative, and the identity/account journeys in Chromium projects with desktop and narrow viewports, including the real passwordless session's initial-response HTML and hydrated UI. The account journey also owns rendered pending-invitation loading, empty, validation, delivery-failure/retry, resend/cancel, exact-confirmation deletion, keyboard, Axe, narrow reflow, and overflow behavior. The project journey owns rendered collection/detail loading, empty, validation, pending, retryable failure, concealed unavailable, success, session-loss, exact request-shape, current-navigation, inline-delete, focus, 320px viewport, 200% root-font, Axe, and overflow behavior. One desktop real-login path performs project CRUD through the built Nitro app and migrated temporary SQLite; focused HTTP/Vitest remains primary for authentication ordering, user ownership, duplicate names, same-family isolation, and concealment. One real packaged account deletion separately proves the mounted app route, confirmed-success navigation, and subsequent signed-out protection without duplicating the server's cookie or data-loss matrix. These automated Chromium, root-font, and Axe cases are not physical-device, browser-zoom, or complete WCAG certification. The bounded server/Playwright/artifact observers register every private capture path, recipient, full URL, and raw token before diagnostics; unreadable, overflowing, or leaking observations fail closed.
-
-`pnpm run api:smoke` is a self-contained mutating integration suite. It refuses URL arguments and ambient application/provider configuration, builds the production app, migrates a fresh named temporary SQLite database, starts it on loopback, and exercises representative identity, family-plan, project, local Files, and locally signed Stripe webhook packaging behavior. The suite removes its database, local provider state, and runtime working directory on success, failure, `SIGINT`, and `SIGTERM`; “runtime working directory” here is process filesystem state, not an app-owned workspace. Node documents the underlying [`mkdtemp`](https://nodejs.org/docs/latest-v24.x/api/fs.html#fsmkdtempsyncprefix-options), recursive [`rm`](https://nodejs.org/docs/latest-v24.x/api/fs.html#fsrmsyncpath-options), and [signal limitations](https://nodejs.org/docs/latest-v24.x/api/process.html#signal-events).
-
-For deployed staging or production checks that should not write data, use `pnpm run ops:smoke -- --base-url=https://your-app.example.com`. It makes credential-free `GET` requests, derives enabled/disabled route expectations from `/api/baseline`, and exercises the shell, public liveness, security headers, and representative anonymous module boundaries. Its Billing probe is `GET /api/account/billing`, never the retired `/api/billing` path. In the built-runtime gate, one held read-only SQLite connection compares [`PRAGMA data_version`](https://www.sqlite.org/pragma.html#pragma_data_version) before and after work performed through other connections, and the local provider directory is fingerprinted over the same interval. SQLite says only values from the same connection are comparable and that its own commits do not change that value; the check therefore claims no intervening commit by another connection, not arbitrary filesystem immutability. Protected readiness remains the container-local authenticated probe and is not opened for public smoke testing.
-
-## API Surface
-
-Unsafe app-owned `/api` requests are fail-closed before route handlers unless at least one verified browser-origin signal is present. Exact `Origin`, `Sec-Fetch-Site: same-origin`, or an exact-origin `Referer` fallback is accepted; every provided recognized signal must agree with the configured `NUXT_PUBLIC_APP_URL` origin. Missing, malformed, `null`, `cross-site`, `same-site`, `none`, and conflicting signals return redacted `403 CROSS_ORIGIN_REQUEST_BLOCKED`. This is stricter application policy derived from the [OWASP CSRF guidance](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html) and the [Fetch Metadata specification](https://www.w3.org/TR/fetch-metadata/), not a claim that browser headers replace authentication or authorization.
-
-The gate has only exact method/path exemptions: Better Auth owns `/api/auth/**`; official Stripe SDK signature verification owns `POST /api/webhooks/stripe`; and the private operational token owns `POST /api/observability/client-test` and `POST /api/observability/test-error`. Local `PUT /api/files/:id/content` is not exempt: it must satisfy the origin gate and then its session, signed-upload-capability, and persisted-owner checks. R2 browser PUTs go directly to Cloudflare's S3 API and instead require the bucket's exact-origin CORS policy. The optional-module gate runs first, so a disabled exclusive route retains its stable `404 MODULE_DISABLED` result. There is no generic `Authorization`-header bypass. Project authorization is independent of this origin gate and family-plan membership: each project route authenticates and predicates the data operation on the session user's immutable ID.
-
-- `GET /api/live` returns an empty `204`; after startup, its app-owned request path bypasses runtime configuration and dependency checks.
-- `GET /api/ready` requires the server-only readiness Bearer token, probes SQLite read-only plus manifest health, returns only a redacted ready state, and uses `503` when a required dependency is unavailable.
-- `POST /api/auth/sign-in/magic-link` returns a neutral request result and sends through the selected email transport; `GET /api/auth/magic-link/verify` consumes the bearer link and establishes the session once.
-- `POST /api/auth/sign-in/social` starts the configured Google authorization-code flow only when its independent runtime flag is ready; verified same-email identities may link under the documented policy.
-- `GET /api/auth/list-accounts` returns token-free local identity mappings; `POST /api/auth/unlink-account` removes the selected local Google mapping while magic link remains available.
-- `GET /login` and `GET /signup` are separate app-owned intent pages backed by one passwordless/social component. Both may create a previously unknown user, show neutral magic-link request results, and link to the fork-customizable Terms and Privacy templates.
-- Normal authentication succeeds at `/app`; an invitation may preserve only its exact validated `/invite/:invitationId` path; authentication errors return to the originating `/login` or `/signup` page. The former frontend `/auth` route is absent, while Better Auth's framework-owned endpoints remain under `/api/auth/**`.
-- `GET /account` requires authentication and owns minimized identity, linked-Google status/unlinking, billing-authorized Family invitations/members, and account deletion. The authenticated top bar provides an app-owned Reka menu with Account and Sign out; it never exposes organization selection, slug, role, or billing authority, and ordinary primary navigation remains native links. A signed-out request returns to `/login`, and local Google unlink does not claim to revoke the upstream Google grant.
-- Password sign-up/sign-in, reset request/redemption, change, and verification endpoints are disabled and return `404`.
-- `GET /api/me` returns only the authenticated user's minimized identity and safe module-state projection. Public workspace bootstrap and lookup endpoints are absent; Better Auth Organization remains the server-side family-plan membership authority.
-- `GET/POST /api/invitations` derives the Family organization and permits create only for a billing-current renewal-on manager. Each pending unexpired invitation reserves one of five non-manager seats. The server fixes every invitation to `member` and never accepts caller-selected organization or role.
-- `POST /api/invitations/:invitationId/resend` and `POST /api/invitations/:invitationId/cancel` require the exact manager-owned invitation; resend requires current Family eligibility, while cancel releases the reservation.
-- `DELETE /api/account` accepts only exact `{ "confirmation": "DELETE" }` from a fresh authenticated session. A billing owner first gets durable immediate Stripe cancellation and retrieval confirmation; ambiguity retains identity/private state, and a worker may retry cancellation but never delete the user. Only the confirmed local transaction expires the identity's sessions.
-- `GET /api/invitations/:invitationId` returns role-free minimized detail only to the matching verified recipient. Accept rechecks manager eligibility/reservation and, for a current Personal subscriber, confirms renewal off and preserves residual paid time before membership; partial state remains recoverable.
-- `GET /app` is the authenticated, private, non-cacheable personal shell. It does not expose workspace identity, membership, role, capability, slug, or `activeOrganizationId`; signed-out requests return to `/login`.
-- `GET /app/projects` lists and creates the authenticated user's private projects. `GET /app/projects/:projectId` reads, renames, and deletes one immutable-ID record; malformed, missing, deleted, and foreign records share a concealed unavailable presentation. Both pages authenticate before project requests and clear stale project state when the session identity disappears.
-- `GET /invite/:invitationId` is a private/no-store, no-referrer, non-mutating collaboration page that preserves only its exact anchored path through passwordless or Google authentication.
-- `GET /` is a user-facing public home. `GET /legal/privacy` and `GET /legal/terms` are explicit customization templates, not production legal advice or persisted consent. Nuxt's global error boundary supplies non-sensitive 404/500 titles and recovery without adding literal `/404` or `/error` routes.
-- `GET /api/baseline` returns only safe module states and social-provider states.
-- `GET/POST /api/projects` lists or creates name-only projects owned by the authenticated user without accepting caller-supplied ownership or slug fields. Project names do not identify records and duplicate names are allowed.
-- `GET/PATCH/DELETE /api/projects/:projectId` addresses a project by its immutable ID and reads or mutates it only when `owner_user_id` matches the authenticated user; foreign and unknown IDs share one concealed `404`.
-- `GET /api/account/billing` returns the safe five-offering catalog plus minimized relationship, entitlement, plan/cadence, renewal/period, transition/dunning, accepted/reserved seats, manager member summaries, and computed capabilities. It exposes no Stripe IDs.
-- `POST /api/account/billing/checkout` strictly accepts one stable offering key and creates/reuses one durable quantity-`1` Checkout attempt for its private configured Price.
-- `POST /api/account/billing/change` derives the approved immediate pending upgrade or period-end schedule from one target offering. `POST /api/account/billing/portal` uses the explicit configuration for payment methods, invoices, cancellation, and reactivation; `POST /api/account/billing/reconcile` performs bounded current-state recovery.
-- `POST /api/webhooks/stripe` verifies the exact raw body through the official SDK and processes the exact 21-event Checkout/subscription/schedule/invoice/refund/dispute target idempotently. It writes a minimized receipt only after durable processing and stores no raw payload.
-- `/account/billing` is the canonical relationship-specific UI for all five offerings, transitions/dunning/reconciliation, Family accepted/reserved seats, manager removal, and member self-leave. Billing-disabled deployments expose no page content or billing controls.
-- `GET /api/files` lists a bounded page of minimized metadata owned by the authenticated user.
-- `POST /api/files/uploads` validates a 1-byte-through-25-MiB upload, canonical base64 `Content-MD5`, and media type before creating an authenticated pending row and 15-minute upload capability. The Files DTO defines no Turnstile field and the handler performs no Turnstile verification.
-- `PUT /api/files/:id/content` streams bytes to persistent local storage through the local driver's signed capability. R2 instead receives presigned PUT and diagnostic HEAD requests on Cloudflare's S3 API domain.
-- `GET /api/files/:id` returns only minimized owner-scoped metadata.
-- `POST /api/files/:id/complete` reauthenticates, verifies trusted object metadata and integrity state, and idempotently marks the owner's pending metadata ready.
-- `GET /api/files/:id/download` reauthenticates and owner-scopes access before returning a 60-second local or R2 GET capability; local-only `GET /api/files/:id/content` reauthenticates that capability and streams private bytes.
-- `DELETE /api/files/:id` immediately conceals the owner's metadata and commits delayed provider cleanup. Unknown, deleted, and foreign IDs share the same `404`; family-plan membership grants no file access.
-- `GET/POST /api/ai/conversations` lists or creates authenticated private conversations; create additionally applies the server-owned entitlement and 100-conversation policy.
-- `GET/DELETE /api/ai/conversations/:conversationId` reads or deletes only the persisted owner row. Foreign, deleted, and unknown IDs share a concealed `404`.
-- `GET/POST/DELETE /api/ai/conversations/:conversationId/messages` lists visible history, creates one idempotent direct OpenAI Responses attempt, or clears visible history. The server owns the model, bounds, optional deployment corpus and Web domain policy, 50-reserved-attempt daily quota, one-generation concurrency, 60-second timeout, and safe error surface. Durable File citations expose a title; durable Web citations expose a bounded title, HTTPS URL, and source span. No prompt, search query/result/action, or raw provider envelope enters ordinary logs or Sentry.
-
-An enabled Files database persists one exact storage binding: driver and bucket identity plus the normalized account-and-jurisdiction endpoint for R2. Every later file operation and cleanup run must match it and fail closed before provider mutation or metadata removal when it does not. Switching between local and R2, or changing the R2 bucket, account, or jurisdiction, is a data migration—not an environment-only deployment change. This baseline supplies no provider-migration command; keep the bound identity unchanged until a stopped-writer copy, verification, cutover, and rollback procedure is implemented and tested.
-
-## Deployment
-
-The included `Dockerfile` builds the root application and runs `.output/server/index.mjs` after preloading the generated Sentry server configuration, as the image's non-root `node:node` user from `/app` on port `3000`. Its deny-by-default `.dockerignore` sends only explicit production build inputs. The root `docker-compose.yml` defines one Git-connected Coolify application: Coolify builds one project-and-commit-scoped image locally, stops the old stack, runs a one-shot migration against the shared persistent `/app/data` volume, and starts web and the supervised worker from that image only after migration succeeds. Off-host backup is an optional `backup` Compose profile; persistent baseline staging/production enables it and starts its private same-image runner behind the same migration gate. Docker's `VOLUME` declaration alone does not configure a Coolify mount.
-
-Before production deploys, copy `.env.production.example` to `.env.production` for local readiness checks or mirror its variables directly in Coolify. Generate a private `NUXT_READINESS_TOKEN`, then run `pnpm run ops:readiness:strict -- --env-file=.env.production`; only modules whose `NUXT_MODULES_*_ENABLED` flag is `true` require provider configuration. Disabled modules remain healthy and inert even if stale provider values are present; remove stale values rather than relying on them.
-
-Set `NUXT_BETTER_AUTH_URL` to the exact origin of `NUXT_PUBLIC_APP_URL`; production requires HTTPS except for explicit loopback tests. Host-split auth is not supported without a separately reviewed proxy/CORS/cookie design. Production rejects known development/default secrets and Better Auth's alternate environment overrides. Better Auth rate limiting trusts only Cloudflare's single-valued `CF-Connecting-IP`, so the Coolify origin must not be directly reachable by untrusted clients. Because the pinned memory store uses a process-local `Map`, this app constrains the baseline to one replica; shared atomic storage must be selected and tested before scaling.
-
-Keep `NUXT_SOCIAL_PROVIDERS_GOOGLE_ENABLED=false` until a Google web client is configured with the exact `/api/auth/callback/google` redirect and R-033 staging evidence is complete. When enabled, provide both `NUXT_SOCIAL_PROVIDERS_GOOGLE_CLIENT_ID` and private `NUXT_SOCIAL_PROVIDERS_GOOGLE_CLIENT_SECRET` as runtime-only values. The application retains no provider tokens and local unlink is not a claim that Google's grant was revoked upstream.
-
-Production email uses `NUXT_EMAIL_TRANSPORT=smtp` plus the exact sender, host, port, security, username, and password fields in `.env.production.example`. `tls` means TLS from connection start; `starttls` requires the upgrade and fails instead of continuing unencrypted, following Nodemailer's [SMTP transport contract](https://nodemailer.com/smtp). Startup and protected readiness validate this configuration but deliberately make no SMTP connection or authentication attempt. Real sending-domain, inbox, rejection, bounce, and provider evidence remains R-033 staging work; local capture and deterministic SMTP doubles are not hosted delivery certification. Nuxt requires each private value to be represented in `runtimeConfig` and overridden through its matching `NUXT_` path at server runtime, as documented in [Nuxt runtime configuration](https://nuxt.com/docs/4.x/guide/going-further/runtime-config).
-
-AI is disabled by default and then requires no OpenAI key. Enabling it requires private `NUXT_OPENAI_API_KEY`, `NUXT_OPENAI_PROJECT_ID`, and exact allowlisted `NUXT_OPENAI_MODEL=gpt-5.6-luna`. `NUXT_OPENAI_FILE_SEARCH_ENABLED` and `NUXT_OPENAI_WEB_SEARCH_ENABLED` are independently false subordinate fork switches. File Search additionally requires one server-only vector-store ID; Web Search additionally requires one through 100 server-owned comma-separated domains. Exact `openai@6.47.0` calls Responses with locally authoritative history, `store: false`, explicit no-cache mode, no SDK retries/logging, and at most one automatically selected built-in call. If both tools are enabled, one turn can use File or Web Search, not both. Raw File/Web search results, actions, and queries are not requested or persisted. `store: false` is not ZDR, does not delete Files/vector stores, and live Web Search is not HIPAA/BAA-covered. Keep AI disabled in persistent environments until #37 records real project/key/model/tool/domain, permissions, billing/spend, request/citation/error, retention, third-party, logging, and deletion evidence. See [the OpenAI guide](docs/openai.md), [ADR 0012](docs/adr/0012-direct-openai-responses-and-local-history.md), [ADR 0013](docs/adr/0013-deployment-owned-openai-file-search.md), and [ADR 0014](docs/adr/0014-server-owned-openai-web-search.md).
-
-Billing uses one Stripe Product and five distinct server-only Price mappings: Personal weekly/monthly/annual and Family monthly/annual, plus one explicit Portal configuration. Clients submit only a stable allowlisted application offering, never Stripe IDs or quantity; the server always creates one item with quantity `1`. Personal covers its purchaser. Family covers the manager plus five non-manager seats, and pending unexpired invitations reserve those seats alongside accepted members.
-
-Background jobs are persisted in SQLite. The selected-commit image also runs the long-lived production worker. With Jobs enabled it starts through the Sentry preload; with Jobs disabled it skips that preload and remains inert until shutdown. Billing or Files requires Jobs and exactly one supervised worker on the same host, image, and `/app/data` volume as the web process. Restart unexpected exits, allow the documented shutdown grace, suppress restarts during stop-first maintenance, and monitor oldest-due backlog, pending cancellation age, and scheduled-effect deadlines. The operational worker performs replay-safe Stripe reconciliation/transitions/reservations/cancellation retry and bounded local/R2 cleanup. A Stripe cancellation job never deletes a user; after it confirms cancellation, account deletion still requires a fresh exact user command. Ordinary file cleanup and recurring safety sweeps remain asynchronous. The queue is at-least-once: atomic leases and worker-token fencing protect queue state, while replay-safe handlers re-read authority before each effect.
-
-The exact production build also contains committed migration SQL and a small maintenance entry point—no pnpm, Drizzle Kit CLI, or application source tree is required. The current package has exactly four entries: preserved baseline `0000`/`0001` plus #169's generated Stripe persistence `0002` and custom invariant `0003`, ending with exactly 30 triggers. The schema includes Billing transitions/dunning/Family join/deletion state, Files, private AI conversations, and separate File/Web citations but no Search/FTS or cache objects. Only an exact packaged ledger prefix is supported; any other populated or ambiguous state fails closed without adoption. Normal Coolify releases run the committed one-shot migration service; manual backup, verification, or restore uses the selected commit's local image as a network-disabled one-off container against `/app/data`. Later schema changes are forward-only. See [ADR 0015](docs/adr/0015-final-pre-release-database-rebaseline.md), [the deployment guide](docs/deployment.md#manual-versioned-image-maintenance-jobs), and [restore runbook](ops/restore-runbook.md).
-
-Deployment runbooks live in `ops/`: production setup notes, the release checklist, and the restore runbook.
-
-The database maintenance gate must complete successfully before the app starts. The Dockerfile's authenticated readiness check accepts only exact HTTP `200` with the redacted ready body; any `401`, `503`, malformed response, timeout, or network failure exits nonzero. That endpoint proves current dependency availability, not migration-ledger or database identity, so a healthy `/api/ready` response never replaces the pre-start maintenance `migrate`/`verify` gate. Docker defines exit `0` as healthy and `1` as unhealthy, and [Coolify gives the Dockerfile health check precedence over its UI check](https://coolify.io/docs/knowledge-base/health-checks). This is locally specified and exercised with disposable containers, but a real Coolify deployment remains external staging evidence.
-
-Static generation is deliberately unsupported: this baseline requires server-start runtime configuration, and prerendered runtime config cannot be changed after generation. The build uses the committed, assignment-free `.env.build` so a developer's ignored root `.env` is not auto-loaded. The full container worker creates secret-shaped canaries at the context root and inside an allowlisted source directory, requires Docker's post-`COPY` checks to prove neither entered the build filesystem, inspects the non-root image configuration/history, then exercises migrations, backup, restore, replacement persistence, and readiness on a fresh named volume. In Coolify, runtime `NUXT_*`/process keys must be Runtime-only and Build-disabled. Sentry upload is eligible only when Observability is explicitly enabled and its complete build-only token/organization/project tuple is present; the token uses a Docker build secret and the non-secret upload controls use build arguments. The approved #36 workflow enables Coolify auto-deploy only for owner-approved merges to `master`, must avoid old/new writer overlap, and temporarily suspends deployment triggers and restart policies during manual migration or restore. Real Sentry upload/symbolication, Coolify volume, and stop-first release evidence remains external staging work because no provider account or deployment exists yet.
+The Baseline ADRs, audit evidence, and detailed guides under `docs/` remain useful source history,
+but many describe removed Baseline behavior. They are not WCU requirements unless the provenance
+ledger or current code explicitly ports them. See [`docs/README.md`](docs/README.md) before relying
+on an imported document.

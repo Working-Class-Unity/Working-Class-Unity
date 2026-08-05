@@ -1,21 +1,16 @@
 import { randomUUID } from 'node:crypto'
 import { chmod, mkdir, open, rename, rm } from 'node:fs/promises'
 import { resolve } from 'node:path'
-import nodemailer from 'nodemailer'
-import type SMTPTransport from 'nodemailer/lib/smtp-transport'
+import { Resend } from 'resend'
 import { getAppRuntimeConfig, type AppRuntimeConfig } from '../../utils/runtime'
-import {
-  renderEnglishBillingNotificationEmail,
-  renderEnglishMagicLinkEmail,
-  renderEnglishWorkspaceInvitationEmail,
-  type EnglishBillingNotificationKind
-} from './templates/en'
+import { renderEnglishMagicLinkEmail } from './templates/en'
 
 export type TransactionalEmailMessage = Readonly<{
   to: string
   subject: string
   text: string
   html: string
+  idempotencyKey?: string
 }>
 
 export interface TransactionalEmailSender {
@@ -31,6 +26,7 @@ type CapturedTransactionalEmail = Readonly<{
     subject: string
     text: string
     html: string
+    idempotencyKey?: string
   }>
   createdAt: string
 }>
@@ -53,8 +49,8 @@ export function createTransactionalEmailSender(config: AppRuntimeConfig['email']
   if (config.transport === 'capture') {
     return createCaptureEmailSender(config)
   }
-  if (config.transport === 'smtp') {
-    return createSmtpEmailSender(config)
+  if (config.transport === 'resend') {
+    return createResendEmailSender(config)
   }
   throw new TransactionalEmailDeliveryError()
 }
@@ -64,46 +60,6 @@ export function createMagicLinkEmail(input: { to: string; url: string; appName: 
   const appName = normalizeDisplayText(input.appName)
   const url = requireHttpUrl(input.url)
   return renderEnglishMagicLinkEmail({ to, url, appName })
-}
-
-export function createWorkspaceInvitationEmail(input: {
-  to: string
-  url: string
-  appName: string
-  workspaceName: string
-}): TransactionalEmailMessage {
-  const to = requireHeaderValue(input.to)
-  const appName = normalizeDisplayText(input.appName)
-  const workspaceName = normalizeDisplayText(input.workspaceName)
-  const url = requireHttpUrl(input.url)
-  return renderEnglishWorkspaceInvitationEmail({ to, url, appName, workspaceName })
-}
-
-type BillingNotificationEmailInput =
-  | Readonly<{
-      to: string
-      appName: string
-      kind: Exclude<EnglishBillingNotificationKind, 'family_access_ending'>
-    }>
-  | Readonly<{
-      to: string
-      appName: string
-      kind: 'family_access_ending'
-      effectiveAt: string | Date
-    }>
-
-export function createBillingNotificationEmail(input: BillingNotificationEmailInput): TransactionalEmailMessage {
-  const to = requireHeaderValue(input.to)
-  const appName = normalizeDisplayText(input.appName)
-  if (input.kind === 'family_access_ending') {
-    return renderEnglishBillingNotificationEmail({
-      to,
-      appName,
-      kind: input.kind,
-      effectiveAt: requireDate(input.effectiveAt)
-    })
-  }
-  return renderEnglishBillingNotificationEmail({ to, appName, kind: input.kind })
 }
 
 function createCaptureEmailSender(config: AppRuntimeConfig['email']): TransactionalEmailSender {
@@ -149,46 +105,21 @@ function createCaptureEmailSender(config: AppRuntimeConfig['email']): Transactio
   }
 }
 
-function createSmtpEmailSender(config: AppRuntimeConfig['email']): TransactionalEmailSender {
-  const transportOptions: SMTPTransport.Options = {
-    host: config.smtp.host,
-    port: Number(config.smtp.port),
-    secure: config.smtp.security === 'tls',
-    requireTLS: config.smtp.security === 'starttls',
-    ignoreTLS: false,
-    opportunisticTLS: false,
-    auth: {
-      user: config.smtp.username,
-      pass: config.smtp.password
-    },
-    tls: {
-      rejectUnauthorized: true,
-      servername: config.smtp.host
-    },
-    connectionTimeout: 10_000,
-    greetingTimeout: 10_000,
-    socketTimeout: 30_000,
-    dnsTimeout: 10_000,
-    logger: false,
-    debug: false,
-    transactionLog: false,
-    disableFileAccess: true,
-    disableUrlAccess: true
-  }
-  const transporter = nodemailer.createTransport(transportOptions)
+function createResendEmailSender(config: AppRuntimeConfig['email']): TransactionalEmailSender {
+  const resend = new Resend(config.resend.apiKey)
 
   return {
     async send(message) {
       try {
-        const info = await transporter.sendMail({
-          from: config.from,
-          ...normalizeMessage(message),
-          disableFileAccess: true,
-          disableUrlAccess: true
-        })
-        if (info.rejected.length > 0 || info.accepted.length === 0) {
-          throw new TransactionalEmailDeliveryError()
-        }
+        const { idempotencyKey, ...email } = normalizeMessage(message)
+        const { error } = await resend.emails.send(
+          {
+            from: config.from,
+            ...email
+          },
+          idempotencyKey ? { idempotencyKey } : undefined
+        )
+        if (error) throw error
       } catch {
         throw new TransactionalEmailDeliveryError()
       }
@@ -200,7 +131,9 @@ function normalizeMessage(message: TransactionalEmailMessage): TransactionalEmai
   const to = requireHeaderValue(message.to)
   const subject = requireHeaderValue(message.subject)
   if (!message.text || !message.html) throw new TransactionalEmailDeliveryError()
-  return { to, subject, text: message.text, html: message.html }
+  const idempotencyKey = message.idempotencyKey ? requireHeaderValue(message.idempotencyKey) : undefined
+  if (idempotencyKey && idempotencyKey.length > 256) throw new TransactionalEmailDeliveryError()
+  return { to, subject, text: message.text, html: message.html, ...(idempotencyKey ? { idempotencyKey } : {}) }
 }
 
 function requireHeaderValue(value: string): string {
@@ -226,10 +159,4 @@ function requireHttpUrl(value: string): string {
   } catch {
     throw new TransactionalEmailDeliveryError()
   }
-}
-
-function requireDate(value: string | Date): string {
-  const date = value instanceof Date ? value : new Date(value)
-  if (!Number.isFinite(date.getTime())) throw new TransactionalEmailDeliveryError()
-  return date.toISOString()
 }

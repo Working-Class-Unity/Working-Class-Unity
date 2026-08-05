@@ -1,4 +1,5 @@
 import Database from 'better-sqlite3'
+import { randomUUID } from 'node:crypto'
 import { drizzle } from 'drizzle-orm/better-sqlite3'
 import { migrate } from 'drizzle-orm/better-sqlite3/migrator'
 import { mkdtempSync, rmSync } from 'node:fs'
@@ -17,9 +18,10 @@ import {
   getAiGenerationAttemptForOwner,
   getAiMessageForOwner,
   getAiUsageBucketForOwner,
+  listAiMessageContentsForOwner,
   listAiConversationsForOwner,
+  listRecentAiMessageMetadataForOwner,
   listAiMessagesForOwner,
-  listRecentAiMessagesForOwner,
   reapAndGetAiGenerationAttemptForOwner,
   reserveAiGenerationAttempt
 } from '../server/db/repositories/ai-conversations'
@@ -184,16 +186,6 @@ describe('AI conversation repository', () => {
         ],
         nextCursor: null
       })
-      expect(listRecentAiMessagesForOwner(connection, ownerId, conversation.id, 10)).toMatchObject([
-        {
-          sequence: 2,
-          citations: [
-            { type: 'file', title: 'Guide One.pdf' },
-            { type: 'file', title: 'Guide Two.md' }
-          ]
-        },
-        { sequence: 1, citations: [] }
-      ])
       expect(getAiMessageForOwner(connection, ownerId, conversation.id, finalized.assistantMessage.id)).toMatchObject({
         content: 'Private answer',
         citations: [
@@ -268,11 +260,6 @@ describe('AI conversation repository', () => {
           now: atMinute(2, 30)
         })
       ).toMatchObject({ kind: 'existing', assistantMessage: { citations } })
-      expect(listRecentAiMessagesForOwner(connection, ownerId, conversation.id, 2)).toMatchObject([
-        { sequence: 2, citations },
-        { sequence: 1, citations: [] }
-      ])
-
       expect(clearAiConversationForOwner(connection, ownerId, conversation.id, atMinute(3))).toMatchObject({
         historyRevision: 1,
         nextSequence: 1
@@ -280,6 +267,75 @@ describe('AI conversation repository', () => {
       expect(count(sqlite, 'ai_message_web_citations')).toBe(0)
       expect(sqlite.pragma('foreign_key_check')).toEqual([])
     })
+  })
+
+  it('reads at most 256 UTF-8 metadata rows before loading only selected citation-free content', () => {
+    const queries: string[] = []
+    withDatabase(
+      'provider-context',
+      ({ connection, sqlite }) => {
+        insertUser(sqlite, ownerId)
+        const conversation = createAiConversation(connection, ownerId, {
+          maximumCount: 10,
+          authorize: persistedAuthorization(ownerId),
+          now: atMinute(0)
+        })
+        const maximumSizeContent = '🙂'.repeat(250_000)
+        expect(Buffer.byteLength(maximumSizeContent, 'utf8')).toBe(1_000_000)
+        const messageIds = insertRawMessages(
+          sqlite,
+          conversation.id,
+          1,
+          257,
+          (sequence) => (sequence === 2 ? maximumSizeContent : sequence === 257 ? '🙂é' : `m${sequence}`),
+          (sequence) => (sequence === 255 ? 'user' : sequence % 2 === 1 ? 'user' : 'assistant')
+        )
+        sqlite.transaction(() => {
+          for (const [messageId, title] of [
+            [messageIds.get(255)!, 'selected-user-canary.pdf'],
+            [messageIds.get(1)!, 'excluded-user-canary.pdf']
+          ]) {
+            sqlite
+              .prepare('insert into ai_message_file_citations (message_id, ordinal, title) values (?, 1, ?)')
+              .run(messageId, title)
+          }
+        })()
+
+        expect(() => getAiMessageForOwner(connection, ownerId, conversation.id, messageIds.get(255)!)).toThrow(
+          'AI citation referred to a non-assistant message'
+        )
+        queries.length = 0
+
+        const metadata = listRecentAiMessageMetadataForOwner(connection, ownerId, conversation.id)
+        expect(metadata).toHaveLength(256)
+        expect(metadata?.[0]).toMatchObject({ sequence: 257, role: 'user', contentBytes: 6 })
+        expect(metadata?.at(-1)).toMatchObject({ sequence: 2, contentBytes: 1_000_000 })
+        expect(metadata?.some(({ sequence }) => sequence === 1)).toBe(false)
+        expect(Object.keys(metadata![0]!).sort()).toEqual(['contentBytes', 'createdAt', 'id', 'role', 'sequence'])
+
+        const contents = listAiMessageContentsForOwner(connection, ownerId, conversation.id, [
+          messageIds.get(255)!,
+          messageIds.get(257)!
+        ])
+        expect(contents).toEqual([
+          { role: 'user', content: 'm255' },
+          { role: 'user', content: '🙂é' }
+        ])
+
+        const metadataQuery = queries.find((query) => query.includes('octet_length(content)'))
+        const contentQuery = queries.find((query) => /select\s+role,\s*content\s+from ai_messages/i.test(query))
+        expect(metadataQuery).toMatch(/order by sequence desc\s+limit 256/i)
+        expect(metadataQuery).not.toMatch(/select\s+[^]*\bcontent\s*(?:,|from)/i)
+        expect(contentQuery).toMatch(/where conversation_id = .* and id in \(/i)
+        expect(contentQuery).toMatch(/order by sequence asc/i)
+        expect(queries.join('\n')).not.toMatch(/ai_message_(?:file|web)_citations/)
+      },
+      {
+        verbose(message) {
+          if (typeof message === 'string') queries.push(message)
+        }
+      }
+    )
   })
 
   it('fails closed while hydrating corrupt persisted Web citation fields', () => {
@@ -599,6 +655,75 @@ describe('AI conversation repository', () => {
       expect(quota).toMatchObject({ kind: 'quota-exceeded', usage: { requestCount: 2 } })
       expect(sqlite.pragma('foreign_key_check')).toEqual([])
     })
+  })
+
+  it('reserves one complete retained turn before rejecting growth without writes', () => {
+    const queries: string[] = []
+    withDatabase(
+      'retained-history-limits',
+      ({ connection, sqlite }) => {
+        insertUser(sqlite, ownerId)
+        const conversation = createAiConversation(connection, ownerId, {
+          maximumCount: 10,
+          authorize: persistedAuthorization(ownerId),
+          now: atMinute(0)
+        })
+        insertRawMessages(sqlite, conversation.id, 1, 254)
+
+        const reserved = reserveAiGenerationAttempt(connection, ownerId, {
+          ...reservation(conversation.id, '18888888-8888-4888-8888-888888888888'),
+          content: 'é',
+          leaseExpiresAt: atMinute(3),
+          now: atMinute(1)
+        })
+        expect(reserved).toMatchObject({ kind: 'reserved', userMessage: { sequence: 255 } })
+        if (reserved.kind !== 'reserved') throw new Error('Expected the final complete turn to be reserved')
+
+        const exactMaximumAssistant = '🙂'.repeat(16_000)
+        expect(Buffer.byteLength(exactMaximumAssistant, 'utf8')).toBe(64_000)
+        expect(
+          finalizeAiGenerationAttempt(connection, ownerId, {
+            conversationId: conversation.id,
+            attemptId: reserved.attempt.id,
+            historyRevision: reserved.attempt.historyRevision,
+            status: 'succeeded',
+            assistantContent: exactMaximumAssistant,
+            now: atMinute(2)
+          })
+        ).toMatchObject({ kind: 'finalized', assistantMessage: { sequence: 256 } })
+        expect(count(sqlite, 'ai_messages')).toBe(256)
+
+        const beforeRejectedReservation = {
+          messages: count(sqlite, 'ai_messages'),
+          attempts: count(sqlite, 'ai_generation_attempts'),
+          leases: count(sqlite, 'ai_generation_leases'),
+          usage: getAiUsageBucketForOwner(connection, ownerId, bucketDate),
+          conversation: getAiConversationForOwner(connection, ownerId, conversation.id)
+        }
+        expect(
+          reserveAiGenerationAttempt(connection, ownerId, {
+            ...reservation(conversation.id, '18888888-8888-4888-8888-888888888889'),
+            leaseExpiresAt: atMinute(5),
+            now: atMinute(4)
+          })
+        ).toEqual({ kind: 'history-limit-exceeded' })
+        expect({
+          messages: count(sqlite, 'ai_messages'),
+          attempts: count(sqlite, 'ai_generation_attempts'),
+          leases: count(sqlite, 'ai_generation_leases'),
+          usage: getAiUsageBucketForOwner(connection, ownerId, bucketDate),
+          conversation: getAiConversationForOwner(connection, ownerId, conversation.id)
+        }).toEqual(beforeRejectedReservation)
+        expect(queries.find((query) => query.includes('sum(contentBytes)'))).toMatch(
+          /from \(\s*select octet_length\(content\) as contentBytes\s+from ai_messages\s+where conversation_id = .*\s+order by sequence desc\s+limit 257\s*\)/i
+        )
+      },
+      {
+        verbose(message) {
+          if (typeof message === 'string') queries.push(message)
+        }
+      }
+    )
   })
 
   it('uses history revisions to discard late results while retaining minimized usage across clear and delete', () => {
@@ -951,9 +1076,6 @@ describe('AI conversation repository', () => {
         [],
         [{ type: 'file', title: 'Paged source 2.pdf' }]
       ])
-      expect(
-        listRecentAiMessagesForOwner(connection, ownerId, conversation.id, 2)?.map(({ sequence }) => sequence)
-      ).toEqual([4, 3])
       expect(sqlite.pragma('foreign_key_check')).toEqual([])
     })
   })
@@ -1050,9 +1172,12 @@ describe('AI conversation repository', () => {
           })
         ).toThrow(RangeError)
       }
-      expect(listRecentAiMessagesForOwner(connection, foreignOwnerId, conversation.id, 1)).toBeNull()
-      for (const limit of [0, 1.5, 6_251]) {
-        expect(() => listRecentAiMessagesForOwner(connection, ownerId, conversation.id, limit)).toThrow(RangeError)
+      expect(listRecentAiMessageMetadataForOwner(connection, foreignOwnerId, conversation.id)).toBeNull()
+      expect(listAiMessageContentsForOwner(connection, foreignOwnerId, conversation.id, ['message'])).toBeNull()
+      for (const messageIds of [[], Array.from({ length: 257 }, (_, index) => `message-${index}`)]) {
+        expect(() => listAiMessageContentsForOwner(connection, ownerId, conversation.id, messageIds)).toThrow(
+          RangeError
+        )
       }
       expect(
         reapAndGetAiGenerationAttemptForOwner(
@@ -1137,6 +1262,8 @@ describe('AI conversation repository', () => {
         errorCode: 'provider_failed',
         now: atMinute(1)
       }
+      const assistantOverflow = `${'🙂'.repeat(16_000)}a`
+      expect(Buffer.byteLength(assistantOverflow, 'utf8')).toBe(64_001)
 
       for (const historyRevision of [-1, 0.5]) {
         expect(() => finalizeAiGenerationAttempt(connection, ownerId, { ...invalidBase, historyRevision })).toThrow(
@@ -1145,10 +1272,10 @@ describe('AI conversation repository', () => {
       }
       for (const candidate of [
         { status: 'succeeded' as const, errorCode: undefined },
-        { status: 'succeeded' as const, assistantContent: 'x'.repeat(1_000_001), errorCode: undefined },
+        { status: 'succeeded' as const, assistantContent: assistantOverflow, errorCode: undefined },
         { status: 'succeeded' as const, assistantContent: 'answer', errorCode: 'not_allowed' },
         { status: 'refused' as const, errorCode: 'provider_refused' },
-        { status: 'refused' as const, assistantContent: 'x'.repeat(1_000_001), errorCode: 'provider_refused' },
+        { status: 'refused' as const, assistantContent: assistantOverflow, errorCode: 'provider_refused' },
         { status: 'refused' as const, assistantContent: 'visible refusal', errorCode: undefined },
         { status: 'refused' as const, assistantContent: 'visible refusal', errorCode: 'Unsafe Code' },
         { status: 'failed' as const, assistantContent: 'must not persist', errorCode: 'provider_failed' },
@@ -1631,10 +1758,10 @@ type DatabaseFixture = Readonly<{
   sqlite: InstanceType<typeof Database>
 }>
 
-function withDatabase(name: string, run: (fixture: DatabaseFixture) => void) {
+function withDatabase(name: string, run: (fixture: DatabaseFixture) => void, options: Database.Options = {}) {
   const directory = mkdtempSync(join(tmpdir(), `swl-ai-repository-${name}-`))
   const databasePath = join(directory, 'app.db')
-  const sqlite = new Database(databasePath)
+  const sqlite = new Database(databasePath, options)
   sqlite.pragma('foreign_keys = ON')
   const db = drizzle({ client: sqlite, schema })
   migrate(db, { migrationsFolder })
@@ -1644,6 +1771,45 @@ function withDatabase(name: string, run: (fixture: DatabaseFixture) => void) {
     sqlite.close()
     rmSync(directory, { recursive: true, force: true })
   }
+}
+
+function insertRawMessages(
+  sqlite: InstanceType<typeof Database>,
+  conversationId: string,
+  startSequence: number,
+  messageCount: number,
+  contentForSequence: (sequence: number) => string = (sequence) => `Historical message ${sequence}`,
+  roleForSequence: (sequence: number) => 'user' | 'assistant' = (sequence) =>
+    sequence % 2 === 1 ? 'user' : 'assistant'
+) {
+  const messageIds = new Map<number, string>()
+  const insert = sqlite.prepare(
+    `insert into ai_messages (id, conversation_id, sequence, role, content, created_at)
+     values (?, ?, ?, ?, ?, ?)`
+  )
+  sqlite.transaction(() => {
+    for (let offset = 0; offset < messageCount; offset += 1) {
+      const sequence = startSequence + offset
+      const messageId = `ai_message_${randomUUID()}`
+      messageIds.set(sequence, messageId)
+      insert.run(
+        messageId,
+        conversationId,
+        sequence,
+        roleForSequence(sequence),
+        contentForSequence(sequence),
+        new Date(fixedRepositoryTime.getTime() + sequence).toISOString()
+      )
+    }
+    sqlite
+      .prepare('update ai_conversations set next_sequence = ?, updated_at = ? where id = ?')
+      .run(
+        startSequence + messageCount,
+        new Date(fixedRepositoryTime.getTime() + startSequence + messageCount).toISOString(),
+        conversationId
+      )
+  })()
+  return messageIds
 }
 
 function insertUser(sqlite: InstanceType<typeof Database>, id: string) {
@@ -1706,6 +1872,8 @@ function seedCompletedAiMessages(connection: DatabaseConnection) {
 function atMinute(minutes: number, seconds = 0) {
   return new Date(Date.UTC(2026, 6, 16, 12, minutes, seconds))
 }
+
+const fixedRepositoryTime = new Date(Date.UTC(2026, 6, 16, 13))
 
 function count(sqlite: InstanceType<typeof Database>, table: string) {
   return (sqlite.prepare(`select count(*) as count from ${table}`).get() as { count: number }).count

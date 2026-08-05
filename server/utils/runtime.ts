@@ -1,19 +1,8 @@
 import { isIP } from 'node:net'
 import { isAbsolute } from 'node:path'
 import { domainToASCII } from 'node:url'
-import {
-  moduleManifest,
-  runtimeModuleIds,
-  type ModuleRequirement,
-  type ModuleState,
-  type RuntimeModuleId
-} from '../../shared/modules'
-import { socialProviderIds, socialProviderManifest, type SocialProviderId } from '../../shared/auth-providers'
 import destr from 'destr'
 import { z } from 'zod'
-
-export { runtimeModuleIds, type RuntimeModuleId } from '../../shared/modules'
-export { socialProviderIds, type SocialProviderId } from '../../shared/auth-providers'
 
 export const forbiddenBetterAuthRuntimeEnvironmentKeys = [
   'BETTER_AUTH_SECRETS',
@@ -26,6 +15,19 @@ export const forbiddenBetterAuthRuntimeEnvironmentKeys = [
 ] as const
 
 export const forbiddenBetterAuthBuildEnvironmentKeys = ['NEXT_PUBLIC_AUTH_URL', 'NEXTAUTH_URL', 'VERCEL_URL'] as const
+
+export const retiredCapabilitySwitchEnvironmentKeys = [
+  'NUXT_MODULES_BILLING_ENABLED',
+  'NUXT_MODULES_FILES_ENABLED',
+  'NUXT_MODULES_AI_ENABLED',
+  'NUXT_MODULES_TURNSTILE_ENABLED',
+  'NUXT_MODULES_OBSERVABILITY_ENABLED',
+  'NUXT_MODULES_JOBS_ENABLED',
+  'NUXT_OPENAI_FILE_SEARCH_ENABLED',
+  'NUXT_OPENAI_WEB_SEARCH_ENABLED'
+] as const
+
+const retiredCapabilitySwitchEnvironmentKeySet = new Set<string>(retiredCapabilitySwitchEnvironmentKeys)
 
 const unsafeProductionAuthSecrets = new Set([
   'better-auth-secret-12345678901234567890',
@@ -64,17 +66,8 @@ export const readinessTokenPattern = /^[A-Za-z][A-Za-z0-9._~+/-]{31,}$/
  */
 export const canonicalAppRuntimePaths = [
   ['BETTER_AUTH', 'object'],
-  ['SOCIAL_PROVIDERS', 'object'],
-  ['SOCIAL_PROVIDERS_GOOGLE', 'object'],
   ['EMAIL', 'object'],
-  ['EMAIL_SMTP', 'object'],
-  ['MODULES', 'object'],
-  ['MODULES_BILLING', 'object'],
-  ['MODULES_FILES', 'object'],
-  ['MODULES_AI', 'object'],
-  ['MODULES_TURNSTILE', 'object'],
-  ['MODULES_OBSERVABILITY', 'object'],
-  ['MODULES_JOBS', 'object'],
+  ['EMAIL_RESEND', 'object'],
   ['STRIPE', 'object'],
   ['FILES', 'object'],
   ['OPENAI', 'object'],
@@ -85,28 +78,14 @@ export const canonicalAppRuntimePaths = [
   ['CLOUDFLARE_R2', 'object'],
   ['CLOUDFLARE_TURNSTILE', 'object'],
   ['PUBLIC', 'object'],
-  ['PUBLIC_MODULE_STATES', 'object'],
   ['DATABASE_URL', 'leaf'],
   ['READINESS_TOKEN', 'leaf'],
   ['BETTER_AUTH_SECRET', 'leaf'],
   ['BETTER_AUTH_URL', 'leaf'],
-  ['SOCIAL_PROVIDERS_GOOGLE_ENABLED', 'leaf'],
-  ['SOCIAL_PROVIDERS_GOOGLE_CLIENT_ID', 'leaf'],
-  ['SOCIAL_PROVIDERS_GOOGLE_CLIENT_SECRET', 'leaf'],
   ['EMAIL_TRANSPORT', 'leaf'],
   ['EMAIL_FROM', 'leaf'],
   ['EMAIL_CAPTURE_DIRECTORY', 'leaf'],
-  ['EMAIL_SMTP_HOST', 'leaf'],
-  ['EMAIL_SMTP_PORT', 'leaf'],
-  ['EMAIL_SMTP_SECURITY', 'leaf'],
-  ['EMAIL_SMTP_USERNAME', 'leaf'],
-  ['EMAIL_SMTP_PASSWORD', 'leaf'],
-  ['MODULES_BILLING_ENABLED', 'leaf'],
-  ['MODULES_FILES_ENABLED', 'leaf'],
-  ['MODULES_AI_ENABLED', 'leaf'],
-  ['MODULES_TURNSTILE_ENABLED', 'leaf'],
-  ['MODULES_OBSERVABILITY_ENABLED', 'leaf'],
-  ['MODULES_JOBS_ENABLED', 'leaf'],
+  ['EMAIL_RESEND_API_KEY', 'leaf'],
   ['STRIPE_SECRET_KEY', 'leaf'],
   ['STRIPE_WEBHOOK_SECRET', 'leaf'],
   ['STRIPE_PORTAL_CONFIGURATION_ID', 'leaf'],
@@ -119,9 +98,7 @@ export const canonicalAppRuntimePaths = [
   ['OPENAI_API_KEY', 'leaf'],
   ['OPENAI_PROJECT_ID', 'leaf'],
   ['OPENAI_MODEL', 'leaf'],
-  ['OPENAI_FILE_SEARCH_ENABLED', 'leaf'],
   ['OPENAI_FILE_SEARCH_VECTOR_STORE_ID', 'leaf'],
-  ['OPENAI_WEB_SEARCH_ENABLED', 'leaf'],
   ['OPENAI_WEB_SEARCH_ALLOWED_DOMAINS', 'leaf'],
   ['SENTRY_DSN', 'leaf'],
   ['SENTRY_ENVIRONMENT', 'leaf'],
@@ -140,28 +117,138 @@ export const canonicalAppRuntimePaths = [
   ['PUBLIC_SENTRY_ENVIRONMENT', 'leaf'],
   ['PUBLIC_SENTRY_RELEASE', 'leaf'],
   ['PUBLIC_SENTRY_TRACES_SAMPLE_RATE', 'leaf'],
-  ['PUBLIC_TURNSTILE_SITE_KEY', 'leaf'],
-  ['PUBLIC_MODULE_STATES_BILLING', 'leaf'],
-  ['PUBLIC_MODULE_STATES_FILES', 'leaf'],
-  ['PUBLIC_MODULE_STATES_AI', 'leaf'],
-  ['PUBLIC_MODULE_STATES_TURNSTILE', 'leaf'],
-  ['PUBLIC_MODULE_STATES_OBSERVABILITY', 'leaf'],
-  ['PUBLIC_MODULE_STATES_JOBS', 'leaf']
+  ['PUBLIC_TURNSTILE_SITE_KEY', 'leaf']
 ] as const
 
 const forbiddenNuxtObjectEnvironmentKeys = new Set(
   canonicalAppRuntimePaths.filter(([, kind]) => kind === 'object').map(([path]) => `NUXT_${path}`)
 )
 
-const forbiddenNuxtPublicModuleStateEnvironmentKeys = new Set(
-  canonicalAppRuntimePaths
-    .filter(([path]) => path === 'PUBLIC_MODULE_STATES' || path.startsWith('PUBLIC_MODULE_STATES_'))
-    .map(([path]) => `NUXT_${path}`)
-)
-
 const forbiddenNitroRuntimeConfigEnvironmentKeys = new Set(canonicalAppRuntimePaths.map(([path]) => `NITRO_${path}`))
 
 type RuntimeEnvironment = Record<string, string | undefined>
+
+type RuntimeRequirement = Readonly<{
+  environmentKey: string
+  configPath: string
+  kind: 'domain-list' | 'http-url' | 'value' | 'value-enum'
+  allowedValues?: readonly string[]
+  preserveBytes?: boolean
+  when?: Readonly<{
+    configPath: string
+    equals: string
+  }>
+}>
+
+const alwaysActiveRequirements = [
+  { environmentKey: 'NUXT_STRIPE_SECRET_KEY', configPath: 'stripe.secretKey', kind: 'value', preserveBytes: true },
+  {
+    environmentKey: 'NUXT_STRIPE_WEBHOOK_SECRET',
+    configPath: 'stripe.webhookSecret',
+    kind: 'value',
+    preserveBytes: true
+  },
+  {
+    environmentKey: 'NUXT_STRIPE_PORTAL_CONFIGURATION_ID',
+    configPath: 'stripe.portalConfigurationId',
+    kind: 'value'
+  },
+  {
+    environmentKey: 'NUXT_STRIPE_PERSONAL_WEEKLY_PRICE_ID',
+    configPath: 'stripe.personalWeeklyPriceId',
+    kind: 'value'
+  },
+  {
+    environmentKey: 'NUXT_STRIPE_PERSONAL_MONTHLY_PRICE_ID',
+    configPath: 'stripe.personalMonthlyPriceId',
+    kind: 'value'
+  },
+  {
+    environmentKey: 'NUXT_STRIPE_PERSONAL_ANNUAL_PRICE_ID',
+    configPath: 'stripe.personalAnnualPriceId',
+    kind: 'value'
+  },
+  {
+    environmentKey: 'NUXT_STRIPE_FAMILY_MONTHLY_PRICE_ID',
+    configPath: 'stripe.familyMonthlyPriceId',
+    kind: 'value'
+  },
+  {
+    environmentKey: 'NUXT_STRIPE_FAMILY_ANNUAL_PRICE_ID',
+    configPath: 'stripe.familyAnnualPriceId',
+    kind: 'value'
+  },
+  {
+    environmentKey: 'NUXT_FILES_DRIVER',
+    configPath: 'files.driver',
+    kind: 'value-enum',
+    allowedValues: ['local', 'r2']
+  },
+  {
+    environmentKey: 'NUXT_CLOUDFLARE_ACCOUNT_ID',
+    configPath: 'cloudflare.accountId',
+    kind: 'value',
+    when: { configPath: 'files.driver', equals: 'r2' }
+  },
+  {
+    environmentKey: 'NUXT_CLOUDFLARE_R2_BUCKET',
+    configPath: 'cloudflare.r2.bucket',
+    kind: 'value',
+    when: { configPath: 'files.driver', equals: 'r2' }
+  },
+  {
+    environmentKey: 'NUXT_CLOUDFLARE_R2_ENDPOINT',
+    configPath: 'cloudflare.r2.endpoint',
+    kind: 'http-url',
+    when: { configPath: 'files.driver', equals: 'r2' }
+  },
+  {
+    environmentKey: 'NUXT_CLOUDFLARE_R2_ACCESS_KEY_ID',
+    configPath: 'cloudflare.r2.accessKeyId',
+    kind: 'value',
+    preserveBytes: true,
+    when: { configPath: 'files.driver', equals: 'r2' }
+  },
+  {
+    environmentKey: 'NUXT_CLOUDFLARE_R2_SECRET_ACCESS_KEY',
+    configPath: 'cloudflare.r2.secretAccessKey',
+    kind: 'value',
+    preserveBytes: true,
+    when: { configPath: 'files.driver', equals: 'r2' }
+  },
+  { environmentKey: 'NUXT_OPENAI_API_KEY', configPath: 'openai.apiKey', kind: 'value', preserveBytes: true },
+  { environmentKey: 'NUXT_OPENAI_PROJECT_ID', configPath: 'openai.projectId', kind: 'value' },
+  {
+    environmentKey: 'NUXT_OPENAI_MODEL',
+    configPath: 'openai.model',
+    kind: 'value-enum',
+    allowedValues: ['gpt-5.6-luna']
+  },
+  {
+    environmentKey: 'NUXT_OPENAI_FILE_SEARCH_VECTOR_STORE_ID',
+    configPath: 'openai.fileSearch.vectorStoreId',
+    kind: 'value',
+    preserveBytes: true
+  },
+  {
+    environmentKey: 'NUXT_OPENAI_WEB_SEARCH_ALLOWED_DOMAINS',
+    configPath: 'openai.webSearch.allowedDomains',
+    kind: 'domain-list',
+    preserveBytes: true
+  },
+  {
+    environmentKey: 'NUXT_CLOUDFLARE_TURNSTILE_SECRET_KEY',
+    configPath: 'cloudflare.turnstile.secretKey',
+    kind: 'value',
+    preserveBytes: true
+  },
+  {
+    environmentKey: 'NUXT_PUBLIC_TURNSTILE_SITE_KEY',
+    configPath: 'public.turnstileSiteKey',
+    kind: 'value',
+    preserveBytes: true
+  }
+] as const satisfies readonly RuntimeRequirement[]
 
 export type RuntimeConfigIssue = Readonly<{
   code: 'invalid' | 'mismatch' | 'missing' | 'shape'
@@ -176,39 +263,14 @@ const runtimeConfigSchema = z.object({
     secret: z.string(),
     url: z.string()
   }),
-  socialProviders: z.object(
-    Object.fromEntries(
-      socialProviderIds.map((id) => [
-        id,
-        z.object({
-          enabled: z.unknown(),
-          clientId: z.unknown(),
-          clientSecret: z.unknown()
-        })
-      ])
-    ) as Record<
-      SocialProviderId,
-      z.ZodObject<{ enabled: z.ZodUnknown; clientId: z.ZodUnknown; clientSecret: z.ZodUnknown }>
-    >
-  ),
   email: z.object({
     transport: z.unknown(),
     from: z.unknown(),
     captureDirectory: z.unknown(),
-    smtp: z.object({
-      host: z.unknown(),
-      port: z.unknown(),
-      security: z.unknown(),
-      username: z.unknown(),
-      password: z.unknown()
+    resend: z.object({
+      apiKey: z.unknown()
     })
   }),
-  modules: z.object(
-    Object.fromEntries(runtimeModuleIds.map((id) => [id, z.object({ enabled: z.unknown() })])) as Record<
-      RuntimeModuleId,
-      z.ZodObject<{ enabled: z.ZodUnknown }>
-    >
-  ),
   stripe: z.unknown(),
   files: z.unknown(),
   openai: z.unknown(),
@@ -238,24 +300,12 @@ type NormalizedRuntimeConfig = {
     secret: string
     url: string
   }
-  socialProviders: Record<
-    SocialProviderId,
-    {
-      enabled: boolean
-      clientId: string
-      clientSecret: string
-    }
-  >
   email: {
-    transport: '' | 'capture' | 'smtp'
+    transport: '' | 'capture' | 'resend'
     from: string
     captureDirectory: string
-    smtp: {
-      host: string
-      port: string
-      security: '' | 'tls' | 'starttls'
-      username: string
-      password: string
+    resend: {
+      apiKey: string
     }
   }
   files: {
@@ -266,15 +316,12 @@ type NormalizedRuntimeConfig = {
     projectId: string
     model: 'gpt-5.6-luna' | ''
     fileSearch: {
-      enabled: boolean
       vectorStoreId: string
     }
     webSearch: {
-      enabled: boolean
       allowedDomains: string[]
     }
   }
-  modules: Record<RuntimeModuleId, { enabled: boolean }>
   stripe: {
     secretKey: string
     webhookSecret: string
@@ -325,8 +372,7 @@ export type AppRuntimeConfig = DeepReadonly<NormalizedRuntimeConfig>
 
 export type RuntimeConfigEvaluation = DeepReadonly<{
   config?: AppRuntimeConfig
-  coreIssues: RuntimeConfigIssue[]
-  moduleIssues: Record<RuntimeModuleId, RuntimeConfigIssue[]>
+  issues: RuntimeConfigIssue[]
 }>
 
 let cachedAppRuntimeConfig: AppRuntimeConfig | undefined
@@ -353,75 +399,29 @@ export function getAppRuntimeConfig(): AppRuntimeConfig {
 }
 
 export function evaluateRuntimeConfig(input: unknown, environment: RuntimeEnvironment): RuntimeConfigEvaluation {
-  const coreIssues: RuntimeConfigIssue[] = []
-  const moduleIssues = emptyModuleIssues()
-  validateRuntimeEnvironmentKeyContract(environment, coreIssues)
-  validateModuleFlagEnvironment(environment, moduleIssues)
+  const issues: RuntimeConfigIssue[] = []
+  validateRuntimeEnvironmentKeyContract(environment, issues)
   const parsed = runtimeConfigSchema.safeParse(input)
 
   if (!parsed.success) {
     for (const issue of parsed.error.issues) {
-      const runtimeIssue = configIssue(
-        'shape',
-        environmentKeyForPath(issue.path),
-        'must use the documented runtime configuration shape'
+      issues.push(
+        configIssue('shape', environmentKeyForPath(issue.path), 'must use the documented runtime configuration shape')
       )
-      const moduleIds = moduleIdsForConfigPath(issue.path)
-      if (moduleIds.length) {
-        for (const moduleId of moduleIds) moduleIssues[moduleId].push(runtimeIssue)
-      } else {
-        coreIssues.push(runtimeIssue)
-      }
     }
-    return freezeEvaluation(undefined, coreIssues, moduleIssues)
+    return freezeEvaluation(undefined, issues)
   }
 
   const config = normalizeRuntimeConfig(parsed.data)
-  validateResolvedModuleFlags(config, environment, moduleIssues)
-  validateCore(config, environment, coreIssues)
-  validateEnabledModules(config, environment, moduleIssues)
-  validateModuleDependencies(config, environment, moduleIssues)
-  validateR2Endpoint(config, moduleIssues.files)
+  validateCore(config, environment, issues)
+  validateCapabilities(config, environment, issues)
+  validateR2Endpoint(config, issues)
 
-  return freezeEvaluation(config, coreIssues, moduleIssues)
-}
-
-function validateModuleDependencies(
-  config: NormalizedRuntimeConfig,
-  environment: RuntimeEnvironment,
-  moduleIssues: Record<RuntimeModuleId, RuntimeConfigIssue[]>
-) {
-  if (config.modules.billing.enabled && !config.modules.jobs.enabled) {
-    moduleIssues.billing.push(
-      configIssue('invalid', 'NUXT_MODULES_JOBS_ENABLED', 'must be true when Billing is enabled')
-    )
-  }
-
-  if (config.modules.files.enabled && !config.modules.jobs.enabled) {
-    moduleIssues.files.push(configIssue('invalid', 'NUXT_MODULES_JOBS_ENABLED', 'must be true when Files is enabled'))
-  }
-
-  if (config.modules.ai.enabled) return
-
-  for (const [key, enabled] of [
-    ['NUXT_OPENAI_FILE_SEARCH_ENABLED', config.openai.fileSearch.enabled],
-    ['NUXT_OPENAI_WEB_SEARCH_ENABLED', config.openai.webSearch.enabled]
-  ] as const) {
-    const rawValue = environment[key]
-    if (rawValue !== 'true' && rawValue !== 'false') {
-      moduleIssues.ai.push(configIssue('invalid', key, 'is required and must be exactly true or false'))
-      continue
-    }
-
-    requireMatch(String(enabled), rawValue, key, moduleIssues.ai)
-    if (rawValue === 'true') {
-      moduleIssues.ai.push(configIssue('invalid', key, 'must be false when the AI module is disabled'))
-    }
-  }
+  return freezeEvaluation(config, issues)
 }
 
 function validateR2Endpoint(config: NormalizedRuntimeConfig, issues: RuntimeConfigIssue[]) {
-  if (!config.modules.files.enabled || config.files.driver !== 'r2') return
+  if (config.files.driver !== 'r2') return
   const accountId = config.cloudflare.accountId
   const bucket = config.cloudflare.r2.bucket
   const endpoint = config.cloudflare.r2.endpoint
@@ -497,27 +497,6 @@ export function evaluateRuntimeEnvironment(environment: RuntimeEnvironment): Run
   return evaluateRuntimeConfig(runtimeConfigFromEnvironment(environment), environment)
 }
 
-export function evaluateModuleStates(
-  evaluation: RuntimeConfigEvaluation
-): Readonly<Record<RuntimeModuleId, ModuleState>> {
-  return deepFreeze(
-    Object.fromEntries(
-      runtimeModuleIds.map((moduleId) => {
-        const enabled = evaluation.config?.modules[moduleId].enabled
-        const state: ModuleState =
-          evaluation.moduleIssues[moduleId].length || enabled === undefined
-            ? 'incomplete'
-            : enabled === false
-              ? 'disabled'
-              : evaluation.coreIssues.length
-                ? 'incomplete'
-                : 'ready'
-        return [moduleId, state]
-      })
-    ) as Record<RuntimeModuleId, ModuleState>
-  )
-}
-
 export function runtimeConfigFromEnvironment(environment: RuntimeEnvironment): unknown {
   return {
     // Nitro 2.13.4 applies destr@2.0.5 to every NUXT_* runtime-config leaf.
@@ -529,37 +508,14 @@ export function runtimeConfigFromEnvironment(environment: RuntimeEnvironment): u
       secret: nitroEnvironmentValue(environment, 'NUXT_BETTER_AUTH_SECRET'),
       url: nitroEnvironmentValue(environment, 'NUXT_BETTER_AUTH_URL')
     },
-    socialProviders: Object.fromEntries(
-      socialProviderIds.map((id) => {
-        const manifest = socialProviderManifest[id]
-        return [
-          id,
-          {
-            enabled: nitroEnvironmentValue(environment, manifest.enabledEnvironmentKey),
-            clientId: nitroEnvironmentValue(environment, manifest.clientIdEnvironmentKey),
-            clientSecret: nitroEnvironmentValue(environment, manifest.clientSecretEnvironmentKey)
-          }
-        ]
-      })
-    ),
     email: {
       transport: nitroEnvironmentValue(environment, 'NUXT_EMAIL_TRANSPORT'),
       from: nitroEnvironmentValue(environment, 'NUXT_EMAIL_FROM'),
       captureDirectory: nitroEnvironmentValue(environment, 'NUXT_EMAIL_CAPTURE_DIRECTORY'),
-      smtp: {
-        host: nitroEnvironmentValue(environment, 'NUXT_EMAIL_SMTP_HOST'),
-        port: nitroEnvironmentValue(environment, 'NUXT_EMAIL_SMTP_PORT'),
-        security: nitroEnvironmentValue(environment, 'NUXT_EMAIL_SMTP_SECURITY'),
-        username: nitroEnvironmentValue(environment, 'NUXT_EMAIL_SMTP_USERNAME'),
-        password: nitroEnvironmentValue(environment, 'NUXT_EMAIL_SMTP_PASSWORD')
+      resend: {
+        apiKey: nitroEnvironmentValue(environment, 'NUXT_EMAIL_RESEND_API_KEY')
       }
     },
-    modules: Object.fromEntries(
-      runtimeModuleIds.map((id) => [
-        id,
-        { enabled: nitroEnvironmentValue(environment, moduleManifest[id].flagEnvironmentKey) }
-      ])
-    ),
     stripe: {
       secretKey: nitroEnvironmentValue(environment, 'NUXT_STRIPE_SECRET_KEY'),
       webhookSecret: nitroEnvironmentValue(environment, 'NUXT_STRIPE_WEBHOOK_SECRET'),
@@ -578,11 +534,9 @@ export function runtimeConfigFromEnvironment(environment: RuntimeEnvironment): u
       projectId: nitroEnvironmentValue(environment, 'NUXT_OPENAI_PROJECT_ID'),
       model: nitroEnvironmentValue(environment, 'NUXT_OPENAI_MODEL'),
       fileSearch: {
-        enabled: nitroEnvironmentValue(environment, 'NUXT_OPENAI_FILE_SEARCH_ENABLED'),
         vectorStoreId: nitroEnvironmentValue(environment, 'NUXT_OPENAI_FILE_SEARCH_VECTOR_STORE_ID')
       },
       webSearch: {
-        enabled: nitroEnvironmentValue(environment, 'NUXT_OPENAI_WEB_SEARCH_ENABLED'),
         allowedDomains: nitroEnvironmentValue(environment, 'NUXT_OPENAI_WEB_SEARCH_ALLOWED_DOMAINS')
       }
     },
@@ -606,7 +560,7 @@ export function runtimeConfigFromEnvironment(environment: RuntimeEnvironment): u
       }
     },
     public: {
-      appName: nitroEnvironmentValue(environment, 'NUXT_PUBLIC_APP_NAME', 'SmallWiseLabs Base App'),
+      appName: nitroEnvironmentValue(environment, 'NUXT_PUBLIC_APP_NAME', 'Working Class Unity'),
       appUrl: nitroEnvironmentValue(environment, 'NUXT_PUBLIC_APP_URL'),
       sentryDsn: nitroEnvironmentValue(environment, 'NUXT_PUBLIC_SENTRY_DSN'),
       sentryEnvironment: nitroEnvironmentValue(environment, 'NUXT_PUBLIC_SENTRY_ENVIRONMENT'),
@@ -623,13 +577,11 @@ function nitroEnvironmentValue(environment: RuntimeEnvironment, key: string, fal
 }
 
 export function assertStartableRuntimeConfig(evaluation: RuntimeConfigEvaluation): AppRuntimeConfig {
-  const issues = [
-    ...evaluation.coreIssues,
-    ...runtimeModuleIds.flatMap((moduleId) => evaluation.moduleIssues[moduleId])
-  ]
-  if (issues.length || !evaluation.config) {
+  if (evaluation.issues.length || !evaluation.config) {
     throw new RuntimeConfigValidationError(
-      issues.length ? issues : [configIssue('shape', 'NUXT_RUNTIME_CONFIG', 'could not be normalized')]
+      evaluation.issues.length
+        ? evaluation.issues
+        : [configIssue('shape', 'NUXT_RUNTIME_CONFIG', 'could not be normalized')]
     )
   }
   return evaluation.config
@@ -653,14 +605,12 @@ export function formatRuntimeConfigIssues(issues: readonly RuntimeConfigIssue[])
 
 function normalizeRuntimeConfig(config: ParsedRuntimeConfig): NormalizedRuntimeConfig {
   const email = recordValue(config.email)
-  const emailSmtp = recordValue(email.smtp)
+  const emailResend = recordValue(email.resend)
   const stripe = recordValue(config.stripe)
   const files = recordValue(config.files)
   const openai = recordValue(config.openai)
   const openaiFileSearch = recordValue(openai.fileSearch)
-  const openaiFileSearchEnabled = openaiFileSearch.enabled === true
   const openaiWebSearch = recordValue(openai.webSearch)
-  const openaiWebSearchEnabled = openaiWebSearch.enabled === true
   const observability = recordValue(config.observability)
   const cloudflare = recordValue(config.cloudflare)
   const r2 = recordValue(cloudflare.r2)
@@ -673,31 +623,14 @@ function normalizeRuntimeConfig(config: ParsedRuntimeConfig): NormalizedRuntimeC
       secret: config.betterAuth.secret,
       url: config.betterAuth.url.trim()
     },
-    socialProviders: Object.fromEntries(
-      socialProviderIds.map((id) => [
-        id,
-        {
-          enabled: config.socialProviders[id].enabled === true,
-          clientId: trimmedStringValue(config.socialProviders[id].clientId),
-          clientSecret: stringValue(config.socialProviders[id].clientSecret)
-        }
-      ])
-    ) as NormalizedRuntimeConfig['socialProviders'],
     email: {
       transport: normalizeEmailTransport(email.transport),
       from: trimmedStringValue(email.from),
       captureDirectory: trimmedStringValue(email.captureDirectory),
-      smtp: {
-        host: trimmedStringValue(emailSmtp.host),
-        port: scalarStringValue(emailSmtp.port),
-        security: normalizeEmailSmtpSecurity(emailSmtp.security),
-        username: stringValue(emailSmtp.username),
-        password: stringValue(emailSmtp.password)
+      resend: {
+        apiKey: stringValue(emailResend.apiKey)
       }
     },
-    modules: Object.fromEntries(
-      runtimeModuleIds.map((id) => [id, { enabled: config.modules[id].enabled === true }])
-    ) as Record<RuntimeModuleId, { enabled: boolean }>,
     stripe: {
       secretKey: stringValue(stripe.secretKey),
       webhookSecret: stringValue(stripe.webhookSecret),
@@ -716,12 +649,10 @@ function normalizeRuntimeConfig(config: ParsedRuntimeConfig): NormalizedRuntimeC
       projectId: trimmedStringValue(openai.projectId),
       model: normalizeOpenAIModel(openai.model),
       fileSearch: {
-        enabled: openaiFileSearchEnabled,
-        vectorStoreId: openaiFileSearchEnabled ? trimmedStringValue(openaiFileSearch.vectorStoreId) : ''
+        vectorStoreId: trimmedStringValue(openaiFileSearch.vectorStoreId)
       },
       webSearch: {
-        enabled: openaiWebSearchEnabled,
-        allowedDomains: openaiWebSearchEnabled ? parseWebSearchAllowedDomains(openaiWebSearch.allowedDomains) : []
+        allowedDomains: parseWebSearchAllowedDomains(openaiWebSearch.allowedDomains)
       }
     },
     sentryDsn: trimmedStringValue(config.sentryDsn),
@@ -744,25 +675,13 @@ function normalizeRuntimeConfig(config: ParsedRuntimeConfig): NormalizedRuntimeC
       }
     },
     public: {
-      appName: config.public.appName.trim() || 'SmallWiseLabs Base App',
+      appName: config.public.appName.trim() || 'Working Class Unity',
       appUrl: config.public.appUrl.trim(),
       sentryDsn: trimmedStringValue(config.public.sentryDsn),
       sentryEnvironment: trimmedStringValue(config.public.sentryEnvironment),
       sentryRelease: trimmedStringValue(config.public.sentryRelease),
       sentryTracesSampleRate: scalarStringValue(config.public.sentryTracesSampleRate),
       turnstileSiteKey: stringValue(config.public.turnstileSiteKey)
-    }
-  }
-}
-
-function validateModuleFlagEnvironment(
-  environment: RuntimeEnvironment,
-  moduleIssues: Record<RuntimeModuleId, RuntimeConfigIssue[]>
-) {
-  for (const id of runtimeModuleIds) {
-    const key = moduleManifest[id].flagEnvironmentKey
-    if (environment[key] !== 'true' && environment[key] !== 'false') {
-      moduleIssues[id].push(configIssue('invalid', key, 'is required and must be exactly true or false'))
     }
   }
 }
@@ -778,8 +697,8 @@ function validateRuntimeEnvironmentKeyContract(environment: RuntimeEnvironment, 
       key.startsWith('NITRO_SECURITY_')
     ) {
       issues.push(configIssue('invalid', key, 'must not override the reviewed application security policy'))
-    } else if (forbiddenNuxtPublicModuleStateEnvironmentKeys.has(key)) {
-      issues.push(configIssue('invalid', key, 'is server-derived and must not be supplied as public runtime input'))
+    } else if (retiredCapabilitySwitchEnvironmentKeySet.has(key)) {
+      issues.push(configIssue('invalid', key, 'has been removed because the capability is always active'))
     } else if (forbiddenNuxtObjectEnvironmentKeys.has(key)) {
       issues.push(configIssue('invalid', key, 'must not set an object node; use the documented NUXT_ leaf variables'))
     } else if (forbiddenNitroRuntimeConfigEnvironmentKeys.has(key)) {
@@ -815,22 +734,6 @@ function validateRuntimeEnvironmentKeyContract(environment: RuntimeEnvironment, 
 
   // NITRO_ENV_PREFIX is intentionally allowed: the built server pins
   // inlineRuntimeConfig.nitro.envPrefix to NUXT_, which has precedence over it.
-}
-
-function validateResolvedModuleFlags(
-  config: NormalizedRuntimeConfig,
-  environment: RuntimeEnvironment,
-  moduleIssues: Record<RuntimeModuleId, RuntimeConfigIssue[]>
-) {
-  for (const id of runtimeModuleIds) {
-    const key = moduleManifest[id].flagEnvironmentKey
-    if (
-      (environment[key] === 'true' || environment[key] === 'false') &&
-      config.modules[id].enabled !== (environment[key] === 'true')
-    ) {
-      moduleIssues[id].push(configIssue('mismatch', key, 'did not resolve to the configured boolean value'))
-    }
-  }
 }
 
 function validateCore(config: NormalizedRuntimeConfig, environment: RuntimeEnvironment, issues: RuntimeConfigIssue[]) {
@@ -914,40 +817,6 @@ function validateCore(config: NormalizedRuntimeConfig, environment: RuntimeEnvir
   }
 
   validateEmailConfig(config.email, environment, issues)
-  validateSocialProviderConfig(config.socialProviders, environment, issues)
-}
-
-function validateSocialProviderConfig(
-  config: NormalizedRuntimeConfig['socialProviders'],
-  environment: RuntimeEnvironment,
-  issues: RuntimeConfigIssue[]
-) {
-  for (const providerId of socialProviderIds) {
-    const manifest = socialProviderManifest[providerId]
-    const rawEnabled = environment[manifest.enabledEnvironmentKey]
-    if (rawEnabled !== 'true' && rawEnabled !== 'false') {
-      issues.push(
-        configIssue('invalid', manifest.enabledEnvironmentKey, 'is required and must be exactly true or false')
-      )
-      continue
-    }
-    if (config[providerId].enabled !== (rawEnabled === 'true')) {
-      issues.push(
-        configIssue('mismatch', manifest.enabledEnvironmentKey, 'did not resolve to the configured boolean value')
-      )
-    }
-    if (rawEnabled === 'false') continue
-
-    const rawClientId = environment[manifest.clientIdEnvironmentKey] ?? ''
-    const clientId = rawClientId.trim()
-    requireValue(rawClientId, manifest.clientIdEnvironmentKey, issues)
-    requireAlreadyTrimmed(rawClientId, manifest.clientIdEnvironmentKey, issues)
-    requireMatch(config[providerId].clientId, clientId, manifest.clientIdEnvironmentKey, issues)
-
-    const clientSecret = environment[manifest.clientSecretEnvironmentKey] ?? ''
-    requireValue(clientSecret, manifest.clientSecretEnvironmentKey, issues)
-    requireMatch(config[providerId].clientSecret, clientSecret, manifest.clientSecretEnvironmentKey, issues)
-  }
 }
 
 function validateEmailConfig(
@@ -960,8 +829,8 @@ function validateEmailConfig(
   requireValue(rawTransport, 'NUXT_EMAIL_TRANSPORT', issues)
   requireMatch(config.transport, transport, 'NUXT_EMAIL_TRANSPORT', issues)
   requireAlreadyTrimmed(rawTransport, 'NUXT_EMAIL_TRANSPORT', issues)
-  if (transport !== 'capture' && transport !== 'smtp') {
-    issues.push(configIssue('invalid', 'NUXT_EMAIL_TRANSPORT', 'must be exactly capture or smtp'))
+  if (transport !== 'capture' && transport !== 'resend') {
+    issues.push(configIssue('invalid', 'NUXT_EMAIL_TRANSPORT', 'must be exactly capture or resend'))
   }
 
   const rawFrom = environment.NUXT_EMAIL_FROM ?? ''
@@ -980,55 +849,44 @@ function validateEmailConfig(
     requireMatch(config.captureDirectory, captureDirectory, 'NUXT_EMAIL_CAPTURE_DIRECTORY', issues)
     requireAlreadyTrimmed(rawCaptureDirectory, 'NUXT_EMAIL_CAPTURE_DIRECTORY', issues)
 
-    if (environment.NODE_ENV === 'production' && environment.CI !== 'true') {
+    const productionTestCaptureAllowed =
+      environment.CI === 'true' &&
+      isLoopbackRuntimeOrigin(environment.NUXT_PUBLIC_APP_URL) &&
+      isLoopbackRuntimeOrigin(environment.NUXT_BETTER_AUTH_URL)
+    if (environment.NODE_ENV === 'production' && !productionTestCaptureAllowed) {
       issues.push(
         configIssue(
           'invalid',
           'NUXT_EMAIL_TRANSPORT',
-          'capture is test-only in production mode and requires the test process control CI=true'
+          'capture is test-only in production mode and requires CI=true with loopback app and auth origins'
         )
       )
     }
     return
   }
 
-  if (transport !== 'smtp') return
-
-  const rawHost = environment.NUXT_EMAIL_SMTP_HOST ?? ''
-  const host = rawHost.trim()
-  requireValue(rawHost, 'NUXT_EMAIL_SMTP_HOST', issues)
-  requireMatch(config.smtp.host, host, 'NUXT_EMAIL_SMTP_HOST', issues)
-  requireAlreadyTrimmed(rawHost, 'NUXT_EMAIL_SMTP_HOST', issues)
-  if (/[\r\n]/.test(rawHost)) {
-    issues.push(configIssue('invalid', 'NUXT_EMAIL_SMTP_HOST', 'must not contain line breaks'))
-  }
-
-  const rawPort = environment.NUXT_EMAIL_SMTP_PORT ?? ''
-  const port = rawPort.trim()
-  requireValue(rawPort, 'NUXT_EMAIL_SMTP_PORT', issues)
-  requireMatch(config.smtp.port, port, 'NUXT_EMAIL_SMTP_PORT', issues)
-  requireAlreadyTrimmed(rawPort, 'NUXT_EMAIL_SMTP_PORT', issues)
-  if (port && (!/^[1-9]\d{0,4}$/.test(port) || Number(port) > 65_535)) {
-    issues.push(configIssue('invalid', 'NUXT_EMAIL_SMTP_PORT', 'must be an integer from 1 through 65535'))
-  }
-
-  const rawSecurity = environment.NUXT_EMAIL_SMTP_SECURITY ?? ''
-  const security = rawSecurity.trim()
-  requireValue(rawSecurity, 'NUXT_EMAIL_SMTP_SECURITY', issues)
-  requireMatch(config.smtp.security, security, 'NUXT_EMAIL_SMTP_SECURITY', issues)
-  requireAlreadyTrimmed(rawSecurity, 'NUXT_EMAIL_SMTP_SECURITY', issues)
-  if (security !== 'tls' && security !== 'starttls') {
-    issues.push(configIssue('invalid', 'NUXT_EMAIL_SMTP_SECURITY', 'must be exactly tls or starttls'))
-  }
-
-  requirePreservedRuntimeValue(environment, config.smtp.username, 'NUXT_EMAIL_SMTP_USERNAME', issues)
-  requirePreservedRuntimeValue(environment, config.smtp.password, 'NUXT_EMAIL_SMTP_PASSWORD', issues)
+  if (transport !== 'resend') return
+  requirePreservedRuntimeValue(environment, config.resend.apiKey, 'NUXT_EMAIL_RESEND_API_KEY', issues)
 }
 
 function isLoopbackHostname(hostname: string): boolean {
   const normalized = hostname.toLowerCase().replace(/^\[|\]$/g, '')
   if (normalized === 'localhost' || normalized.endsWith('.localhost') || normalized === '::1') return true
   return isIP(normalized) === 4 && normalized.split('.')[0] === '127'
+}
+
+function isLoopbackRuntimeOrigin(value: string | undefined): boolean {
+  try {
+    const origin = value?.trim() ?? ''
+    const parsed = new URL(origin)
+    return (
+      (parsed.protocol === 'http:' || parsed.protocol === 'https:') &&
+      parsed.origin === origin &&
+      isLoopbackHostname(parsed.hostname)
+    )
+  } catch {
+    return false
+  }
 }
 
 function validateDatabaseUrl(databaseUrl: string, nodeEnvironment: string | undefined, issues: RuntimeConfigIssue[]) {
@@ -1049,26 +907,40 @@ function validateDatabaseUrl(databaseUrl: string, nodeEnvironment: string | unde
   }
 }
 
-function validateEnabledModules(
+function validateCapabilities(
   config: NormalizedRuntimeConfig,
   environment: RuntimeEnvironment,
-  moduleIssues: Record<RuntimeModuleId, RuntimeConfigIssue[]>
+  issues: RuntimeConfigIssue[]
 ) {
-  for (const moduleId of runtimeModuleIds) {
-    if (!config.modules[moduleId].enabled) continue
+  for (const requirement of alwaysActiveRequirements) {
+    if (!requirementApplies(config, requirement)) continue
+    validateRuntimeRequirement(config, environment, requirement, issues)
+  }
 
-    for (const requirement of moduleManifest[moduleId].requiredConfig) {
-      if (!requirementApplies(config, requirement)) continue
-      validateModuleRequirement(config, environment, requirement, moduleIssues[moduleId])
-    }
+  validateStripeConfiguration(config, environment, issues)
+  validateFilesConfiguration(config, environment, issues)
+  validateOpenAIConfiguration(config, environment, issues)
+  validateTurnstileTestKeyContainment(config, environment, issues)
+  validateSentryConfiguration(config, environment, issues)
+}
 
-    if (moduleId === 'turnstile') {
-      validateTurnstileTestKeyContainment(config, environment, moduleIssues.turnstile)
-    } else if (moduleId === 'ai') {
-      validateOpenAIConfiguration(config, environment, moduleIssues.ai)
-    } else if (moduleId === 'billing') {
-      validateStripeConfiguration(config, environment, moduleIssues.billing)
-    }
+function validateFilesConfiguration(
+  config: NormalizedRuntimeConfig,
+  environment: RuntimeEnvironment,
+  issues: RuntimeConfigIssue[]
+) {
+  const productionTestLocalAllowed =
+    environment.CI === 'true' &&
+    isLoopbackRuntimeOrigin(environment.NUXT_PUBLIC_APP_URL) &&
+    isLoopbackRuntimeOrigin(environment.NUXT_BETTER_AUTH_URL)
+  if (environment.NODE_ENV === 'production' && config.files.driver === 'local' && !productionTestLocalAllowed) {
+    issues.push(
+      configIssue(
+        'invalid',
+        'NUXT_FILES_DRIVER',
+        'local is test-only in production mode and requires CI=true with loopback app and auth origins'
+      )
+    )
   }
 }
 
@@ -1098,8 +970,9 @@ function validateStripeConfiguration(
     issues.push(configIssue('invalid', portalKey, 'must be a Stripe Billing Portal configuration ID'))
   }
 
-  const priceRequirements = moduleManifest.billing.requiredConfig.filter((requirement) =>
-    requirement.environmentKey.endsWith('_PRICE_ID')
+  const priceRequirements = alwaysActiveRequirements.filter(
+    (requirement) =>
+      requirement.environmentKey.startsWith('NUXT_STRIPE_') && requirement.environmentKey.endsWith('_PRICE_ID')
   )
   const keysByPriceId = new Map<string, string[]>()
 
@@ -1134,12 +1007,41 @@ function validateOpenAIConfiguration(
     requireAlreadyTrimmed(environment[key] ?? '', key, issues)
   }
 
-  if (!config.openai.fileSearch.enabled) return
   const key = 'NUXT_OPENAI_FILE_SEARCH_VECTOR_STORE_ID'
   const value = environment[key] ?? ''
   requireAlreadyTrimmed(value, key, issues)
   if (value.length > 512) {
     issues.push(configIssue('invalid', key, 'must contain at most 512 characters'))
+  }
+}
+
+function validateSentryConfiguration(
+  config: NormalizedRuntimeConfig,
+  environment: RuntimeEnvironment,
+  issues: RuntimeConfigIssue[]
+) {
+  const values = [
+    ['NUXT_SENTRY_DSN', config.sentryDsn],
+    ['NUXT_PUBLIC_SENTRY_DSN', config.public.sentryDsn]
+  ] as const
+  const production = environment.NODE_ENV === 'production'
+
+  for (const [key, resolvedValue] of values) {
+    const rawValue = environment[key] ?? ''
+    if (production) {
+      requireRuntimeHttpUrl(environment, key, resolvedValue, issues, true)
+    } else if (rawValue) {
+      requireRuntimeHttpUrl(environment, key, resolvedValue, issues, true)
+    } else {
+      requireMatch(resolvedValue, rawValue, key, issues)
+    }
+  }
+
+  for (const [key, resolvedValue] of [
+    ['NUXT_SENTRY_TRACES_SAMPLE_RATE', config.sentryTracesSampleRate],
+    ['NUXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE', config.public.sentryTracesSampleRate]
+  ] as const) {
+    validateRuntimeSampleRate(environment, key, resolvedValue, issues)
   }
 }
 
@@ -1179,18 +1081,13 @@ function validateTurnstileTestKeyContainment(
   }
 }
 
-function validateModuleRequirement(
+function validateRuntimeRequirement(
   config: NormalizedRuntimeConfig,
   environment: RuntimeEnvironment,
-  requirement: ModuleRequirement,
+  requirement: RuntimeRequirement,
   issues: RuntimeConfigIssue[]
 ) {
   const resolvedValue = scalarStringValue(configValueAtPath(config, requirement.configPath))
-
-  if (requirement.kind === 'sample-rate') {
-    validateRuntimeSampleRate(environment, requirement.environmentKey, resolvedValue, issues)
-    return
-  }
 
   if (requirement.kind === 'domain-list') {
     validateWebSearchAllowedDomains(
@@ -1219,7 +1116,7 @@ function validateModuleRequirement(
         configIssue(
           'invalid',
           requirement.environmentKey,
-          `must be exactly one of ${requirement.allowedValues?.join(', ') ?? ''} when the module is enabled`
+          `must be exactly one of ${requirement.allowedValues?.join(', ') ?? ''}`
         )
       )
     }
@@ -1229,7 +1126,7 @@ function validateModuleRequirement(
   requireRuntimeValue(environment, requirement.environmentKey, resolvedValue, issues, requirement.preserveBytes)
 }
 
-function requirementApplies(config: NormalizedRuntimeConfig, requirement: ModuleRequirement): boolean {
+function requirementApplies(config: NormalizedRuntimeConfig, requirement: RuntimeRequirement): boolean {
   return !requirement.when || configValueAtPath(config, requirement.when.configPath) === requirement.when.equals
 }
 
@@ -1333,16 +1230,6 @@ function validateRuntimeSampleRate(
   validateSampleRate(resolvedValue, key, issues)
 }
 
-function emptyModuleIssues(): Record<RuntimeModuleId, RuntimeConfigIssue[]> {
-  return runtimeModuleIds.reduce<Record<RuntimeModuleId, RuntimeConfigIssue[]>>(
-    (issues, id) => {
-      issues[id] = []
-      return issues
-    },
-    {} as Record<RuntimeModuleId, RuntimeConfigIssue[]>
-  )
-}
-
 function normalizeFilesDriver(value: unknown): NormalizedRuntimeConfig['files']['driver'] {
   const driver = trimmedStringValue(value)
   return driver === 'local' || driver === 'r2' ? driver : ''
@@ -1405,12 +1292,7 @@ function validateWebSearchAllowedDomains(
 
 function normalizeEmailTransport(value: unknown): NormalizedRuntimeConfig['email']['transport'] {
   const transport = trimmedStringValue(value)
-  return transport === 'capture' || transport === 'smtp' ? transport : ''
-}
-
-function normalizeEmailSmtpSecurity(value: unknown): NormalizedRuntimeConfig['email']['smtp']['security'] {
-  const security = trimmedStringValue(value)
-  return security === 'tls' || security === 'starttls' ? security : ''
+  return transport === 'capture' || transport === 'resend' ? transport : ''
 }
 
 function recordValue(value: unknown): Record<string, unknown> {
@@ -1429,14 +1311,6 @@ function scalarStringValue(value: unknown): string {
   return typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' ? String(value) : ''
 }
 
-function moduleIdsForConfigPath(path: PropertyKey[]): RuntimeModuleId[] {
-  const [root = '', nested = ''] = path.map(String)
-  if (root === 'modules' && runtimeModuleIds.includes(nested as RuntimeModuleId)) {
-    return [nested as RuntimeModuleId]
-  }
-  return []
-}
-
 function environmentKeyForPath(path: PropertyKey[]): string {
   return `NUXT_${path
     .map((part) =>
@@ -1453,16 +1327,11 @@ function configIssue(code: RuntimeConfigIssue['code'], key: string, message: str
 
 function freezeEvaluation(
   config: NormalizedRuntimeConfig | undefined,
-  coreIssues: RuntimeConfigIssue[],
-  moduleIssues: Record<RuntimeModuleId, RuntimeConfigIssue[]>
+  issues: RuntimeConfigIssue[]
 ): RuntimeConfigEvaluation {
   return deepFreeze({
     config: config ? deepFreeze(config) : undefined,
-    coreIssues: deduplicateIssues(coreIssues),
-    moduleIssues: Object.fromEntries(runtimeModuleIds.map((id) => [id, deduplicateIssues(moduleIssues[id])])) as Record<
-      RuntimeModuleId,
-      RuntimeConfigIssue[]
-    >
+    issues: deduplicateIssues(issues)
   })
 }
 

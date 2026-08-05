@@ -1,30 +1,33 @@
 import { sql } from 'drizzle-orm'
 import { check, index, integer, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core'
-import { billingCadences, billingPlans } from '../../../shared/billing'
-import { billingSnapshotStatuses, familyPlanKey, stripeSubscriptionStatuses } from '../../../shared/family-plan'
-import { createdAtColumn, updatedAtColumn } from './core'
 import { user } from './auth'
-import { invitation, member, organization } from './organizations'
+import { billingCadences, billingPlans, billingSnapshotStatuses } from '../../../shared/billing'
 
-export { billingSnapshotStatuses, stripeSubscriptionStatuses }
+export { billingStripeInvariantSql } from './billing.invariants'
 
-export const externalBillingRetentionPurpose = 'external_billing_reconciliation' as const
-export const stripeBillingRetentionPolicy = 'stripe_billing_lifecycle' as const
+const createdAtColumn = () =>
+  text('created_at')
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`)
+const updatedAtColumn = () =>
+  text('updated_at')
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`)
 
-export const checkoutAttemptStates = [
+export const checkoutAttemptStates = Object.freeze([
   'pending',
   'open',
   'completed',
   'expired',
   'failed',
   'reconciliation_required'
-] as const
-export const billingSubscriptionTransitionKinds = [
+] as const)
+export const billingSubscriptionTransitionKinds = Object.freeze([
   'cadence_change',
   'personal_to_family',
   'family_to_personal'
-] as const
-export const billingSubscriptionTransitionStates = [
+] as const)
+export const billingSubscriptionTransitionStates = Object.freeze([
   'pending',
   'action_required',
   'scheduled',
@@ -32,21 +35,12 @@ export const billingSubscriptionTransitionStates = [
   'applied',
   'failed',
   'canceled'
-] as const
-export const familyJoinAttemptStates = [
-  'pending',
-  'renewal_stop_pending',
-  'renewal_off_confirmed',
-  'membership_pending',
-  'completed',
-  'reconciliation_required',
-  'failed'
-] as const
-export const billingAccountDeletionRequestStates = [
+] as const)
+export const billingAccountDeletionRequestStates = Object.freeze([
   'pending',
   'reconciliation_required',
   'cancellation_confirmed'
-] as const
+] as const)
 
 const validOfferingPair = (plan: unknown, cadence: unknown) =>
   sql`((${plan} = 'personal' and ${cadence} in ('weekly', 'monthly', 'annual')) or (${plan} = 'family' and ${cadence} in ('monthly', 'annual')))`
@@ -55,16 +49,18 @@ export const billingCustomers = sqliteTable(
   'billing_customers',
   {
     id: text('id').primaryKey(),
-    organizationId: text('organization_id')
+    purchaserUserId: text('purchaser_user_id')
       .notNull()
-      .references(() => organization.id, { onDelete: 'cascade' }),
+      .references(() => user.id, { onDelete: 'restrict' }),
     stripeCustomerId: text('stripe_customer_id').notNull(),
     createdAt: createdAtColumn(),
     updatedAt: updatedAtColumn()
   },
   (table) => [
-    uniqueIndex('billing_customers_organization_id_uidx').on(table.organizationId),
-    uniqueIndex('billing_customers_stripe_customer_id_uidx').on(table.stripeCustomerId)
+    uniqueIndex('billing_customers_purchaser_user_id_uidx').on(table.purchaserUserId),
+    uniqueIndex('billing_customers_stripe_customer_id_uidx').on(table.stripeCustomerId),
+    check('billing_customers_id_check', sql`length(trim(${table.id})) between 1 and 128`),
+    check('billing_customers_stripe_id_check', sql`${table.stripeCustomerId} glob 'cus_*'`)
   ]
 )
 
@@ -72,12 +68,12 @@ export const billingCheckoutAttempts = sqliteTable(
   'billing_checkout_attempts',
   {
     id: text('id').primaryKey(),
-    organizationId: text('organization_id')
+    purchaserUserId: text('purchaser_user_id')
       .notNull()
-      .references(() => organization.id, { onDelete: 'cascade' }),
+      .references(() => user.id, { onDelete: 'restrict' }),
     billingCustomerId: text('billing_customer_id').references(() => billingCustomers.id, { onDelete: 'cascade' }),
-    planKey: text('plan_key', { enum: billingPlans }).notNull().default(familyPlanKey),
-    cadence: text('cadence', { enum: billingCadences }),
+    planKey: text('plan_key', { enum: billingPlans }).notNull(),
+    cadence: text('cadence', { enum: billingCadences }).notNull(),
     stripePriceId: text('stripe_price_id').notNull(),
     stripeSessionId: text('stripe_session_id'),
     idempotencyKey: text('idempotency_key').notNull(),
@@ -89,20 +85,18 @@ export const billingCheckoutAttempts = sqliteTable(
     updatedAt: updatedAtColumn()
   },
   (table) => [
-    index('billing_checkout_attempts_organization_id_idx').on(table.organizationId),
+    index('billing_checkout_attempts_purchaser_user_id_idx').on(table.purchaserUserId),
     uniqueIndex('billing_checkout_attempts_stripe_session_id_uidx').on(table.stripeSessionId),
     uniqueIndex('billing_checkout_attempts_idempotency_key_uidx').on(table.idempotencyKey),
     uniqueIndex('billing_checkout_attempts_one_open_uidx')
-      .on(table.organizationId)
+      .on(table.purchaserUserId)
       .where(sql`${table.state} in ('pending', 'open', 'reconciliation_required')`),
-    check(
-      'billing_checkout_attempts_offering_check',
-      sql`(${table.cadence} is not null and ${validOfferingPair(table.planKey, table.cadence)}) or (${table.planKey} = 'family' and ${table.cadence} is null)`
-    ),
+    check('billing_checkout_attempts_offering_check', validOfferingPair(table.planKey, table.cadence)),
     check(
       'billing_checkout_attempts_state_check',
       sql`${table.state} in ('pending', 'open', 'completed', 'expired', 'failed', 'reconciliation_required')`
     ),
+    check('billing_checkout_attempts_price_check', sql`${table.stripePriceId} glob 'price_*'`),
     check('billing_checkout_attempts_reuse_check', sql`${table.reuseUntil} >= ${table.createdAt}`)
   ]
 )
@@ -111,9 +105,9 @@ export const billingSubscriptions = sqliteTable(
   'billing_subscriptions',
   {
     id: text('id').primaryKey(),
-    organizationId: text('organization_id')
+    purchaserUserId: text('purchaser_user_id')
       .notNull()
-      .references(() => organization.id, { onDelete: 'cascade' }),
+      .references(() => user.id, { onDelete: 'restrict' }),
     billingCustomerId: text('billing_customer_id')
       .notNull()
       .references(() => billingCustomers.id, { onDelete: 'cascade' }),
@@ -139,7 +133,7 @@ export const billingSubscriptions = sqliteTable(
     updatedAt: updatedAtColumn()
   },
   (table) => [
-    uniqueIndex('billing_subscriptions_organization_id_uidx').on(table.organizationId),
+    uniqueIndex('billing_subscriptions_purchaser_user_id_uidx').on(table.purchaserUserId),
     uniqueIndex('billing_subscriptions_customer_id_uidx').on(table.billingCustomerId),
     uniqueIndex('billing_subscriptions_stripe_subscription_id_uidx').on(table.stripeSubscriptionId),
     uniqueIndex('billing_subscriptions_stripe_subscription_item_id_uidx').on(table.stripeSubscriptionItemId),
@@ -151,7 +145,7 @@ export const billingSubscriptions = sqliteTable(
     ),
     check(
       'billing_subscriptions_offering_check',
-      sql`(${table.planKey} is null and ${table.cadence} is null) or (${table.planKey} is not null and ${table.cadence} is not null and ${validOfferingPair(table.planKey, table.cadence)}) or (${table.planKey} = 'family' and ${table.cadence} is null)`
+      sql`(${table.planKey} is null and ${table.cadence} is null) or (${table.planKey} is not null and ${table.cadence} is not null and ${validOfferingPair(table.planKey, table.cadence)})`
     ),
     check(
       'billing_subscriptions_grace_check',
@@ -173,9 +167,9 @@ export const billingSubscriptionTransitions = sqliteTable(
   'billing_subscription_transitions',
   {
     id: text('id').primaryKey(),
-    organizationId: text('organization_id')
+    purchaserUserId: text('purchaser_user_id')
       .notNull()
-      .references(() => organization.id, { onDelete: 'cascade' }),
+      .references(() => user.id, { onDelete: 'restrict' }),
     billingSubscriptionId: text('billing_subscription_id')
       .notNull()
       .references(() => billingSubscriptions.id, { onDelete: 'cascade' }),
@@ -197,13 +191,13 @@ export const billingSubscriptionTransitions = sqliteTable(
     updatedAt: updatedAtColumn()
   },
   (table) => [
-    index('billing_subscription_transitions_organization_id_idx').on(table.organizationId),
+    index('billing_subscription_transitions_purchaser_user_id_idx').on(table.purchaserUserId),
     index('billing_subscription_transitions_subscription_id_idx').on(table.billingSubscriptionId),
     uniqueIndex('billing_subscription_transitions_idempotency_key_uidx').on(table.idempotencyKey),
     uniqueIndex('billing_subscription_transitions_schedule_id_uidx').on(table.stripeSubscriptionScheduleId),
     uniqueIndex('billing_subscription_transitions_pending_invoice_id_uidx').on(table.stripePendingInvoiceId),
     uniqueIndex('billing_subscription_transitions_one_open_uidx')
-      .on(table.organizationId)
+      .on(table.purchaserUserId)
       .where(sql`${table.state} in ('pending', 'action_required', 'scheduled', 'reconciliation_required')`),
     check(
       'billing_subscription_transitions_kind_check',
@@ -244,79 +238,20 @@ export const billingSubscriptionTransitions = sqliteTable(
   ]
 )
 
-export const familyJoinAttempts = sqliteTable(
-  'family_join_attempts',
-  {
-    id: text('id').primaryKey(),
-    recipientUserId: text('recipient_user_id')
-      .notNull()
-      .references(() => user.id, { onDelete: 'cascade' }),
-    personalOrganizationId: text('personal_organization_id')
-      .notNull()
-      .references(() => organization.id, { onDelete: 'cascade' }),
-    personalBillingSubscriptionId: text('personal_billing_subscription_id')
-      .notNull()
-      .references(() => billingSubscriptions.id, { onDelete: 'cascade' }),
-    capturedPersonalBillingRevision: integer('captured_personal_billing_revision').notNull(),
-    targetOrganizationId: text('target_organization_id').references(() => organization.id, { onDelete: 'set null' }),
-    invitationId: text('invitation_id').references(() => invitation.id, { onDelete: 'set null' }),
-    acceptedMemberId: text('accepted_member_id').references(() => member.id, { onDelete: 'set null' }),
-    stripeCancellationIdempotencyKey: text('stripe_cancellation_idempotency_key').notNull(),
-    personalPaidThrough: text('personal_paid_through'),
-    state: text('state', { enum: familyJoinAttemptStates }).notNull().default('pending'),
-    stateReason: text('state_reason'),
-    revision: integer('revision').notNull().default(0),
-    createdAt: createdAtColumn(),
-    updatedAt: updatedAtColumn()
-  },
-  (table) => [
-    index('family_join_attempts_recipient_user_id_idx').on(table.recipientUserId),
-    index('family_join_attempts_personal_subscription_id_idx').on(table.personalBillingSubscriptionId),
-    uniqueIndex('family_join_attempts_invitation_id_uidx').on(table.invitationId),
-    uniqueIndex('family_join_attempts_stripe_idempotency_key_uidx').on(table.stripeCancellationIdempotencyKey),
-    uniqueIndex('family_join_attempts_one_open_per_recipient_uidx')
-      .on(table.recipientUserId)
-      .where(
-        sql`${table.state} in ('pending', 'renewal_stop_pending', 'renewal_off_confirmed', 'membership_pending', 'reconciliation_required')`
-      ),
-    check(
-      'family_join_attempts_state_check',
-      sql`${table.state} in ('pending', 'renewal_stop_pending', 'renewal_off_confirmed', 'membership_pending', 'completed', 'reconciliation_required', 'failed')`
-    ),
-    check(
-      'family_join_attempts_paid_through_check',
-      sql`${table.state} not in ('renewal_off_confirmed', 'membership_pending', 'completed') or ${table.personalPaidThrough} is not null`
-    ),
-    check(
-      'family_join_attempts_reason_check',
-      sql`${table.stateReason} is null or length(trim(${table.stateReason})) between 1 and 128`
-    ),
-    check(
-      'family_join_attempts_revision_check',
-      sql`${table.capturedPersonalBillingRevision} >= 0 and ${table.revision} >= 0`
-    )
-  ]
-)
-
 export const billingAccountDeletionRequests = sqliteTable(
   'billing_account_deletion_requests',
   {
     id: text('id').primaryKey(),
-    userId: text('user_id')
+    purchaserUserId: text('purchaser_user_id')
       .notNull()
-      .references(() => user.id, { onDelete: 'cascade' }),
-    organizationId: text('organization_id')
-      .notNull()
-      .references(() => organization.id, { onDelete: 'cascade' }),
+      .references(() => user.id, { onDelete: 'restrict' }),
     billingSubscriptionId: text('billing_subscription_id').references(() => billingSubscriptions.id, {
-      onDelete: 'set null'
+      onDelete: 'restrict'
     }),
-    billingCustomerId: text('billing_customer_id')
-      .notNull()
-      .references(() => billingCustomers.id, { onDelete: 'cascade' }),
+    billingCustomerId: text('billing_customer_id').references(() => billingCustomers.id, { onDelete: 'restrict' }),
     expectedStripeSubscriptionId: text('expected_stripe_subscription_id'),
-    expectedStripeCustomerId: text('expected_stripe_customer_id').notNull(),
-    capturedBillingRevision: integer('captured_billing_revision').notNull(),
+    expectedStripeCustomerId: text('expected_stripe_customer_id'),
+    capturedBillingRevision: integer('captured_billing_revision').notNull().default(0),
     state: text('state', { enum: billingAccountDeletionRequestStates }).notNull().default('pending'),
     reason: text('reason'),
     cancellationConfirmedAt: text('cancellation_confirmed_at'),
@@ -325,8 +260,7 @@ export const billingAccountDeletionRequests = sqliteTable(
     updatedAt: updatedAtColumn()
   },
   (table) => [
-    uniqueIndex('billing_account_deletion_requests_user_id_uidx').on(table.userId),
-    uniqueIndex('billing_account_deletion_requests_organization_id_uidx').on(table.organizationId),
+    uniqueIndex('billing_account_deletion_requests_purchaser_user_id_uidx').on(table.purchaserUserId),
     uniqueIndex('billing_account_deletion_requests_subscription_id_uidx').on(table.billingSubscriptionId),
     check(
       'billing_account_deletion_requests_state_check',
@@ -342,12 +276,12 @@ export const billingAccountDeletionRequests = sqliteTable(
       sql`(${table.state} = 'cancellation_confirmed' and ${table.cancellationConfirmedAt} is not null) or (${table.state} <> 'cancellation_confirmed' and ${table.cancellationConfirmedAt} is null)`
     ),
     check(
-      'billing_account_deletion_requests_revision_check',
-      sql`${table.capturedBillingRevision} >= 0 and ${table.revision} >= 0`
+      'billing_account_deletion_requests_reference_check',
+      sql`(((${table.billingCustomerId} is null and ${table.expectedStripeCustomerId} is null) or (${table.billingCustomerId} is not null and ${table.expectedStripeCustomerId} is not null and length(trim(${table.expectedStripeCustomerId})) between 1 and 255 and ${table.expectedStripeCustomerId} glob 'cus_*')) and ((${table.billingSubscriptionId} is null and ${table.expectedStripeSubscriptionId} is null) or (${table.billingSubscriptionId} is not null and ${table.expectedStripeSubscriptionId} is not null and length(trim(${table.expectedStripeSubscriptionId})) between 1 and 255 and ${table.expectedStripeSubscriptionId} glob 'sub_*')))`
     ),
     check(
-      'billing_account_deletion_requests_reference_check',
-      sql`((${table.billingSubscriptionId} is null and ${table.expectedStripeSubscriptionId} is null) or (${table.billingSubscriptionId} is not null and ${table.expectedStripeSubscriptionId} is not null and length(trim(${table.expectedStripeSubscriptionId})) between 1 and 255)) and length(trim(${table.expectedStripeCustomerId})) between 1 and 255`
+      'billing_account_deletion_requests_revision_check',
+      sql`${table.capturedBillingRevision} >= 0 and ${table.revision} >= 0`
     )
   ]
 )
@@ -371,10 +305,6 @@ export const billingEvents = sqliteTable(
   ]
 )
 
-/**
- * Provider continuity retained after identity deletion. The row deliberately
- * has no user, organization, email, Price, receipt, or content linkage.
- */
 export const detachedBillingSubjects = sqliteTable(
   'detached_billing_subjects',
   {
@@ -394,9 +324,14 @@ export const detachedBillingSubjects = sqliteTable(
   (table) => [
     uniqueIndex('detached_billing_subject_provider_reference_uidx').on(table.provider, table.providerReference),
     index('detached_billing_subject_customer_reference_idx').on(table.provider, table.providerCustomerReference),
+    check('detached_billing_subject_provider_check', sql`${table.provider} = 'stripe'`),
     check(
       'detached_billing_subject_retention_purpose_check',
       sql`${table.retentionPurpose} = 'external_billing_reconciliation'`
+    ),
+    check(
+      'detached_billing_subject_retention_policy_check',
+      sql`${table.retentionPolicy} = 'stripe_billing_lifecycle'`
     ),
     check(
       'detached_billing_subject_purge_after_check',
@@ -409,19 +344,30 @@ export const detachedBillingSubjects = sqliteTable(
   ]
 )
 
+export const billingStripeSchema = Object.freeze({
+  billingCustomers,
+  billingCheckoutAttempts,
+  billingSubscriptions,
+  billingSubscriptionTransitions,
+  billingAccountDeletionRequests,
+  billingEvents,
+  detachedBillingSubjects
+})
+
 export type BillingCustomer = typeof billingCustomers.$inferSelect
 export type BillingCheckoutAttempt = typeof billingCheckoutAttempts.$inferSelect
 export type BillingSubscription = typeof billingSubscriptions.$inferSelect
 export type BillingSubscriptionTransition = typeof billingSubscriptionTransitions.$inferSelect
-export type NewBillingSubscriptionTransition = typeof billingSubscriptionTransitions.$inferInsert
-export type FamilyJoinAttempt = typeof familyJoinAttempts.$inferSelect
-export type NewFamilyJoinAttempt = typeof familyJoinAttempts.$inferInsert
 export type BillingAccountDeletionRequest = typeof billingAccountDeletionRequests.$inferSelect
-export type NewBillingAccountDeletionRequest = typeof billingAccountDeletionRequests.$inferInsert
 export type BillingEvent = typeof billingEvents.$inferSelect
 export type DetachedBillingSubject = typeof detachedBillingSubjects.$inferSelect
 export type CheckoutAttemptState = (typeof checkoutAttemptStates)[number]
 export type BillingSubscriptionTransitionKind = (typeof billingSubscriptionTransitionKinds)[number]
 export type BillingSubscriptionTransitionState = (typeof billingSubscriptionTransitionStates)[number]
-export type FamilyJoinAttemptState = (typeof familyJoinAttemptStates)[number]
 export type BillingAccountDeletionRequestState = (typeof billingAccountDeletionRequestStates)[number]
+
+export type NewBillingCustomer = typeof billingCustomers.$inferInsert
+export type NewBillingCheckoutAttempt = typeof billingCheckoutAttempts.$inferInsert
+export type NewBillingSubscription = typeof billingSubscriptions.$inferInsert
+export type NewBillingSubscriptionTransition = typeof billingSubscriptionTransitions.$inferInsert
+export type NewBillingAccountDeletionRequest = typeof billingAccountDeletionRequests.$inferInsert

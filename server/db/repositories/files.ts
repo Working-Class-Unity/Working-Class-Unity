@@ -1,4 +1,12 @@
+import { randomUUID } from 'node:crypto'
 import { and, asc, desc, eq, inArray, lt, lte, ne, or } from 'drizzle-orm'
+import { objectKeyForFileId } from '../../services/storage/file-object-keys'
+import {
+  fileUploadInitiationLimit,
+  fileUploadInitiationWindowMs,
+  fileUploadTokenTtlMs,
+  pendingFileUploadLimit
+} from '../../services/storage/file-policy'
 import type { DatabaseConnection } from '../connect'
 import { files, type FileMetadata, type NewFileMetadata } from '../schema'
 
@@ -7,6 +15,25 @@ const maximumPageSize = 100
 
 export type CreatePendingFileInput = Omit<NewFileMetadata, 'createdAt' | 'updatedAt' | 'deletedAt' | 'status'> & {
   status?: 'pending'
+}
+
+export type AdmitPendingFileUploadInput = Omit<
+  CreatePendingFileInput,
+  'id' | 'objectKey' | 'uploadExpiresAt' | 'status'
+>
+
+export class PendingFileUploadLimitError extends Error {
+  constructor() {
+    super('Pending file upload limit reached')
+    this.name = 'PendingFileUploadLimitError'
+  }
+}
+
+export class FileUploadInitiationRateLimitError extends Error {
+  constructor() {
+    super('File upload initiation rate limit reached')
+    this.name = 'FileUploadInitiationRateLimitError'
+  }
 }
 
 export type FileListCursor = Readonly<{
@@ -26,7 +53,73 @@ export type CleanupCursor = Readonly<{
 
 export async function createPendingFile(connection: DatabaseConnection, input: CreatePendingFileInput) {
   const now = new Date().toISOString()
-  const [file] = await connection.db
+  return insertPendingFile(connection, input, now)
+}
+
+export function admitPendingFileUpload(
+  connection: DatabaseConnection,
+  input: AdmitPendingFileUploadInput,
+  options: Readonly<{ now?: () => Date }> = {}
+) {
+  const clock = options.now ?? (() => new Date())
+  return connection.sqlite
+    .transaction(() => {
+      const admittedAt = clock()
+      const admittedAtIso = admittedAt.toISOString()
+      const pendingCount = Number(
+        (
+          connection.sqlite
+            .prepare(
+              `select count(*) as count
+               from (
+                 select 1
+                 from files indexed by files_owner_status_created_id_idx
+                 where owner_id = ? and status = 'pending'
+                 limit ?
+               )`
+            )
+            .get(input.ownerId, pendingFileUploadLimit) as { count: number | bigint }
+        ).count
+      )
+      if (pendingCount >= pendingFileUploadLimit) throw new PendingFileUploadLimitError()
+
+      const cutoff = new Date(admittedAt.getTime() - fileUploadInitiationWindowMs).toISOString()
+      const recentCount = Number(
+        (
+          connection.sqlite
+            .prepare(
+              `select count(*) as count
+               from (
+                 select 1
+                 from files indexed by files_owner_status_created_id_idx
+                 where owner_id = ?
+                   and status in ('pending', 'ready', 'deleted')
+                   and created_at > ?
+                 limit ?
+               )`
+            )
+            .get(input.ownerId, cutoff, fileUploadInitiationLimit) as { count: number | bigint }
+        ).count
+      )
+      if (recentCount >= fileUploadInitiationLimit) throw new FileUploadInitiationRateLimitError()
+
+      const id = `file_${randomUUID()}`
+      return insertPendingFile(
+        connection,
+        {
+          ...input,
+          id,
+          objectKey: objectKeyForFileId(id),
+          uploadExpiresAt: new Date(admittedAt.getTime() + fileUploadTokenTtlMs).toISOString()
+        },
+        admittedAtIso
+      )
+    })
+    .immediate()
+}
+
+function insertPendingFile(connection: DatabaseConnection, input: CreatePendingFileInput, now: string) {
+  const [file] = connection.db
     .insert(files)
     .values({
       ...input,
@@ -35,6 +128,7 @@ export async function createPendingFile(connection: DatabaseConnection, input: C
       updatedAt: now
     })
     .returning()
+    .all()
 
   if (!file) {
     throw new Error('Failed to create pending file metadata')
@@ -124,6 +218,19 @@ export async function listExpiredPendingFiles(
     .where(and(eq(files.status, 'pending'), lte(files.uploadExpiresAt, options.now)))
     .orderBy(asc(files.uploadExpiresAt), asc(files.id))
     .limit(boundedLimit(options.limit))
+}
+
+export function getEarliestFileUploadExpiry(connection: DatabaseConnection, status: 'pending' | 'deleted') {
+  const row = connection.sqlite
+    .prepare(
+      `select upload_expires_at as uploadExpiresAt
+       from files indexed by files_status_upload_expires_id_idx
+       where status = ?
+       order by upload_expires_at, id
+       limit 1`
+    )
+    .get(status) as { uploadExpiresAt: string } | undefined
+  return row?.uploadExpiresAt ?? null
 }
 
 export async function markExpiredPendingFileDeleted(

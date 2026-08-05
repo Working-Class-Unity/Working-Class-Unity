@@ -43,12 +43,8 @@ const canonicalBuildStripeCatalogCanaries = {
 }
 const canonicalBuildSentryCanary = 'https://build-canary@o0.ingest.invalid/0'
 const runtimeAuthSecret = 'runtime-only-auth-secret-sentinel-not-a-credential'
-const runtimeGoogleClientId = 'runtime-social-smoke.apps.googleusercontent.com'
-const runtimeGoogleClientSecret = 'runtime-google-client-secret-sentinel-not-a-credential'
 const runtimeReadinessToken = 'runtime-only-readiness-token-sentinel-not-a-credential'
 const runtimeAuthEscapeCanary = 'runtime-auth-escape-canary-must-never-appear'
-const runtimeAppUrl = 'https://runtime-app.example.test'
-const runtimeAuthUrl = runtimeAppUrl
 const runtimeStripeSecret = 'rk_test_runtime_config_boundary_not_used'
 const runtimeStripeWebhookSecret = 'whsec_runtime_config_boundary'
 const runtimeStripeCatalog = {
@@ -96,10 +92,7 @@ const buildEnv = {
   STRIPE_SECRET_KEY: buildPrivateCanary,
   NUXT_DATABASE_URL: `file:${canonicalBuildDatabasePath}`,
   NUXT_BETTER_AUTH_SECRET: canonicalBuildAuthCanary,
-  NUXT_SOCIAL_PROVIDERS_GOOGLE_ENABLED: 'false',
   NUXT_READINESS_TOKEN: canonicalBuildReadinessCanary,
-  NUXT_MODULES_BILLING_ENABLED: 'true',
-  NUXT_MODULES_JOBS_ENABLED: 'true',
   NUXT_STRIPE_SECRET_KEY: canonicalBuildStripeCanary,
   NUXT_STRIPE_WEBHOOK_SECRET: canonicalBuildWebhookCanary,
   NUXT_STRIPE_PORTAL_CONFIGURATION_ID: canonicalBuildStripeCatalogCanaries.portalConfigurationId,
@@ -155,24 +148,25 @@ await coordinator.run(async () => {
       NITRO_PRESET: 'node-server',
       NITRO_HOST: '127.0.0.1',
       NITRO_PORT: String(port),
-      NUXT_PUBLIC_APP_URL: runtimeAppUrl,
+      NUXT_PUBLIC_APP_URL: baseUrl,
       NUXT_BETTER_AUTH_SECRET: runtimeAuthSecret,
-      NUXT_BETTER_AUTH_URL: runtimeAuthUrl,
-      NUXT_SOCIAL_PROVIDERS_GOOGLE_ENABLED: 'true',
-      NUXT_SOCIAL_PROVIDERS_GOOGLE_CLIENT_ID: runtimeGoogleClientId,
-      NUXT_SOCIAL_PROVIDERS_GOOGLE_CLIENT_SECRET: runtimeGoogleClientSecret,
+      NUXT_BETTER_AUTH_URL: baseUrl,
       NUXT_EMAIL_TRANSPORT: 'capture',
       NUXT_EMAIL_FROM: runtimeEmailFrom,
       NUXT_EMAIL_CAPTURE_DIRECTORY: runtimeEmailCaptureDirectory,
       NUXT_READINESS_TOKEN: runtimeReadinessToken,
-      NUXT_MODULES_BILLING_ENABLED: 'true',
-      NUXT_MODULES_FILES_ENABLED: 'false',
-      NUXT_MODULES_AI_ENABLED: 'false',
-      NUXT_OPENAI_FILE_SEARCH_ENABLED: 'false',
-      NUXT_OPENAI_WEB_SEARCH_ENABLED: 'false',
-      NUXT_MODULES_TURNSTILE_ENABLED: 'false',
-      NUXT_MODULES_OBSERVABILITY_ENABLED: 'false',
-      NUXT_MODULES_JOBS_ENABLED: 'true',
+      NUXT_FILES_DRIVER: 'local',
+      NUXT_OPENAI_API_KEY: 'runtime-openai-key-not-a-provider-credential',
+      NUXT_OPENAI_PROJECT_ID: 'proj_runtime_smoke',
+      NUXT_OPENAI_MODEL: 'gpt-5.6-luna',
+      NUXT_OPENAI_FILE_SEARCH_VECTOR_STORE_ID: 'vs_runtime_empty',
+      NUXT_OPENAI_WEB_SEARCH_ALLOWED_DOMAINS: 'example.test',
+      NUXT_CLOUDFLARE_TURNSTILE_SECRET_KEY: 'runtime-turnstile-secret-not-a-provider-credential',
+      NUXT_PUBLIC_TURNSTILE_SITE_KEY: 'runtime-turnstile-site-not-a-provider-credential',
+      NUXT_SENTRY_DSN: 'http://public@127.0.0.1:9/1',
+      NUXT_PUBLIC_SENTRY_DSN: 'http://public@127.0.0.1:9/1',
+      NUXT_SENTRY_TRACES_SAMPLE_RATE: '0',
+      NUXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE: '0',
       NUXT_STRIPE_SECRET_KEY: runtimeStripeSecret,
       NUXT_STRIPE_WEBHOOK_SECRET: runtimeStripeWebhookSecret,
       NUXT_STRIPE_PORTAL_CONFIGURATION_ID: runtimeStripeCatalog.portalConfigurationId,
@@ -463,12 +457,11 @@ function assertBaselineSecurityHeaders(response, label) {
 }
 
 async function runCommandOriginSmoke() {
-  const projectCountBefore = countRuntimeProjects()
-  const label = 'Encoded hostile project command'
-  const response = await fetchWithTimeout(`${baseUrl}/%61pi/projects`, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', origin: 'https://attacker.invalid' },
-    body: '{malformed'
+  const userCountBefore = countRuntimeUsers()
+  const label = 'Encoded hostile account-deletion command'
+  const response = await fetchWithTimeout(`${baseUrl}/%61pi/account`, {
+    method: 'DELETE',
+    headers: { origin: 'https://attacker.invalid' }
   })
   const body = await response.json().catch(() => null)
 
@@ -481,14 +474,14 @@ async function runCommandOriginSmoke() {
   )
   assertBaselineSecurityHeaders(response, label)
 
-  assert(countRuntimeProjects() === projectCountBefore, 'Command-origin smoke unexpectedly mutated project state')
+  assert(countRuntimeUsers() === userCountBefore, 'Command-origin smoke unexpectedly mutated account state')
 }
 
-function countRuntimeProjects() {
+function countRuntimeUsers() {
   const Database = requireFromApp('better-sqlite3')
   const sqlite = new Database(runtimeDatabasePath, { readonly: true })
   try {
-    return sqlite.prepare('select count(*) as count from projects').get().count
+    return sqlite.prepare('select count(*) as count from user').get().count
   } finally {
     sqlite.close()
   }
@@ -633,7 +626,6 @@ function createOutputMonitor(label) {
     ['canonical build Sentry canary', canonicalBuildSentryCanary],
     ['canonical build database path', canonicalBuildDatabasePath],
     ['runtime auth secret', runtimeAuthSecret],
-    ['runtime Google client secret', runtimeGoogleClientSecret],
     ['runtime readiness token', runtimeReadinessToken],
     ['runtime auth escape canary', runtimeAuthEscapeCanary],
     ['runtime Stripe secret', runtimeStripeSecret],

@@ -19,25 +19,11 @@ describe('Turnstile boundary', () => {
     expect(turnstileHeaderName).toBe('x-turnstile-token')
   })
 
-  it('performs no token parsing, UUID generation, or provider I/O while disabled', async () => {
-    const fetchImpl = vi.fn<typeof fetch>()
-
-    await expect(
-      verifyTurnstileToken({
-        token: '',
-        expectedAction: turnstileActions.magicLink,
-        config: turnstileConfig({ enabled: false }),
-        fetchImpl
-      })
-    ).resolves.toEqual({ configured: false, success: true })
-    expect(fetchImpl).not.toHaveBeenCalled()
-  })
-
   it.each([
     ['secret key', (config: AppRuntimeConfig) => incompleteConfig(config, { secretKey: '' })],
     ['site key', (config: AppRuntimeConfig) => incompleteConfig(config, { siteKey: '' })],
     ['application URL', (config: AppRuntimeConfig) => incompleteConfig(config, { appUrl: '' })]
-  ])('fails closed without provider I/O when enabled configuration lacks the %s', async (_label, arrange) => {
+  ])('fails closed without provider I/O when configuration lacks the %s', async (_label, arrange) => {
     const fetchImpl = vi.fn<typeof fetch>()
 
     await expect(
@@ -277,8 +263,7 @@ describe('Turnstile boundary', () => {
   })
 })
 
-function turnstileConfig(options: { enabled?: boolean } = {}): AppRuntimeConfig {
-  const enabled = options.enabled ?? true
+function turnstileConfig(): AppRuntimeConfig {
   return assertStartableRuntimeConfig(
     evaluateRuntimeEnvironment({
       CI: 'true',
@@ -287,25 +272,26 @@ function turnstileConfig(options: { enabled?: boolean } = {}): AppRuntimeConfig 
       NUXT_READINESS_TOKEN: 'turnstile-readiness-token-with-32-characters',
       NUXT_BETTER_AUTH_SECRET: 'turnstile-auth-secret-with-32-characters',
       NUXT_BETTER_AUTH_URL: 'https://app.example.test',
-      NUXT_SOCIAL_PROVIDERS_GOOGLE_ENABLED: 'false',
       NUXT_EMAIL_TRANSPORT: 'capture',
       NUXT_EMAIL_FROM: 'Turnstile test <no-reply@example.test>',
       NUXT_EMAIL_CAPTURE_DIRECTORY: './data/email-capture-turnstile',
       NUXT_PUBLIC_APP_URL: 'https://app.example.test/product',
-      NUXT_MODULES_BILLING_ENABLED: 'false',
-      NUXT_MODULES_FILES_ENABLED: 'false',
-      NUXT_MODULES_AI_ENABLED: 'false',
-      NUXT_OPENAI_FILE_SEARCH_ENABLED: 'false',
-      NUXT_OPENAI_WEB_SEARCH_ENABLED: 'false',
-      NUXT_MODULES_TURNSTILE_ENABLED: String(enabled),
-      NUXT_MODULES_OBSERVABILITY_ENABLED: 'false',
-      NUXT_MODULES_JOBS_ENABLED: 'false',
-      ...(enabled
-        ? {
-            NUXT_CLOUDFLARE_TURNSTILE_SECRET_KEY: 'live-turnstile-secret',
-            NUXT_PUBLIC_TURNSTILE_SITE_KEY: 'live-turnstile-site'
-          }
-        : {})
+      NUXT_STRIPE_SECRET_KEY: 'rk_test_turnstile_not_a_provider_credential',
+      NUXT_STRIPE_WEBHOOK_SECRET: 'whsec_turnstile_not_a_provider_credential',
+      NUXT_STRIPE_PORTAL_CONFIGURATION_ID: 'bpc_turnstile',
+      NUXT_STRIPE_PERSONAL_WEEKLY_PRICE_ID: 'price_turnstile_personal_weekly',
+      NUXT_STRIPE_PERSONAL_MONTHLY_PRICE_ID: 'price_turnstile_personal_monthly',
+      NUXT_STRIPE_PERSONAL_ANNUAL_PRICE_ID: 'price_turnstile_personal_annual',
+      NUXT_STRIPE_FAMILY_MONTHLY_PRICE_ID: 'price_turnstile_family_monthly',
+      NUXT_STRIPE_FAMILY_ANNUAL_PRICE_ID: 'price_turnstile_family_annual',
+      NUXT_FILES_DRIVER: 'local',
+      NUXT_OPENAI_API_KEY: 'turnstile-openai-key-not-a-provider-credential',
+      NUXT_OPENAI_PROJECT_ID: 'proj_turnstile_test',
+      NUXT_OPENAI_MODEL: 'gpt-5.6-luna',
+      NUXT_OPENAI_FILE_SEARCH_VECTOR_STORE_ID: 'vs_turnstile_empty',
+      NUXT_OPENAI_WEB_SEARCH_ALLOWED_DOMAINS: 'example.test',
+      NUXT_CLOUDFLARE_TURNSTILE_SECRET_KEY: 'live-turnstile-secret',
+      NUXT_PUBLIC_TURNSTILE_SITE_KEY: 'live-turnstile-site'
     })
   )
 }

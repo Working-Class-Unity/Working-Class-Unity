@@ -120,8 +120,6 @@ async function assertConfiguredUploadFailure(secretArguments, buildEnvironment) 
     '--target',
     'build',
     '--build-arg',
-    'NUXT_MODULES_OBSERVABILITY_ENABLED=true',
-    '--build-arg',
     'SENTRY_ORG=local-proof',
     '--build-arg',
     'SENTRY_PROJECT=local-proof',

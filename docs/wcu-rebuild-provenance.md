@@ -29,8 +29,9 @@ its verification deliberately, then record the result below.
 - Remove product feature switches. Identity, Files, AI, Billing, email, jobs, and backups are part
   of the application; tests may still use deterministic provider substitutes.
 - Allow open registration with email magic links only. New accounts begin as non-members.
-- Limit the initial profile model to display name and avatar. Required/optional and privacy
-  behavior remain documented implementation decisions.
+- Limit the initial profile model to a required identity display name and an optional avatar. WCU
+  has no public profile or member directory; the authenticated account holder is the only initial
+  consumer of these fields.
 - Keep a minimal operator-assigned administrator role separate from paid membership.
 - Keep self-service account deletion in the first launch scope.
 - Keep private, user-owned AI conversations using OpenAI Responses and make them available to all
@@ -50,6 +51,8 @@ its verification deliberately, then record the result below.
   one-membership/two-price catalog until the foundation is otherwise complete.
 - Defer paid-page authorization until after the initial platform foundation.
 - Use Resend as the email provider and Coolify for deployment.
+- Defer real provider credentials and hosted certification. Deterministic tests preserve the
+  application contracts but do not certify OpenAI, R2, Resend, Stripe, Sentry, or Coolify accounts.
 - Retain the existing WCU subdomains, but do not retain the old site's other integrations.
 - Preserve behavioral verification for retained capabilities. Remove or rewrite tests only when an
   approved removed or changed contract makes the old assertion invalid.

@@ -2,19 +2,13 @@ import { describe, expect, it } from 'vitest'
 import { resolveSentryServerPreloadConfiguration } from '../shared/sentry-environment'
 
 const completeEnvironment = {
-  NUXT_MODULES_OBSERVABILITY_ENABLED: 'true',
   NUXT_PUBLIC_SENTRY_DSN: 'https://public@example.test/2',
   NUXT_SENTRY_DSN: 'https://private@example.test/1'
 } as const
 
 describe('Sentry server preload environment', () => {
-  it('stays inactive unless Observability is explicitly enabled', () => {
-    expect(
-      resolveSentryServerPreloadConfiguration({
-        ...completeEnvironment,
-        NUXT_MODULES_OBSERVABILITY_ENABLED: 'TRUE'
-      })
-    ).toBeUndefined()
+  it('stays inactive without complete DSNs', () => {
+    expect(resolveSentryServerPreloadConfiguration({})).toBeUndefined()
   })
 
   it.each([

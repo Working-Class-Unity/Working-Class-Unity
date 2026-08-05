@@ -10,13 +10,8 @@ after(async () => {
   await Promise.all([...openServers].map((server) => closeServer(server)))
 })
 
-test('mixed deployed module states produce only anonymous GET probes with no provider credentials', async (t) => {
-  const fixture = await startRecorder({
-    ai: 'disabled',
-    billing: 'ready',
-    files: 'disabled',
-    observability: 'disabled'
-  })
+test('active capability checks produce only anonymous GET probes with no provider credentials', async (t) => {
+  const fixture = await startRecorder()
   t.after(() => fixture.close())
   const logger = recordingLogger()
 
@@ -27,10 +22,9 @@ test('mixed deployed module states produce only anonymous GET probes with no pro
   assert.equal(logger.errors.length, 0)
 
   const expectedAccept = new Map([
-    ['/api/baseline', 'application/json'],
     ['/', 'text/html'],
     ['/api/live', 'application/json'],
-    ['/observability-client-test', 'application/json'],
+    ['/observability-client-test', 'text/html'],
     ['/api/ai/conversations', 'application/json'],
     ['/api/account/billing', 'application/json'],
     ['/api/files', 'application/json']
@@ -63,16 +57,8 @@ test('mixed deployed module states produce only anonymous GET probes with no pro
   }
 })
 
-test('an advertised ready module fails closed when its anonymous response is not 401', async (t) => {
-  const fixture = await startRecorder(
-    {
-      ai: 'disabled',
-      billing: 'ready',
-      files: 'disabled',
-      observability: 'disabled'
-    },
-    { '/api/account/billing': { body: '{}', status: 200 } }
-  )
+test('an active private boundary fails closed when its anonymous response is not 401', async (t) => {
+  const fixture = await startRecorder({ '/api/account/billing': { body: '{}', status: 200 } })
   t.after(() => fixture.close())
   const logger = recordingLogger()
 
@@ -80,18 +66,13 @@ test('an advertised ready module fails closed when its anonymous response is not
 
   assert.equal(result.ok, false)
   assert.equal(result.failures.length, 1)
-  assert.match(result.failures[0], /expected anonymous 401 for ready billing, received 200/)
+  assert.match(result.failures[0], /expected anonymous 401 for billing, received 200/)
   assert.equal(logger.errors.length, 1)
   assert.match(logger.errors[0], /^fail - GET \/api\/account\/billing/)
 })
 
-test('observability page follows its advertised ready state with a GET-only probe', async (t) => {
-  const fixture = await startRecorder({
-    ai: 'disabled',
-    billing: 'disabled',
-    files: 'disabled',
-    observability: 'ready'
-  })
+test('observability page receives a GET-only probe', async (t) => {
+  const fixture = await startRecorder()
   t.after(() => fixture.close())
 
   const result = await runDeploymentSmoke({ baseUrl: fixture.baseUrl, logger: recordingLogger() })
@@ -173,7 +154,7 @@ test('CLI target parsing rejects ambiguous syntax and never falls back to the mu
   }
 })
 
-async function startRecorder(moduleStates, overrides = {}) {
+async function startRecorder(overrides = {}) {
   const requests = []
   const server = createServer((request, response) => {
     requests.push({ headers: request.headers, method: request.method, url: request.url })
@@ -183,10 +164,6 @@ async function startRecorder(moduleStates, overrides = {}) {
       return
     }
 
-    if (request.url === '/api/baseline') {
-      sendJson(response, 200, { modules: moduleStates, stack: ['Nuxt'] })
-      return
-    }
     if (request.url === '/') {
       send(response, 200, '<title>Configured Fixture App</title>', {
         'content-security-policy': "default-src 'none'; script-src 'nonce-fixture-nonce'",
@@ -203,17 +180,15 @@ async function startRecorder(moduleStates, overrides = {}) {
       send(response, 204, '', { 'cache-control': 'no-store' })
       return
     }
-    const moduleEntry = Object.entries({
+    const capabilityEntry = Object.entries({
       ai: '/api/ai/conversations',
       billing: '/api/account/billing',
       files: '/api/files',
       observability: '/observability-client-test'
     }).find(([, path]) => path === request.url)
-    if (moduleEntry) {
-      const [moduleId] = moduleEntry
-      if (moduleStates[moduleId] === 'disabled') {
-        sendModuleDisabled(response, moduleId)
-      } else if (moduleId === 'observability') {
+    if (capabilityEntry) {
+      const [capabilityId] = capabilityEntry
+      if (capabilityId === 'observability') {
         send(response, 200, '<h1>Client Event Test</h1>')
       } else {
         sendJson(response, 401, { statusCode: 401 })
@@ -246,10 +221,6 @@ function send(response, status, body, headers = {}) {
 
 function sendJson(response, status, body) {
   send(response, status, JSON.stringify(body), { 'content-type': 'application/json' })
-}
-
-function sendModuleDisabled(response, moduleId) {
-  sendJson(response, 404, { data: { code: 'MODULE_DISABLED', module: moduleId } })
 }
 
 function recordingLogger() {

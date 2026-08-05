@@ -62,7 +62,11 @@ describe('direct OpenAI Responses adapter', () => {
         max_output_tokens: OPENAI_MAX_OUTPUT_TOKENS,
         truncation: 'disabled',
         prompt_cache_options: { mode: 'explicit' },
-        safety_identifier: validInput().safetyIdentifier
+        safety_identifier: validInput().safetyIdentifier,
+        tools: expectedSearchTools(),
+        tool_choice: 'auto',
+        parallel_tool_calls: false,
+        max_tool_calls: 1
       })
       expect(result).toEqual({
         kind: 'text',
@@ -113,6 +117,74 @@ describe('direct OpenAI Responses adapter', () => {
     expect(JSON.stringify(result)).not.toContain(rawEnvelopeCanary)
   })
 
+  it('accepts exactly 64,000 UTF-8 output bytes and rejects 64,001 across normalized text and refusals', async () => {
+    const exactOutput = '🙂'.repeat(16_000)
+    const overflowOutput = `${exactOutput}a`
+    expect(Buffer.byteLength(exactOutput, 'utf8')).toBe(64_000)
+    expect(Buffer.byteLength(overflowOutput, 'utf8')).toBe(64_001)
+    const responses = [
+      {
+        body: {
+          ...successResponse(),
+          output: [
+            assistantMessage([
+              { type: 'output_text', text: exactOutput.slice(0, exactOutput.length / 2), annotations: [] },
+              { type: 'output_text', text: exactOutput.slice(exactOutput.length / 2), annotations: [] }
+            ])
+          ]
+        },
+        requestId: 'request_openai_exact_text'
+      },
+      {
+        body: {
+          ...refusalResponse(),
+          output: [assistantMessage([{ type: 'refusal', refusal: exactOutput }])]
+        },
+        requestId: 'request_openai_exact_refusal'
+      },
+      {
+        body: {
+          ...successResponse(),
+          output: [assistantMessage([{ type: 'output_text', text: overflowOutput, annotations: [] }])]
+        },
+        requestId: 'request_openai_overflow_text'
+      },
+      {
+        body: {
+          ...refusalResponse(),
+          output: [assistantMessage([{ type: 'refusal', refusal: overflowOutput }])]
+        },
+        requestId: 'request_openai_overflow_refusal'
+      }
+    ]
+    const fakeFetch: NonNullable<ClientOptions['fetch']> = vi.fn(async () => {
+      const response = responses.shift()
+      if (!response) throw new Error('Unexpected provider request')
+      return jsonResponse(response.body, { 'x-request-id': response.requestId })
+    })
+    const adapter = createOpenAIResponsesAdapter(adapterConfig(), { fetch: fakeFetch })
+
+    await expect(adapter.createResponse(validInput())).resolves.toMatchObject({
+      kind: 'text',
+      text: exactOutput,
+      requestId: 'request_openai_exact_text'
+    })
+    await expect(adapter.createResponse(validInput())).resolves.toMatchObject({
+      kind: 'refusal',
+      text: exactOutput,
+      requestId: 'request_openai_exact_refusal'
+    })
+    await expect(adapter.createResponse(validInput())).rejects.toMatchObject({
+      code: 'invalid_response',
+      requestId: 'request_openai_overflow_text'
+    })
+    await expect(adapter.createResponse(validInput())).rejects.toMatchObject({
+      code: 'invalid_response',
+      requestId: 'request_openai_overflow_refusal'
+    })
+    expect(fakeFetch).toHaveBeenCalledTimes(4)
+  })
+
   it('adds one bounded deployment-owned File Search tool and returns only normalized citation titles', async () => {
     const requests: Request[] = []
     const fakeFetch: NonNullable<ClientOptions['fetch']> = vi.fn(async (input, init) => {
@@ -141,6 +213,11 @@ describe('direct OpenAI Responses adapter', () => {
           type: 'file_search',
           vector_store_ids: ['vs_test_deployment_corpus'],
           max_num_results: OPENAI_FILE_SEARCH_MAX_RESULTS
+        },
+        {
+          type: 'web_search',
+          filters: { allowed_domains: ['example.com', 'reference.test'] },
+          search_context_size: OPENAI_WEB_SEARCH_CONTEXT_SIZE
         }
       ],
       tool_choice: 'auto',
@@ -193,6 +270,11 @@ describe('direct OpenAI Responses adapter', () => {
       prompt_cache_options: { mode: 'explicit' },
       safety_identifier: validInput().safetyIdentifier,
       tools: [
+        {
+          type: 'file_search',
+          vector_store_ids: ['vs_test_deployment_corpus'],
+          max_num_results: OPENAI_FILE_SEARCH_MAX_RESULTS
+        },
         {
           type: 'web_search',
           filters: { allowed_domains: ['example.com', 'reference.test'] },
@@ -316,27 +398,21 @@ describe('direct OpenAI Responses adapter', () => {
     expect(result.citations[0]?.type).toBe(citationType)
   })
 
-  it('leaves the disabled request tool-free even when stale subordinate values exist', async () => {
+  it('keeps both retained search tools active for every response', async () => {
     const requests: Request[] = []
     const fakeFetch: NonNullable<ClientOptions['fetch']> = vi.fn(async (input, init) => {
       requests.push(new Request(input, init))
       return jsonResponse(successResponse())
     })
-    const config = {
-      ...adapterConfig(),
-      fileSearch: { enabled: false, vectorStoreId: 'vs_stale_ignored' },
-      webSearch: { enabled: false, allowedDomains: ['stale.example'] }
-    } as const
-
-    await createOpenAIResponsesAdapter(config, { fetch: fakeFetch }).createResponse(validInput())
+    await createOpenAIResponsesAdapter(adapterConfig(), { fetch: fakeFetch }).createResponse(validInput())
 
     const body = (await requests[0].clone().json()) as Record<string, unknown>
-    expect(body).not.toHaveProperty('tools')
-    expect(body).not.toHaveProperty('tool_choice')
-    expect(body).not.toHaveProperty('parallel_tool_calls')
-    expect(body).not.toHaveProperty('max_tool_calls')
-    expect(JSON.stringify(body)).not.toContain('vs_stale_ignored')
-    expect(JSON.stringify(body)).not.toContain('stale.example')
+    expect(body).toMatchObject({
+      tools: expectedSearchTools(),
+      tool_choice: 'auto',
+      parallel_tool_calls: false,
+      max_tool_calls: 1
+    })
   })
 
   it('guards, lazily constructs, caches, and resets the production adapter without making a live request', async () => {
@@ -345,17 +421,7 @@ describe('direct OpenAI Responses adapter', () => {
         'x-request-id': 'request_openai_lazy'
       })
     )
-    const disabledConfig = adapterRuntimeConfig(false)
-
-    expect(() => getOpenAIResponsesAdapter(disabledConfig)).toThrowError(
-      expect.objectContaining({
-        statusCode: 404,
-        data: { code: 'MODULE_DISABLED', module: 'ai' }
-      })
-    )
-    expect(fakeFetch).not.toHaveBeenCalled()
-
-    const readyConfig = adapterRuntimeConfig(true)
+    const readyConfig = adapterRuntimeConfig()
     const runtimeConfig = vi.spyOn(runtime, 'getAppRuntimeConfig').mockReturnValue(readyConfig)
     const first = getOpenAIResponsesAdapter()
 
@@ -379,14 +445,14 @@ describe('direct OpenAI Responses adapter', () => {
     { projectId: 'test-openai-project ' },
     { model: '' },
     { model: 'gpt-unapproved' },
-    { fileSearch: { enabled: true, vectorStoreId: '' } },
-    { fileSearch: { enabled: true, vectorStoreId: ' vs_untrimmed' } },
-    { webSearch: { enabled: true, allowedDomains: [] } },
-    { webSearch: { enabled: true, allowedDomains: ['Example.com'] } },
-    { webSearch: { enabled: true, allowedDomains: ['127.0.0.01'] } },
-    { webSearch: { enabled: true, allowedDomains: ['*.example.com'] } },
-    { webSearch: { enabled: true, allowedDomains: ['example.com', 'news.example.com'] } },
-    { webSearch: { enabled: true, allowedDomains: ['example.com', 'example.com'] } }
+    { fileSearch: { vectorStoreId: '' } },
+    { fileSearch: { vectorStoreId: ' vs_untrimmed' } },
+    { webSearch: { allowedDomains: [] } },
+    { webSearch: { allowedDomains: ['Example.com'] } },
+    { webSearch: { allowedDomains: ['127.0.0.01'] } },
+    { webSearch: { allowedDomains: ['*.example.com'] } },
+    { webSearch: { allowedDomains: ['example.com', 'news.example.com'] } },
+    { webSearch: { allowedDomains: ['example.com', 'example.com'] } }
   ])('rejects incomplete or altered provider configuration: %o', (override) => {
     expect(() =>
       createOpenAIResponsesAdapter({
@@ -703,11 +769,6 @@ describe('direct OpenAI Responses adapter', () => {
 
   it.each([
     {
-      label: 'File Search output while disabled',
-      config: adapterConfig(),
-      body: fileSearchResponse()
-    },
-    {
       label: 'citation without a completed File Search call',
       config: fileSearchAdapterConfig(),
       body: {
@@ -817,11 +878,6 @@ describe('direct OpenAI Responses adapter', () => {
   })
 
   it.each([
-    {
-      label: 'Web Search output while disabled',
-      config: adapterConfig(),
-      body: webSearchResponse()
-    },
     {
       label: 'citation without a completed Web Search call',
       config: webSearchAdapterConfig(),
@@ -1199,37 +1255,42 @@ function adapterConfig() {
     apiKey: 'test-openai-key',
     projectId: 'test-openai-project',
     model: 'gpt-5.6-luna',
-    fileSearch: { enabled: false, vectorStoreId: '' },
-    webSearch: { enabled: false, allowedDomains: [] }
+    fileSearch: { vectorStoreId: 'vs_test_deployment_corpus' },
+    webSearch: { allowedDomains: ['example.com', 'reference.test'] }
   } as const
 }
 
 function fileSearchAdapterConfig() {
-  return {
-    ...adapterConfig(),
-    fileSearch: { enabled: true, vectorStoreId: 'vs_test_deployment_corpus' }
-  } as const
+  return adapterConfig()
 }
 
 function webSearchAdapterConfig() {
-  return {
-    ...adapterConfig(),
-    webSearch: { enabled: true, allowedDomains: ['example.com', 'reference.test'] }
-  } as const
+  return adapterConfig()
 }
 
 function combinedSearchAdapterConfig() {
-  return {
-    ...fileSearchAdapterConfig(),
-    webSearch: { enabled: true, allowedDomains: ['example.com', 'reference.test'] }
-  } as const
+  return adapterConfig()
 }
 
-function adapterRuntimeConfig(enabled: boolean): AppRuntimeConfig {
+function adapterRuntimeConfig(): AppRuntimeConfig {
   return {
-    modules: { ai: { enabled } },
     openai: adapterConfig()
   } as unknown as AppRuntimeConfig
+}
+
+function expectedSearchTools() {
+  return [
+    {
+      type: 'file_search',
+      vector_store_ids: ['vs_test_deployment_corpus'],
+      max_num_results: OPENAI_FILE_SEARCH_MAX_RESULTS
+    },
+    {
+      type: 'web_search',
+      filters: { allowed_domains: ['example.com', 'reference.test'] },
+      search_context_size: OPENAI_WEB_SEARCH_CONTEXT_SIZE
+    }
+  ]
 }
 
 function validInput(): OpenAIResponseInput {

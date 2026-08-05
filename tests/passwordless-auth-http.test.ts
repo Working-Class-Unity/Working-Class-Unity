@@ -25,6 +25,7 @@ beforeEach(() => {
   fixtureReady = false
   fixture = createFixture()
   fixtureReady = true
+  vi.stubGlobal('fetch', successfulSiteverify)
 })
 
 afterEach(() => {
@@ -34,8 +35,58 @@ afterEach(() => {
 })
 
 describe('configured passwordless HTTP behavior', () => {
+  it('requires a canonical display name for registration and profile updates', async () => {
+    const siteverify = vi.fn(successfulSiteverify)
+    vi.stubGlobal('fetch', siteverify)
+    const deliveriesBefore = fixture.deliveries.length
+    const verificationsBefore = count('verification')
+
+    for (const name of [undefined, '', ' ', ' Leading space', 'x'.repeat(101)]) {
+      const response = await fixture.auth.handler(
+        authRequest('/api/auth/sign-in/magic-link', {
+          method: 'POST',
+          headers: { [turnstileHeaderName]: `invalid-name-${randomUUID()}` },
+          body: JSON.stringify({ ...magicLinkBody('invalid-name@example.test'), name })
+        })
+      )
+      expect(response.status).toBe(400)
+      expect(await response.json()).toMatchObject({ code: 'INVALID_DISPLAY_NAME' })
+    }
+
+    expect(siteverify).not.toHaveBeenCalled()
+    expect(fixture.deliveries.length).toBe(deliveriesBefore)
+    expect(count('verification')).toBe(verificationsBefore)
+
+    const email = 'profile-name@example.test'
+    const issued = await issueMagicLink(email)
+    const verified = await fixture.auth.handler(authRequest(issued.url))
+    const sessionHeaders = convertSetCookieToCookie(new Headers(verified.headers))
+
+    for (const name of ['', ' ', 'Trailing space ', 'x'.repeat(101)]) {
+      const response = await fixture.auth.handler(
+        authRequest('/api/auth/update-user', {
+          method: 'POST',
+          headers: sessionHeaders,
+          body: JSON.stringify({ name })
+        })
+      )
+      expect(response.status).toBe(400)
+      expect(await response.json()).toMatchObject({ code: 'INVALID_DISPLAY_NAME' })
+    }
+
+    expect(fixture.sqlite.prepare('select name from user where email = ?').get(email)).toEqual({ name: email })
+    const updated = await fixture.auth.handler(
+      authRequest('/api/auth/update-user', {
+        method: 'POST',
+        headers: sessionHeaders,
+        body: JSON.stringify({ name: 'Profile Name' })
+      })
+    )
+    expect(updated.status).toBe(200)
+    expect(fixture.sqlite.prepare('select name from user where email = ?').get(email)).toEqual({ name: 'Profile Name' })
+  })
+
   it('requires the bounded header challenge before magic-link side effects and redacts verification failures', async () => {
-    replaceFixture({ turnstileEnabled: true })
     const siteverify = vi.fn(async (_input: string | URL | Request, init?: RequestInit) => {
       const body = new URLSearchParams(String(init?.body))
       const token = body.get('response')
@@ -123,7 +174,6 @@ describe('configured passwordless HTTP behavior', () => {
   })
 
   it('keeps Better Auth request limiting ahead of Turnstile verification', async () => {
-    replaceFixture({ turnstileEnabled: true })
     const siteverify = vi.fn(async () =>
       jsonResponse({
         success: true,
@@ -155,7 +205,6 @@ describe('configured passwordless HTTP behavior', () => {
   })
 
   it('rejects an invalid application request before consuming its Turnstile challenge', async () => {
-    replaceFixture({ turnstileEnabled: true })
     const siteverify = vi.fn<typeof fetch>()
     vi.stubGlobal('fetch', siteverify)
     const deliveriesBefore = fixture.deliveries.length
@@ -232,7 +281,7 @@ describe('configured passwordless HTTP behavior', () => {
       { callbackURL: '/login' },
       { newUserCallbackURL: '/signup' },
       { errorCallbackURL: '/app' },
-      { errorCallbackURL: '/invite/Invite_123-opaque' },
+      { errorCallbackURL: '/account' },
       { callbackURL: '/auth' },
       { newUserCallbackURL: '/auth' },
       { errorCallbackURL: '/auth' }
@@ -297,6 +346,7 @@ describe('configured passwordless HTTP behavior', () => {
     expect(outcomes.filter((outcome) => outcome.error === 'INVALID_TOKEN').length).toBe(1)
     expect(findVerification(issued.verification.identifier)).toBeNull()
     expect(countWhere('user', 'email', email)).toBe(1)
+    expect(fixture.sqlite.prepare('select role from user where email = ?').get(email)).toEqual({ role: 'user' })
     expect(sessionCount(email)).toBe(1)
 
     const accepted = outcomes.find((outcome) => outcome.error === undefined)!.response
@@ -359,6 +409,7 @@ describe('configured passwordless HTTP behavior', () => {
     const failed = await fixture.auth.handler(
       authRequest('/api/auth/sign-in/magic-link', {
         method: 'POST',
+        headers: { [turnstileHeaderName]: `delivery-failure-${randomUUID()}` },
         body: JSON.stringify(magicLinkBody(deliveryEmail))
       })
     )
@@ -367,7 +418,7 @@ describe('configured passwordless HTTP behavior', () => {
     expect(serialized).not.toMatch(/private-delivery|smtp-private|capture|filesystem/i)
   })
 
-  it('keeps password and OIDC registration surfaces absent through the configured handler', async () => {
+  it('keeps password, social, and OIDC registration surfaces absent through the configured handler', async () => {
     expect(await sessionEmail(new Headers())).toBeNull()
     const paths = [
       ['/api/auth/sign-up/email', 'POST'],
@@ -377,6 +428,14 @@ describe('configured passwordless HTTP behavior', () => {
       ['/api/auth/reset-password/private-token', 'GET'],
       ['/api/auth/change-password', 'POST'],
       ['/api/auth/verify-password', 'POST'],
+      ['/api/auth/sign-in/social', 'POST'],
+      ['/api/auth/callback/google', 'GET'],
+      ['/api/auth/link-social', 'POST'],
+      ['/api/auth/list-accounts', 'GET'],
+      ['/api/auth/unlink-account', 'POST'],
+      ['/api/auth/get-access-token', 'POST'],
+      ['/api/auth/refresh-token', 'POST'],
+      ['/api/auth/account-info', 'POST'],
       ['/api/auth/oauth2/register', 'POST']
     ] as const
 
@@ -410,6 +469,7 @@ describe('configured passwordless HTTP behavior', () => {
           {
             method: 'POST',
             headers: {
+              [turnstileHeaderName]: `request-rate-${index}-${randomUUID()}`,
               'x-forwarded-for': `203.0.113.${80 + index}, 10.0.0.2`,
               'x-real-ip': `192.0.2.${40 + index}`
             },
@@ -428,7 +488,11 @@ describe('configured passwordless HTTP behavior', () => {
     const separateClient = await fixture.auth.handler(
       authRequest(
         '/api/auth/sign-in/magic-link',
-        { method: 'POST', body: JSON.stringify(magicLinkBody(requestEmail)) },
+        {
+          method: 'POST',
+          headers: { [turnstileHeaderName]: `separate-client-${randomUUID()}` },
+          body: JSON.stringify(magicLinkBody(requestEmail))
+        },
         '198.51.100.41'
       )
     )
@@ -461,6 +525,7 @@ describe('configured passwordless HTTP behavior', () => {
           '/api/auth/sign-in/magic-link',
           {
             method: 'POST',
+            headers: { [turnstileHeaderName]: `malformed-rate-${index}-${randomUUID()}` },
             body: JSON.stringify(magicLinkBody('malformed-rate@example.test'))
           },
           `198.51.100.${70 + index}, 10.0.0.2`
@@ -474,7 +539,7 @@ describe('configured passwordless HTTP behavior', () => {
   })
 })
 
-function createFixture(options: { turnstileEnabled?: boolean } = {}) {
+function createFixture() {
   const directory = mkdtempSync(join(tmpdir(), 'swl-passwordless-http-'))
   const databasePath = join(directory, 'fixture.sqlite')
   const sqlite = new Database(databasePath)
@@ -484,7 +549,7 @@ function createFixture(options: { turnstileEnabled?: boolean } = {}) {
     const connection = { sqlite, db: drizzle({ client: sqlite, schema }), databasePath }
     const deliveries: TransactionalEmailMessage[] = []
     const state: { deliveryFailure?: Error } = {}
-    const auth = createAuthentication(testRuntimeConfig(options), connection, () => ({
+    const auth = createAuthentication(testRuntimeConfig(), connection, () => ({
       async send(message) {
         if (state.deliveryFailure) throw state.deliveryFailure
         deliveries.push(message)
@@ -510,19 +575,10 @@ function createFixture(options: { turnstileEnabled?: boolean } = {}) {
   }
 }
 
-function replaceFixture(options: { turnstileEnabled?: boolean }) {
-  fixture.cleanup()
-  fixtureReady = false
-  fixture = createFixture(options)
-  fixtureReady = true
-}
-
-function testRuntimeConfig(options: { turnstileEnabled?: boolean } = {}): AppRuntimeConfig {
+function testRuntimeConfig(): AppRuntimeConfig {
   return {
     betterAuth: { secret: 'passwordless-http-secret-with-32-characters', url: baseURL },
-    modules: { turnstile: { enabled: options.turnstileEnabled === true } },
     cloudflare: { turnstile: { secretKey: '1x0000000000000000000000000000000AA' } },
-    socialProviders: { google: { enabled: false, clientId: '', clientSecret: '' } },
     public: {
       appName: 'Passwordless HTTP Test',
       appUrl: baseURL,
@@ -538,13 +594,28 @@ function jsonResponse(body: unknown) {
   })
 }
 
+function successfulSiteverify() {
+  return Promise.resolve(
+    jsonResponse({
+      success: true,
+      challenge_ts: new Date().toISOString(),
+      hostname: 'passwordless.example.test',
+      action: 'auth_magic_link'
+    })
+  )
+}
+
 async function issueMagicLink(email: string, headers: Record<string, string> = {}, clientIp = nextUniqueClientIp()) {
   const deliveryIndex = fixture.deliveries.length
   const verificationIdsBefore = new Set(verificationRows().map((row) => row.identifier))
   const response = await fixture.auth.handler(
     authRequest(
       '/api/auth/sign-in/magic-link',
-      { method: 'POST', headers, body: JSON.stringify(magicLinkBody(email)) },
+      {
+        method: 'POST',
+        headers: { [turnstileHeaderName]: `issue-${randomUUID()}`, ...headers },
+        body: JSON.stringify(magicLinkBody(email))
+      },
       clientIp
     )
   )

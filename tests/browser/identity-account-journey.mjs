@@ -12,41 +12,37 @@ async function assertPublicEntryAndLegalRoutes(context, helpers) {
 
   try {
     await page.route('**/api/auth/get-session', (route) => helpers.fulfillJson(route, null))
-    await page.route('**/api/baseline', (route) =>
-      helpers.fulfillJson(route, { socialProviders: { google: 'disabled' } })
-    )
 
     await page.goto('/')
     await expect(page.locator('html')).toHaveAttribute('lang', 'en-US')
     await expect(page.locator('html')).toHaveAttribute('dir', 'ltr')
     expect(new URL(page.url()).pathname).toBe('/')
-    await expect(page.getByRole('heading', { name: 'A simple, private place to begin.' })).toBeVisible()
-    await expect(page.getByText('Your data stays yours', { exact: true })).toBeVisible()
-    const getStarted = page.getByRole('link', { name: 'Get started', exact: true })
+    await expect(page.getByRole('heading', { name: 'Welcome to Working Class Unity.' })).toBeVisible()
+    await expect(
+      page.getByText('The WCU website is being rebuilt. Create an account or log in with an email magic link.', {
+        exact: true
+      })
+    ).toBeVisible()
+    const getStarted = page.getByRole('link', { name: 'Create account', exact: true })
     await getStarted.focus()
     await expect(getStarted).toBeFocused()
     await page.keyboard.press('Enter')
 
     await expect(page).toHaveURL(/\/signup$/)
     await expect(page.getByRole('heading', { name: 'Create your account' })).toBeVisible()
-    await expect(page.getByText('Use a passwordless sign-in method to create or return to your account.')).toBeVisible()
+    await expect(page.getByText('Enter your email address to create or return to your account.')).toBeVisible()
     await expect(page.getByRole('link', { name: 'Terms', exact: true })).toHaveAttribute('href', '/legal/terms')
     await expect(page.getByRole('link', { name: 'Privacy Policy', exact: true })).toHaveAttribute(
       'href',
       '/legal/privacy'
     )
-    await expect(page.getByText('Google authentication is not configured. Email remains available.')).toBeVisible()
     await expect(page.getByRole('button', { name: 'Continue with Google' })).toHaveCount(0)
     await helpers.assertAccessibleWithoutOverflow(page)
 
     await page.getByRole('link', { name: 'Log in', exact: true }).click()
     await expect(page).toHaveURL(/\/login$/)
     await expect(page.getByRole('heading', { name: 'Log in' })).toBeVisible()
-    await expect(
-      page.getByText(
-        'Use email or an available provider. If this is your first visit, continuing may create your account.'
-      )
-    ).toBeVisible()
+    await expect(page.getByText('Enter your email address to receive a passwordless sign-in link.')).toBeVisible()
     await expect(page.getByRole('button', { name: 'Send email link' })).toBeEnabled()
 
     await page.getByRole('link', { name: 'Privacy Policy', exact: true }).click()
@@ -102,7 +98,7 @@ async function assertNotFoundRecovery(context, helpers) {
     await expect(recovery).toBeFocused()
     await page.keyboard.press('Enter')
     await expect(page).toHaveURL(/\/$/)
-    await expect(page.getByRole('heading', { name: 'A simple, private place to begin.' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Welcome to Working Class Unity.' })).toBeVisible()
     await helpers.assertAccessibleWithoutOverflow(page)
 
     observations.errorResponses = observations.errorResponses.filter(

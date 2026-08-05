@@ -2,7 +2,7 @@ import { resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
 const usage = 'Usage: node scripts/deployment-smoke.mjs [--base-url <http(s)://host[:port]>]'
-const moduleBoundaryPaths = {
+const capabilityBoundaryPaths = {
   ai: '/api/ai/conversations',
   billing: '/api/account/billing',
   files: '/api/files',
@@ -12,7 +12,6 @@ const moduleBoundaryPaths = {
 export async function runDeploymentSmoke({ baseUrl, fetchImpl = globalThis.fetch, logger = console }) {
   const normalizedBaseUrl = normalizeBaseUrl(baseUrl)
   const failures = []
-  let moduleStates
 
   const request = (path, options = {}) =>
     readOnlyFetch(new URL(path, normalizedBaseUrl), {
@@ -20,16 +19,6 @@ export async function runDeploymentSmoke({ baseUrl, fetchImpl = globalThis.fetch
       fetchImpl,
       method: options.method ?? 'GET'
     })
-
-  const requestJson = async (path) => {
-    const response = await request(path)
-    const body = await response.json().catch(() => null)
-
-    assert(response.ok, `expected 2xx, received ${response.status}`)
-    assert(body && typeof body === 'object' && !Array.isArray(body), 'expected JSON object response')
-
-    return body
-  }
 
   const runCheck = async (name, run) => {
     try {
@@ -39,20 +28,6 @@ export async function runDeploymentSmoke({ baseUrl, fetchImpl = globalThis.fetch
       failures.push(`${name}: ${error instanceof Error ? error.message : String(error)}`)
     }
   }
-
-  await runCheck('GET /api/baseline reports the deployed module states', async () => {
-    const projection = await requestJson('/api/baseline')
-    assert(isRecord(projection.modules), 'expected baseline module-state object')
-
-    for (const moduleId of Object.keys(moduleBoundaryPaths)) {
-      assert(
-        projection.modules[moduleId] === 'disabled' || projection.modules[moduleId] === 'ready',
-        `expected ${moduleId} state to be disabled or ready`
-      )
-    }
-
-    moduleStates = projection.modules
-  })
 
   const checks = [
     {
@@ -95,26 +70,16 @@ export async function runDeploymentSmoke({ baseUrl, fetchImpl = globalThis.fetch
     await runCheck(check.name, check.run)
   }
 
-  for (const [moduleId, path] of Object.entries(moduleBoundaryPaths)) {
-    await runCheck(`GET ${path} follows the advertised ${moduleId} module state`, async () => {
-      assert(moduleStates, 'baseline module states must be available before probing module routes')
-      const response = await request(path, {
-        // Nuxt's HTML error renderer omits the structured MODULE_DISABLED
-        // payload. JSON preserves the stable disabled contract, while the
-        // ready page still renders HTML from this GET-only request.
-        accept: moduleId === 'observability' ? 'application/json' : undefined
-      })
-      if (moduleStates[moduleId] === 'disabled') {
-        await assertModuleDisabled(response, moduleId)
-        return
-      }
-      if (moduleId === 'observability') {
+  for (const [capabilityId, path] of Object.entries(capabilityBoundaryPaths)) {
+    await runCheck(`GET ${path} reaches the active ${capabilityId} boundary`, async () => {
+      const response = await request(path)
+      if (capabilityId === 'observability') {
         const html = await response.text()
-        assert(response.ok, `expected ready observability page 2xx, received ${response.status}`)
-        assert(/Client Event Test/.test(html), 'expected the ready observability client-test page')
+        assert(response.ok, `expected observability page 2xx, received ${response.status}`)
+        assert(/Client Event Test/.test(html), 'expected the observability client-test page')
         return
       }
-      assert(response.status === 401, `expected anonymous 401 for ready ${moduleId}, received ${response.status}`)
+      assert(response.status === 401, `expected anonymous 401 for ${capabilityId}, received ${response.status}`)
     })
   }
 
@@ -176,26 +141,6 @@ export function parseDeploymentSmokeTarget(argv, environment = process.env) {
   )
 }
 
-async function assertModuleDisabled(response, moduleId) {
-  assert(response.status === 404, `expected disabled 404, received ${response.status}`)
-  const text = await response.text()
-  let body
-  try {
-    body = JSON.parse(text)
-  } catch {
-    body = null
-  }
-  const structured = body?.data?.code === 'MODULE_DISABLED' && body.data.module === moduleId
-  const renderedModuleMarkers = [
-    `module:&quot;${moduleId}&quot;`,
-    `module&quot;:&quot;${moduleId}&quot;`,
-    `module:"${moduleId}"`,
-    `"module":"${moduleId}"`
-  ]
-  const rendered = text.includes('MODULE_DISABLED') && renderedModuleMarkers.some((marker) => text.includes(marker))
-  assert(structured || rendered, `expected stable disabled ${moduleId} response`)
-}
-
 function acceptsFor(path) {
   if (path.startsWith('/api/')) {
     return 'application/json'
@@ -240,10 +185,6 @@ function assertHeaderIncludes(response, name, expected) {
 function assertHeaderAbsent(response, name) {
   const actual = response.headers.get(name)
   assert(actual === null, `expected ${name} to be absent, received ${actual}`)
-}
-
-function isRecord(value) {
-  return value !== null && typeof value === 'object' && !Array.isArray(value)
 }
 
 async function main() {

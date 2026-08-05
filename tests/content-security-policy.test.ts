@@ -22,65 +22,62 @@ describe('browser Content Security Policy', () => {
     expect(createBaseContentSecurityPolicy(false)['style-src']).not.toContain("'nonce-{{nonce}}'")
   })
 
-  it('leaves disabled browser providers out of the policy', () => {
+  it('always allows the documented Turnstile script and frame origin', () => {
     const base = createBaseContentSecurityPolicy(true)
     const extended = withBrowserProviderSources(base, providerConfig())
-
-    expect(extended).toEqual(base)
-    expect(extended).not.toBe(base)
-  })
-
-  it('allows only the Sentry DSN origin when browser observability is enabled', () => {
-    const base = createBaseContentSecurityPolicy(true)
-    const extended = withBrowserProviderSources(
-      base,
-      providerConfig({
-        observability: true,
-        sentryDsn: 'https://public-key@o123.ingest.sentry.io/456?ignored=yes'
-      })
-    )
-
-    expect(extended).toEqual({ ...base, 'connect-src': ["'self'", 'https://o123.ingest.sentry.io'] })
-    expect(base['connect-src']).toEqual(["'self'"])
-    expect(JSON.stringify(extended)).not.toContain('public-key')
-    expect(JSON.stringify(extended)).not.toContain('/456')
-  })
-
-  it('allows the documented Turnstile script and frame origin only when Turnstile is enabled', () => {
-    const base = createBaseContentSecurityPolicy(true)
-    const extended = withBrowserProviderSources(base, providerConfig({ turnstile: true }))
 
     expect(extended).toEqual({
       ...base,
       'frame-src': ['https://challenges.cloudflare.com'],
       'script-src': ["'self'", "'strict-dynamic'", "'nonce-{{nonce}}'", 'https://challenges.cloudflare.com']
     })
+    expect(extended).not.toBe(base)
   })
 
-  it('fails closed when enabled observability has no valid browser DSN', () => {
+  it('adds only the configured Sentry DSN origin to the always-active provider policy', () => {
+    const base = createBaseContentSecurityPolicy(true)
+    const extended = withBrowserProviderSources(
+      base,
+      providerConfig({
+        sentryDsn: 'https://public-key@o123.ingest.sentry.io/456?ignored=yes'
+      })
+    )
+
+    expect(extended).toEqual({
+      ...base,
+      'connect-src': ["'self'", 'https://o123.ingest.sentry.io'],
+      'frame-src': ['https://challenges.cloudflare.com'],
+      'script-src': ["'self'", "'strict-dynamic'", "'nonce-{{nonce}}'", 'https://challenges.cloudflare.com']
+    })
+    expect(base['connect-src']).toEqual(["'self'"])
+    expect(JSON.stringify(extended)).not.toContain('public-key')
+    expect(JSON.stringify(extended)).not.toContain('/456')
+  })
+
+  it('fails closed when a configured browser Sentry DSN is invalid', () => {
     expect(() =>
-      withBrowserProviderSources(
-        createBaseContentSecurityPolicy(true),
-        providerConfig({ observability: true, sentryDsn: 'not-a-url' })
-      )
+      withBrowserProviderSources(createBaseContentSecurityPolicy(true), providerConfig({ sentryDsn: 'not-a-url' }))
     ).toThrow(TypeError)
+  })
+
+  it('allows only the exact configured R2 bucket origin for browser file capabilities', () => {
+    const base = createBaseContentSecurityPolicy(true)
+    const fileRequestOrigin = 'https://private-files.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.r2.cloudflarestorage.com'
+    const extended = withBrowserProviderSources(base, providerConfig({ fileRequestOrigin }))
+
+    expect(extended['connect-src']).toEqual(["'self'", fileRequestOrigin])
+    expect(() =>
+      withBrowserProviderSources(base, providerConfig({ fileRequestOrigin: `${fileRequestOrigin}/objects` }))
+    ).toThrow('exact HTTPS origin')
   })
 })
 
 function providerConfig({
-  observability = false,
   sentryDsn = '',
-  turnstile = false
+  fileRequestOrigin = ''
 }: {
-  observability?: boolean
   sentryDsn?: string
-  turnstile?: boolean
+  fileRequestOrigin?: string
 } = {}) {
-  return {
-    modules: {
-      observability: { enabled: observability },
-      turnstile: { enabled: turnstile }
-    },
-    public: { sentryDsn }
-  }
+  return { sentryDsn, fileRequestOrigin }
 }
