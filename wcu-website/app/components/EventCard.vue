@@ -59,6 +59,9 @@ const linkLabelKey = computed(() => {
   if (props.event.isVirtual && typeof link === 'string' && link.includes('zoom.us')) {
     return 'calendar.zoom'
   }
+  if (typeof link === 'string' && (link.includes('maps.app.goo.gl') || link.includes('google.com/maps'))) {
+    return 'calendar.google_maps'
+  }
   return 'calendar.rsvp_here'
 })
 

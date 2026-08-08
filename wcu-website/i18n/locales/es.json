@@ -1852,6 +1852,7 @@
     "virtual_event": "Evento Virtual",
     "join_virtual": "Unirse al Evento Virtual",
     "rsvp_here": "Confirmar Asistencia",
+    "google_maps": "Google Maps",
     "zoom": "Zoom",
     "events": {
       "generalMeeting": {
@@ -1905,6 +1906,10 @@
       "wcuGameNightSeries": {
         "title": "Noche de Juegos con WCU",
         "description": "Noche de Juegos con WCU"
+      },
+      "farmersMarketTabling": {
+        "title": "Mesa informativa en el Farmers Market",
+        "description": "Acompaña a Working Class Unity en el Farmers Market de Lodi."
       },
       "coffeeWithWcuSeries": {
         "title": "Café con WCU",
