@@ -62,6 +62,43 @@ describe('Event registry', () => {
     const ids = events.map((event) => event.id)
     expect(new Set(ids).size).toBe(ids.length)
   })
+
+  it('includes the published Coffee with WCU recurring schedule', () => {
+    const coffeeEvents = events
+      .filter((event) => event.titleKey === 'calendar.events.coffeeWithWcuSeries.title')
+      .filter((event) => event.startDateTime >= '2026-08-15')
+
+    expect(coffeeEvents.map(({ startDateTime, endDateTime }) => [startDateTime, endDateTime])).toEqual([
+      ['2026-08-15T17:00:00.000Z', '2026-08-15T18:30:00.000Z'],
+      ['2026-09-12T17:00:00.000Z', '2026-09-12T18:30:00.000Z'],
+      ['2026-10-10T17:00:00.000Z', '2026-10-10T18:30:00.000Z'],
+      ['2026-11-14T18:00:00.000Z', '2026-11-14T19:30:00.000Z'],
+      ['2026-12-12T18:00:00.000Z', '2026-12-12T19:30:00.000Z'],
+    ])
+    expect(coffeeEvents.every((event) => event.isActive)).toBe(true)
+  })
+
+  it('stores the updated Lodi Game Night and Farmers Market events', () => {
+    const gameNight = events.find((event) => event.id === 'event-21')
+    expect(gameNight).toMatchObject({
+      startDateTime: '2026-08-29T00:30:00.000Z',
+      endDateTime: '2026-08-29T02:00:00.000Z',
+      location: 'Side Hustle Brew - 2441 S Stockton St Ste 1, Lodi, CA 95240, USA',
+      rsvpLink: 'https://maps.app.goo.gl/qur1NseMzjnrBFU7A',
+      isActive: true,
+    })
+
+    const farmersMarket = events.find((event) => event.id === 'event-80')
+    expect(farmersMarket).toMatchObject({
+      titleKey: 'calendar.events.farmersMarketTabling.title',
+      eventType: 'action',
+      startDateTime: '2026-08-29T02:00:00.000Z',
+      endDateTime: '2026-08-29T03:30:00.000Z',
+      location: 'Lodi Farmers Market - 502 E Lodi Ave, Lodi, CA 95240, USA',
+      rsvpLink: 'https://maps.app.goo.gl/y8e2wrB7bEBQE8UM6',
+      isActive: true,
+    })
+  })
 })
 
 describe('Tenant handbook registry', () => {
