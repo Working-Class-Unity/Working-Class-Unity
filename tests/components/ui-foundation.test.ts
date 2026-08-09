@@ -1,0 +1,86 @@
+// @vitest-environment happy-dom
+
+import { mount } from '@vue/test-utils'
+import { h } from 'vue'
+import { describe, expect, it } from 'vitest'
+import AppButton from '../../app/components/AppButton.vue'
+import AppField from '../../app/components/AppField.vue'
+import AppNotice from '../../app/components/AppNotice.vue'
+
+describe('the shared UI foundation', () => {
+  it('keeps AppButton native and prevents duplicate pending actions', async () => {
+    const wrapper = mount(AppButton, { slots: { default: 'Save' } })
+    const button = wrapper.get('button')
+
+    expect(button.attributes('type')).toBe('button')
+    expect(button.attributes('data-variant')).toBe('primary')
+    expect(button.attributes('aria-busy')).toBeUndefined()
+    expect(button.attributes('disabled')).toBeUndefined()
+
+    await wrapper.setProps({ pending: true, type: 'submit', variant: 'danger', size: 'compact' })
+
+    expect(button.attributes('type')).toBe('submit')
+    expect(button.attributes('data-variant')).toBe('danger')
+    expect(button.attributes('data-size')).toBe('compact')
+    expect(button.attributes('aria-busy')).toBe('true')
+    expect(button.attributes('disabled')).toBeDefined()
+  })
+
+  it('gives AppField a stable control and description contract', async () => {
+    const wrapper = mount(AppField, {
+      props: {
+        label: 'Email',
+        hint: 'Use your personal address.',
+        error: 'Email is required.',
+        required: true,
+        requiredLabel: 'required'
+      },
+      slots: {
+        default: ({ id, describedBy, invalid, required }) =>
+          h('input', {
+            id,
+            'aria-describedby': describedBy,
+            'aria-invalid': invalid ? 'true' : undefined,
+            required
+          })
+      }
+    })
+    const input = wrapper.get('input')
+    const generatedId = input.attributes('id')
+
+    expect(generatedId).toBeTruthy()
+    expect(wrapper.get('label').attributes('for')).toBe(generatedId)
+    expect(wrapper.get('.required-label').attributes('aria-hidden')).toBe('true')
+    expect(input.attributes('aria-describedby')).toBe(`${generatedId}-hint ${generatedId}-error`)
+    expect(input.attributes('aria-invalid')).toBe('true')
+    expect(input.attributes('required')).toBeDefined()
+
+    await wrapper.setProps({ error: '' })
+
+    expect(wrapper.get('input').attributes('id')).toBe(generatedId)
+    expect(wrapper.get('input').attributes('aria-describedby')).toBe(`${generatedId}-hint`)
+    expect(wrapper.get('input').attributes('aria-invalid')).toBeUndefined()
+  })
+
+  it('announces AppNotice content only when the caller requests it', () => {
+    const staticNotice = mount(AppNotice, {
+      props: { tone: 'error' },
+      slots: { default: 'Existing error' }
+    })
+    const politeNotice = mount(AppNotice, {
+      props: { tone: 'success', announce: 'polite' },
+      slots: { default: 'Saved' }
+    })
+    const assertiveNotice = mount(AppNotice, {
+      props: { tone: 'error', announce: 'assertive' },
+      slots: { default: 'Submission failed' }
+    })
+
+    expect(staticNotice.attributes('role')).toBeUndefined()
+    expect(staticNotice.attributes('aria-live')).toBeUndefined()
+    expect(politeNotice.attributes('role')).toBe('status')
+    expect(politeNotice.attributes('aria-live')).toBe('polite')
+    expect(assertiveNotice.attributes('role')).toBe('alert')
+    expect(assertiveNotice.attributes('aria-live')).toBe('assertive')
+  })
+})

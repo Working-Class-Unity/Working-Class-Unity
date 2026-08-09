@@ -34,14 +34,14 @@ async function recover() {
 
 <template>
   <main id="main-content" class="page-shell error-page" tabindex="-1">
-    <section class="panel error-panel" aria-labelledby="error-title">
+    <section class="error-panel" aria-labelledby="error-title">
       <p class="eyebrow">{{ t('errors.status', { statusCode: props.error.statusCode }) }}</p>
       <h1 id="error-title">{{ heading }}</h1>
       <p class="error-description">{{ t(`errors.${errorKind}.description`) }}</p>
-      <AppStatusMessage v-if="recoveryError" tone="error">{{ recoveryError }}</AppStatusMessage>
-      <button class="secondary-button error-home-link" type="button" :disabled="isRecovering" @click="recover">
+      <AppNotice v-if="recoveryError" tone="error" announce="assertive">{{ recoveryError }}</AppNotice>
+      <AppButton class="error-home-link" variant="secondary" :pending="isRecovering" @click="recover">
         {{ isRecovering ? t('errors.returningHome') : t('errors.returnHome') }}
-      </button>
+      </AppButton>
     </section>
   </main>
 </template>
@@ -49,6 +49,7 @@ async function recover() {
 <style scoped>
 @layer components {
   .error-page {
+    display: grid;
     min-height: 100vh;
     place-items: center;
     padding: var(--space-6) 0;
@@ -58,7 +59,19 @@ async function recover() {
     display: grid;
     width: min(100%, 680px);
     gap: var(--space-4);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-2);
     padding: var(--space-6);
+    background: var(--color-surface-subtle);
+    box-shadow: var(--shadow-panel);
+  }
+
+  .eyebrow {
+    margin: 0;
+    color: var(--color-action);
+    font-size: var(--font-size-caption);
+    font-weight: var(--font-weight-heavy);
+    text-transform: uppercase;
   }
 
   .error-description {

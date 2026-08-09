@@ -12,14 +12,15 @@ useHead(() => ({
 </script>
 
 <template>
-  <AppPage class="auth-entry-page">
+  <div class="auth-entry-page">
     <AuthEntryForm intent="login" :session-error="sessionError?.message" />
-  </AppPage>
+  </div>
 </template>
 
 <style scoped>
 @layer components {
   .auth-entry-page {
+    display: grid;
     place-items: start center;
     padding-bottom: var(--space-6);
   }

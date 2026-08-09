@@ -15,6 +15,7 @@ const props = defineProps<{
 const route = useRoute()
 const { t } = useI18n()
 const displayName = ref('')
+const displayNameInput = ref<HTMLInputElement | null>(null)
 const displayNameError = ref('')
 const email = ref('')
 const emailInput = ref<HTMLInputElement | null>(null)
@@ -40,10 +41,7 @@ const copy = computed(() =>
 )
 const callbacks = computed(() => resolveAuthCallbacks(props.intent))
 const displayNameInputId = computed(() => `${props.intent}-display-name`)
-const displayNameErrorId = computed(() => `${props.intent}-display-name-error`)
-const displayNameHelpId = computed(() => `${props.intent}-display-name-help`)
 const emailInputId = computed(() => `${props.intent}-email`)
-const fieldErrorId = computed(() => `${props.intent}-email-error`)
 const formStatusId = computed(() => `${props.intent}-form-status`)
 
 watch(displayName, () => {
@@ -62,6 +60,7 @@ async function submitAuth() {
 
   if (!validateAuthForm()) {
     formError.value = t('auth.errors.formInvalid')
+    await focusFirstInvalidControl()
     return
   }
 
@@ -98,6 +97,15 @@ async function submitAuth() {
   }
 }
 
+async function focusFirstInvalidControl() {
+  await nextTick()
+  if (displayNameError.value) {
+    displayNameInput.value?.focus()
+    return
+  }
+  emailInput.value?.focus()
+}
+
 function validateAuthForm() {
   if (!displayName.value.trim()) {
     displayNameError.value = t('auth.displayName.required')
@@ -116,19 +124,16 @@ function validateAuthForm() {
 </script>
 
 <template>
-  <section class="panel auth-entry-panel" :aria-labelledby="`${intent}-title`">
+  <section class="auth-entry-panel" :aria-labelledby="`${intent}-title`">
     <div class="panel-heading">
       <p class="eyebrow">{{ copy.eyebrow }}</p>
       <h1 :id="`${intent}-title`">{{ copy.title }}</h1>
       <p class="auth-intro">{{ copy.intro }}</p>
     </div>
 
-    <UiStateBlock
-      v-if="sessionError"
-      tone="error"
-      :title="t('auth.sessionUnavailable.title')"
-      :description="t('auth.sessionUnavailable.description')"
-    />
+    <AppNotice v-if="sessionError" tone="error" :title="t('auth.sessionUnavailable.title')">
+      <p>{{ t('auth.sessionUnavailable.description') }}</p>
+    </AppNotice>
 
     <form
       class="auth-form"
@@ -136,55 +141,65 @@ function validateAuthForm() {
       novalidate
       @submit.prevent="submitAuth"
     >
-      <div class="form-field">
-        <label :for="displayNameInputId">{{ t('auth.displayName.label') }}</label>
-        <!-- eslint-disable vue/html-self-closing -->
-        <input
-          :id="displayNameInputId"
-          v-model.trim="displayName"
-          name="name"
-          type="text"
-          autocomplete="name"
-          :maxlength="displayNameMaxLength"
-          :aria-describedby="displayNameError ? `${displayNameHelpId} ${displayNameErrorId}` : displayNameHelpId"
-          :aria-invalid="displayNameError ? 'true' : undefined"
-          required
-        />
-        <!-- eslint-enable vue/html-self-closing -->
-        <small :id="displayNameHelpId">{{ t('auth.displayName.help') }}</small>
-        <small v-if="displayNameError" :id="displayNameErrorId" class="field-error">
-          {{ displayNameError }}
-        </small>
-      </div>
+      <AppField
+        :id="displayNameInputId"
+        :label="t('auth.displayName.label')"
+        :hint="t('auth.displayName.help')"
+        :error="displayNameError"
+        required
+        :required-label="t('common.required')"
+      >
+        <template #default="{ id, describedBy, invalid, required }">
+          <!-- eslint-disable vue/html-self-closing -->
+          <input
+            :id="id"
+            ref="displayNameInput"
+            v-model.trim="displayName"
+            name="name"
+            type="text"
+            autocomplete="name"
+            :maxlength="displayNameMaxLength"
+            :aria-describedby="describedBy"
+            :aria-invalid="invalid ? 'true' : undefined"
+            :required="required"
+          />
+          <!-- eslint-enable vue/html-self-closing -->
+        </template>
+      </AppField>
 
-      <label class="form-field" :for="emailInputId">
-        <span>{{ t('common.email') }}</span>
-        <!-- eslint-disable vue/html-self-closing -->
-        <input
-          :id="emailInputId"
-          ref="emailInput"
-          v-model.trim="email"
-          name="email"
-          type="email"
-          autocomplete="email"
-          :aria-describedby="fieldError ? fieldErrorId : undefined"
-          :aria-invalid="fieldError ? 'true' : undefined"
-          required
-        />
-        <!-- eslint-enable vue/html-self-closing -->
-        <small v-if="fieldError" :id="fieldErrorId" class="field-error">
-          {{ fieldError }}
-        </small>
-      </label>
+      <AppField
+        :id="emailInputId"
+        :label="t('common.email')"
+        :error="fieldError"
+        required
+        :required-label="t('common.required')"
+      >
+        <template #default="{ id, describedBy, invalid, required }">
+          <!-- eslint-disable vue/html-self-closing -->
+          <input
+            :id="id"
+            ref="emailInput"
+            v-model.trim="email"
+            name="email"
+            type="email"
+            autocomplete="email"
+            inputmode="email"
+            :aria-describedby="describedBy"
+            :aria-invalid="invalid ? 'true' : undefined"
+            :required="required"
+          />
+          <!-- eslint-enable vue/html-self-closing -->
+        </template>
+      </AppField>
 
       <TurnstileChallenge ref="turnstileChallenge" v-model="turnstileToken" :action="turnstileActions.magicLink" />
 
-      <AppStatusMessage v-if="formError" :id="formStatusId" tone="error">
+      <AppNotice v-if="formError" :id="formStatusId" tone="error" announce="assertive">
         {{ formError }}
-      </AppStatusMessage>
-      <AppStatusMessage v-else-if="formSuccess" :id="formStatusId" tone="success">
+      </AppNotice>
+      <AppNotice v-else-if="formSuccess" :id="formStatusId" tone="success" announce="polite">
         {{ formSuccess }}
-      </AppStatusMessage>
+      </AppNotice>
 
       <i18n-t id="auth-legal" keypath="auth.legal.acknowledgment" tag="p" class="legal-acknowledgment">
         <template #terms>
@@ -195,9 +210,9 @@ function validateAuthForm() {
         </template>
       </i18n-t>
 
-      <button class="primary-button" type="submit" :disabled="isSubmitting || !turnstileToken">
+      <AppButton type="submit" :pending="isSubmitting" :disabled="!turnstileToken">
         {{ isSubmitting ? t('auth.email.sending') : t('auth.email.submit') }}
-      </button>
+      </AppButton>
     </form>
   </section>
 </template>
@@ -208,7 +223,25 @@ function validateAuthForm() {
     display: grid;
     width: min(100%, 680px);
     gap: var(--space-4);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-2);
     padding: var(--space-5);
+    background: var(--color-surface-subtle);
+    box-shadow: var(--shadow-panel);
+  }
+
+  .panel-heading {
+    display: grid;
+    gap: var(--space-1);
+    margin-block-end: var(--space-4);
+  }
+
+  .eyebrow {
+    margin: 0;
+    color: var(--color-action);
+    font-size: var(--font-size-caption);
+    font-weight: var(--font-weight-heavy);
+    text-transform: uppercase;
   }
 
   .auth-intro {

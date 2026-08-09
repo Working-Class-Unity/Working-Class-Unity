@@ -1,198 +1,339 @@
-# CSS and Interface Guide
+- **Status and scope**
+  - Canonical target reviewed on [[August 6th, 2026]] against the official Nuxt 4, Vue 3, Reka UI, Stylelint, ESLint, MDN, and W3C documentation linked below.
+  - The baseline exactly pins compatible versions of Nuxt, Vue, Stylelint, ESLint, and Reka UI in the repository manifest and lockfile. The supported Node.js and package-manager versions are also pinned in repository toolchain configuration.
+  - The baseline uses native HTML, raw CSS, Vue single-file components, app-owned wrappers, and Reka UI only for composite accessible behavior.
+  - PrimeVue, Tailwind CSS, Nuxt UI, shadcn-vue, and utility-class-generated product styling are excluded.
+  - This page is the normative final-state architecture. Implementation progress, temporary gaps, and rollout sequencing belong in GitHub issues and audit evidence rather than this guide.
+- **Recommendation summary**
+  - Use Nuxt global CSS for reset, tokens, document defaults, shell layout, and a very small utility set.
+  - Use Vue `<style scoped>` for component-specific presentation, with component rules placed in the declared `components` cascade layer.
+  - Use CSS custom properties for primitive and semantic tokens. Component-local variables are appropriate when they express a real local contract.
+  - Prefer native semantic elements before any custom primitive.
+  - Use Reka UI for interaction patterns whose keyboard navigation, focus management, dismissal, or ARIA behavior would otherwise be substantial application code.
+  - Wrap Reka primitives in small app-owned components. Pages should not scatter Reka imports, content policy, and styling.
+  - Keep the initial shared surface to `AppButton`, `AppField`, and `AppNotice`, plus the feature-owned `AccountMenu`; keep flow, cluster, container, and grid as CSS layout primitives.
+  - Give coding agents a concise `app/AGENTS.md`, one canonical implementation fixture, an explicit component inventory, and one repository check command.
+  - Keep SSR as the default and require unresolved-authentication, pending, error, empty, and success handling for asynchronous product surfaces.
+  - The feature-owned account/family menu is not a business workspace switcher. It may expose account actions, owner-only invitation entry points, and sign-out; it does not expose roles, slugs, workspace administration, or member-management controls.
+  - Stylelint and Nuxt-aware ESLint belong in the baseline. Browser behavior and accessibility require behavioral tests; source-text assertions are not substitutes.
+- **1. CSS ownership and files**
+  - Nuxt officially supports local stylesheets in `app/assets`, component imports, and global registration through the `css` property in `nuxt.config.ts`.
+  - Target file shape:
+    - ```plain text
+      app/assets/css/
+        main.css
+        reset.css
+        tokens.css
+        base.css
+        layout.css
+        utilities.css
+      ```
+  - `main.css` declares the layer order and imports the other global files; it contains no unrelated component or page rules.
+  - Register the entry stylesheet as `~/assets/css/main.css` in `nuxt.config.ts`.
+  - Ownership:
+    - `reset`: conservative normalization only.
+    - `tokens`: primitive and semantic custom properties.
+    - `base`: document, typography, links, forms, focus, selection, and default table/list behavior.
+    - `layout`: app shell and reusable flow, cluster, container, and grid primitives.
+    - `components`: app-owned component and Reka-wrapper presentation.
+    - `utilities`: a deliberately small set such as visually hidden or layout helpers.
+- **2. Cascade layers**
+  - Declare one stable order before imports:
+    - ```css
+      @layer reset, tokens, base, layout, components, utilities, overrides;
 
-Status: **approved canonical target as of 2026-07-09; account-menu terminology amended by ADR 0006 on 2026-07-12; CSS/accessibility foundation implemented by R-023A; account/family menu implemented by R-021; project reference journey implemented by R-022**. The baseline uses native HTML, Vue SFCs, raw CSS, app-owned components, and exact `reka-ui@2.10.1` only for complex accessible primitives such as the account/family action dropdown.
-
-PrimeVue, Tailwind CSS, Nuxt UI, shadcn-vue, and utility-class-generated product styling are excluded.
-
-## CSS ownership
-
-- Global files define reset, tokens, document defaults, shell layout, and a deliberately small utility set.
-- App-owned components keep their styles in scoped SFC blocks by default and place those rules in the declared `components` layer.
-- Pages own page-specific composition, not copies of shared field/button/state styles.
-- Reka supplies behavior/accessibility primitives; the app supplies markup wrappers, content policy, classes, and CSS.
-- Product forks may extend tokens/components but should not rewrite the foundation to add one screen.
-
-## Recommended files
-
-```text
-app/assets/css/
-  main.css       # ordered imports/layers only
-  reset.css      # conservative normalization
-  tokens.css     # primitive and semantic custom properties
-  base.css       # html/body/type/link/form/focus/selection defaults
-  layout.css     # app shell, containers, flow/cluster/grid primitives
-  utilities.css  # small accessibility/layout utilities only
-```
-
-Use an explicit cascade order:
-
-```css
-@layer reset, tokens, base, layout, components, utilities, overrides;
-```
-
-Scoped selectors do not change cascade-layer precedence. Unlayered author rules outrank all named layers, so ordinary SFC rules must be wrapped in `@layer components` rather than left unlayered. Pinned Stylelint's maintained `rule-nesting-at-rule-required-list` and `layer-name-pattern` rules enforce that Vue SFC boundary; there is no repository-owned CSS source scanner. The `overrides` layer is reserved for a narrow, documented third-party cascade constraint and is not an ordinary SFC escape hatch.
-
-Adopt the split with the product shell repair; do not create empty architecture files solely to satisfy a presence check.
-
-## Tokens
-
-Tokens should cover:
-
-- canvas/surface/text/muted/border/action/focus/status colors;
-- font family, size, line height, weight, and measure;
-- spacing scale;
-- radius, border, shadow, and z-index layers;
-- control/touch size;
-- animation duration/easing;
-- content and shell widths.
-
-Prefer semantic consumption (`--color-text-muted`, `--control-min-block-size`) over primitive color names inside components. Repeated colors, shadows, type, spacing, control, and motion decisions belong in tokens. A genuinely one-off composition value does not need a token merely to increase indirection.
-
-Tokens used by the head theme color must be generated/synchronized or tested for agreement.
-
-## Native semantics first
-
-Use native elements when they already provide the needed behavior:
-
-- links for navigation;
-- buttons for commands;
-- labels and native inputs/selects/textareas for forms;
-- headings in a logical hierarchy;
-- lists/tables/description lists for their actual content;
-- `dialog` only when its browser/a11y behavior meets the interaction contract;
-- status/alert/live regions only for appropriate dynamic messages.
-
-Do not turn normal primary navigation into an ARIA menu. ARIA menu semantics are for application-style command menus, such as the Reka account/family dropdown.
-
-## App-owned component baseline
-
-The reference journey establishes small reusable components or shared native-control styles for:
-
-- button/link variants while preserving link-versus-command semantics;
-- form fields, hints, and error association;
-- status/alert messages through `AppStatusMessage`;
-- loading, empty, error/retry, and success states through `UiStateBlock`, with forbidden/not-found states added where a feature requires them;
-- a stable page main target through `AppPage`;
-- panel/card only when it represents a real visual primitive;
-- the implemented Reka account/family menu wrapper from R-021/#23.
-
-Avoid a generic component for every HTML tag. Create a component when it centralizes behavior, accessibility, validation/state policy, or repeated design semantics.
-
-## Reka account/family menu contract
-
-The menu contains an identity summary, Account, and Sign out. Family controls live on `/account` and appear only after persisted billing-manager authority is confirmed. The invisible family-plan organization is not a selectable workspace and its name, slug, role, membership list, and `activeOrganizationId` are not rendered. The implemented behavior evidence proves:
-
-- trigger has an accurate accessible name and expanded state;
-- Enter/Space and pointer open it;
-- arrow keys move among enabled items according to the Reka pattern;
-- Escape closes and returns focus to the trigger;
-- outside click closes without losing logical focus;
-- disabled/current items are conveyed semantically;
-- Family controls target only the caller's server-derived group after billing-manager verification; the UI never expands into role administration;
-- route changes close the menu;
-- long identity labels and narrow viewports do not overflow;
-- no private identity or family-plan data is rendered before authentication.
-
-R-021 imports Reka's named dropdown primitives directly into one app-owned wrapper. It adds no Reka Nuxt module, auto-import layer, generic menu abstraction, or product-wide component kit, and keeps its small presentation additions in `@layer components`.
-
-R-020C's pending-invitation rows and destructive-account panel reuse the shared field, button, status, and state primitives. Their small scoped additions remain inside `@layer components`, stack at narrow widths, and wrap long identities; they do not add a foundation layer, global selector system, CSS checker, or alternate component framework.
-
-R-022's project collection and detail pages use native links, buttons, labels, and text inputs with the shared page/status/state styles. A small project-name form component centralizes labels, validation association, and focus behavior; a separate inline deletion component centralizes confirmation and focus restoration without introducing a dialog or menu primitive. Their feature-specific scoped styles remain in `@layer components` and extend the existing responsive foundation. The UI never presents a distinct forbidden state for another user's project: malformed, missing, deleted, and foreign IDs use one concealed unavailable view.
-
-R-024B's `/account/billing` page also uses native links/buttons plus the shared status/state primitives. It renders one server-projected relationship at a time: eligible independent, family manager, or covered member. Manager commands and the member's explicit self-leave confirmation are ordinary semantic controls with busy, retry, session-loss, and focus behavior; a covered member never receives hidden or disabled manager controls. Small billing-specific layout rules remain scoped in `@layer components`, wrap at 320–390 CSS pixels and 200% root font size, and do not change the CSS foundation or introduce a provider-branded component kit.
-
-## Accessibility baseline
-
-Required for the global journey and each enabled module:
-
-- skip link to a stable main target;
-- one clear page `h1` and sensible descendant heading order;
-- unique route title and meaningful metadata;
-- `aria-current` for active navigation;
-- visible focus indicator with at least 3:1 contrast against adjacent colors;
-- text contrast at least 4.5:1 for normal text and 3:1 for large text/UI boundaries as applicable;
-- expected touch targets at least 44 × 44 CSS pixels or an equivalently spaced accessible target;
-- visible labels; errors tied through `aria-describedby`; first invalid field/error summary focus strategy;
-- status is never color-only;
-- keyboard-only access with no trap except an intentional modal pattern;
-- reduced-motion behavior for nonessential animation;
-- text resize at 200% plus reflow at 320 CSS pixels without horizontal page scrolling;
-- screen-reader labels for icons and icon-only controls;
-- no inaccessible custom select/menu/dialog replacement when native behavior is sufficient.
-
-## Language and locale readiness
-
-The implemented baseline is English-only but catalog-backed:
-
-- exact `@nuxtjs/i18n@10.5.0`;
-- one lazy application-owned `en` catalog;
-- SSR `lang="en-US"` and `dir="ltr"`;
-- stable unprefixed routes and no browser-language detection;
-- no selector, locale cookie, preference API, database field, migration, or proof translation;
-- complete-message interpolation for user/provider values and component interpolation for sentences containing links or semantic markup;
-- named formats only for the two current invitation date presentations;
-- stable locale-independent routes, API/error codes, logs, provider payloads, and user-owned content;
-- app-owned English transactional-email templates that preserve their existing validation and HTML-escaping boundary outside Nuxt request context.
-
-A second locale requires owner approval, human linguistic and legal review, explicit selection/persistence/fallback precedence, email locale propagation, callback and cache review, canonical URL/SEO decisions, text-expansion evidence, and an RTL/bidi audit when its direction requires one. Add tests for the real locale's observable switching, persistence, fallback, email, and high-risk layout behavior at that point. Do not add hypothetical locale fixtures, exhaustive catalog inventories, or framework-behavior tests.
-
-## Async and error states
-
-Every data view defines before implementation:
-
-- initial/loading;
-- empty with a useful next action;
-- success/content;
-- recoverable error with retry;
-- validation error;
-- unauthorized/sign-in required;
-- forbidden/missing capability;
-- not found or intentionally concealed;
-- stale/conflict where edits can race;
-- optional module disabled/unavailable.
-
-Do not fetch a private endpoint for a signed-out screen merely to hide the expected 401 afterward. Resolve session/module state first when it materially changes the request.
-
-## Responsive baseline
-
-- Start from content-driven narrow layout; add breakpoints when composition requires them.
-- Prefer Grid/Flexbox, `minmax`, wrapping, max inline sizes, and intrinsic sizing.
-- Avoid `100vw` content widths, fixed minimum tracks that overflow, and hover-only disclosure.
-- `clamp`, auto-fit grids, container queries, cascade layers, `color-mix`, and newer color functions are recommendations only after the browser matrix is set.
-- Do not force portrait orientation.
-- Test long identity/project/file names, localization expansion, 320–390px widths, landscape, and 200% text resize. The declared production support policy is the repository's single [`baseline widely available on 2025-05-01` Browserslist query](https://github.com/browserslist/browserslist#queries). It deliberately remains broader than Vite 8's newer [2026-01-01 production default](https://vite.dev/guide/migration.html#default-browser-target-change); changing that policy requires an explicit compatibility review because unsupported cascade layers would discard layered rules.
-
-## Enforceable checks
-
-### Per PR
-
-- Stylelint's standard CSS and Vue configurations parse every global/scoped style.
-- Pinned maintained Stylelint rules reject `!important`, unlayered Vue rules, and Vue layer names other than `components`.
-- `main.css` owns the reviewed import/layer order; imported global files are assigned to their layer by `@import ... layer(...)` and are not nested in a second same-named layer.
-- Components/pages changed have targeted behavior/a11y tests.
-- No exact selector, token inventory, literal count, or source-fragment checker is a merge-gate guarantee.
-
-### Browser gate
-
-- keyboard journey and focus return;
-- automated accessibility scan with reviewed exceptions;
-- Chromium CSS viewports at 320px, 390px, and desktop widths plus a 200% root-font text stress case for reflow/overflow; these are not physical-device or browser-zoom certification;
-- rendered target-size, text/control/focus contrast, and reduced-motion checks;
-- loading/empty/error/forbidden/not-found examples;
-- the existing account journey's Reka menu interaction suite;
-- screenshots only where visual regression evidence is materially useful.
-
-### Periodic, not every commit
-
-- built-CSS/token/specificity audit;
-- component example catalog/Storybook once the shared surface is substantial;
-- dead CSS/export/dependency analysis;
-- real iOS/Android browser checks for the declared support matrix.
-
-## Implementation status
-
-The dated audit at commit `98e6922` remains the historical finding record. R-023A replaces the mixed global file with the declared reset/tokens/base/layout/component/utilities architecture, consolidates native field and status presentation, adds the stable skip/main/current-route behavior, strengthens focus/control/status contrast, and moves rendered 44px, 320px, 200%-text, reduced-motion, Axe, and console/overflow evidence into the existing Playwright journey.
-
-The former CSS regex script and its negative-letter-spacing, viewport-font, `100vw`, selector-name, and declaration-presence bookkeeping are retired without a replacement source assertion. Stylelint owns CSS/Vue syntax plus the layer and `!important` conventions; Playwright owns the retained rendered outcomes. R-021/#23 implements the Reka account/family menu without changing the CSS foundation. One existing Playwright account journey owns pointer and keyboard opening, arrow movement, Escape and outside dismissal, focus return, route-close behavior, Axe, narrow Chromium viewport/root-font reflow, and truthful sign-out failure/retry evidence.
-
-R-022 adds project-specific collection, detail, validation, retry, concealment, session-loss, inline-delete, focus, and overflow behavior to that same standard Playwright layer. One real packaged desktop-Chromium path performs project create/read/update/delete after magic-link authentication against the migrated temporary SQLite database. Axe reports no violations for the exercised rendered states, but this foundation remains bounded automated evidence rather than complete WCAG, assistive-technology, browser-zoom, cross-browser, or physical-device certification.
+      @import './reset.css' layer(reset);
+      @import './tokens.css' layer(tokens);
+      @import './base.css' layer(base);
+      @import './layout.css' layer(layout);
+      @import './utilities.css' layer(utilities);
+      ```
+  - Unlayered author rules outrank normal declarations in named layers. Scoped Vue selectors do not change that rule, so ordinary SFC CSS should be wrapped in `@layer components`.
+  - Use `overrides` only for a narrow, documented exception. Do not turn it into a second component layer.
+- **3. Global base and color schemes**
+  - Plain HTML should remain readable and operable before component classes are applied. Cover headings, paragraphs, links, lists, tables, labels, inputs, textareas, selects, buttons, focus, and selection.
+  - The baseline uses `color-scheme: light`. A fork declares additional schemes only when it supplies complete corresponding theme tokens and behavior.
+  - If a fork implements both light and dark themes, set the color-scheme metadata early, declare `color-scheme: light dark`, and supply complete theme tokens. The property changes browser-provided UI; it does not theme arbitrary application content by itself.
+  - Avoid broad resets that erase useful native semantics or focus indicators without supplying an accessible replacement.
+- **4. Tokens and calculated values**
+  - Use three practical levels:
+    - Primitive tokens hold palette and scale values, such as `--blue-600` or `--space-4`.
+    - Semantic tokens express application meaning, such as `--color-action`, `--color-text-muted`, and `--control-min-block-size`.
+    - Component variables express a local contract, such as `--button-bg` or `--menu-max-height`.
+  - Components should consume semantic tokens rather than raw palette names.
+  - Tokenize repeated design decisions: color, typography, spacing, radius, border, shadow, focus, z-index, control size, and motion.
+  - Keep intrinsic one-off geometry local, such as `max-width: 72ch`, `aspect-ratio: 16 / 9`, or a feature-specific grid ratio. Do not create a token for every numeric value.
+  - The baseline does not require `color-mix()`, relative colors, `light-dark()`, or newer color spaces. A fork may adopt them only after the target browser matrix is set and tested, with a simpler fallback when supported older clients need one.
+  - The baseline does not introduce `@property`. A fork may use it when type checking, animation, or controlled inheritance provides demonstrated value. For typed syntax, its `initial-value` must be computationally independent:
+    - ```css
+      @property --cluster-gap {
+        syntax: '<length>';
+        inherits: false;
+        initial-value: 16px;
+      }
+      ```
+- **5. Responsive layout and typography**
+  - Start with a content-driven narrow layout. Add breakpoints when the composition requires them, not for named devices.
+  - Prefer Grid, Flexbox, wrapping, `minmax()`, `repeat(auto-fit, ...)`, intrinsic sizes, and bounded `clamp()` values before repeated breakpoint rewrites.
+  - Use container queries when a reusable component must respond to its container rather than the viewport.
+  - Avoid `100vw` content widths, fixed minimum tracks that overflow, hover-only disclosure, and viewport-based typography without sensible minimum and maximum values.
+  - Validate long names, localization expansion, 320–390px widths, landscape, 200% text resizing, and reflow at a 320 CSS-pixel-wide viewport (commonly reached from a 1280px viewport at 400% browser zoom).
+  - Vue scoped CSS remains the default for SFCs. The baseline does not use native `@scope`; consider it only for a plain global subtree after the supported-browser matrix and a concrete need are known. It does not stop inherited properties from crossing a scope limit.
+- **6. Vue scoped CSS and CSS Modules**
+  - Use `<style scoped>` by default for component-specific CSS. Vue implements it with transformed selectors rather than Shadow DOM.
+  - Prefer class selectors for component roots and meaningful internal parts. Vue warns that scoped type selectors can carry a larger selector cost.
+  - Use `:deep()` only when a wrapper intentionally styles a child component or teleported Reka content. Use `:global()` only for a rule that is genuinely global.
+  - Keep scoped rules inside `@layer components` so they participate in the baseline cascade.
+  - CSS Modules are an exception for cases that need class names as JavaScript values or imported collision-resistant classes. They are not the default for ordinary Vue components.
+- **7. Reka UI selection rule**
+  - Reka UI is an unstyled, modular Vue primitive library centered on accessibility and customization. It supplies interaction mechanics; the application remains responsible for structure, content, classes, functional layout styles, visual design, authorization, and tests.
+  - Native-first examples:
+    - Use a native link for navigation and a native button for a command.
+    - Use native inputs, textareas, and selects when their behavior is sufficient.
+    - Do not turn ordinary primary navigation into an ARIA menu.
+    - Use native `fieldset`/`legend` for grouped controls, `details`/`summary` for ordinary disclosure, and `progress` or `output` when those semantics match the product need.
+  - Relevant Reka primitives when native behavior is insufficient:
+    - `DropdownMenu` for the account/family command menu. Its official contract includes managed focus, keyboard navigation, typeahead, dismissal, and the Menu Button WAI-ARIA pattern.
+    - `Dialog` for modal tasks that require managed focus and labelled content.
+    - `AlertDialog` for an important or destructive decision that requires a response.
+    - `Popover` for rich transient content that is not a command menu.
+    - `Select` only when the native select cannot meet a documented product requirement.
+    - `Toast` for non-blocking, temporary feedback. Its action must be safe to ignore; a required response belongs in an `AlertDialog` or persistent page UI.
+  - Do not install a full component layer speculatively. Add a primitive when a real journey needs its documented behavior.
+- **8. Reka integration and styling**
+  - Reka officially supports both direct imports from `reka-ui` and the `reka-ui/nuxt` auto-import module.
+  - The baseline prefers explicit imports inside its small app-owned Reka wrappers: dependencies remain visible and the official package remains tree-shakeable. A fork may adopt the supported Nuxt module when repeated imports create a demonstrated maintenance cost.
+  - Give every rendered primitive part an app-owned class. Style documented state attributes such as `data-state`, `data-disabled`, `data-highlighted`, `data-side`, and `data-align` rather than depending on undocumented DOM structure.
+  - Reka is unstyled, including functional styles. The app must provide overlay coverage, positioning constraints, overflow, stacking, touch size, and motion.
+  - Portalled or teleported content may sit outside the wrapper's scoped DOM. Follow Reka's official styling guidance by using a reviewed `:deep()` selector or a deliberately global class in the `components` layer.
+  - Use Reka's documented CSS variables for collision-aware sizes and transform origins rather than measuring private internals.
+  - Use controlled state such as `v-model:open` only when the application must coordinate behavior—for example, closing a menu on route navigation.
+  - If `asChild` is used to compose an app-owned trigger, ensure the child renders one valid element and forwards the attributes, events, and reference required by Reka's composition contract.
+- **9. Feature-owned account/family menu contract**
+  - Implement `AccountMenu` as a feature-owned component around `DropdownMenuRoot`, `DropdownMenuTrigger`, `DropdownMenuPortal`, `DropdownMenuContent`, `DropdownMenuLabel`, `DropdownMenuItem`, and `DropdownMenuSeparator` as needed. Do not extract a generic `AppDropdownMenu` until a second real journey demonstrates a stable shared contract.
+  - Appropriate content: authenticated identity summary, account settings, owner-only invite entry point when implemented, and sign-out.
+  - Excluded content: workspace switcher, editable organization slug, visible role matrix, member administration, ownership transfer, or a general workspace settings surface.
+  - Family-plan membership grants entitlement; it must not imply access to another member's private records.
+  - Required behavior:
+    - Accurate trigger name and expanded state.
+    - Pointer, Enter, and Space open behavior.
+    - Arrow-key navigation among enabled items and typeahead where labels support it.
+    - Escape closes and restores focus to the trigger.
+    - Outside interaction dismisses according to the documented Reka behavior.
+    - Route changes close controlled menu state.
+    - Disabled states are semantic, not visual-only.
+    - Long names and narrow viewports do not overflow.
+    - No private identity or family information renders before authentication is resolved.
+- **10. Accessibility and motion**
+  - Reka reduces primitive-level accessibility work but does not make application copy, labels, routing, contrast, loading states, or authorization correct automatically.
+  - Maintain a visible focus indicator. The enhanced product target is at least the area of a 2 CSS-pixel perimeter with a 3:1 change of contrast; this corresponds to WCAG 2.2 Focus Appearance at Level AAA, while visible focus remains required at the baseline conformance level.
+  - Normal text should meet 4.5:1 contrast; large text and required non-text UI boundaries should meet 3:1 where WCAG 2.2 applies.
+  - Keep the product target of 44 × 44 CSS pixels for expected touch controls. This is deliberately stricter than WCAG 2.2 AA's 24 × 24 minimum/spacing rule and aligns with the 44 × 44 enhanced target.
+  - Never communicate status by color alone.
+  - Honor `prefers-reduced-motion`; animations must not be required to understand state.
+  - Test keyboard-only operation, focus return, focus not being obscured by sticky or fixed UI, route-change announcements, programmatic status messages, zoom/reflow, and screen-reader naming in the assembled application.
+- **11. Stylelint, ESLint, and evidence**
+  - The baseline runs Stylelint over `app/**/*.{css,vue}` and extends `stylelint-config-standard-vue`.
+  - The baseline uses Nuxt's project-aware `@nuxt/eslint` integration. Apply `no-restricted-imports` or an equivalent maintained rule so direct `reka-ui` imports remain inside approved wrappers and feature-owned integration components.
+  - Provide one canonical check script that runs ESLint, Stylelint, `nuxt typecheck`, and fast tests. When CI is provided, it installs with the pinned package manager and frozen lockfile before running that command.
+  - Use ordinary Node/Vitest tests for pure logic and Nuxt's test utilities only when a component needs the Nuxt runtime, auto-imports, routing, plugins, or asynchronous setup.
+  - Stylelint should own CSS parsing and stable rule-level conventions. Add token naming or unknown-property rules only after the token contract is stable and false positives are understood.
+  - Do not use regex or source-fragment checks to claim that the UI is accessible, responsive, visually correct, or behaviorally integrated with Reka.
+  - Use Vue/Vitest tests for wrapper state and events, and Playwright for the assembled keyboard, focus, route, mobile-reflow, and accessibility journeys.
+  - Screenshots are evidence only when visual regression is materially useful; they are not a substitute for behavior and accessibility assertions.
+- **12. Agent-facing implementation contract**
+  - Keep a concise `app/AGENTS.md` as the operational entry point for coding agents. It links to this architecture instead of duplicating it.
+  - The agent file states the exact repository commands, directory ownership rules, current component inventory, allowed Reka import locations, required page-state handling, and the path to one canonical implementation example.
+  - Record one deliberate Nuxt component auto-import convention. Nested component paths affect generated names, so filenames and directories must produce names that are obvious at the call site.
+  - Keep auto-imported composables at the top level of `app/composables`, re-export nested composables from its index, or explicitly configure nested scanning. Do not leave discoverability to convention that Nuxt does not scan.
+  - Maintain one small reference fixture or non-production example that demonstrates the shell, a form field, asynchronous states, persistent feedback, and the account menu. Agents copy this working composition rather than reconstructing it from prose.
+  - Restrict direct `reka-ui` imports with ESLint to the approved feature-owned components and shared wrappers. Pages and unrelated feature components consume the app-owned contract.
+  - Adding or changing a shared component updates its inventory entry, usage example, public contract, and focused tests in the same change.
+  - Prefer exact local documentation and the official Reka `.md` documentation endpoints when supplying context to an LLM; do not paste stale vendor API summaries into `AGENTS.md`.
+  - Provide one canonical repository check script, such as `pnpm check`, that runs Nuxt-aware ESLint, Stylelint, Nuxt typecheck, and fast tests. The file records the actual command rather than asking agents to infer package scripts.
+- **13. Minimal baseline component surface**
+  - The initial shared surface is intentionally small. Native HTML and the documented layout classes remain the default outside the components listed here.
+  - `AppButton` renders a native `button`, defaults to `type="button"`, and supports only the documented semantic variants, sizes, disabled state, and pending state. It never performs navigation; use `NuxtLink` or a native link for navigation.
+  - `AppField` owns the label, hint, required, and validation-message relationship for a native control. Its slot exposes the stable ID and ARIA attributes that the control must bind. Generate default IDs with Vue `useId()` so they remain stable across SSR and hydration.
+  - `AppNotice` presents persistent information, success, warning, or error feedback. Its visual variant does not automatically determine live-region behavior; announcements are enabled explicitly according to whether content changed after a user action.
+  - `AccountMenu` remains feature-owned and may compose Reka directly within its documented boundary. Extract `AppDropdownMenu` only when another real journey demonstrates a coherent shared API.
+  - Flow, cluster, container, and grid remain documented CSS layout primitives rather than renderless Vue wrappers.
+  - Do not add generic `AppBox`, `AppStack`, `AppText`, `AppCard`, polymorphic “everything” components, or raw-CSS-value props. A component exists for repeated semantics, behavior, accessibility policy, or a stable visual contract—not merely to rename an element.
+  - Shared baseline components do not fetch data, read feature stores, or contain authorization rules. Pages and feature components provide typed props and handle emitted events.
+  - Dialog, AlertDialog, Popover, Select, Toast, Tooltip, Tabs, and other wrappers are added only when a documented journey requires their behavior.
+- **14. Nuxt rendering, data, state, and security contract**
+  - Server rendering is the default. A client-only component or page requires a browser-only dependency or documented product reason and provides meaningful fallback content when users would otherwise see an empty region.
+  - Do not read `window`, `document`, `localStorage`, current time, random values, or viewport state during universal rendering. Use CSS for responsive presentation and Nuxt/Vue SSR-safe state or post-mount behavior for genuine browser-only needs.
+  - Use `useFetch` or `useAsyncData` for initial SSR-aware reads. Use `$fetch` for user-triggered mutations and other event-driven client requests.
+  - Pages and feature composables own data access, caching keys, transformation, and retry policy. Foundational components render typed inputs and emit user intent.
+  - Every asynchronous surface deliberately handles unresolved authentication when applicable, pending, error, empty, and success states. Loading UI includes visible text or another understandable status; error UI provides a useful recovery action when recovery is possible.
+  - Component-local state is the default. Use `useState` for genuinely shared SSR-safe state; never export module-level Vue reactive state that could be shared across server requests.
+  - Put app/server-neutral types and pure utilities in `shared/types` and `shared/utils`. Client app code does not import server-only implementation, and Nitro code does not import Vue components or app composables.
+  - Authorization is enforced before protected data is queried or serialized into the Nuxt payload. Conditional rendering, hidden controls, route middleware, and disabled UI are not authorization boundaries.
+  - Do not render untrusted content with `v-html`. A documented, reviewed sanitization boundary is required when rich HTML is a real product requirement.
+  - Treat hydration warnings as defects. Do not suppress a mismatch until the differing server/client output is intentional, bounded, and tested.
+- **15. Application shell, forms, and feedback**
+  - The default `app.vue` and layout composition provides a skip link, header, primary navigation, one main landmark, and an optional footer. Use a stable target such as `<main id="main-content" tabindex="-1">`.
+  - Include `NuxtRouteAnnouncer` and meaningful page titles so client-side navigation is announced. Each routed page exposes one clear `h1`; a route-loading indicator may supplement but never replace content-level pending states.
+  - Implement `error.vue` for fatal and route-level failures. Recoverable component or data failures stay local, explain what happened in user-oriented language, and provide retry or another safe next action where possible.
+  - Prefer native `form`, `label`, `fieldset`, `legend`, `input`, `textarea`, `select`, and `button`. Use `details`/`summary` for ordinary disclosure and native `progress` or `output` when their semantics match.
+  - Every form control has a stable `name`, an associated label, and an appropriate `type`, `autocomplete`, and `inputmode` where applicable.
+  - Connect help and error text with `aria-describedby`. Invalid state uses visible text and `aria-invalid`; required state is communicated semantically and in understandable copy.
+  - Submission exposes a pending state, prevents accidental duplicate actions, and preserves enough context for the user to understand the result. Client validation improves feedback, while server validation remains authoritative.
+  - When validation fails, focus the first invalid control or an error summary according to the form's documented pattern. An error summary links to affected controls when several errors may occur.
+  - Dynamic status messages use the appropriate `status`, `alert`, or other live-region semantics without moving focus unnecessarily. Initial static notices are not announced merely because their visual variant is “error.”
+  - Prefer controls with visible text. An icon-only control requires a stable accessible name, and a tooltip may supplement that name but never replace it.
+  - Sticky headers, banners, toasts, and overlays must not fully obscure the element with keyboard focus, including at narrow viewports and high zoom.
+- **16. Long-term maintenance model**
+  - Treat the baseline as a small, code-owned design system even though it does not use a utility framework. Healthy maintenance comes from clear ownership, evidence-based reuse, stable component contracts, and behavior-focused verification—not from recreating Tailwind as local utilities.
+  - **A. Decide where UI code belongs**
+    - Before creating anything, check native HTML, an existing app component, and the documented Reka primitives in that order.
+    - Keep a component feature-local while it serves one feature or one contextual need. Promote it to the shared baseline only when the same behavior, accessibility policy, or design semantics are useful beyond that context and the team can maintain the shared API.
+    - This follows the [GitLab Pajamas contribution lifecycle](https://design.gitlab.com/get-started/lifecycle), which asks whether an element is useful beyond one use case and maintainable as shared infrastructure, and the [GOV.UK contribution criteria](https://design-system.service.gov.uk/community/contribution-criteria/), which require a proposed component to be useful, unique, consistent, and versatile.
+    - Classify shared UI as either baseline/core or feature-owned. A feature-owned component may reuse baseline components without becoming part of the baseline itself. GitLab uses a comparable core/extended distinction in its [contribution model](https://design.gitlab.com/get-started/contributing/).
+    - Do not create `New`, `V2`, or competing replacement components without a bounded migration and removal plan. Pajamas documents that parallel replacement components created confusion and technical debt.
+    - A shared-component change keeps implementation, CSS/tokens, public usage guidance, and tests synchronized in the same bounded change. Pajamas explicitly treats design, build, and documentation parity as one lifecycle.
+    - GitLab's current product styling tooling differs from this baseline; adopt its lifecycle lessons, not its Tailwind implementation.
+  - **B. Maintain a small public component API**
+    - Keep each shared Vue component in its own file with a consistent PascalCase name. App-specific foundational wrappers use an `App` prefix such as `AppButton` or `AppField`, following the official [Vue component naming guidance](https://vuejs.org/style-guide/rules-strongly-recommended.html).
+    - A foundational component may contain native HTML, other foundational components, and Reka primitives, but it does not depend directly on feature data or global application state.
+    - Declare props and emitted events explicitly. Props follow Vue's one-way data flow and are never mutated by the child; see [Vue props](https://vuejs.org/guide/components/props).
+    - Supported variants and sizes are a small typed union with semantic names such as `primary`, `danger`, or `compact`. Do not expose raw color, spacing, shadow, or arbitrary CSS-value props as a substitute for a coherent component contract.
+    - Vue's normal `class`, `style`, and listener fallthrough remains available, but wrappers deliberately control where attributes land. Multi-root or nested-control wrappers bind `$attrs` to the actual interactive element as described in [Vue fallthrough attributes](https://vuejs.org/guide/components/attrs).
+    - A Reka wrapper exposes only the props and emits that belong to its supported app contract; it does not automatically make the entire vendor API public. Within that chosen surface, forward documented props and emits without reproducing their mechanics manually. Use Reka's [`useForwardPropsEmits`](https://reka-ui.com/docs/utilities/use-forward-props-emits) where it reduces wrapper mistakes.
+    - Use Reka `asChild` only when composition is actually needed. The child must remain one valid semantic element and accept the behavior Reka forwards; see [Reka composition](https://reka-ui.com/docs/guides/composition).
+    - Every shared component defines its applicable state matrix: default, hover, active, focus-visible, disabled, pending, validation/error, success, long content, narrow viewport, high zoom, and reduced motion. States that do not apply are omitted intentionally rather than simulated.
+    - Slots own flexible content; props own stable behavior and visual variants. Do not encode feature business rules inside a baseline presentation component.
+  - **C. Keep CSS ownership predictable**
+    - Global CSS remains limited to the declared reset, tokens, base, layout, and small utility responsibilities. Pages compose layouts; shared components own their visual and interaction-state CSS; feature components own feature-local styling.
+    - Prefer a component root class plus shallow part classes. Do not select through page structure or depend on a parent route class to make a shared component render correctly.
+    - State styling uses an explicit component attribute/class contract. For Reka components, use its documented attributes such as `data-state`, `data-disabled`, `data-highlighted`, `data-side`, and `data-align`; see [Reka styling](https://reka-ui.com/docs/guides/styling).
+    - `:deep()` is limited to an intentional child or teleported primitive boundary. A deep selector never depends on undocumented Reka descendants.
+    - Preserve the declared cascade-layer order. A new layer requires an architecture decision; a new component or feature does not.
+    - Avoid `!important`. Stylelint provides [`declaration-no-important`](https://stylelint.io/user-guide/rules/declaration-no-important/); exceptions must identify the external cascade constraint they solve and disappear when that constraint does.
+    - Prefer understandable selectors over arbitrary numeric limits. If measured specificity or nesting drift appears, adopt maintained Stylelint rules such as [`selector-max-specificity`](https://stylelint.io/user-guide/rules/selector-max-specificity/) or `max-nesting-depth` with a reviewed configuration rather than a custom parser.
+    - Add a global utility only when it represents a stable, repeated layout or accessibility operation. Do not accumulate one-off spacing, color, or typography utilities that recreate an undocumented utility framework.
+    - Remove obsolete selectors, variants, tokens, examples, and tests in the same change that removes their last supported use. Search results and browser coverage are evidence to inspect—not automatic proof that dynamic CSS is unused.
+  - **D. Govern design tokens as decisions**
+    - A token exists because it names a reusable design decision, not merely because a literal value appears once. [GitLab's token guidance](https://design.gitlab.com/product-foundations/design-tokens/) similarly treats token names as a way to codify meaning rather than expose raw values.
+    - CSS custom properties remain the baseline source of truth. Components consume semantic tokens; primitive palette/scale tokens are implementation inputs, not public component APIs.
+    - Before adding a token, identify its semantic purpose, expected consumers, theme behavior, and whether an existing token already expresses the same decision.
+    - Change a semantic token when the design decision changes globally. Add a component-local variable when only one component needs a tunable internal relationship.
+    - Rename or retire tokens deliberately. Migrate all known consumers in the same change when practical; otherwise provide a temporary alias with an explicit removal issue rather than retaining compatibility aliases indefinitely.
+    - Do not add token-generation infrastructure solely for this CSS-only baseline. If forks later need interchange among code, native mobile, and design tools, use the stable [Design Tokens Community Group 2025.10 format](https://www.w3.org/community/reports/design-tokens/CG-FINAL-format-20251028/) instead of inventing a repository-specific JSON format.
+  - **E. Maintain one browser-support policy**
+    - Declare the supported production browsers once through Browserslist so compatible tools resolve the same target set; see the official [Browserslist configuration](https://github.com/browserslist/browserslist/blob/main/README.md?plain=1).
+    - Review the resolved browser list when the framework or browser database is upgraded. Do not silently narrow support because a new CSS feature is convenient.
+    - MDN Baseline status is useful input, but MDN notes that it does not cover older devices, embedded webviews, assistive technology, or actual usability; see [MDN Baseline](https://developer.mozilla.org/en-US/docs/Glossary/Baseline/Compatibility).
+    - A CSS feature outside the declared support set needs a safe fallback, progressive enhancement through `@supports`, or an explicit product decision to change the browser policy.
+  - **F. Verify the right thing at the lowest useful layer**
+    - Stylelint owns CSS syntax and stable conventions. Extend its maintained configuration and use file-specific overrides as documented in [Stylelint configuration](https://stylelint.io/user-guide/configure/); do not create another CSS source scanner.
+    - Vue component tests assert observable inputs and outputs—props, interactions, rendered roles/text, emitted events, and side effects—rather than classes or implementation internals, following [Vue Test Utils guidance](https://test-utils.vuejs.org/guide/essentials/easy-to-test).
+    - Playwright tests assembled behavior using user-visible roles and labels, not CSS selectors. This follows [Playwright's testing guidance](https://playwright.dev/docs/best-practices).
+    - Reka-wrapper browser tests cover the documented keyboard, focus, dismissal, and labelling contract plus the application's route and authentication coordination.
+    - Automated accessibility scans catch common defects but do not prove conformance. Combine them with keyboard, focus, zoom/reflow, contrast, and appropriate assistive-technology review as recommended by [Playwright's accessibility guide](https://playwright.dev/docs/accessibility-testing).
+    - Use visual comparisons only for durable appearance contracts that behavior assertions cannot express. Playwright's official [`toHaveScreenshot()` workflow](https://playwright.dev/docs/next/test-snapshots) is preferred over a custom image-diff harness.
+    - Add a maintained component catalog only when the shared surface becomes difficult to discover or review as a matrix. Storybook's model treats stories as discrete component states and supports interaction, accessibility, and visual testing; see [Storybook UI testing](https://storybook.js.org/docs/writing-tests). Adoption remains a separately reviewed tooling decision, not an automatic baseline dependency.
+  - **G. Upgrade Reka through the wrapper boundary**
+    - Keep Reka exactly pinned and review its official [release notes](https://reka-ui.com/docs/overview/releases) before every upgrade, including changed defaults, accessibility behavior, CSS variables, and breaking migrations.
+    - Upgrade the app-owned wrapper and its focused tests first, then run the assembled journeys. Pages should not require broad edits because they consume the wrapper rather than primitive internals.
+    - Do not preserve two long-lived wrapper generations. When an upgrade requires an API change, define the migration, update consumers, and remove the superseded contract in one bounded sequence.
+  - **H. Perform evidence-triggered health reviews**
+    - Review the shared surface at a milestone or fork release, or when developers can no longer answer where a style/component belongs. Do not add calendar-driven ceremony to a small system without evidence that it helps.
+    - Inspect duplicate components, nearly identical variants, unused tokens/utilities, `:deep()` use, `!important`, specificity escalation, browser fallbacks, and Reka wrapper drift.
+    - Use Chrome DevTools [Coverage](https://developer.chrome.com/docs/devtools/coverage) and CSS Overview as diagnostics across representative routes and interactions. Coverage from one page or state must never automatically delete CSS used elsewhere or generated dynamically.
+    - Measure built CSS and runtime impact as trends. Unexpected growth triggers investigation; it does not justify compressed code, arbitrary line caps, or another generic checker.
+    - Prefer deleting obsolete concepts over replacing them one-for-one. Keep a custom rule or helper only when it protects a named product, accessibility, browser, or integration guarantee that maintained tools cannot express.
+  - **I. Required questions for every shared UI change**
+    - Does native HTML or an existing component already satisfy the need?
+    - Is this behavior genuinely shared, or should it remain feature-local?
+    - What is the smallest stable prop, emit, slot, and variant contract?
+    - Which CSS layer and component owns every new rule?
+    - Does an existing semantic token express each repeated decision?
+    - Which states, content extremes, browser targets, and accessibility behaviors apply?
+    - Is a Reka primitive being wrapped through documented APIs rather than restyled through private DOM?
+    - What observable component and browser tests prove the change?
+    - What old selector, token, variant, component, or test can now be removed?
+    - If new infrastructure is proposed, which maintained alternative was evaluated and why is the net system simpler?
+- **Implementation checklist**
+  - Use the split global stylesheet structure defined above, with `main.css` limited to ordered layer declarations and imports.
+  - Declare and preserve the cascade-layer order.
+  - Register the single global entry stylesheet through Nuxt.
+  - Move repeated primitives into semantic tokens and app-owned components.
+  - Keep SFC rules scoped and layered.
+  - Add `app/AGENTS.md` with the actual component inventory, directory/import boundaries, canonical example, and repository check command.
+  - Implement only the initial shared `AppButton`, `AppField`, and `AppNotice` contracts; keep `AccountMenu` feature-owned and layout primitives in CSS.
+  - Provide the semantic application shell, skip link, stable main target, `NuxtRouteAnnouncer`, meaningful page titles, and `error.vue`.
+  - Keep SSR as the default; use `useFetch`/`useAsyncData` for initial reads and `$fetch` for user-triggered mutations; render every applicable authentication and asynchronous state.
+  - Pin Node.js and the package manager, configure Nuxt-aware ESLint, and enforce the approved `reka-ui` import boundary.
+  - Verify native form labels, descriptions, validation messages, pending behavior, error recovery, and server-authoritative validation.
+  - Exactly pin Reka UI in the repository manifest and lockfile.
+  - The baseline includes the feature-owned account/family `DropdownMenu`; add a generic dropdown wrapper or other Reka primitive only for a documented product journey.
+  - Keep primary navigation native and semantic.
+  - Run the canonical check command covering Nuxt-aware ESLint, Stylelint, Nuxt typecheck, and fast tests, followed by targeted integration tests and the existing browser/accessibility gates.
+  - Verify 320px, 390px, and desktop layouts; 200% text resizing; reflow at a 320 CSS-pixel viewport; long content; keyboard navigation; focus return and non-obscuring sticky UI; route announcements; reduced motion; and contrast.
+- **Official references**
+  - [Nuxt 4: Styling](https://nuxt.com/docs/4.x/getting-started/styling)
+  - [Vue 3: SFC CSS features](https://vuejs.org/api/sfc-css-features.html)
+  - [Reka UI: Introduction](https://reka-ui.com/docs/overview/introduction)
+  - [Reka UI: Installation and Nuxt support](https://reka-ui.com/docs/overview/installation)
+  - [Reka UI: Accessibility](https://reka-ui.com/docs/overview/accessibility)
+  - [Reka UI: Styling](https://reka-ui.com/docs/guides/styling)
+  - [Reka UI: Composition and `asChild`](https://reka-ui.com/docs/guides/composition)
+  - [Reka UI: Dropdown Menu](https://reka-ui.com/docs/components/dropdown-menu)
+  - [Reka UI: Dialog](https://reka-ui.com/docs/components/dialog)
+  - [Reka UI: Alert Dialog](https://reka-ui.com/docs/components/alert-dialog)
+  - [Reka UI: Popover](https://reka-ui.com/docs/components/popover)
+  - [Reka UI: Select](https://reka-ui.com/docs/components/select)
+  - [Reka UI: Toast](https://reka-ui.com/docs/components/toast)
+  - [Stylelint: Getting started](https://stylelint.io/user-guide/get-started/)
+  - [MDN: Using CSS custom properties](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_cascading_variables/Using_CSS_custom_properties)
+  - [MDN: `@layer`](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/%40layer)
+  - [MDN: `@property`](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/%40property)
+  - [MDN: `@scope`](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/%40scope)
+  - [MDN: `color-scheme`](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/color-scheme)
+  - [W3C: WCAG 2.2](https://www.w3.org/TR/WCAG22/)
+  - [W3C: Target Size Minimum](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum)
+  - [W3C: Target Size Enhanced](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced)
+  - [W3C: Non-text Contrast](https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html)
+  - [W3C: Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance.html)
+  - **Maintenance and governance sources**
+    - [Vue: Style Guide](https://vuejs.org/style-guide/)
+    - [Vue: Props and one-way data flow](https://vuejs.org/guide/components/props)
+    - [Vue: Fallthrough attributes](https://vuejs.org/guide/components/attrs)
+    - [Vue Test Utils: Write components that are easy to test](https://test-utils.vuejs.org/guide/essentials/easy-to-test)
+    - [Reka UI: Releases](https://reka-ui.com/docs/overview/releases)
+    - [Reka UI: `useForwardPropsEmits`](https://reka-ui.com/docs/utilities/use-forward-props-emits)
+    - [Stylelint: Configuring](https://stylelint.io/user-guide/configure/)
+    - [Stylelint: Rules](https://stylelint.io/user-guide/rules/)
+    - [Browserslist: Official README and configuration guidance](https://github.com/browserslist/browserslist/blob/main/README.md?plain=1)
+    - [MDN: Baseline compatibility](https://developer.mozilla.org/en-US/docs/Glossary/Baseline/Compatibility)
+    - [Design Tokens Community Group: Stable 2025.10 format](https://www.w3.org/community/reports/design-tokens/CG-FINAL-format-20251028/)
+    - [GitLab Pajamas: Contribution lifecycle](https://design.gitlab.com/get-started/lifecycle)
+    - [GitLab Pajamas: Contributing and core/extended classification](https://design.gitlab.com/get-started/contributing/)
+    - [GitLab Pajamas: Design tokens](https://design.gitlab.com/product-foundations/design-tokens/)
+    - [GOV.UK Design System: Contribution criteria](https://design-system.service.gov.uk/community/contribution-criteria/)
+    - [Storybook: UI testing](https://storybook.js.org/docs/writing-tests)
+    - [Playwright: Best practices](https://playwright.dev/docs/best-practices)
+    - [Playwright: Accessibility testing](https://playwright.dev/docs/accessibility-testing)
+    - [Playwright: Visual comparisons](https://playwright.dev/docs/next/test-snapshots)
+    - [Chrome DevTools: CSS and JavaScript Coverage](https://developer.chrome.com/docs/devtools/coverage)
+  - **Agent execution, Nuxt runtime, and application structure sources**
+    - [Nuxt 4: Components directory and generated names](https://nuxt.com/docs/4.x/directory-structure/app/components)
+    - [Nuxt 4: Composables directory and scanning](https://nuxt.com/docs/4.x/directory-structure/app/composables)
+    - [Nuxt 4: Data fetching](https://nuxt.com/docs/4.x/getting-started/data-fetching)
+    - [Nuxt 4: Hydration best practices](https://nuxt.com/docs/4.x/guide/best-practices/hydration)
+    - [Nuxt 4: State management](https://nuxt.com/docs/4.x/getting-started/state-management)
+    - [Nuxt 4: Shared app/server code](https://nuxt.com/docs/4.x/directory-structure/shared)
+    - [Nuxt 4: Route announcer](https://nuxt.com/docs/4.x/api/components/nuxt-route-announcer)
+    - [Nuxt 4: Error handling](https://nuxt.com/docs/4.x/getting-started/error-handling)
+    - [Nuxt 4: SEO and page metadata](https://nuxt.com/docs/4.x/getting-started/seo-meta)
+    - [Nuxt 4: Project-aware ESLint](https://nuxt.com/docs/4.x/guide/concepts/code-style)
+    - [Nuxt 4: TypeScript and `nuxt typecheck`](https://nuxt.com/docs/4.x/guide/concepts/typescript)
+    - [Nuxt 4: Testing and `@nuxt/test-utils`](https://nuxt.com/docs/4.x/getting-started/testing)
+    - [Vue: SSR-stable `useId()`](https://vuejs.org/api/composition-api-helpers.html#useid)
+    - [Vue: Security](https://vuejs.org/guide/best-practices/security.html)
+    - [Reka UI: LLM-readable Markdown introduction](https://reka-ui.com/docs/overview/introduction.md)
+    - [W3C: Reflow](https://www.w3.org/WAI/WCAG22/Understanding/reflow.html)
+    - [W3C: Focus Not Obscured (Minimum)](https://www.w3.org/WAI/WCAG22/Understanding/focus-not-obscured-minimum.html)
+    - [W3C: Status Messages](https://www.w3.org/WAI/WCAG22/Understanding/status-messages.html)

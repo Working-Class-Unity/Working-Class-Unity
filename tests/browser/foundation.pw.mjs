@@ -158,6 +158,65 @@ test('home presents the WCU foundation and preserves client navigation', async (
   await assertCleanPage(page, observations)
 })
 
+test('session retry announces progress and failure without losing focus', async ({ page }) => {
+  const observations = observePage(page)
+  await page.goto('/')
+  await page.waitForLoadState('networkidle')
+
+  let requestCount = 0
+  let deferSessionResponses = false
+  let releaseRetryResponse = () => {}
+  const retryResponseReady = new Promise((resolve) => {
+    releaseRetryResponse = resolve
+  })
+  await page.route('**/api/auth/get-session*', async (route) => {
+    requestCount += 1
+    if (deferSessionResponses) await retryResponseReady
+    await fulfillJson(route, { code: 'SESSION_UNAVAILABLE' }, 503)
+  })
+
+  await page.evaluate(async () => {
+    const sessionData = window.useNuxtApp?.()._asyncData?.['app-session']
+    if (!sessionData) throw new Error('The app-session async-data entry was unavailable')
+    await sessionData.execute()
+  })
+
+  const topbar = page.getByRole('banner', { name: 'Application' })
+  await expect(topbar.getByText('Session check unavailable', { exact: true })).toBeVisible()
+  await expect(topbar.getByRole('alert')).toHaveCount(0)
+  await expect(topbar.getByRole('status')).toHaveCount(0)
+
+  const retryButton = topbar.getByRole('button')
+  const requestsBeforeRetry = requestCount
+  deferSessionResponses = true
+  await retryButton.focus()
+  await retryButton.click()
+  await expect.poll(() => requestCount).toBeGreaterThan(requestsBeforeRetry)
+  await expect(retryButton).toBeFocused()
+  await expect(retryButton).toHaveAttribute('aria-disabled', 'true')
+  await expect(retryButton).toHaveAccessibleName('Checking your session...')
+  await expect(topbar.getByRole('status')).toContainText('Checking your session...')
+  const pendingRequestCount = requestCount
+  await retryButton.dispatchEvent('click')
+  await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => resolve())))
+  expect(requestCount).toBe(pendingRequestCount)
+
+  releaseRetryResponse()
+  await expect(retryButton).toBeEnabled()
+  await expect(retryButton).toBeFocused()
+  await expect(retryButton).toHaveAccessibleName('Try again')
+  await expect(topbar.getByRole('alert')).toContainText('Session check unavailable')
+  await page.unroute('**/api/auth/get-session*')
+
+  observations.errorResponses = observations.errorResponses.filter(
+    (entry) => !(entry.includes('503') && entry.includes('/api/auth/get-session'))
+  )
+  observations.console = observations.console.filter(
+    (entry) => !/Failed to load resource: the server responded with a status of 503/.test(entry)
+  )
+  await assertCleanPage(page, observations)
+})
+
 test('login is accessible before and after requesting a magic link', async ({ page }) => {
   test.setTimeout(35_000)
   const observations = observePage(page)
@@ -185,7 +244,20 @@ test('login is accessible before and after requesting a magic link', async ({ pa
   await assertControlBoundaryContrast(emailInput)
   await assertAccessibleWithoutOverflow(page)
 
+  await submitButton.click()
+  await expect(displayNameInput).toBeFocused()
+  await expect(displayNameInput).toHaveAttribute('aria-invalid', 'true')
+  await expect(page.locator('#login-form-status[role="alert"]')).toHaveText(
+    'Check the highlighted field and try again.'
+  )
+
   await displayNameInput.fill('Browser Login')
+  await submitButton.click()
+  await expect(emailInput).toBeFocused()
+  await expect(emailInput).toHaveAttribute('aria-invalid', 'true')
+  await expect(emailInput).toHaveAttribute('aria-describedby', 'login-email-error')
+  await expect(page.getByText('Email is required.', { exact: true })).toBeVisible()
+
   await emailInput.fill('browser.magic-link@example.test')
   await submitButton.click()
   await expect(page.locator('#login-form-status[role="status"]')).toHaveText(
@@ -240,7 +312,7 @@ privateBrowserTest(
     const observations = observePage(page)
     const project = testInfo.project.name.replaceAll(/[^a-z0-9]/gi, '-').toLowerCase()
     const email = `browser.login+${project}.${authEmailMarker}@example.test`
-    const displayName = `Browser ${testInfo.project.name}`
+    const displayName = `Browser ${testInfo.project.name} member with a deliberately long account display name`
     const clientAddress = testInfo.project.name === 'desktop-chromium' ? '192.0.2.10' : '192.0.2.11'
 
     await page.setExtraHTTPHeaders({ 'cf-connecting-ip': clientAddress })
@@ -290,6 +362,7 @@ privateBrowserTest(
     )
     expect(observations.sameOriginRequests.some((request) => request.includes('/api/workspaces'))).toBe(false)
     await page.waitForLoadState('networkidle')
+    await assertAccountMenuContract(page, displayName, email, observations)
 
     if (testInfo.project.name === 'desktop-chromium') {
       const signedInHomeResponse = await gotoForInitialResponse(page, '/', manifestUrl)
@@ -383,6 +456,99 @@ test('observability route is active without sending a missing token', async ({ p
   expect(observations.sameOriginRequests.filter((request) => request.includes('/api/observability'))).toEqual([])
   await assertCleanPage(page, observations)
 })
+
+async function assertAccountMenuContract(page, displayName, email, observations) {
+  const trigger = page.getByRole('button', { name: `Account menu for ${displayName}` })
+  const menu = page.getByRole('menu')
+
+  await expect(trigger).toHaveAttribute('aria-expanded', 'false')
+  await trigger.click()
+  await expect(trigger).toHaveAttribute('aria-expanded', 'true')
+  await expect(menu).toBeVisible()
+  await expect(menu.getByText(displayName, { exact: true })).toBeVisible()
+  await expect(menu.getByText(email, { exact: true })).toBeVisible()
+  await page.mouse.click(1, 1)
+  await expect(menu).toBeHidden()
+  await expect(trigger).toHaveAttribute('aria-expanded', 'false')
+
+  await trigger.focus()
+  await page.keyboard.press('Enter')
+  const accountItem = page.getByRole('menuitem', { name: 'Account', exact: true })
+  const signOutItem = page.getByRole('menuitem', { name: 'Sign out', exact: true })
+  await expect(accountItem).toBeFocused()
+  await page.keyboard.press('ArrowDown')
+  await expect(signOutItem).toBeFocused()
+  await page.keyboard.press('ArrowUp')
+  await expect(accountItem).toBeFocused()
+  await page.keyboard.press('ArrowDown')
+  await expect(signOutItem).toBeFocused()
+  await page.keyboard.press('Escape')
+  await expect(menu).toBeHidden()
+  await expect(trigger).toBeFocused()
+
+  await page.keyboard.press('Space')
+  await expect(menu).toBeVisible()
+  await expect(accountItem).toBeFocused()
+  await page.keyboard.press('s')
+  await expect(signOutItem).toBeFocused()
+  await page.keyboard.press('Escape')
+  await expect(trigger).toBeFocused()
+
+  const previousViewport = page.viewportSize()
+  await page.setViewportSize({ width: 320, height: 800 })
+  await trigger.click()
+  await expect(menu).toBeVisible()
+  await assertNoHorizontalOverflow(page)
+  const menuBox = await menu.boundingBox()
+  expect(menuBox, 'account menu has a rendered box').not.toBeNull()
+  expect(menuBox.x, 'account menu stays inside the narrow viewport').toBeGreaterThanOrEqual(0)
+  expect(menuBox.x + menuBox.width, 'account menu stays inside the narrow viewport').toBeLessThanOrEqual(320)
+  await page.keyboard.press('Escape')
+  if (previousViewport) await page.setViewportSize(previousViewport)
+
+  let signOutRequested = false
+  let releaseSignOutResponse = () => {}
+  const signOutResponseReady = new Promise((resolve) => {
+    releaseSignOutResponse = resolve
+  })
+  await page.route('**/api/auth/sign-out', async (route) => {
+    signOutRequested = true
+    await signOutResponseReady
+    await route.fulfill({
+      status: 503,
+      contentType: 'application/json',
+      body: JSON.stringify({ code: 'SIGN_OUT_UNAVAILABLE', message: 'Sign out unavailable' })
+    })
+  })
+  await trigger.click()
+  await signOutItem.click()
+  await expect.poll(() => signOutRequested).toBe(true)
+  const pendingSignOut = page.getByRole('menuitem', { name: 'Signing out...', exact: true })
+  await expect(pendingSignOut).toBeDisabled()
+  await expect(pendingSignOut).toHaveAttribute('aria-busy', 'true')
+  await expect(pendingSignOut).toHaveAttribute('data-disabled', '')
+  await accountItem.focus()
+  await page.keyboard.press('ArrowDown')
+  await expect(accountItem).toBeFocused()
+  releaseSignOutResponse()
+  await expect(page.getByRole('alert')).toHaveText(
+    'We could not confirm that you were signed out. Your session may still be active. Please try again.'
+  )
+  await page.unroute('**/api/auth/sign-out')
+  observations.errorResponses = observations.errorResponses.filter(
+    (entry) => !(entry.includes('503') && entry.includes('/api/auth/sign-out'))
+  )
+  observations.console = observations.console.filter(
+    (entry) => !/Failed to load resource: the server responded with a status of 503/.test(entry)
+  )
+  await page.keyboard.press('Escape')
+
+  await trigger.click()
+  await page.evaluate(() => window.useNuxtApp?.().$router.push('/account'))
+  await expect(page).toHaveURL(/\/account$/)
+  await expect(menu).toBeHidden()
+  await expect(page.locator('.nuxt-route-announcer [role="status"]')).toHaveText('Account')
+}
 
 function capturedMagicLink(email) {
   if (!existsSync(emailCaptureDirectory)) return undefined
@@ -556,9 +722,9 @@ async function nuxtManifestUrl(page) {
   return new URL(`/_nuxt/builds/meta/${encodeURIComponent(buildId)}.json`, runtimeUrl).href
 }
 
-async function fulfillJson(route, value) {
+async function fulfillJson(route, value, status = 200) {
   await route.fulfill({
-    status: 200,
+    status,
     contentType: 'application/json',
     body: JSON.stringify(value)
   })

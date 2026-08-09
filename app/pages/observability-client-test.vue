@@ -5,6 +5,16 @@ const { t } = useI18n()
 
 const status = ref<TestStatus>('idle')
 const detail = ref(t('observability.preparing'))
+const noticeTone = computed(() => {
+  if (status.value === 'captured') return 'success'
+  if (status.value === 'missing-token') return 'warning'
+  if (status.value === 'failed') return 'error'
+  return 'info'
+})
+const noticeAnnouncement = computed(() => {
+  if (status.value === 'idle') return undefined
+  return status.value === 'failed' ? 'assertive' : 'polite'
+})
 
 useHead(() => ({
   title: t('metadata.observability.title')
@@ -57,18 +67,18 @@ async function runClientTest() {
 </script>
 
 <template>
-  <AppPage class="observability-test-page">
-    <section class="panel observability-test-panel" aria-labelledby="observability-test-title">
+  <div class="observability-test-page">
+    <section class="observability-test-panel" aria-labelledby="observability-test-title">
       <div class="panel-heading">
         <p class="eyebrow">{{ t('observability.eyebrow') }}</p>
         <h1 id="observability-test-title">{{ t('observability.title') }}</h1>
       </div>
 
-      <p class="test-status" :data-status="status" :role="status === 'failed' ? 'alert' : 'status'">
+      <AppNotice :tone="noticeTone" :announce="noticeAnnouncement">
         {{ detail }}
-      </p>
+      </AppNotice>
     </section>
-  </AppPage>
+  </div>
 </template>
 
 <style scoped>
@@ -80,38 +90,29 @@ async function runClientTest() {
   .observability-test-panel {
     display: grid;
     gap: var(--space-4);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-2);
     padding: var(--space-5);
+    background: var(--color-surface-subtle);
+    box-shadow: var(--shadow-panel);
+  }
+
+  .panel-heading {
+    display: grid;
+    gap: var(--space-1);
+    margin-block-end: var(--space-4);
+  }
+
+  .eyebrow {
+    margin: 0;
+    color: var(--color-action);
+    font-size: var(--font-size-caption);
+    font-weight: var(--font-weight-heavy);
+    text-transform: uppercase;
   }
 
   .observability-test-panel h1 {
     font-size: 2.4rem;
-  }
-
-  .test-status {
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-2);
-    padding: var(--space-4);
-    margin: 0;
-    background: var(--color-surface);
-    font-weight: var(--font-weight-strong);
-  }
-
-  .test-status[data-status='captured'] {
-    border-color: var(--color-status-success-text);
-    color: var(--color-status-success-text);
-    background: var(--color-status-success-surface);
-  }
-
-  .test-status[data-status='missing-token'] {
-    border-color: var(--color-status-warning-text);
-    color: var(--color-status-warning-text);
-    background: var(--color-status-warning-surface);
-  }
-
-  .test-status[data-status='failed'] {
-    border-color: var(--color-status-error-text);
-    color: var(--color-status-error-text);
-    background: var(--color-status-error-surface);
   }
 
   @media (width <= 620px) {

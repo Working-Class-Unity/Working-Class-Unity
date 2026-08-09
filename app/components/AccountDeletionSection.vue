@@ -65,26 +65,41 @@ function errorValues(error: unknown): unknown[] {
       <p>{{ t('account.deletion.billingWarning') }}</p>
     </div>
 
-    <AppStatusMessage v-if="deletionError" tone="error">{{ deletionError }}</AppStatusMessage>
+    <AppNotice v-if="deletionError" tone="error" announce="assertive">{{ deletionError }}</AppNotice>
 
     <form class="deletion-form" @submit.prevent="deleteAccount">
-      <label class="form-field" for="delete-account-confirmation">
-        <span>{{ t('account.deletion.confirmationLabel', { confirmation: deletionConfirmation }) }}</span>
-        <input
-          id="delete-account-confirmation"
-          v-model="confirmation"
-          name="confirmation"
-          type="text"
-          autocomplete="off"
-          spellcheck="false"
-          aria-describedby="delete-account-help"
-          :disabled="isDeleting"
-        />
-      </label>
+      <AppField
+        id="delete-account-confirmation"
+        :label="t('account.deletion.confirmationLabel', { confirmation: deletionConfirmation })"
+        required
+        :required-label="t('common.required')"
+      >
+        <template #default="{ id, describedBy, required }">
+          <!-- eslint-disable vue/html-self-closing -->
+          <input
+            :id="id"
+            v-model="confirmation"
+            name="confirmation"
+            type="text"
+            autocomplete="off"
+            spellcheck="false"
+            :aria-describedby="[describedBy, 'delete-account-help'].filter(Boolean).join(' ')"
+            :required="required"
+            :disabled="isDeleting"
+          />
+          <!-- eslint-enable vue/html-self-closing -->
+        </template>
+      </AppField>
       <p id="delete-account-help" class="deletion-help">{{ t('account.deletion.help') }}</p>
-      <button class="destructive-button" type="submit" :disabled="!confirmationMatches || isDeleting">
+      <AppButton
+        class="deletion-button"
+        type="submit"
+        variant="danger"
+        :disabled="!confirmationMatches"
+        :pending="isDeleting"
+      >
         {{ isDeleting ? t('account.deletion.deleting') : t('account.deletion.submit') }}
-      </button>
+      </AppButton>
     </form>
   </section>
 </template>
@@ -115,28 +130,12 @@ function errorValues(error: unknown): unknown[] {
     font-weight: var(--font-weight-strong);
   }
 
-  .destructive-button {
-    display: inline-flex;
+  .deletion-button {
     width: fit-content;
-    min-block-size: var(--control-min-block-size);
-    min-inline-size: var(--control-min-inline-size);
-    align-items: center;
-    justify-content: center;
-    border: var(--border-width) solid var(--color-status-error-text);
-    border-radius: var(--radius-2);
-    padding: 0 var(--space-4);
-    color: var(--color-surface);
-    background: var(--color-status-error-text);
-    font-weight: var(--font-weight-bold);
-  }
-
-  .destructive-button:focus-visible,
-  .destructive-button:hover:not(:disabled) {
-    filter: brightness(0.88);
   }
 
   @media (width <= 620px) {
-    .destructive-button {
+    .deletion-button {
       width: 100%;
     }
   }

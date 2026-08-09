@@ -4,6 +4,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuPortal,
   DropdownMenuRoot,
   DropdownMenuSeparator,
   DropdownMenuTrigger
@@ -22,16 +23,10 @@ const emit = defineEmits<{
 const route = useRoute()
 const { t } = useI18n()
 const open = ref(false)
-const triggerElement = ref<HTMLButtonElement | null>(null)
 const isSigningOut = ref(false)
 const signOutError = ref('')
 const triggerLabel = computed(() => t('account.menu.triggerLabel', { identity: props.user.name }))
 const nuxtUseId = () => useId()
-const menuContentStyle = {
-  minWidth: '0',
-  width: 'min(19rem, calc(100vw - (2 * var(--content-gutter-compact))))',
-  maxWidth: 'min(calc(100vw - (2 * var(--content-gutter-compact))), var(--reka-dropdown-menu-content-available-width))'
-}
 
 watch(
   () => route.fullPath,
@@ -39,11 +34,6 @@ watch(
     open.value = false
   }
 )
-
-function restoreTriggerFocus(event: Event) {
-  event.preventDefault()
-  requestAnimationFrame(() => triggerElement.value?.focus())
-}
 
 async function signOut(event: Event) {
   event.preventDefault()
@@ -75,49 +65,49 @@ async function signOut(event: Event) {
   <ConfigProvider :use-id="nuxtUseId">
     <DropdownMenuRoot v-model:open="open" :modal="false">
       <DropdownMenuTrigger as-child>
-        <button ref="triggerElement" class="account-menu-trigger" type="button" :aria-label="triggerLabel">
+        <button class="account-menu-trigger" type="button" :aria-label="triggerLabel">
           <span>{{ t('account.menu.account') }}</span>
           <span aria-hidden="true">&#9662;</span>
         </button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent
-        class="account-menu-content"
-        align="end"
-        :side-offset="8"
-        :collision-padding="10"
-        :prioritize-position="true"
-        :style="menuContentStyle"
-        @close-auto-focus="restoreTriggerFocus"
-      >
-        <DropdownMenuLabel class="account-menu-identity">
-          <strong>{{ props.user.name }}</strong>
-          <span>{{ props.user.email }}</span>
-        </DropdownMenuLabel>
+      <DropdownMenuPortal>
+        <DropdownMenuContent
+          class="account-menu-content"
+          align="end"
+          :side-offset="8"
+          :collision-padding="10"
+          :prioritize-position="true"
+        >
+          <DropdownMenuLabel class="account-menu-identity">
+            <strong>{{ props.user.name }}</strong>
+            <span>{{ props.user.email }}</span>
+          </DropdownMenuLabel>
 
-        <DropdownMenuSeparator class="account-menu-separator" />
+          <DropdownMenuSeparator class="account-menu-separator" />
 
-        <DropdownMenuItem as-child>
-          <NuxtLink class="account-menu-item" to="/account">{{ t('account.menu.account') }}</NuxtLink>
-        </DropdownMenuItem>
+          <DropdownMenuItem as-child>
+            <NuxtLink class="account-menu-item" to="/account">{{ t('account.menu.account') }}</NuxtLink>
+          </DropdownMenuItem>
 
-        <DropdownMenuSeparator class="account-menu-separator" />
+          <DropdownMenuSeparator class="account-menu-separator" />
 
-        <DropdownMenuItem as-child @select="signOut">
-          <button
-            class="account-menu-item account-menu-command"
-            type="button"
-            :aria-disabled="isSigningOut"
-            :aria-busy="isSigningOut"
-          >
-            {{ isSigningOut ? t('account.menu.signingOut') : t('account.menu.signOut') }}
-          </button>
-        </DropdownMenuItem>
+          <DropdownMenuItem as-child :disabled="isSigningOut" @select="signOut">
+            <button
+              class="account-menu-item account-menu-command"
+              type="button"
+              :disabled="isSigningOut"
+              :aria-busy="isSigningOut ? 'true' : undefined"
+            >
+              {{ isSigningOut ? t('account.menu.signingOut') : t('account.menu.signOut') }}
+            </button>
+          </DropdownMenuItem>
 
-        <DropdownMenuLabel v-if="signOutError" class="account-menu-error" role="alert">
-          {{ signOutError }}
-        </DropdownMenuLabel>
-      </DropdownMenuContent>
+          <DropdownMenuLabel v-if="signOutError" class="account-menu-error" role="alert">
+            {{ signOutError }}
+          </DropdownMenuLabel>
+        </DropdownMenuContent>
+      </DropdownMenuPortal>
     </DropdownMenuRoot>
   </ConfigProvider>
 </template>
@@ -125,7 +115,7 @@ async function signOut(event: Event) {
 <style scoped>
 @layer components {
   .account-menu-trigger,
-  .account-menu-item {
+  :deep(.account-menu-item) {
     display: inline-flex;
     min-block-size: var(--control-min-block-size);
     min-inline-size: var(--control-min-inline-size);
@@ -151,15 +141,12 @@ async function signOut(event: Event) {
     background: var(--color-surface-subtle);
   }
 
-  .account-menu-content {
-    z-index: 10;
+  :deep(.account-menu-content) {
+    z-index: var(--z-menu);
     display: grid;
     min-inline-size: 0;
-    inline-size: min(19rem, calc(100vw - (2 * var(--content-gutter-compact))));
-    max-inline-size: min(
-      calc(100vw - (2 * var(--content-gutter-compact))),
-      var(--reka-dropdown-menu-content-available-width)
-    );
+    inline-size: min(19rem, var(--reka-dropdown-menu-content-available-width));
+    max-inline-size: var(--reka-dropdown-menu-content-available-width);
     max-block-size: min(24rem, var(--reka-dropdown-menu-content-available-height));
     overflow: auto;
     border: var(--border-width) solid var(--color-control-border);
@@ -170,35 +157,35 @@ async function signOut(event: Event) {
     box-shadow: var(--shadow-panel);
   }
 
-  .account-menu-identity,
-  .account-menu-error {
+  :deep(.account-menu-identity),
+  :deep(.account-menu-error) {
     min-width: 0;
     padding: var(--space-2) var(--space-3);
     overflow-wrap: anywhere;
   }
 
-  .account-menu-identity {
+  :deep(.account-menu-identity) {
     display: grid;
     gap: var(--space-1);
   }
 
-  .account-menu-identity strong,
-  .account-menu-identity span {
+  :deep(.account-menu-identity strong),
+  :deep(.account-menu-identity span) {
     min-inline-size: 0;
   }
 
-  .account-menu-identity span {
+  :deep(.account-menu-identity span) {
     color: var(--color-text-muted);
     font-size: var(--font-size-small);
   }
 
-  .account-menu-separator {
+  :deep(.account-menu-separator) {
     block-size: var(--border-width);
     margin: var(--space-1) 0;
     background: var(--color-border);
   }
 
-  .account-menu-item {
+  :deep(.account-menu-item) {
     inline-size: 100%;
     justify-content: flex-start;
     padding: var(--space-2) var(--space-3);
@@ -206,23 +193,24 @@ async function signOut(event: Event) {
     text-decoration: none;
   }
 
-  .account-menu-item[data-highlighted],
-  .account-menu-item:focus-visible {
+  :deep(.account-menu-item[data-highlighted]),
+  :deep(.account-menu-item:focus-visible) {
     border-color: var(--color-action);
     color: var(--color-text);
     background: var(--color-action-soft);
   }
 
-  .account-menu-command[aria-disabled='true'] {
+  :deep(.account-menu-command:disabled),
+  :deep(.account-menu-item[data-disabled]) {
     cursor: progress;
     opacity: 0.62;
   }
 
-  .account-menu-command {
+  :deep(.account-menu-command) {
     cursor: pointer;
   }
 
-  .account-menu-error {
+  :deep(.account-menu-error) {
     margin-block-start: var(--space-1);
     border-inline-start: var(--border-width-accent) solid var(--color-status-error-text);
     color: var(--color-status-error-text);

@@ -2,6 +2,9 @@
   "common": {
     "email": "Email",
     "emailInvalid": "Enter a valid email address.",
+    "required": "required",
+    "retry": "Try again",
+    "checkingSession": "Checking your session...",
     "sessionVerificationFailed": "We could not verify your session right now.",
     "working": "Working..."
   },
@@ -41,6 +44,7 @@
     "applicationLabel": "Application",
     "brandHome": "{appName} home",
     "primaryLabel": "Primary",
+    "sessionUnavailable": "Session check unavailable",
     "app": "App",
     "login": "Log in",
     "signup": "Sign up"

@@ -30,6 +30,7 @@ async function assertPublicEntryAndLegalRoutes(context, helpers) {
 
     await expect(page).toHaveURL(/\/signup$/)
     await expect(page.getByRole('heading', { name: 'Create your account' })).toBeVisible()
+    await expect(page.locator('.nuxt-route-announcer [role="status"]')).toHaveText('Sign up')
     await expect(page.getByText('Enter your email address to create or return to your account.')).toBeVisible()
     await expect(page.getByRole('link', { name: 'Terms', exact: true })).toHaveAttribute('href', '/legal/terms')
     await expect(page.getByRole('link', { name: 'Privacy Policy', exact: true })).toHaveAttribute(

@@ -181,9 +181,9 @@ defineExpose({ reset })
     <p class="turnstile-status" :data-state="challengeState" :role="challengeState === 'failure' ? 'alert' : 'status'">
       {{ statusMessage }}
     </p>
-    <button v-if="challengeState === 'failure'" class="secondary-button" type="button" @click="retry">
+    <AppButton v-if="challengeState === 'failure'" class="turnstile-retry" variant="secondary" @click="retry">
       {{ t('security.check.retry') }}
-    </button>
+    </AppButton>
   </div>
 </template>
 
@@ -212,7 +212,7 @@ defineExpose({ reset })
     color: var(--color-status-error-text);
   }
 
-  .turnstile-challenge > .secondary-button {
+  .turnstile-retry {
     width: fit-content;
   }
 }

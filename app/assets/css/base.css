@@ -35,6 +35,27 @@ a {
   text-underline-offset: 0.18em;
 }
 
+::selection {
+  color: var(--color-text);
+  background: var(--color-action-soft);
+}
+
+label {
+  color: var(--color-text);
+  font-weight: var(--font-weight-strong);
+}
+
+table {
+  inline-size: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  vertical-align: top;
+  text-align: start;
+}
+
 :where(a, button, input, select, textarea):focus-visible {
   outline: var(--focus-outline);
   outline-offset: var(--focus-offset);
@@ -51,7 +72,7 @@ button {
 }
 
 button:disabled {
-  cursor: progress;
+  cursor: not-allowed;
   opacity: 0.62;
 }
 
@@ -73,41 +94,4 @@ textarea {
 :where(input, select, textarea)[aria-invalid='true'] {
   border-color: var(--color-status-error-text);
   background: var(--color-status-error-surface);
-}
-
-.primary-button,
-.secondary-button {
-  display: inline-flex;
-  min-block-size: var(--control-min-block-size);
-  min-inline-size: var(--control-min-inline-size);
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius-2);
-  padding: 0 var(--space-4);
-  font-weight: var(--font-weight-bold);
-  text-align: center;
-  text-decoration: none;
-}
-
-.primary-button {
-  border: var(--border-width) solid var(--color-action);
-  color: var(--color-action-contrast);
-  background: var(--color-action);
-}
-
-.secondary-button {
-  border: var(--border-width) solid var(--color-control-border);
-  color: var(--color-text);
-  background: var(--color-surface);
-}
-
-.primary-button:focus-visible,
-.primary-button:hover:not(:disabled) {
-  filter: brightness(0.9);
-}
-
-.secondary-button:focus-visible,
-.secondary-button:hover:not(:disabled) {
-  border-color: var(--color-action);
-  background: var(--color-action-soft);
 }

@@ -1,132 +1,214 @@
-# Working Class Unity coding SOP
-
-This file is the canonical operating guidance for developers and coding agents throughout this
-repository.
-
-## Local files
-
-- GitHub repositories are stored under `/home/chima/GitHub`.
-- Save Git worktrees under `/home/chima/Worktrees`.
-
-## Think before coding
-
-- Don't assume. Don't hide confusion. Surface tradeoffs.
-- State assumptions explicitly. If uncertain, ask.
-- If multiple interpretations exist, present them—don't pick silently.
-- If a simpler approach exists, say so. Push back when warranted.
-- If something is unclear, stop. Name what's confusing. Ask.
-
-## Use subagents aggressively
-
-- Offload research, codebase exploration, and parallel analysis to subagents when the user or
-  operating environment permits subagents.
-- Keep each agent focused on one clear task.
-- Protect the main context window by moving side work out of the primary thread.
-- Delegate concrete, bounded work that can run in parallel without blocking the main thread.
-- Do not duplicate work between the main thread and subagents.
-- Integrate results deliberately, and record important findings where future agents will see them.
-- For important or high-risk work, separate implementation from verification when subagents are
-  available.
-  - Give a fresh, non-authoring reviewer the acceptance criteria and final diff.
-  - Have it derive expected behavior from the requirements, not the implementation agent's
-    summary.
-  - Ask whether the tests verify the intended behavior and would reject a plausible incorrect
-    implementation.
-  - Keep the reviewer read-only. Review overlap is intentional, but implementation work must not
-    be duplicated.
-- Treat user-provided or explicitly approved acceptance tests as constraints. Do not edit them
-  without approval.
-- Prefer a focused integration or end-to-end check over many mocked unit tests when it provides
-  stronger evidence with less maintenance.
-- Use mutation testing only when the repository already supports it and the change affects core,
-  high-risk domain logic. Do not introduce mutation-testing tooling unless requested.
-
-## Make documentation-based decisions
-
-- Do not assume or hide confusion. Surface tradeoffs.
-- Make decisions based on developer documentation. Search for it or use relevant MCPs.
-- If multiple interpretations exist, look for well-regarded open-source repositories for examples
-  to help with interpretation.
-- If a simpler approach exists, explore it.
-
-## Simplicity first
-
-- Write the minimum code that solves the problem. Nothing speculative.
-- No features beyond what was asked.
-- No abstractions for single-use code.
-- No flexibility or configurability that wasn't requested.
-- No error handling for impossible scenarios.
-- If you write 200 lines and it could be 50, rewrite it.
-- Ask: “Would a senior engineer say this is overcomplicated?” If yes, simplify.
-
-## Make surgical changes
-
-- Touch only what you must. Clean up only your own mess.
-- When editing existing code:
-  - Don't improve adjacent code, comments, or formatting.
-  - Don't refactor things that aren't broken.
-  - Match the existing style, even if you'd do it differently.
-  - If you notice unrelated dead code, mention it—don't delete it.
-- When your changes create orphans:
-  - Remove imports, variables, or functions that your changes made unused.
-  - Don't remove pre-existing dead code unless asked.
-- Every changed line should trace directly to the user's request.
-- Before handoff, inspect the complete diff. Explicitly report any dependency or lockfile change,
-  public API or schema change, CI or deployment change, deleted or weakened test, or new mock
-  boundary.
-
-## Execute toward a verifiable goal
-
-- Transform tasks into the smallest verifiable goal. Tests are a verification method, not an
-  automatic deliverable.
-- Examples:
-  - “Add validation” becomes “Define the invalid-input behavior required by the specification or
-    contract; verify the smallest relevant set; implement.”
-  - “Fix the bug” becomes “Reproduce the observable failure with the smallest reliable check;
-    confirm it fails when practical; fix it; confirm it passes.”
-  - “Refactor X” becomes “Run relevant checks before and after; add tests only for an important
-    contract that was previously unprotected.”
-- For a multi-step task, state a brief plan:
-
-  ```text
-  1. [Step] -> verify: [check]
-  2. [Step] -> verify: [check]
-  3. [Step] -> verify: [check]
-  ```
-
-- Strong success criteria let you loop independently. Weak criteria such as “make it work” require
-  constant clarification.
-
-## Verify with restraint
-
-- Permanent tests must justify their maintenance cost.
-  - Add one only when it protects an acceptance criterion, reproduced bug, stable important
-    contract, or concrete security, data-integrity, or other high-impact risk.
-  - Prefer the smallest set covering distinct required behaviors. For a bug, start with one minimal
-    regression test that fails before the fix.
-  - Test observable outcomes and stable contracts, not incidental implementation details.
-  - Do not test behavior owned entirely by a framework or library. Test this project's
-    configuration or integration when that is the contract at risk.
-  - Do not add tests solely to increase coverage.
-- Edge cases require evidence.
-  - Implement or test an edge case only when required by the specification, previously observed,
-    part of an existing contract, or necessary for security or data integrity.
-  - Report merely conceivable cases as possible follow-ups without adding code.
-- Keep diagnostic probes temporary. Remove them before handoff unless they qualify as permanent
-  regression tests.
-- Prefer existing fixtures and real dependencies where practical. For every new mock boundary,
-  explain what it replaces and why the alternatives are unsuitable.
-- Never delete, skip, weaken, or rewrite a test merely to make the implementation pass.
-  - If requested behavior intentionally changes a tested contract, explain why the old assertion
-    is invalid and preserve equivalent coverage for the new contract.
-
-## Perform a subtraction pass
-
-- After the implementation works and checks pass, review only your diff for safe reductions. Add
-  no capabilities during this pass.
-  - Remove agent-introduced duplication, unnecessary wrappers, one-use abstractions, speculative
-    validation, impossible-state fallbacks, unrequested compatibility shims, and redundant tests
-    or mocks.
-  - Reuse existing project facilities where that reduces the diff without obscuring behavior.
-  - Do not force a deletion when none is safe.
-  - Re-run relevant checks after any reduction.
+- Coding Agent Standard Operating Procedure
+  - Version: 2026-08-06
+  - tag::
+    - SOP
+  - Purpose
+    - This SOP governs coding, debugging, refactoring, security remediation, review, and delivery work.
+    - It prioritizes correct results, controlled scope, small diffs, proportionate evidence, and efficient use of context and model effort.
+  - Instruction precedence:
+    - System, safety, permission, and environment constraints.
+    - The user's explicit request, approved scope, and acceptance criteria.
+    - Repository-specific instructions and required checks.
+    - This SOP's defaults.
+  - Within the same authority level:
+    - approved scope -> safety and correctness -> smallest sufficient evidence -> speed and parallelism
+  - Local Files and Git
+    - GitHub repositories are stored under `/home/chima/GitHub`.
+    - Worktrees must be stored under `/home/chima/Worktrees`.
+    - Resolve the exact repository, base branch, worktree, and base commit before editing.
+    - Fetch the canonical remote branch and create a dedicated worktree for each concurrently edited branch.
+    - Do not create task worktrees inside a repository checkout or under `/home/chima/GitHub`.
+    - Do not modify another task's worktree or rely on a stale primary checkout.
+    - Follow the repository's branch convention; otherwise use `agent/`.
+    - Keep temporary reports and task ledgers outside tracked repository paths unless the user asks to commit them.
+    - Do not commit, push, create issues or PRs, merge, deploy, or otherwise mutate external state beyond what the user authorized.
+  - Scope, Budget, and Stopping Conditions
+    - Before implementation, freeze a small task contract:
+      - concrete goal;
+      - approved requirement, issue, or finding IDs;
+      - allowed repository and external write surfaces;
+      - explicit non-goals; and
+      - minimum completion evidence.
+      - Rules:
+      - Autonomy means independent execution within the approved task. It does not expand scope.
+      - A request to finish without intervention does not authorize unrelated repairs or a recursive scan-fix-rescan program.
+      - New findings, unrelated defects, flaky tests, dead code, and possible improvements are report-only unless the user expands scope.
+      - Do not create external records for incidental findings without explicit authority.
+      - If an unrelated default-branch failure blocks completion, confirm it once and report it. Do not begin a chain of prerequisite repairs unless separately authorized.
+      - Do not run a new repository-wide or security scan after remediation unless explicitly requested.
+      - New findings from an approved verification scan remain separate work; report them without automatically filing or fixing them.
+      - Stop and ask before materially expanding public behavior, data handling, schema, deployment, irreversible operations, or external state.
+  - Think Before Coding
+    - Do not hide material uncertainty.
+    - Record important assumptions once in the task contract or task ledger.
+    - If multiple interpretations would produce materially different outcomes, present them and ask.
+    - Resolve routine ambiguity from repository evidence and conventions without asking.
+    - If a simpler approach exists, say so and push back when warranted.
+    - Surface tradeoffs before committing to a public API, schema, migration, security policy, process, or deployment shape.
+    - Prefer the smallest reversible choice when uncertainty is real but non-material.
+  - Use Subagents Deliberately
+    - The primary agent is the default implementer and integrator. Use a subagent only for distinct expertise, meaningful non-overlapping parallelism, bounded research, or one risk-proportionate independent review.
+    - Use at most three concurrent subagents unless the user approves more.
+    - Do not permit nested delegation unless explicitly approved.
+    - Give each agent one concrete task and stopping condition.
+    - Do not duplicate research, exploration, implementation, or review.
+    - Use one implementer and at most one read-only reviewer per semantic diff by default.
+    - Add another reviewer only for an unresolved high-impact concern or genuinely different specialty; record why.
+    - A specialized scanner or review tool counts as an independent analysis pass.
+    - Do not use model agents for CI monitoring, waiting, templates, routine status, or mechanical Git.
+    - Do not stream partial agent output. Wait for completion and read one filtered final result.
+    - Reuse an agent for bounded follow-up; do not spawn a fresh agent for a small changed hunk.
+    - Give agents only the goal, applicable SOP clauses, acceptance criteria, relevant paths, and constraints.
+    - Read repository AGENTS.md once per agent session; reread only if it changed.
+    - Limit the final agent summary to 600 words. Put detailed evidence in a local artifact and return its path.
+    - Reserve strongest/highest reasoning for materially complex architecture, security, or final validation—not implementation, monitoring, or mechanical work.
+    - For independent review:
+      - Keep the reviewer read-only.
+      - Supply original requirements, acceptance criteria, final diff, and relevant tests—not the author's conclusions.
+      - Require independent derivation of expected behavior.
+      - Ask whether tests prove the intended contract and reject a plausible incorrect implementation.
+      - After review changes, inspect changed hunks and affected invariants. Repeat the complete review only if the semantic design materially changed.
+  - Context, Tool Output, and Monitoring
+    - Treat context as a limited engineering resource.
+    - Search with targeted tools such as `rg`, `jq`, and scoped Git commands before reading whole files or logs.
+    - Do not dump complete READMEs, reports, lockfiles, CI logs, agent lists, or large diffs into the primary context without need.
+    - Filter output at the source. Default to no more than roughly 4,000 output tokens per result.
+    - Store large evidence in a local artifact and return a compact summary and path.
+    - Do not reread unchanged SOPs, documentation, reports, or agent output.
+    - Keep one canonical explanation; link it instead of duplicating it across plans, updates, issues, PRs, and handoffs.
+    - Never expose secrets or unnecessary private source in output.
+    - For long-running work:
+      - Use one persistent watcher or the environment's native wait mechanism.
+      - Never assign an agent to monitor CI or a process.
+      - Poll at the minimum cadence required by the host.
+      - Query compact status first; read only the failing log section after failure.
+      - Report meaningful state changes. If a heartbeat is required, send a minimal heartbeat without extra diagnostics.
+      - Retry a plausibly flaky command or CI job once. A repeated failure is a blocker or separate task.
+      - For work longer than one hour or involving more than three PRs:
+      - Maintain a concise task ledger outside the tracked repository.
+      - Record scope, decisions, branches, exact heads, checks, blockers, and next action.
+      - Checkpoint after each integration wave.
+      - If permitted, begin a fresh conversation for a materially new phase and use the ledger as handoff.
+  - Documentation-Based Decisions
+    - Start from approved requirements, repository source and docs, and exact locked dependency versions.
+    - Consult official external documentation only when a material decision depends on behavior not established by repository evidence.
+    - Assign one research owner and reuse its decision note.
+    - Timebox routine external research to fifteen minutes unless deeper research is requested.
+    - Inspect commit-pinned open-source examples only when official docs and locked source leave a material ambiguity unresolved.
+    - Explore the simpler documented approach first.
+    - Label architectural judgments as project decisions, not industry standards.
+    - Do not apply current documentation silently to an incompatible locked version.
+  - Simplicity and Surgical Changes
+    - Write the minimum code that solves the approved problem.
+    - Add no unrequested feature, flexibility, configurability, compatibility shim, or abstraction.
+    - Add no error handling for impossible scenarios.
+    - Reuse existing project facilities when that reduces the diff without obscuring behavior.
+    - If 200 lines can honestly become 50, rewrite them.
+    - Ask whether a senior engineer would consider the solution overcomplicated; simplify if so.
+    - Touch only what the task requires.
+    - Do not improve adjacent code, comments, naming, formatting, or architecture.
+    - Match existing style and component boundaries.
+    - Mention unrelated dead code; do not delete it.
+    - Remove only imports, variables, functions, fixtures, or files made unused by this change.
+    - Every changed line must trace to the approved goal, acceptance criteria, or necessary evidence.
+    - Treat user-provided or approved acceptance tests as constraints; do not edit them without approval.
+  - Goal-Driven Execution and Work Packaging
+    - Transform the request into the smallest verifiable outcome. Tests are evidence, not an automatic deliverable.
+    - For a bug: reproduce the observable failure with the smallest reliable check, confirm failure when practical, fix it, and confirm success.
+    - For validation: define required invalid-input behavior, test the smallest relevant boundary, and implement it.
+    - For refactoring: record relevant checks before and after; add a test only for an important previously unprotected contract.
+    - For multi-step work, state a brief outcome-oriented plan:
+      - [Step] -> verify: [check]
+      - [Step] -> verify: [check]
+      - [Step] -> verify: [check]
+      - Packaging rules:
+      - Keep one coherent semantic change per branch and PR.
+      - Organize implementation by root cause and shared change boundary, not scanner occurrence count.
+      - Separate tracking issues may be closed by one atomic PR when one shared implementation resolves them.
+      - If one PR per finding is explicitly required, obey without duplicating shared implementation.
+      - Parallelize only non-overlapping work. Serialize shared files, migrations, public contracts, fixed ports, containers, and other global resources.
+      - The primary agent owns integration, conflicts, the final diff, and handoff.
+  - Verification Ladder
+    - Use the least expensive evidence that adequately proves the approved behavior.
+    - Level 1 - During implementation
+      - Begin with one minimal regression that fails before the fix when practical.
+      - Run the smallest focused test or deterministic check covering the changed boundary.
+      - Iterate with focused checks only.
+      - Level 2 - Frozen semantic diff
+      - After implementation and subtraction, run the relevant package, integration, or end-to-end suite once.
+      - Run format, lint, typecheck, build, migration, or contract checks when changed paths or repository policy require them.
+      - Level 3 - Final integration tree
+      - Run one full repository gate when policy or risk requires it.
+      - Equivalent protected CI normally replaces a duplicate local full gate.
+      - Run both only when CI is unavailable, repository policy requires both, or documented high-impact risk justifies both.
+      - For a multi-PR wave, prefer focused per-PR checks plus required CI and one aggregate final gate.
+      - Rebases and retries:
+      - A rebase or commit rewrite preserving the exact tree requires no new complete review or full gate.
+      - If the tree changes, inspect and test changed hunks and affected invariants.
+      - Rerun the full gate only when relevant semantic changes or repository policy require it.
+      - Retry a suspected flake once; repeated failure is not a reason for indefinite repair loops.
+      - Record the exact verified commit or tree when relevant.
+  - Verification With Restraint
+    - A permanent test must protect an acceptance criterion, reproduced bug, stable important contract, concrete security or data-integrity property, or another high-impact integration risk.
+    - Prefer the smallest set covering distinct required behaviors.
+    - Test observable outcomes and stable contracts, not implementation details.
+    - Do not test behavior owned entirely by a framework; test this project's integration when needed.
+    - Do not add tests solely for coverage.
+    - Test edge cases only when required, observed, already contracted, or necessary for security or data integrity.
+    - Report merely conceivable cases as possible follow-ups.
+    - Remove diagnostic probes before handoff unless they qualify as regressions.
+    - Prefer existing fixtures and real dependencies.
+    - Explain every new mock boundary and why a real or existing fixture is unsuitable.
+    - Never delete, skip, weaken, or rewrite a test merely to make implementation pass.
+    - If approved behavior changes a tested contract, explain why and preserve equivalent coverage.
+    - Prefer focused integration or end-to-end evidence over many mocks.
+    - Use mutation testing only when already supported and justified by high-risk core logic.
+  - Security Remediation Boundaries
+    - Freeze the source scan ID, immutable repository revision, and approved finding IDs.
+    - Distinguish findings from multiple occurrences of one root cause.
+    - Preserve separate tracking when requested, but design the smallest coherent shared fix.
+    - Validate approved findings with targeted regressions and attack-path checks.
+    - Treat the original scanner as one independent discovery pass.
+    - Do not automatically run another full security scan.
+    - Before an explicitly approved verification scan, define its time/cost limit and stopping condition.
+    - Report new findings separately and obtain authorization before filing or fixing them.
+    - Do not turn remediation into an open-ended attempt to make the repository globally clean.
+  - Subtraction and Complete-Diff Review
+    - Perform one subtraction pass after implementation works and before independent review. Review only the current diff and add no capability.
+    - Remove agent-introduced duplication, unnecessary wrappers, one-use abstractions, speculative validation, impossible-state fallbacks, unrequested shims, and redundant tests or mocks.
+    - Do not assign a separate agent to a routine subtraction pass.
+    - Do not force deletion when none is safe.
+    - Rerun relevant checks only if subtraction changes the diff.
+    - Before handoff or PR publication, the primary agent inspects the complete diff once and confirms:
+      - every change traces to the task;
+      - no unrelated refactor or formatting entered;
+      - generated, dependency, and lockfile changes are expected;
+      - public API and schema changes are intentional;
+      - no test was weakened merely to pass;
+      - new mocks are necessary; and
+      - no secret, private artifact, or diagnostic residue was added.
+  - Issues, PRs, Progress, and Handoff
+    - Keep issues and PRs concise and source-backed.
+    - An issue normally needs: problem, scope, acceptance criteria, and references.
+    - A PR normally needs: outcome, important decisions, changed scope, verification, rollback, and material risks.
+    - Link canonical reports and logs instead of reproducing them.
+    - Lead progress updates with outcomes or meaningful state changes; do not narrate every command.
+    - Report blockers with evidence and the smallest decision required.
+    - Do not present speculative intermediate findings as validated conclusions.
+    - The final handoff must include:
+      - outcome and exact repository, branch, PR, commit, or tree when relevant;
+      - checks actually run and their results;
+      - limitations or unresolved blockers;
+      - external state changed; and
+      - paths to detailed artifacts when useful.
+      - Report material changes in these categories:
+      - dependencies or lockfiles;
+      - public APIs;
+      - schemas or migrations;
+      - CI or deployment;
+      - deleted, skipped, weakened, or materially changed tests;
+      - new mock boundaries; and
+      - unrelated issues observed but intentionally untouched.
+      - List changed categories, then state:
+      - "All other change-audit categories were inspected and are unchanged."
+    - Never claim completion while required work remains. Never claim checks that were not run, and never describe a local pass as protected CI.

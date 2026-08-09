@@ -8,8 +8,8 @@ useHead(() => ({
 </script>
 
 <template>
-  <AppPage class="legal-page">
-    <article class="panel legal-panel" aria-labelledby="terms-title">
+  <div class="legal-page">
+    <article class="legal-panel" aria-labelledby="terms-title">
       <div class="panel-heading">
         <p class="eyebrow">{{ t('legal.eyebrow') }}</p>
         <h1 id="terms-title">{{ t('legal.terms.title') }}</h1>
@@ -32,12 +32,13 @@ useHead(() => ({
         <p>{{ t('legal.terms.payments.description') }}</p>
       </section>
     </article>
-  </AppPage>
+  </div>
 </template>
 
 <style scoped>
 @layer components {
   .legal-page {
+    display: grid;
     place-items: start center;
     padding-bottom: var(--space-6);
   }
@@ -46,7 +47,25 @@ useHead(() => ({
     display: grid;
     width: min(100%, 800px);
     gap: var(--space-5);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-2);
     padding: var(--space-5);
+    background: var(--color-surface-subtle);
+    box-shadow: var(--shadow-panel);
+  }
+
+  .panel-heading {
+    display: grid;
+    gap: var(--space-1);
+    margin-block-end: var(--space-4);
+  }
+
+  .eyebrow {
+    margin: 0;
+    color: var(--color-action);
+    font-size: var(--font-size-caption);
+    font-weight: var(--font-weight-heavy);
+    text-transform: uppercase;
   }
 
   .legal-panel section {

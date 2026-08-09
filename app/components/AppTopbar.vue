@@ -6,7 +6,14 @@ const route = useRoute()
 const { t } = useI18n()
 const responseCacheControl = useResponseHeader('cache-control')
 const clientSession = import.meta.client ? authClient.useSession() : null
-const { data: session, error: sessionError } = await useAppSession()
+const { data: session, error: sessionError, status: sessionStatus, refresh: refreshSession } = await useAppSession()
+const retryState = ref<'idle' | 'pending' | 'failed'>('idle')
+const retrying = computed(() => retryState.value === 'pending')
+const retryAnnouncement = computed<'polite' | 'assertive' | undefined>(() => {
+  if (retryState.value === 'pending') return 'polite'
+  if (retryState.value === 'failed') return 'assertive'
+  return undefined
+})
 
 if (import.meta.server && session.value?.user) {
   responseCacheControl.value = 'private, no-store'
@@ -34,6 +41,19 @@ function signedOut() {
   session.value = null
 }
 
+async function retrySession() {
+  if (retrying.value) return
+
+  retryState.value = 'pending'
+  try {
+    await refreshSession()
+  } catch {
+    retryState.value = 'failed'
+    return
+  }
+  retryState.value = sessionError.value ? 'failed' : 'idle'
+}
+
 function currentPage(path: string) {
   return route.path === path ? 'page' : undefined
 }
@@ -47,10 +67,31 @@ function currentPage(path: string) {
       :aria-current="currentPage('/')"
       :aria-label="t('navigation.brandHome', { appName: $config.public.appName })"
     >
+      <!-- eslint-disable-next-line vue/html-self-closing -->
       <img src="/icon.svg" alt="" class="brand-mark" />
       <span>{{ $config.public.appName }}</span>
     </NuxtLink>
-    <nav class="topbar-nav" :aria-label="t('navigation.primaryLabel')">
+    <AppNotice
+      v-if="sessionError"
+      class="topbar-session"
+      :tone="retrying ? 'info' : 'error'"
+      :announce="retryAnnouncement"
+      :title="retrying ? t('common.checkingSession') : t('navigation.sessionUnavailable')"
+    >
+      <AppButton
+        variant="secondary"
+        size="compact"
+        :aria-busy="retrying ? 'true' : undefined"
+        :aria-disabled="retrying ? 'true' : undefined"
+        @click="retrySession"
+      >
+        {{ retrying ? t('common.checkingSession') : t('common.retry') }}
+      </AppButton>
+    </AppNotice>
+    <AppNotice v-else-if="sessionStatus === 'pending'" class="topbar-session" tone="info">
+      {{ t('common.checkingSession') }}
+    </AppNotice>
+    <nav v-else class="topbar-nav cluster" :aria-label="t('navigation.primaryLabel')">
       <NuxtLink v-if="session?.user" to="/app" :aria-current="currentPage('/app')">
         {{ t('navigation.app') }}
       </NuxtLink>
@@ -98,11 +139,11 @@ function currentPage(path: string) {
   }
 
   .topbar-nav {
-    display: flex;
-    align-items: center;
     justify-content: flex-end;
-    gap: var(--space-2);
-    flex-wrap: wrap;
+  }
+
+  .topbar-session {
+    max-inline-size: 24rem;
   }
 
   .topbar-nav a {
@@ -141,6 +182,11 @@ function currentPage(path: string) {
     .topbar-nav {
       width: 100%;
       justify-content: flex-start;
+    }
+
+    .topbar-session {
+      max-inline-size: none;
+      width: 100%;
     }
   }
 }

@@ -4,10 +4,6 @@
   box-sizing: border-box;
 }
 
-html {
-  min-inline-size: 20rem;
-}
-
 body,
 h1,
 h2,
