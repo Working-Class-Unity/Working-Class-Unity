@@ -1,5 +1,8 @@
 # Production Operations
 
+> Imported donor history; this is not an operational WCU runbook. Reconcile it with
+> [`docs/basic-release.md`](../docs/basic-release.md) and current Compose before any deployment.
+
 ## Baseline
 
 - Host the core app as a Coolify-managed Docker application on a DigitalOcean Droplet.

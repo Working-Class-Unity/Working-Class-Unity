@@ -23,6 +23,10 @@ const providerMocks = vi.hoisted(() => ({
   createResponse: vi.fn()
 }))
 
+// Retain lower-level handler coverage without treating dormant code as a release entry point.
+vi.mock('../shared/basic-release-policy', () => ({
+  assertBasicReleaseCapabilityAvailable: vi.fn()
+}))
 vi.mock('../server/db/client', () => databaseMocks)
 vi.mock('../server/utils/auth/require-session', () => sessionMocks)
 vi.mock('../server/utils/runtime', async (importOriginal) => ({
@@ -129,7 +133,7 @@ afterAll(async () => {
   await new Promise<void>((resolve, reject) => server.close((error) => (error ? reject(error) : resolve())))
 })
 
-describe('private AI conversation HTTP boundary', () => {
+describe('dormant private AI conversation HTTP implementation', () => {
   it('authenticates before parsing and rejects caller-supplied authority or provider fields', async () => {
     sessionMocks.requireSession.mockRejectedValueOnce(
       createError({ statusCode: 401, statusMessage: 'Authentication required' })

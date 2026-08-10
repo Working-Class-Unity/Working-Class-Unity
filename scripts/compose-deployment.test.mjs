@@ -20,13 +20,24 @@ const applicationSecretNames = [
   'NUXT_EMAIL_RESEND_API_KEY',
   'NUXT_STRIPE_SECRET_KEY',
   'NUXT_STRIPE_WEBHOOK_SECRET',
-  'NUXT_CLOUDFLARE_R2_ACCESS_KEY_ID',
-  'NUXT_CLOUDFLARE_R2_SECRET_ACCESS_KEY',
-  'NUXT_OPENAI_API_KEY',
   'NUXT_CLOUDFLARE_TURNSTILE_SECRET_KEY',
   'NUXT_SENTRY_DSN',
   'NUXT_OBSERVABILITY_TEST_TOKEN'
 ]
+const excludedProviderEnvironmentNames = [
+  'NUXT_CLOUDFLARE_ACCOUNT_ID',
+  'NUXT_FILES_DRIVER',
+  'NUXT_CLOUDFLARE_R2_BUCKET',
+  'NUXT_CLOUDFLARE_R2_ENDPOINT',
+  'NUXT_CLOUDFLARE_R2_ACCESS_KEY_ID',
+  'NUXT_CLOUDFLARE_R2_SECRET_ACCESS_KEY',
+  'NUXT_OPENAI_API_KEY',
+  'NUXT_OPENAI_PROJECT_ID',
+  'NUXT_OPENAI_MODEL',
+  'NUXT_OPENAI_FILE_SEARCH_VECTOR_STORE_ID',
+  'NUXT_OPENAI_WEB_SEARCH_ALLOWED_DOMAINS'
+]
+const clearedApplicationEnvironmentNames = [...applicationSecretNames, ...excludedProviderEnvironmentNames]
 const backupEnvironmentNames = [
   'BACKUP_R2_ACCOUNT_ID',
   'BACKUP_R2_BUCKET',
@@ -56,12 +67,6 @@ const requiredEnvironmentNames = [
   'NUXT_STRIPE_PERSONAL_ANNUAL_PRICE_ID',
   'NUXT_STRIPE_FAMILY_MONTHLY_PRICE_ID',
   'NUXT_STRIPE_FAMILY_ANNUAL_PRICE_ID',
-  'NUXT_FILES_DRIVER',
-  'NUXT_OPENAI_API_KEY',
-  'NUXT_OPENAI_PROJECT_ID',
-  'NUXT_OPENAI_MODEL',
-  'NUXT_OPENAI_FILE_SEARCH_VECTOR_STORE_ID',
-  'NUXT_OPENAI_WEB_SEARCH_ALLOWED_DOMAINS',
   'NUXT_CLOUDFLARE_TURNSTILE_SECRET_KEY',
   'NUXT_PUBLIC_TURNSTILE_SITE_KEY',
   'NUXT_SENTRY_DSN',
@@ -131,6 +136,7 @@ test('service environment overrides Coolify shared env-file backup credentials',
   const runtimeEnvironment = {
     ...Object.fromEntries(requiredEnvironmentNames.map((name) => [name, `test-${name.toLowerCase()}`])),
     ...Object.fromEntries(applicationSecretNames.map((name) => [name, `private-${name.toLowerCase()}`])),
+    ...Object.fromEntries(excludedProviderEnvironmentNames.map((name) => [name, `excluded-${name.toLowerCase()}`])),
     SOURCE_COMMIT: sourceCommit,
     ...validBackupEnvironment
   }
@@ -181,6 +187,11 @@ test('service environment overrides Coolify shared env-file backup credentials',
       assert.equal(rendered.services.web.environment[name], runtimeEnvironment[name])
       assert.equal(rendered.services.worker.environment[name], runtimeEnvironment[name])
     }
+    for (const name of excludedProviderEnvironmentNames) {
+      for (const serviceName of serviceNames) {
+        assert.equal(rendered.services[serviceName].environment[name], '')
+      }
+    }
   } finally {
     rmSync(directory, { recursive: true, force: true })
   }
@@ -208,7 +219,7 @@ test('one-shot migration gates every long-lived database service', () => {
 })
 
 test('one-shot operators do not receive application provider credentials', () => {
-  for (const name of applicationSecretNames) {
+  for (const name of clearedApplicationEnvironmentNames) {
     assert.equal(services.migrate.environment[name], clearedEnvironmentExpression)
     assert.equal(services['backup-runner'].environment[name], clearedEnvironmentExpression)
   }
@@ -217,7 +228,7 @@ test('one-shot operators do not receive application provider credentials', () =>
 })
 
 test('Coolify-cleared values use only the reserved unset indirection', () => {
-  for (const name of applicationSecretNames) {
+  for (const name of clearedApplicationEnvironmentNames) {
     assert.equal(compose['x-cleared-application-secrets'][name], clearedEnvironmentExpression)
   }
   for (const name of backupEnvironmentNames) {
@@ -228,7 +239,7 @@ test('Coolify-cleared values use only the reserved unset indirection', () => {
 
   const reservedValue = 'reserved-value-must-never-be-configured'
   const rendered = renderedCompose({ [clearedEnvironmentName]: reservedValue, ...validBackupEnvironment })
-  for (const name of applicationSecretNames) {
+  for (const name of clearedApplicationEnvironmentNames) {
     assert.equal(rendered.services.migrate.environment[name], reservedValue)
     assert.equal(rendered.services['backup-runner'].environment[name], reservedValue)
   }
@@ -283,7 +294,12 @@ function renderedCompose(overrides = {}) {
 
 function cleanComposeEnvironment() {
   const environment = { ...process.env }
-  for (const name of [...backupEnvironmentNames, ...applicationSecretNames, clearedEnvironmentName, 'SOURCE_COMMIT']) {
+  for (const name of [
+    ...backupEnvironmentNames,
+    ...clearedApplicationEnvironmentNames,
+    clearedEnvironmentName,
+    'SOURCE_COMMIT'
+  ]) {
     delete environment[name]
   }
   return environment

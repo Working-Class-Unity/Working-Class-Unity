@@ -395,7 +395,7 @@ describe('server foundation utilities', () => {
     for (const value of Object.values(legacyValues)) expect(message).not.toContain(value)
   })
 
-  it('requires each always-active provider capability to be complete', () => {
+  it('requires each active basic-release provider capability to be complete', () => {
     const cases = [
       [
         'billing',
@@ -408,17 +408,6 @@ describe('server foundation utilities', () => {
           'NUXT_STRIPE_PERSONAL_ANNUAL_PRICE_ID',
           'NUXT_STRIPE_FAMILY_MONTHLY_PRICE_ID',
           'NUXT_STRIPE_FAMILY_ANNUAL_PRICE_ID'
-        ]
-      ],
-      ['files', ['NUXT_FILES_DRIVER']],
-      [
-        'ai',
-        [
-          'NUXT_OPENAI_API_KEY',
-          'NUXT_OPENAI_PROJECT_ID',
-          'NUXT_OPENAI_MODEL',
-          'NUXT_OPENAI_FILE_SEARCH_VECTOR_STORE_ID',
-          'NUXT_OPENAI_WEB_SEARCH_ALLOWED_DOMAINS'
         ]
       ],
       ['turnstile', ['NUXT_CLOUDFLARE_TURNSTILE_SECRET_KEY', 'NUXT_PUBLIC_TURNSTILE_SITE_KEY']],
@@ -440,7 +429,30 @@ describe('server foundation utilities', () => {
     }
   })
 
-  it('accepts a complete always-active local configuration', () => {
+  it('starts without excluded Files, R2, or OpenAI provider configuration', () => {
+    const environment = runtimeEnvironment({
+      NUXT_CLOUDFLARE_ACCOUNT_ID: undefined,
+      NUXT_FILES_DRIVER: undefined,
+      NUXT_CLOUDFLARE_R2_BUCKET: undefined,
+      NUXT_CLOUDFLARE_R2_ENDPOINT: undefined,
+      NUXT_CLOUDFLARE_R2_ACCESS_KEY_ID: undefined,
+      NUXT_CLOUDFLARE_R2_SECRET_ACCESS_KEY: undefined,
+      NUXT_OPENAI_API_KEY: undefined,
+      NUXT_OPENAI_PROJECT_ID: undefined,
+      NUXT_OPENAI_MODEL: undefined,
+      NUXT_OPENAI_FILE_SEARCH_VECTOR_STORE_ID: undefined,
+      NUXT_OPENAI_WEB_SEARCH_ALLOWED_DOMAINS: undefined
+    })
+    const config = assertStartableRuntimeConfig(evaluateRuntimeEnvironment(environment))
+
+    expect(config.files.driver).toBe('')
+    expect(config.cloudflare.r2.bucket).toBe('')
+    expect(config.openai.apiKey).toBe('')
+    expect(config.openai.fileSearch.vectorStoreId).toBe('')
+    expect(config.openai.webSearch.allowedDomains).toEqual([])
+  })
+
+  it('continues to validate supplied dormant provider configuration', () => {
     const config = assertStartableRuntimeConfig(evaluateRuntimeEnvironment(runtimeEnvironment()))
 
     expect(config.files.driver).toBe('local')
@@ -477,7 +489,7 @@ describe('server foundation utilities', () => {
     for (const key of retiredCapabilitySwitchEnvironmentKeys) {
       const evaluation = evaluateRuntimeEnvironment(runtimeEnvironment({ [key]: 'false' }))
       expect(evaluation.issues).toContainEqual(
-        expect.objectContaining({ code: 'invalid', key, message: expect.stringContaining('always active') })
+        expect.objectContaining({ code: 'invalid', key, message: expect.stringContaining('source-controlled') })
       )
     }
   })
@@ -871,7 +883,7 @@ describe('server foundation utilities', () => {
     }
   })
 
-  it('fails malformed destr-resolved leaves for always-active providers', () => {
+  it('fails malformed destr-resolved leaves for configured providers', () => {
     const cases = [
       {
         key: 'NUXT_STRIPE_SECRET_KEY',

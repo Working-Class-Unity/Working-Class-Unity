@@ -2,7 +2,7 @@ import Database from 'better-sqlite3'
 import { drizzle } from 'drizzle-orm/better-sqlite3'
 import { migrate } from 'drizzle-orm/better-sqlite3/migrator'
 import { execFile, spawn } from 'node:child_process'
-import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdtempSync, rmSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
@@ -50,40 +50,32 @@ describe('worker entry', () => {
     }
   }, 40_000)
 
-  it('runs configured local Files cleanup and retains one future safety sweep', async () => {
-    const directory = mkdtempSync(join(tmpdir(), 'swl-worker-files-'))
+  it('leaves disabled Files jobs untouched while continuing to process Billing jobs', async () => {
+    const directory = mkdtempSync(join(tmpdir(), 'swl-worker-disabled-files-'))
     const databasePath = join(directory, 'worker.db')
-    const objectPath = join(dirname(databasePath), 'objects/files/v1/file_123e4567-e89b-42d3-a456-426614174000')
     let sqlite: InstanceType<typeof Database> | undefined
     let worker: RunningWorker | undefined
     try {
       sqlite = createMigratedDatabase(databasePath)
-      sqlite
-        .prepare('insert into app_settings (key, value) values (?, ?)')
-        .run('files.storage-binding.v1', JSON.stringify({ version: 1, driver: 'local', bucket: 'local' }))
-      const jobId = insertJob(sqlite, 'files.cleanup-orphans')
-      mkdirSync(dirname(objectPath), { recursive: true })
-      writeFileSync(objectPath, 'orphaned worker fixture')
+      const disabledJobId = insertJob(sqlite, 'files.cleanup-orphans')
+      const billingJobId = insertJob(sqlite, billingAccountDeletionCancellationJobType, {
+        requestId: 'missing_request'
+      })
 
       worker = startWorker(databasePath)
 
-      expect(await waitForCompletedJob(sqlite, jobId)).toEqual(completedOnce)
-      const cleanupJobs = await waitForFileCleanupConvergence(sqlite, objectPath)
-      const completed = cleanupJobs.filter((job) => job.status === 'succeeded')
-      const queued = cleanupJobs.filter((job) => job.status === 'queued')
-      expect(completed.length).toBeGreaterThan(1)
-      expect(completed.every((job) => job.attempts === 1)).toBe(true)
-      expect(queued).toEqual([
-        {
-          status: 'queued',
-          attempts: 0,
-          payload: '{}',
-          runAfter: expect.any(String)
-        }
-      ])
-      expect(Date.parse(queued[0]!.runAfter!)).toBeGreaterThan(Date.now() + 23 * 60 * 60 * 1000)
+      expect(await waitForCompletedJob(sqlite, billingJobId)).toEqual(completedOnce)
+      expect(readJob(sqlite, disabledJobId)).toEqual({
+        attempts: 0,
+        last_error: null,
+        locked_at: null,
+        locked_by: null,
+        status: 'queued'
+      })
+      expect(readFileCleanupJobs(sqlite)).toEqual([{ status: 'queued', attempts: 0 }])
       const output = await stopWorker(worker)
-      expect(output.stdout).toContain(`Worker processed job ${jobId}: succeeded`)
+      expect(output.stdout).toContain(`Worker processed job ${billingJobId}: succeeded`)
+      expect(output.stdout).not.toContain(`Worker processed job ${disabledJobId}:`)
     } finally {
       await forceStopWorker(worker)
       if (sqlite?.open) sqlite.close()
@@ -225,38 +217,10 @@ async function waitForCompletedJob(sqlite: InstanceType<typeof Database>, jobId:
   return job
 }
 
-async function waitForFileCleanupConvergence(sqlite: InstanceType<typeof Database>, objectPath: string) {
-  const deadline = Date.now() + 15_000
-  let jobs = readFileCleanupJobs(sqlite)
-  while ((existsSync(objectPath) || !hasOnlyFutureSafetyJob(jobs)) && Date.now() < deadline) {
-    await new Promise((resolve) => setTimeout(resolve, 25))
-    jobs = readFileCleanupJobs(sqlite)
-  }
-  if (existsSync(objectPath) || !hasOnlyFutureSafetyJob(jobs)) {
-    throw new Error(`Worker did not converge file cleanup: ${JSON.stringify(jobs)}`)
-  }
-  return jobs
-}
-
-function hasOnlyFutureSafetyJob(jobs: ReturnType<typeof readFileCleanupJobs>) {
-  const active = jobs.filter((job) => job.status === 'queued' || job.status === 'running')
-  return (
-    jobs.every((job) => job.status === 'succeeded' || job.status === 'queued') &&
-    active.length === 1 &&
-    active[0]?.status === 'queued' &&
-    active[0].attempts === 0 &&
-    active[0].payload === '{}' &&
-    typeof active[0].runAfter === 'string' &&
-    Date.parse(active[0].runAfter) > Date.now() + 23 * 60 * 60 * 1000
-  )
-}
-
 function readFileCleanupJobs(sqlite: InstanceType<typeof Database>) {
   return sqlite
-    .prepare(
-      "select status, attempts, payload, run_after as runAfter from job_queue where type = 'files.cleanup-orphans' order by id"
-    )
-    .all() as Array<{ status: string; attempts: number; payload: string; runAfter: string | null }>
+    .prepare("select status, attempts from job_queue where type = 'files.cleanup-orphans' order by id")
+    .all() as Array<{ status: string; attempts: number }>
 }
 
 async function stopWorker(worker: RunningWorker) {
@@ -311,12 +275,6 @@ function workerEnvironment(databasePath: string, overrides: Record<string, strin
     NUXT_STRIPE_PERSONAL_ANNUAL_PRICE_ID: 'price_worker_personal_annual',
     NUXT_STRIPE_FAMILY_MONTHLY_PRICE_ID: 'price_worker_family_monthly',
     NUXT_STRIPE_FAMILY_ANNUAL_PRICE_ID: 'price_worker_family_annual',
-    NUXT_FILES_DRIVER: 'local',
-    NUXT_OPENAI_API_KEY: 'worker-openai-key-not-a-provider-credential',
-    NUXT_OPENAI_PROJECT_ID: 'proj_worker_entry',
-    NUXT_OPENAI_MODEL: 'gpt-5.6-luna',
-    NUXT_OPENAI_FILE_SEARCH_VECTOR_STORE_ID: 'vs_worker_empty',
-    NUXT_OPENAI_WEB_SEARCH_ALLOWED_DOMAINS: 'example.test',
     NUXT_CLOUDFLARE_TURNSTILE_SECRET_KEY: 'worker-turnstile-secret-not-a-provider-credential',
     NUXT_PUBLIC_TURNSTILE_SITE_KEY: 'worker-turnstile-site-not-a-provider-credential',
     NUXT_SENTRY_DSN: 'https://server@example.ingest.sentry.io/1',

@@ -40,7 +40,7 @@ without a documented product journey.
   user-triggered mutations.
 - Every applicable asynchronous surface handles unresolved authentication, pending, error, empty,
   and success states. Recoverable errors provide a safe retry.
-- Do not render private identity or family information until authentication is resolved.
+- Do not render private identity or account information until authentication is resolved.
 - Each route supplies one clear `h1` and meaningful page title. The default layout owns the stable
   `main-content` landmark and skip-link target.
 - Forms use native controls, stable names and IDs, associated labels, descriptions, visible errors,

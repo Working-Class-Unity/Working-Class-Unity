@@ -14,7 +14,7 @@
   - Keep the initial shared surface to `AppButton`, `AppField`, and `AppNotice`, plus the feature-owned `AccountMenu`; keep flow, cluster, container, and grid as CSS layout primitives.
   - Give coding agents a concise `app/AGENTS.md`, one canonical implementation fixture, an explicit component inventory, and one repository check command.
   - Keep SSR as the default and require unresolved-authentication, pending, error, empty, and success handling for asynchronous product surfaces.
-  - The feature-owned account/family menu is not a business workspace switcher. It may expose account actions, owner-only invitation entry points, and sign-out; it does not expose roles, slugs, workspace administration, or member-management controls.
+  - The feature-owned account menu may expose account settings and sign-out. Membership management belongs on the dashboard; invitations, organization/workspace controls, roles, and member administration are excluded.
   - Stylelint and Nuxt-aware ESLint belong in the baseline. Browser behavior and accessibility require behavioral tests; source-text assertions are not substitutes.
 - **1. CSS ownership and files**
   - Nuxt officially supports local stylesheets in `app/assets`, component imports, and global registration through the `css` property in `nuxt.config.ts`.
@@ -93,7 +93,7 @@
     - Do not turn ordinary primary navigation into an ARIA menu.
     - Use native `fieldset`/`legend` for grouped controls, `details`/`summary` for ordinary disclosure, and `progress` or `output` when those semantics match the product need.
   - Relevant Reka primitives when native behavior is insufficient:
-    - `DropdownMenu` for the account/family command menu. Its official contract includes managed focus, keyboard navigation, typeahead, dismissal, and the Menu Button WAI-ARIA pattern.
+    - `DropdownMenu` for the account command menu. Its official contract includes managed focus, keyboard navigation, typeahead, dismissal, and the Menu Button WAI-ARIA pattern.
     - `Dialog` for modal tasks that require managed focus and labelled content.
     - `AlertDialog` for an important or destructive decision that requires a response.
     - `Popover` for rich transient content that is not a command menu.
@@ -109,11 +109,11 @@
   - Use Reka's documented CSS variables for collision-aware sizes and transform origins rather than measuring private internals.
   - Use controlled state such as `v-model:open` only when the application must coordinate behavior—for example, closing a menu on route navigation.
   - If `asChild` is used to compose an app-owned trigger, ensure the child renders one valid element and forwards the attributes, events, and reference required by Reka's composition contract.
-- **9. Feature-owned account/family menu contract**
+- **9. Feature-owned account menu contract**
   - Implement `AccountMenu` as a feature-owned component around `DropdownMenuRoot`, `DropdownMenuTrigger`, `DropdownMenuPortal`, `DropdownMenuContent`, `DropdownMenuLabel`, `DropdownMenuItem`, and `DropdownMenuSeparator` as needed. Do not extract a generic `AppDropdownMenu` until a second real journey demonstrates a stable shared contract.
-  - Appropriate content: authenticated identity summary, account settings, owner-only invite entry point when implemented, and sign-out.
-  - Excluded content: workspace switcher, editable organization slug, visible role matrix, member administration, ownership transfer, or a general workspace settings surface.
-  - Family-plan membership grants entitlement; it must not imply access to another member's private records.
+  - Appropriate content: authenticated identity summary, account settings, and sign-out.
+  - Excluded content: membership management, invitations, organization/workspace controls, visible roles, member administration, ownership transfer, or a general workspace settings surface.
+  - Membership status belongs on the personal dashboard and never grants access to another person's private records.
   - Required behavior:
     - Accurate trigger name and expanded state.
     - Pointer, Enter, and Space open behavior.
@@ -123,7 +123,7 @@
     - Route changes close controlled menu state.
     - Disabled states are semantic, not visual-only.
     - Long names and narrow viewports do not overflow.
-    - No private identity or family information renders before authentication is resolved.
+    - No private identity or account information renders before authentication is resolved.
 - **10. Accessibility and motion**
   - Reka reduces primitive-level accessibility work but does not make application copy, labels, routing, contrast, loading states, or authorization correct automatically.
   - Maintain a visible focus indicator. The enhanced product target is at least the area of a 2 CSS-pixel perimeter with a 3:1 change of contrast; this corresponds to WCAG 2.2 Focus Appearance at Level AAA, while visible focus remains required at the baseline conformance level.
@@ -268,7 +268,7 @@
   - Pin Node.js and the package manager, configure Nuxt-aware ESLint, and enforce the approved `reka-ui` import boundary.
   - Verify native form labels, descriptions, validation messages, pending behavior, error recovery, and server-authoritative validation.
   - Exactly pin Reka UI in the repository manifest and lockfile.
-  - The baseline includes the feature-owned account/family `DropdownMenu`; add a generic dropdown wrapper or other Reka primitive only for a documented product journey.
+  - The baseline includes the feature-owned account `DropdownMenu`; add a generic dropdown wrapper or other Reka primitive only for a documented product journey.
   - Keep primary navigation native and semantic.
   - Run the canonical check command covering Nuxt-aware ESLint, Stylelint, Nuxt typecheck, and fast tests, followed by targeted integration tests and the existing browser/accessibility gates.
   - Verify 320px, 390px, and desktop layouts; 200% text resizing; reflow at a 320 CSS-pixel viewport; long content; keyboard navigation; focus return and non-obscuring sticky UI; route announcements; reduced motion; and contrast.

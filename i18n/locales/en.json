@@ -172,7 +172,7 @@
       },
       "providers": {
         "title": "Providers and sharing",
-        "description": "List every authentication, payment, storage, analytics, email, AI, and abuse-defense provider together with the information each provider receives."
+        "description": "List every authentication, payment, infrastructure, analytics, email, and abuse-defense provider together with the information each provider receives."
       },
       "abuseDefense": {
         "title": "Abuse defense",

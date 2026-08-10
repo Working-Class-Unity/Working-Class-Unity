@@ -13,9 +13,8 @@ launch it until the application UI is designed and the hosted integrations are c
 - Open registration through email magic links only.
 - Private accounts with a display name, optional avatar, and an operator-assigned `user | admin`
   role. New accounts are non-members; membership authorization comes later.
-- Private, user-owned file storage through local storage or Cloudflare R2.
-- Private, user-owned OpenAI conversations with deployment-owned File Search and allowlisted Web
-  Search available to the server. Private R2 files are not automatically indexed into OpenAI.
+- AI chat, Files, File Search, Web Search, OpenAI resources, and user-file R2 are source-disabled for
+  the basic release. Dormant implementation and schema are not product availability.
 - Purchaser-owned Stripe Billing. The final one-membership/two-price WCU catalog is deferred until
   the rest of the foundation is complete.
 - Resend transactional email, SQLite-backed jobs, Sentry observability, and separate R2 database
@@ -23,8 +22,8 @@ launch it until the application UI is designed and the hosted integrations are c
 - A Docker/Coolify deployment shape with one web process, one worker, a migration gate, and an
   off-host backup process.
 
-Family workspaces, generic Projects, invitations, social login, passwords, and runtime product
-switches are not part of WCU.
+Family workspaces, generic Projects, invitations, social login, passwords, runtime product switches,
+and operator toggles for excluded capabilities are not part of WCU.
 
 The rebuild decisions and exact source boundary are recorded in
 [`docs/wcu-rebuild-provenance.md`](docs/wcu-rebuild-provenance.md). Agent working rules are in
@@ -69,8 +68,9 @@ node scripts/run-pnpm.mjs run build
 
 `npm run verify:pinned` runs the complete pinned verification pipeline, including tooling,
 supply-chain, runtime, browser, API, and container checks. Network-backed provider certification is
-separate: deterministic tests do not prove that WCU's Resend, Stripe, OpenAI, R2, Sentry, or
-Coolify credentials and hosted configuration are correct.
+separate: deterministic tests do not prove that WCU's Resend, Stripe, database-backup R2, Sentry, or
+Coolify credentials and hosted configuration are correct. This release provisions no OpenAI or
+user-file R2 resource.
 
 ## Database and deployment
 

@@ -161,7 +161,7 @@ describe('production-wired account deletion', () => {
       rowCount(database, 'verification', "json_valid(value) and lower(json_extract(value, '$.email')) = ?", email)
     ).toBe(0)
     expect(rowCount(database, 'job_queue', "type like 'billing.%' or instr(payload, ?) > 0", user.id)).toBe(0)
-    expect(rowCount(database, 'job_queue', "type = 'files.cleanup-orphans' and payload = '{}'")).toBe(1)
+    expect(rowCount(database, 'job_queue', "type = 'files.cleanup-orphans' and payload = '{}'")).toBe(0)
     expect(database.pragma('foreign_key_check')).toEqual([])
 
     const expiredSession = await auth.handler(authRequest('/api/auth/get-session', { headers: sessionHeaders }))
@@ -190,12 +190,6 @@ function configureRuntime(databasePath: string) {
     NUXT_STRIPE_PERSONAL_ANNUAL_PRICE_ID: 'price_account_deletion_personal_annual',
     NUXT_STRIPE_FAMILY_MONTHLY_PRICE_ID: 'price_account_deletion_family_monthly',
     NUXT_STRIPE_FAMILY_ANNUAL_PRICE_ID: 'price_account_deletion_family_annual',
-    NUXT_FILES_DRIVER: 'local',
-    NUXT_OPENAI_API_KEY: 'account-deletion-openai-not-a-provider-credential',
-    NUXT_OPENAI_PROJECT_ID: 'proj_account_deletion_integration',
-    NUXT_OPENAI_MODEL: 'gpt-5.6-luna',
-    NUXT_OPENAI_FILE_SEARCH_VECTOR_STORE_ID: 'vs_account_deletion_empty',
-    NUXT_OPENAI_WEB_SEARCH_ALLOWED_DOMAINS: 'example.test',
     NUXT_CLOUDFLARE_TURNSTILE_SECRET_KEY: 'account-deletion-turnstile-not-a-provider-credential',
     NUXT_PUBLIC_TURNSTILE_SITE_KEY: 'account-deletion-turnstile-site-not-a-provider-credential'
   }

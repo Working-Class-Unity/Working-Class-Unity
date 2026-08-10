@@ -140,7 +140,7 @@ type RuntimeRequirement = Readonly<{
   }>
 }>
 
-const alwaysActiveRequirements = [
+const runtimeRequirements = [
   { environmentKey: 'NUXT_STRIPE_SECRET_KEY', configPath: 'stripe.secretKey', kind: 'value', preserveBytes: true },
   {
     environmentKey: 'NUXT_STRIPE_WEBHOOK_SECRET',
@@ -698,7 +698,7 @@ function validateRuntimeEnvironmentKeyContract(environment: RuntimeEnvironment, 
     ) {
       issues.push(configIssue('invalid', key, 'must not override the reviewed application security policy'))
     } else if (retiredCapabilitySwitchEnvironmentKeySet.has(key)) {
-      issues.push(configIssue('invalid', key, 'has been removed because the capability is always active'))
+      issues.push(configIssue('invalid', key, 'is unsupported because basic-release availability is source-controlled'))
     } else if (forbiddenNuxtObjectEnvironmentKeys.has(key)) {
       issues.push(configIssue('invalid', key, 'must not set an object node; use the documented NUXT_ leaf variables'))
     } else if (forbiddenNitroRuntimeConfigEnvironmentKeys.has(key)) {
@@ -912,8 +912,8 @@ function validateCapabilities(
   environment: RuntimeEnvironment,
   issues: RuntimeConfigIssue[]
 ) {
-  for (const requirement of alwaysActiveRequirements) {
-    if (!requirementApplies(config, requirement)) continue
+  for (const requirement of runtimeRequirements) {
+    if (!requirementApplies(config, environment, requirement)) continue
     validateRuntimeRequirement(config, environment, requirement, issues)
   }
 
@@ -970,7 +970,7 @@ function validateStripeConfiguration(
     issues.push(configIssue('invalid', portalKey, 'must be a Stripe Billing Portal configuration ID'))
   }
 
-  const priceRequirements = alwaysActiveRequirements.filter(
+  const priceRequirements = runtimeRequirements.filter(
     (requirement) =>
       requirement.environmentKey.startsWith('NUXT_STRIPE_') && requirement.environmentKey.endsWith('_PRICE_ID')
   )
@@ -1126,8 +1126,25 @@ function validateRuntimeRequirement(
   requireRuntimeValue(environment, requirement.environmentKey, resolvedValue, issues, requirement.preserveBytes)
 }
 
-function requirementApplies(config: NormalizedRuntimeConfig, requirement: RuntimeRequirement): boolean {
-  return !requirement.when || configValueAtPath(config, requirement.when.configPath) === requirement.when.equals
+function requirementApplies(
+  config: NormalizedRuntimeConfig,
+  environment: RuntimeEnvironment,
+  requirement: RuntimeRequirement
+): boolean {
+  if (requirement.when && configValueAtPath(config, requirement.when.configPath) !== requirement.when.equals) {
+    return false
+  }
+  if (requirement.environmentKey === 'NUXT_FILES_DRIVER') return Boolean(environment.NUXT_FILES_DRIVER)
+  if (requirement.environmentKey.startsWith('NUXT_OPENAI_')) {
+    return [
+      'NUXT_OPENAI_API_KEY',
+      'NUXT_OPENAI_PROJECT_ID',
+      'NUXT_OPENAI_MODEL',
+      'NUXT_OPENAI_FILE_SEARCH_VECTOR_STORE_ID',
+      'NUXT_OPENAI_WEB_SEARCH_ALLOWED_DOMAINS'
+    ].some((key) => Boolean(environment[key]))
+  }
+  return true
 }
 
 function configValueAtPath(config: NormalizedRuntimeConfig, path: string): unknown {

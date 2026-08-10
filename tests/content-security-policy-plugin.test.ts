@@ -22,7 +22,7 @@ describe('browser provider CSP plugin', () => {
     runtimeMocks.getAppRuntimeConfig.mockReset()
   })
 
-  it('registers the documented hook and unconditionally extends the provider directives', async () => {
+  it('registers the documented hook without widening CSP for stale user-file R2 configuration', async () => {
     runtimeMocks.getAppRuntimeConfig.mockReturnValue({
       files: { driver: 'r2' },
       cloudflare: {
@@ -56,11 +56,7 @@ describe('browser provider CSP plugin', () => {
 
     expect(routeRules['/**']?.headers?.contentSecurityPolicy).toEqual({
       ...base,
-      'connect-src': [
-        "'self'",
-        'https://o123.ingest.sentry.io',
-        'https://private-files.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.r2.cloudflarestorage.com'
-      ],
+      'connect-src': ["'self'", 'https://o123.ingest.sentry.io'],
       'frame-src': ['https://challenges.cloudflare.com'],
       'script-src': ["'self'", "'strict-dynamic'", "'nonce-{{nonce}}'", 'https://challenges.cloudflare.com']
     })

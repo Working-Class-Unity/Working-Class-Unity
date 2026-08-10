@@ -71,12 +71,17 @@ export async function runDeploymentSmoke({ baseUrl, fetchImpl = globalThis.fetch
   }
 
   for (const [capabilityId, path] of Object.entries(capabilityBoundaryPaths)) {
-    await runCheck(`GET ${path} reaches the active ${capabilityId} boundary`, async () => {
+    await runCheck(`GET ${path} reaches the ${capabilityId} release boundary`, async () => {
       const response = await request(path)
       if (capabilityId === 'observability') {
         const html = await response.text()
         assert(response.ok, `expected observability page 2xx, received ${response.status}`)
         assert(/Client Event Test/.test(html), 'expected the observability client-test page')
+        return
+      }
+      if (capabilityId === 'ai' || capabilityId === 'files') {
+        assert(response.status === 404, `expected excluded ${capabilityId} 404, received ${response.status}`)
+        assertHeader(response, 'cache-control', 'no-store')
         return
       }
       assert(response.status === 401, `expected anonymous 401 for ${capabilityId}, received ${response.status}`)

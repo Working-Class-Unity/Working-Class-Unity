@@ -1,5 +1,6 @@
 import { createHmac } from 'node:crypto'
 import { createError } from 'h3'
+import { assertBasicReleaseCapabilityAvailable } from '../../../shared/basic-release-policy'
 import { useDatabase } from '../../db/client'
 import type { DatabaseConnection } from '../../db/connect'
 import {
@@ -259,6 +260,7 @@ export function createAiConversationService(dependencies: AiConversationServiceD
 }
 
 function productionService() {
+  assertBasicReleaseCapabilityAvailable('ai')
   const config = getAppRuntimeConfig()
   return createAiConversationService({
     connection: useDatabase(),

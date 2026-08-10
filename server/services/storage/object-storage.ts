@@ -1,4 +1,5 @@
 import { dirname, join, resolve } from 'node:path'
+import { assertBasicReleaseCapabilityAvailable } from '../../../shared/basic-release-policy'
 import { resolveSqlitePath } from '../../db/connect'
 import { getAppRuntimeConfig } from '../../utils/runtime'
 import type { FileReconciliationPrefix } from './file-object-keys'
@@ -32,6 +33,7 @@ export type StoredObjectPage = Readonly<{
 }>
 
 export function useObjectStorage(): ObjectStorage {
+  assertBasicReleaseCapabilityAvailable('files')
   const config = getAppRuntimeConfig()
 
   if (config.files.driver === 'r2') {
