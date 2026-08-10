@@ -28,7 +28,7 @@ The root [`AGENTS.md`](../AGENTS.md) governs all work. The normative interface a
 - `AppNotice`: persistent visual feedback with explicit, opt-in announcement behavior.
 - `AppTopbar`: application-shell header and native primary navigation.
 - `AccountMenu`: feature-owned Reka dropdown for identity, account navigation, and sign-out.
-- `AuthEntryForm`, `TurnstileChallenge`, and `AccountDeletionSection`: feature components, not shared primitives.
+- `AuthEntryForm`, `TurnstileChallenge`, `AccountProfileForm`, and `AccountDeletionSection`: feature components, not shared primitives.
 
 Direct `reka-ui` imports are allowed only in `components/AccountMenu.vue`. Pages and unrelated
 components consume app-owned contracts. Do not add another Reka primitive or a generic wrapper

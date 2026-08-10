@@ -5,7 +5,7 @@ import Database from 'better-sqlite3'
 import { drizzle } from 'drizzle-orm/better-sqlite3'
 import { describe, expect, it } from 'vitest'
 import * as schema from '../server/db/schema'
-import { createAccountDeletionUserOptions } from '../server/utils/auth/account-deletion'
+import { createAuthenticationUserOptions } from '../server/utils/auth/user-options'
 
 const redirectSchemas = [
   ['OIDC provider', oidcProvider({ loginPage: '/login' }).endpoints.registerOAuthApplication.options.body],
@@ -36,7 +36,7 @@ describe('Better Auth advisory and adapter compatibility', () => {
           provider: 'sqlite',
           schema
         }),
-        user: createAccountDeletionUserOptions({ sqlite, db: database, databasePath: ':memory:' }),
+        user: createAuthenticationUserOptions({ sqlite, db: database, databasePath: ':memory:' }),
         disabledPaths: ['/sign-up/email', '/sign-in/email'],
         emailAndPassword: {
           enabled: false
@@ -60,7 +60,10 @@ describe('Better Auth advisory and adapter compatibility', () => {
       expect(context.options.emailAndPassword?.enabled).toBe(false)
       expect(context.options.verification?.storeInDatabase).toBe(true)
       expect(context.options.user?.additionalFields).toMatchObject({
-        role: { type: ['user', 'admin'], required: false, defaultValue: 'user', input: false }
+        role: { type: ['user', 'admin'], required: false, defaultValue: 'user', input: false },
+        firstName: { type: 'string', required: false, returned: false, validator: { input: expect.any(Object) } },
+        lastName: { type: 'string', required: false, returned: false, validator: { input: expect.any(Object) } },
+        displayName: { type: 'string', required: false, returned: true, validator: { input: expect.any(Object) } }
       })
       expect(context.options.disabledPaths).toEqual(expect.arrayContaining(['/sign-up/email', '/sign-in/email']))
       expect(context.options.plugins?.find((plugin) => plugin.id === 'magic-link')?.options).toMatchObject({

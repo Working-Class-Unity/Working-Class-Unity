@@ -141,7 +141,8 @@ test('home presents the WCU foundation and preserves client navigation', async (
   await page.getByRole('link', { name: 'Create account', exact: true }).click()
   await expect(page).toHaveURL(/\/signup$/)
   await expect(page.getByRole('heading', { name: 'Create your account' })).toBeVisible()
-  await expect(page.getByRole('textbox', { name: 'Display name', exact: true })).toBeVisible()
+  await expect(page.getByRole('textbox', { name: 'Email', exact: true })).toBeVisible()
+  await expect(page.getByRole('textbox', { name: /(?:first|last|display) name/i })).toHaveCount(0)
   await expect(page.getByRole('link', { name: 'Sign up', exact: true })).toHaveAttribute('aria-current', 'page')
   await expect(page).toHaveTitle('Sign up')
   await expect(page.getByLabel('Security check')).toBeVisible()
@@ -226,9 +227,8 @@ test('login is accessible before and after requesting a magic link', async ({ pa
   await expect(page).toHaveTitle('Log in')
   await assertRuntimePublicConfig(page)
   const emailInput = page.getByRole('textbox', { name: 'Email', exact: true })
-  const displayNameInput = page.getByRole('textbox', { name: 'Display name', exact: true })
-  await expect(displayNameInput).toBeVisible()
   await expect(emailInput).toBeVisible()
+  await expect(page.getByRole('textbox', { name: /(?:first|last|display) name/i })).toHaveCount(0)
   await expect(page.locator('input[type="password"]')).toHaveCount(0)
   await expect(page.locator('.mode-tabs')).toHaveCount(0)
   await expect(page.getByRole('button', { name: 'Continue with Google' })).toHaveCount(0)
@@ -239,19 +239,10 @@ test('login is accessible before and after requesting a magic link', async ({ pa
   const submitButton = page.getByRole('button', { name: 'Send email link' })
   await expect(submitButton).toBeEnabled()
   await assertMinimumTargetSize(emailInput)
-  await assertMinimumTargetSize(displayNameInput)
   await assertMinimumTargetSize(submitButton)
   await assertControlBoundaryContrast(emailInput)
   await assertAccessibleWithoutOverflow(page)
 
-  await submitButton.click()
-  await expect(displayNameInput).toBeFocused()
-  await expect(displayNameInput).toHaveAttribute('aria-invalid', 'true')
-  await expect(page.locator('#login-form-status[role="alert"]')).toHaveText(
-    'Check the highlighted field and try again.'
-  )
-
-  await displayNameInput.fill('Browser Login')
   await submitButton.click()
   await expect(emailInput).toBeFocused()
   await expect(emailInput).toHaveAttribute('aria-invalid', 'true')
@@ -306,13 +297,15 @@ test('signed-out private routes reach login before private data is requested', a
 const privateBrowserTest = test.extend({ screenshot: 'off', trace: 'off', video: 'off' })
 
 privateBrowserTest(
-  'real magic-link signup preserves the display name through app and account views',
+  'real email-only signup keeps account profile fields optional and editable later',
   async ({ page }, testInfo) => {
-    testInfo.setTimeout(45_000)
+    testInfo.setTimeout(60_000)
     const observations = observePage(page)
     const project = testInfo.project.name.replaceAll(/[^a-z0-9]/gi, '-').toLowerCase()
     const email = `browser.login+${project}.${authEmailMarker}@example.test`
-    const displayName = `Browser ${testInfo.project.name} member with a deliberately long account display name`
+    const firstName = `Given ${project}`
+    const lastName = `Surname ${project}`
+    const displayName = `Browser ${testInfo.project.name} member`
     const clientAddress = testInfo.project.name === 'desktop-chromium' ? '192.0.2.10' : '192.0.2.11'
 
     await page.setExtraHTTPHeaders({ 'cf-connecting-ip': clientAddress })
@@ -320,12 +313,22 @@ privateBrowserTest(
     await page.goto('/signup')
     await page.waitForLoadState('networkidle')
     const manifestUrl = await nuxtManifestUrl(page)
-    await page.getByRole('textbox', { name: 'Display name', exact: true }).fill(displayName)
+    await expect(page.getByRole('textbox', { name: /(?:first|last|display) name/i })).toHaveCount(0)
     await page.getByRole('textbox', { name: 'Email', exact: true }).fill(email)
     await expect(page.getByText('Security check complete.', { exact: true })).toBeVisible()
     const sendEmailLink = page.getByRole('button', { name: 'Send email link' })
     await expect(sendEmailLink).toBeEnabled()
+    const magicLinkRequestPromise = page.waitForRequest(
+      (request) => new URL(request.url()).pathname === '/api/auth/sign-in/magic-link'
+    )
     await sendEmailLink.click()
+    const magicLinkRequest = await magicLinkRequestPromise
+    expect(magicLinkRequest.postDataJSON()).toEqual({
+      email,
+      callbackURL: '/app',
+      newUserCallbackURL: '/app',
+      errorCallbackURL: '/signup'
+    })
     await expect(page.locator('#signup-form-status[role="status"]')).toBeVisible()
     await expect(page.getByText('Security check complete.', { exact: true })).toBeVisible()
 
@@ -345,11 +348,11 @@ privateBrowserTest(
     expect(appResponse.headers()['cache-control']).toBe('private, no-store')
     expect(appHtml.includes('Your WCU account is ready.'), 'initial app HTML contains the WCU shell').toBe(true)
     expect(appHtml.includes(email), 'initial app HTML contains the authenticated identity').toBe(true)
-    expect(appHtml.includes(displayName), 'initial app HTML contains the required display name').toBe(true)
+    expect(appHtml.includes(displayName), 'initial app HTML excludes profile data that was never collected').toBe(false)
     expect(appHtml.includes('/w/'), 'initial app HTML excludes visible workspace navigation').toBe(false)
     expect(appHtml.includes('activeOrganizationId'), 'initial app HTML excludes active-organization state').toBe(false)
     await expect(page.getByText('Your WCU account is ready.', { exact: true })).toBeVisible()
-    await expect(page.getByRole('heading', { name: `Welcome back, ${displayName}` })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Welcome back', exact: true })).toBeVisible()
     await expect(page.getByText(`Signed in as ${email}`, { exact: true })).toBeVisible()
     await expect(page.getByRole('button', { name: /^Account menu for / })).toBeVisible()
     await expect(page.getByText(/workspace/i)).toHaveCount(0)
@@ -362,7 +365,7 @@ privateBrowserTest(
     )
     expect(observations.sameOriginRequests.some((request) => request.includes('/api/workspaces'))).toBe(false)
     await page.waitForLoadState('networkidle')
-    await assertAccountMenuContract(page, displayName, email, observations)
+    await assertAccountMenuContract(page, email, email, observations)
 
     if (testInfo.project.name === 'desktop-chromium') {
       const signedInHomeResponse = await gotoForInitialResponse(page, '/', manifestUrl)
@@ -410,8 +413,67 @@ privateBrowserTest(
     ).toBe(false)
     await expect(page.getByRole('heading', { name: 'Account', exact: true, level: 1 })).toBeVisible()
     await expect(page.getByText(email, { exact: true })).toBeVisible()
-    await expect(page.getByText(displayName, { exact: true })).toBeVisible()
-    await expect(page.getByRole('button', { name: /^Account menu for / })).toBeVisible()
+    await page.waitForLoadState('networkidle')
+    await page.waitForFunction(() => window.useNuxtApp?.().isHydrating === false)
+
+    const firstNameInput = page.getByRole('textbox', { name: 'First name', exact: true })
+    const lastNameInput = page.getByRole('textbox', { name: 'Last name', exact: true })
+    const displayNameInput = page.getByRole('textbox', { name: 'Display name', exact: true })
+    await expect(firstNameInput).toHaveValue('')
+    await expect(lastNameInput).toHaveValue('')
+    await expect(displayNameInput).toHaveValue('')
+    await expect(page.getByText('They are not required to use your account.', { exact: false })).toBeVisible()
+    await expect(page.getByRole('button', { name: `Account menu for ${email}` })).toBeVisible()
+
+    await firstNameInput.fill(`  ${firstName}  `)
+    await lastNameInput.fill(`  ${lastName}  `)
+    await displayNameInput.fill(`  ${displayName}  `)
+    await page.getByRole('button', { name: 'Save profile', exact: true }).click()
+    await expect(page.getByText('Profile saved.', { exact: true })).toBeVisible()
+    await expect(firstNameInput).toHaveValue(firstName)
+    await expect(lastNameInput).toHaveValue(lastName)
+    await expect(displayNameInput).toHaveValue(displayName)
+
+    const namedMenuTrigger = page.getByRole('button', { name: `Account menu for ${displayName}` })
+    await expect(namedMenuTrigger).toBeVisible()
+    await namedMenuTrigger.click()
+    await expect(page.getByRole('menu').getByText(displayName, { exact: true })).toBeVisible()
+    await expect(page.getByRole('menu').getByText(email, { exact: true })).toBeVisible()
+    await page.keyboard.press('Escape')
+    await page.waitForLoadState('networkidle')
+
+    const namedAppResponse = await gotoForInitialResponse(page, '/app', manifestUrl)
+    if (!namedAppResponse) throw new Error('Named-profile navigation did not return a personal-app response')
+    const namedAppHtml = await namedAppResponse.text()
+    expect(namedAppResponse.status()).toBe(200)
+    expect(namedAppHtml.includes(displayName), 'named app HTML contains the explicit display name').toBe(true)
+    expect(namedAppHtml.includes(firstName), 'named app HTML excludes the private first name').toBe(false)
+    expect(namedAppHtml.includes(lastName), 'named app HTML excludes the private last name').toBe(false)
+    await expect(page.getByRole('heading', { name: `Welcome back, ${displayName}` })).toBeVisible()
+    await expect(page.getByText(firstName, { exact: true })).toHaveCount(0)
+    await expect(page.getByText(lastName, { exact: true })).toHaveCount(0)
+    await page.waitForLoadState('networkidle')
+
+    const savedAccountResponse = await gotoForInitialResponse(page, '/account', manifestUrl)
+    if (!savedAccountResponse) throw new Error('Saved-profile navigation did not return an account response')
+    expect(savedAccountResponse.status()).toBe(200)
+    await page.waitForFunction(() => window.useNuxtApp?.().isHydrating === false)
+    await expect(page.getByRole('textbox', { name: 'First name', exact: true })).toHaveValue(firstName)
+    await expect(page.getByRole('textbox', { name: 'Last name', exact: true })).toHaveValue(lastName)
+    await expect(page.getByRole('textbox', { name: 'Display name', exact: true })).toHaveValue(displayName)
+    await page.getByRole('textbox', { name: 'First name', exact: true }).fill('')
+    await page.getByRole('textbox', { name: 'Last name', exact: true }).fill('')
+    await page.getByRole('textbox', { name: 'Display name', exact: true }).fill('')
+    await page.getByRole('button', { name: 'Save profile', exact: true }).click()
+    await expect(page.getByText('Profile saved.', { exact: true })).toBeVisible()
+    await expect(page.getByRole('button', { name: `Account menu for ${email}` })).toBeVisible()
+    await page.waitForLoadState('networkidle')
+
+    const clearedAppResponse = await gotoForInitialResponse(page, '/app', manifestUrl)
+    if (!clearedAppResponse) throw new Error('Cleared-profile navigation did not return a personal-app response')
+    expect(clearedAppResponse.status()).toBe(200)
+    await expect(page.getByRole('heading', { name: 'Welcome back', exact: true })).toBeVisible()
+    await expect(page.getByRole('button', { name: `Account menu for ${email}` })).toBeVisible()
     await page.waitForLoadState('networkidle')
 
     const deletionAccountResponse = await gotoForInitialResponse(page, '/account', manifestUrl)

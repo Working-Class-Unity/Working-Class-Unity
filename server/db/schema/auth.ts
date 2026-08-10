@@ -13,6 +13,9 @@ export const user = sqliteTable(
     email: text('email').notNull(),
     emailVerified: integer('email_verified', { mode: 'boolean' }).notNull().default(false),
     image: text('image'),
+    firstName: text('first_name'),
+    lastName: text('last_name'),
+    displayName: text('display_name'),
     role: text('role', { enum: userRoles }).notNull().default('user'),
     createdAt: authTimestamp('created_at'),
     updatedAt: authTimestamp('updated_at')
@@ -20,6 +23,18 @@ export const user = sqliteTable(
   (table) => [
     uniqueIndex('user_email_idx').on(table.email),
     check('user_name_check', sql`${table.name} = trim(${table.name}) and length(${table.name}) between 1 and 100`),
+    check(
+      'user_first_name_check',
+      sql`${table.firstName} is null or (${table.firstName} = trim(${table.firstName}) and length(${table.firstName}) between 1 and 100)`
+    ),
+    check(
+      'user_last_name_check',
+      sql`${table.lastName} is null or (${table.lastName} = trim(${table.lastName}) and length(${table.lastName}) between 1 and 100)`
+    ),
+    check(
+      'user_display_name_check',
+      sql`${table.displayName} is null or (${table.displayName} = trim(${table.displayName}) and length(${table.displayName}) between 1 and 100)`
+    ),
     check('user_role_check', sql`${table.role} in ('user', 'admin')`)
   ]
 )

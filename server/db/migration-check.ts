@@ -10,7 +10,7 @@ const tempDir = mkdtempSync(join(tmpdir(), 'wcu-migration-check-'))
 const databasePath = join(tempDir, 'app.db')
 const migrationsFolder = resolve('server/db/migrations')
 const sqlite = new Database(databasePath)
-const expectedMigrationTags = ['0000_wcu_initial'] as const
+const expectedMigrationTags = ['0000_wcu_initial', '0001_wcu_account_profile'] as const
 const expectedRuntimeTables = [
   'account',
   'ai_conversations',
@@ -65,7 +65,7 @@ try {
   requireCurrentRuntimeSchema('Repeat migration')
   verifySqliteIntegrityAndForeignKeys(sqlite, 'Repeat migration', fail)
 
-  console.log('Fresh and repeat WCU initial migration check passed with 21 tables and 10 Billing triggers.')
+  console.log('Fresh and repeat WCU migration check passed with 21 tables and 10 Billing triggers.')
 } finally {
   sqlite.close()
   rmSync(tempDir, { recursive: true, force: true })
@@ -122,6 +122,12 @@ function requireCurrentRuntimeSchema(label: string) {
   const roleColumn = userColumns.find(({ name }) => name === 'role')
   if (!roleColumn || roleColumn.notnull !== 1 || roleColumn.dflt_value !== "'user'") {
     fail(`${label} did not create the required default-user role column.`)
+  }
+  for (const name of ['first_name', 'last_name', 'display_name']) {
+    const column = userColumns.find((candidate) => candidate.name === name)
+    if (!column || column.notnull !== 0 || column.dflt_value !== null) {
+      fail(`${label} did not create nullable user.${name}.`)
+    }
   }
 
   for (const table of [

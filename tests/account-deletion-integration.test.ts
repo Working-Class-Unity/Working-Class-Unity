@@ -88,7 +88,6 @@ describe('production-wired account deletion', () => {
         headers: { [turnstileHeaderName]: 'accepted-integration-challenge' },
         body: JSON.stringify({
           email,
-          name: 'Deletion Integration',
           callbackURL: '/app',
           newUserCallbackURL: '/app',
           errorCallbackURL: '/login'

@@ -1,7 +1,7 @@
 import Database from 'better-sqlite3'
 import { drizzle } from 'drizzle-orm/better-sqlite3'
 import { migrate } from 'drizzle-orm/better-sqlite3/migrator'
-import { mkdtempSync, rmSync } from 'node:fs'
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -29,12 +29,24 @@ describe('database behavior contracts', () => {
           () => sqlite.prepare("update user set role = 'owner' where id = 'constraint-owner'").run()
         ],
         [
-          'user with a blank display name',
+          'user with a blank Better Auth compatibility name',
           () => sqlite.prepare("update user set name = '   ' where id = 'constraint-owner'").run()
         ],
         [
-          'user with an oversized display name',
+          'user with an oversized Better Auth compatibility name',
           () => sqlite.prepare("update user set name = ? where id = 'constraint-owner'").run('x'.repeat(101))
+        ],
+        [
+          'user with a whitespace-only first name',
+          () => sqlite.prepare("update user set first_name = ' ' where id = 'constraint-owner'").run()
+        ],
+        [
+          'user with a padded last name',
+          () => sqlite.prepare("update user set last_name = ' Padded' where id = 'constraint-owner'").run()
+        ],
+        [
+          'user with an oversized optional display name',
+          () => sqlite.prepare("update user set display_name = ? where id = 'constraint-owner'").run('x'.repeat(101))
         ],
         [
           'detached billing subject whose purge date precedes deletion',
@@ -124,6 +136,48 @@ describe('database behavior contracts', () => {
       }
     })
   })
+
+  it('preserves existing identities while adding nullable account profile fields', () => {
+    const directory = mkdtempSync(join(tmpdir(), 'wcu-database-behavior-profile-upgrade-'))
+    const sqlite = new Database(join(directory, 'app.db'))
+    sqlite.pragma('foreign_keys = ON')
+
+    try {
+      applyMigrationSql(sqlite, '0000_wcu_initial.sql')
+      insertUser(sqlite, 'pre-profile-user')
+      sqlite
+        .prepare(
+          `insert into session (id, expires_at, token, created_at, updated_at, user_id)
+           values ('pre-profile-session', 2, 'pre-profile-token', 1, 1, 'pre-profile-user')`
+        )
+        .run()
+
+      applyMigrationSql(sqlite, '0001_wcu_account_profile.sql')
+
+      expect(
+        sqlite
+          .prepare(
+            `select id, name, email, first_name as firstName, last_name as lastName,
+                    display_name as displayName from user where id = 'pre-profile-user'`
+          )
+          .get()
+      ).toEqual({
+        id: 'pre-profile-user',
+        name: 'WCU account',
+        email: 'pre-profile-user@example.test',
+        firstName: null,
+        lastName: null,
+        displayName: 'pre-profile-user'
+      })
+      expect(sqlite.prepare("select user_id as userId from session where id = 'pre-profile-session'").get()).toEqual({
+        userId: 'pre-profile-user'
+      })
+      expect(sqlite.pragma('foreign_key_check')).toEqual([])
+    } finally {
+      sqlite.close()
+      rmSync(directory, { recursive: true, force: true })
+    }
+  })
 })
 
 function withMigratedDatabase(name: string, run: (sqlite: Sqlite) => void) {
@@ -136,6 +190,16 @@ function withMigratedDatabase(name: string, run: (sqlite: Sqlite) => void) {
   } finally {
     sqlite.close()
     rmSync(directory, { recursive: true, force: true })
+  }
+}
+
+function applyMigrationSql(sqlite: Sqlite, filename: string) {
+  const migration = readFileSync(join(migrationsFolder, filename), 'utf8')
+  for (const statement of migration
+    .split('--> statement-breakpoint')
+    .map((part) => part.trim())
+    .filter(Boolean)) {
+    sqlite.exec(statement)
   }
 }
 

@@ -59,12 +59,25 @@
       "title": "Continuing to log in",
       "description": "A signed-in session is required to view this page."
     },
+    "profile": {
+      "title": "Profile settings",
+      "description": "Add these details whenever you are ready. They are not required to use your account.",
+      "help": "First and last names stay in Account Settings. Only an explicit display name is used elsewhere in your WCU account.",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "displayName": "Display name",
+      "optional": "Optional",
+      "displayNameHelp": "Optional. Your email is used in your dashboard and account menu when this is blank.",
+      "save": "Save profile",
+      "saving": "Saving profile...",
+      "saved": "Profile saved.",
+      "saveError": "We could not save your profile right now. Please try again."
+    },
     "identity": {
-      "title": "Your profile",
+      "title": "Sign-in details",
       "avatar": "Avatar",
       "avatarAlt": "Avatar for {identity}",
-      "noAvatar": "No avatar set",
-      "displayName": "Display name"
+      "noAvatar": "No avatar set"
     },
     "menu": {
       "triggerLabel": "Account menu for {identity}",
@@ -119,12 +132,6 @@
     "sessionUnavailable": {
       "title": "Session check unavailable",
       "description": "We could not check your current session. You can still request a new email link."
-    },
-    "displayName": {
-      "label": "Display name",
-      "help": "Used only if this email is creating a new account.",
-      "required": "Display name is required.",
-      "tooLong": "Display name must be {max} characters or fewer."
     },
     "email": {
       "required": "Email is required.",

@@ -4,9 +4,9 @@ type RawSession = typeof authClient.$Infer.Session
 
 export type AppSessionUser = {
   id: string
-  name: string
   email: string
   image: string | null
+  displayName: string | null
 }
 
 export type AppSession = {
@@ -19,11 +19,15 @@ export function toAppSession(session: RawSession | null): AppSession | null {
   return {
     user: {
       id: session.user.id,
-      name: session.user.name,
       email: session.user.email,
-      image: session.user.image ?? null
+      image: session.user.image ?? null,
+      displayName: session.user.displayName ?? null
     }
   }
+}
+
+export function appUserIdentity(user: Pick<AppSessionUser, 'displayName' | 'email'>): string {
+  return user.displayName ?? user.email
 }
 
 export function useAppSession() {

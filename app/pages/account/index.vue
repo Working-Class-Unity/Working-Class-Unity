@@ -1,12 +1,26 @@
 <script setup lang="ts">
-const { t } = useI18n()
-const { data: session, error: sessionError, status: sessionStatus, refresh: refreshSession } = await useAppSession()
+import type { AccountProfile } from '#shared/profile'
+import { appUserIdentity, type AppSessionUser } from '~/composables/useAppSession'
 
-if (!sessionError.value && !session.value?.user) {
+type AccountSettingsUser = AppSessionUser & AccountProfile
+
+const { t } = useI18n()
+const { data: appSession, refresh: refreshAppSession } = await useAppSession()
+const {
+  data: account,
+  error: sessionError,
+  status: sessionStatus,
+  refresh: refreshAccount
+} = await useFetch<{ user: AccountSettingsUser }>('/api/me', {
+  key: 'account-profile',
+  dedupe: 'defer'
+})
+
+if (!account.value?.user && (!sessionError.value || sessionError.value.statusCode === 401)) {
   await navigateTo('/login', { redirectCode: 302 })
 }
 
-const user = computed(() => session.value?.user ?? null)
+const user = computed(() => account.value?.user ?? null)
 const retryState = ref<'idle' | 'pending' | 'failed'>('idle')
 const retrying = computed(() => retryState.value === 'pending')
 const retryAnnouncement = computed<'polite' | 'assertive' | undefined>(() => {
@@ -20,7 +34,28 @@ useHead(() => ({
 }))
 
 function accountDeleted() {
-  session.value = null
+  account.value = undefined
+  appSession.value = null
+}
+
+function profileUpdated(profile: AccountProfile) {
+  if (!account.value?.user) return
+  account.value = {
+    ...account.value,
+    user: {
+      ...account.value.user,
+      ...profile
+    }
+  }
+  if (appSession.value?.user) {
+    appSession.value = {
+      ...appSession.value,
+      user: {
+        ...appSession.value.user,
+        displayName: profile.displayName
+      }
+    }
+  }
 }
 
 async function retrySession() {
@@ -28,19 +63,23 @@ async function retrySession() {
 
   retryState.value = 'pending'
   try {
-    await refreshSession()
+    await Promise.all([refreshAccount(), refreshAppSession()])
   } catch {
     retryState.value = 'failed'
     return
   }
 
   if (sessionError.value) {
+    if (sessionError.value.statusCode === 401) {
+      await navigateTo('/login')
+      return
+    }
     retryState.value = 'failed'
     return
   }
 
   retryState.value = 'idle'
-  if (!session.value?.user) await navigateTo('/login')
+  if (!account.value?.user) await navigateTo('/login')
 }
 </script>
 
@@ -73,6 +112,8 @@ async function retrySession() {
       </AppNotice>
 
       <div v-else class="account-content">
+        <AccountProfileForm :user="user" @updated="profileUpdated" />
+
         <section aria-labelledby="identity-title">
           <h2 id="identity-title">{{ t('account.identity.title') }}</h2>
           <dl class="identity-list grid">
@@ -84,15 +125,11 @@ async function retrySession() {
                   v-if="user.image"
                   class="profile-avatar"
                   :src="user.image"
-                  :alt="t('account.identity.avatarAlt', { identity: user.name })"
+                  :alt="t('account.identity.avatarAlt', { identity: appUserIdentity(user) })"
                 />
                 <!-- eslint-enable vue/html-self-closing -->
                 <span v-if="!user.image">{{ t('account.identity.noAvatar') }}</span>
               </dd>
-            </div>
-            <div>
-              <dt>{{ t('account.identity.displayName') }}</dt>
-              <dd>{{ user.name }}</dd>
             </div>
             <div>
               <dt>{{ t('common.email') }}</dt>
