@@ -46,7 +46,7 @@ async function retrySession() {
       <div class="panel-heading">
         <p class="eyebrow">{{ t('personalApp.eyebrow') }}</p>
         <h1 id="personal-app-title">
-          {{ user ? t('personalApp.welcomeNamed', { name: user.name }) : t('personalApp.welcome') }}
+          {{ user?.displayName ? t('personalApp.welcomeNamed', { name: user.displayName }) : t('personalApp.welcome') }}
         </h1>
       </div>
 

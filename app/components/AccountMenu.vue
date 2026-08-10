@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from 'reka-ui'
-import type { AppSessionUser } from '~/composables/useAppSession'
+import { appUserIdentity, type AppSessionUser } from '~/composables/useAppSession'
 import { authClient } from '~/lib/auth-client'
 
 const props = defineProps<{
@@ -25,7 +25,8 @@ const { t } = useI18n()
 const open = ref(false)
 const isSigningOut = ref(false)
 const signOutError = ref('')
-const triggerLabel = computed(() => t('account.menu.triggerLabel', { identity: props.user.name }))
+const identity = computed(() => appUserIdentity(props.user))
+const triggerLabel = computed(() => t('account.menu.triggerLabel', { identity: identity.value }))
 const nuxtUseId = () => useId()
 
 watch(
@@ -80,8 +81,8 @@ async function signOut(event: Event) {
           :prioritize-position="true"
         >
           <DropdownMenuLabel class="account-menu-identity">
-            <strong>{{ props.user.name }}</strong>
-            <span>{{ props.user.email }}</span>
+            <strong>{{ identity }}</strong>
+            <span v-if="props.user.displayName">{{ props.user.email }}</span>
           </DropdownMenuLabel>
 
           <DropdownMenuSeparator class="account-menu-separator" />

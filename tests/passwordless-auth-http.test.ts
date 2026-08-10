@@ -35,55 +35,165 @@ afterEach(() => {
 })
 
 describe('configured passwordless HTTP behavior', () => {
-  it('requires a canonical display name for registration and profile updates', async () => {
-    const siteverify = vi.fn(successfulSiteverify)
-    vi.stubGlobal('fetch', siteverify)
-    const deliveriesBefore = fixture.deliveries.length
-    const verificationsBefore = count('verification')
-
-    for (const name of [undefined, '', ' ', ' Leading space', 'x'.repeat(101)]) {
-      const response = await fixture.auth.handler(
-        authRequest('/api/auth/sign-in/magic-link', {
-          method: 'POST',
-          headers: { [turnstileHeaderName]: `invalid-name-${randomUUID()}` },
-          body: JSON.stringify({ ...magicLinkBody('invalid-name@example.test'), name })
-        })
-      )
-      expect(response.status).toBe(400)
-      expect(await response.json()).toMatchObject({ code: 'INVALID_DISPLAY_NAME' })
-    }
-
-    expect(siteverify).not.toHaveBeenCalled()
-    expect(fixture.deliveries.length).toBe(deliveriesBefore)
-    expect(count('verification')).toBe(verificationsBefore)
-
-    const email = 'profile-name@example.test'
+  it('registers a new user from an email-only magic-link request', async () => {
+    const email = 'email-only-registration@example.test'
     const issued = await issueMagicLink(email)
+
+    expect(issued.response.status).toBe(200)
+    expect(JSON.parse(issued.body)).toEqual({ status: true })
+    expect(JSON.parse(issued.verification.value)).toMatchObject({ email })
+
     const verified = await fixture.auth.handler(authRequest(issued.url))
+    expect(redirectOutcome(verified).error).toBeUndefined()
     const sessionHeaders = convertSetCookieToCookie(new Headers(verified.headers))
 
-    for (const name of ['', ' ', 'Trailing space ', 'x'.repeat(101)]) {
-      const response = await fixture.auth.handler(
-        authRequest('/api/auth/update-user', {
-          method: 'POST',
-          headers: sessionHeaders,
-          body: JSON.stringify({ name })
-        })
-      )
-      expect(response.status).toBe(400)
-      expect(await response.json()).toMatchObject({ code: 'INVALID_DISPLAY_NAME' })
-    }
+    expect(
+      fixture.sqlite
+        .prepare(
+          'select email, name, first_name as firstName, last_name as lastName, display_name as displayName from user where email = ?'
+        )
+        .get(email)
+    ).toEqual({
+      email,
+      name: 'WCU account',
+      firstName: null,
+      lastName: null,
+      displayName: null
+    })
 
-    expect(fixture.sqlite.prepare('select name from user where email = ?').get(email)).toEqual({ name: email })
+    const session = await fixture.auth.handler(authRequest('/api/auth/get-session', { headers: sessionHeaders }))
+    const sessionBody = await session.json()
+    expect(sessionBody).toMatchObject({ user: { email, displayName: null } })
+    expect(sessionBody.user).not.toHaveProperty('firstName')
+    expect(sessionBody.user).not.toHaveProperty('lastName')
+
+    const forgedEmail = 'forged-signup-profile@example.test'
+    const forged = await issueMagicLink(forgedEmail, {}, nextUniqueClientIp(), {
+      ...magicLinkBody(forgedEmail),
+      name: 'Forged auth name',
+      firstName: 'Forged first name',
+      lastName: 'Forged last name',
+      displayName: 'Forged display name'
+    })
+    const forgedVerified = await fixture.auth.handler(authRequest(forged.url))
+    expect(forgedVerified.status).toBe(302)
+    expect(profileRow(forgedEmail)).toEqual({
+      name: 'WCU account',
+      firstName: null,
+      lastName: null,
+      displayName: null
+    })
+  })
+
+  it('normalizes, isolates, validates, and clears optional account profile fields', async () => {
+    const ownerEmail = 'profile-owner@example.test'
+    const otherEmail = 'profile-other@example.test'
+    const ownerIssued = await issueMagicLink(ownerEmail)
+    const otherIssued = await issueMagicLink(otherEmail)
+    const ownerVerified = await fixture.auth.handler(authRequest(ownerIssued.url))
+    const otherVerified = await fixture.auth.handler(authRequest(otherIssued.url))
+    const ownerHeaders = convertSetCookieToCookie(new Headers(ownerVerified.headers))
+    const other = fixture.sqlite.prepare('select id from user where email = ?').get(otherEmail) as { id: string }
+
+    const anonymous = await fixture.auth.handler(
+      authRequest('/api/auth/update-user', {
+        method: 'POST',
+        body: JSON.stringify({ displayName: 123 })
+      })
+    )
+    expect(anonymous.status).toBe(401)
+
     const updated = await fixture.auth.handler(
       authRequest('/api/auth/update-user', {
         method: 'POST',
-        headers: sessionHeaders,
-        body: JSON.stringify({ name: 'Profile Name' })
+        headers: ownerHeaders,
+        body: JSON.stringify({
+          userId: other.id,
+          firstName: '  Chíma  ',
+          lastName: '  联合  ',
+          displayName: '  Worker 🌹  '
+        })
       })
     )
     expect(updated.status).toBe(200)
-    expect(fixture.sqlite.prepare('select name from user where email = ?').get(email)).toEqual({ name: 'Profile Name' })
+    expect(profileRow(ownerEmail)).toEqual({
+      name: 'WCU account',
+      firstName: 'Chíma',
+      lastName: '联合',
+      displayName: 'Worker 🌹'
+    })
+    expect(profileRow(otherEmail)).toEqual({
+      name: 'WCU account',
+      firstName: null,
+      lastName: null,
+      displayName: null
+    })
+
+    const session = await fixture.auth.handler(authRequest('/api/auth/get-session', { headers: ownerHeaders }))
+    const sessionBody = await session.json()
+    expect(sessionBody).toMatchObject({ user: { email: ownerEmail, displayName: 'Worker 🌹' } })
+    expect(sessionBody.user).not.toHaveProperty('firstName')
+    expect(sessionBody.user).not.toHaveProperty('lastName')
+
+    const coreNameUpdate = await fixture.auth.handler(
+      authRequest('/api/auth/update-user', {
+        method: 'POST',
+        headers: ownerHeaders,
+        body: JSON.stringify({ name: 'Caller-owned core name' })
+      })
+    )
+    expect(coreNameUpdate.status).toBe(400)
+    expect(await coreNameUpdate.json()).toMatchObject({ code: 'INVALID_PROFILE_UPDATE' })
+
+    const astralBoundary = '🌹'.repeat(50)
+    const acceptedAstralBoundary = await fixture.auth.handler(
+      authRequest('/api/auth/update-user', {
+        method: 'POST',
+        headers: ownerHeaders,
+        body: JSON.stringify({ firstName: astralBoundary })
+      })
+    )
+    expect(acceptedAstralBoundary.status).toBe(200)
+    expect(profileRow(ownerEmail)).toMatchObject({ firstName: astralBoundary })
+
+    for (const body of [
+      { firstName: 'x'.repeat(101) },
+      { firstName: '🌹'.repeat(51) },
+      { lastName: 123 },
+      { displayName: 'x'.repeat(101) }
+    ]) {
+      const invalid = await fixture.auth.handler(
+        authRequest('/api/auth/update-user', {
+          method: 'POST',
+          headers: ownerHeaders,
+          body: JSON.stringify(body)
+        })
+      )
+      expect(invalid.status).toBe(400)
+      expect(profileRow(ownerEmail)).toEqual({
+        name: 'WCU account',
+        firstName: astralBoundary,
+        lastName: '联合',
+        displayName: 'Worker 🌹'
+      })
+    }
+
+    const cleared = await fixture.auth.handler(
+      authRequest('/api/auth/update-user', {
+        method: 'POST',
+        headers: ownerHeaders,
+        body: JSON.stringify({ firstName: ' ', lastName: '\t', displayName: '' })
+      })
+    )
+    expect(cleared.status).toBe(200)
+    expect(profileRow(ownerEmail)).toEqual({
+      name: 'WCU account',
+      firstName: null,
+      lastName: null,
+      displayName: null
+    })
+
+    expect(otherVerified.status).toBe(302)
   })
 
   it('requires the bounded header challenge before magic-link side effects and redacts verification failures', async () => {
@@ -605,7 +715,12 @@ function successfulSiteverify() {
   )
 }
 
-async function issueMagicLink(email: string, headers: Record<string, string> = {}, clientIp = nextUniqueClientIp()) {
+async function issueMagicLink(
+  email: string,
+  headers: Record<string, string> = {},
+  clientIp = nextUniqueClientIp(),
+  requestBody: Record<string, unknown> = magicLinkBody(email)
+) {
   const deliveryIndex = fixture.deliveries.length
   const verificationIdsBefore = new Set(verificationRows().map((row) => row.identifier))
   const response = await fixture.auth.handler(
@@ -614,7 +729,7 @@ async function issueMagicLink(email: string, headers: Record<string, string> = {
       {
         method: 'POST',
         headers: { [turnstileHeaderName]: `issue-${randomUUID()}`, ...headers },
-        body: JSON.stringify(magicLinkBody(email))
+        body: JSON.stringify(requestBody)
       },
       clientIp
     )
@@ -638,11 +753,18 @@ async function issueMagicLink(email: string, headers: Record<string, string> = {
 function magicLinkBody(email: string) {
   return {
     email,
-    name: email,
     callbackURL: '/app',
     newUserCallbackURL: '/app',
     errorCallbackURL: '/login'
   }
+}
+
+function profileRow(email: string) {
+  return fixture.sqlite
+    .prepare(
+      'select name, first_name as firstName, last_name as lastName, display_name as displayName from user where email = ?'
+    )
+    .get(email)
 }
 
 function authRequest(url: string | URL, init: RequestInit = {}, clientIp = nextUniqueClientIp()) {

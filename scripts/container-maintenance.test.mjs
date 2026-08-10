@@ -26,7 +26,8 @@ const entry = resolve('server/maintenance.mjs')
 const migrationsFolder = resolve('server/db/migrations')
 const runPnpm = resolve('scripts/run-pnpm.mjs')
 const stoppedApp = '--confirm-app-stopped'
-const finalMigrationCount = 1
+const finalMigrationCount = JSON.parse(readFileSync(join(migrationsFolder, 'meta', '_journal.json'), 'utf8')).entries
+  .length
 
 test('maintenance rejects missing configuration, relative paths, and unknown commands', async () => {
   const missing = await runProcess(['migrate', stoppedApp], { NUXT_DATABASE_URL: undefined })
@@ -52,13 +53,23 @@ test('fresh and repeat migrations are idempotent and back up existing state', as
 
   const fresh = await runMaintenance(databasePath, ['migrate', stoppedApp])
   assert.equal(fresh.code, 0)
-  assert.match(fresh.stdout, /1 newly applied; 1\/1 current; pre-migration backup not required/)
+  assert.match(
+    fresh.stdout,
+    new RegExp(
+      `${finalMigrationCount} newly applied; ${finalMigrationCount}/${finalMigrationCount} current; pre-migration backup not required`
+    )
+  )
   assert.equal(fresh.stderr, '')
 
   writeSetting(databasePath, 'migration-sentinel', 'preserved')
   const repeat = await runMaintenance(databasePath, ['migrate', stoppedApp])
   assert.equal(repeat.code, 0)
-  assert.match(repeat.stdout, /0 newly applied; 1\/1 current; pre-migration backup written as app-pre-migrate-/)
+  assert.match(
+    repeat.stdout,
+    new RegExp(
+      `0 newly applied; ${finalMigrationCount}/${finalMigrationCount} current; pre-migration backup written as app-pre-migrate-`
+    )
+  )
   assert.equal(readSetting(databasePath, 'migration-sentinel'), 'preserved')
   assert.equal(readdirSync(join(sandbox, 'backups')).filter((name) => name.includes('pre-migrate')).length, 1)
 
@@ -70,6 +81,86 @@ test('fresh and repeat migrations are idempotent and back up existing state', as
       sqlite.prepare("select count(*) as count from sqlite_master where type = 'table' and name = 'files'").get().count,
       1
     )
+  } finally {
+    sqlite.close()
+  }
+})
+
+test('production maintenance preserves user-owned rows while upgrading the baseline ledger', async (t) => {
+  const sandbox = disposableDirectory(t)
+  const fixtureRoot = join(sandbox, 'baseline-package')
+  const fixtureEntry = join(fixtureRoot, 'maintenance.mjs')
+  const fixtureMigrations = join(fixtureRoot, 'db', 'migrations')
+  const databasePath = join(sandbox, 'app.db')
+  mkdirSync(join(fixtureRoot, 'db'), { recursive: true })
+  symlinkSync(resolve('node_modules'), join(fixtureRoot, 'node_modules'), 'dir')
+  cpSync(entry, fixtureEntry)
+  cpSync(migrationsFolder, fixtureMigrations, { recursive: true })
+
+  const fixtureJournalPath = join(fixtureMigrations, 'meta', '_journal.json')
+  const fixtureJournal = JSON.parse(readFileSync(fixtureJournalPath, 'utf8'))
+  fixtureJournal.entries = fixtureJournal.entries.slice(0, 1)
+  writeFileSync(fixtureJournalPath, JSON.stringify(fixtureJournal, null, 2) + '\n')
+
+  const baseline = await runProcess(
+    ['migrate', stoppedApp],
+    { NUXT_DATABASE_URL: `file:${databasePath}` },
+    fixtureEntry
+  )
+  assert.equal(baseline.code, 0, baseline.stderr)
+  assert.match(baseline.stdout, /1 newly applied; 1\/1 current/)
+
+  const existing = new Database(databasePath)
+  try {
+    existing.pragma('foreign_keys = ON')
+    existing
+      .prepare('insert into user (id, name, email, email_verified, created_at, updated_at) values (?, ?, ?, 1, ?, ?)')
+      .run('upgrade-user', 'Legacy Display', 'upgrade@example.test', 1786334000000, 1786334000000)
+    existing
+      .prepare(
+        'insert into account (id, account_id, provider_id, user_id, created_at, updated_at) values (?, ?, ?, ?, ?, ?)'
+      )
+      .run('upgrade-account', 'upgrade@example.test', 'credential', 'upgrade-user', 1786334000000, 1786334000000)
+    existing
+      .prepare('insert into session (id, expires_at, token, created_at, updated_at, user_id) values (?, ?, ?, ?, ?, ?)')
+      .run('upgrade-session', 1886334000000, 'upgrade-session-token', 1786334000000, 1786334000000, 'upgrade-user')
+    existing
+      .prepare(
+        'insert into billing_customers (id, purchaser_user_id, stripe_customer_id, created_at, updated_at) values (?, ?, ?, ?, ?)'
+      )
+      .run('upgrade-customer', 'upgrade-user', 'cus_upgrade', '2026-08-09T12:00:00.000Z', '2026-08-09T12:00:00.000Z')
+  } finally {
+    existing.close()
+  }
+
+  const upgraded = await runMaintenance(databasePath, ['migrate', stoppedApp])
+  assert.equal(upgraded.code, 0, upgraded.stderr)
+  assert.match(
+    upgraded.stdout,
+    new RegExp(
+      `1 newly applied; ${finalMigrationCount}/${finalMigrationCount} current; pre-migration backup written as app-pre-migrate-`
+    )
+  )
+
+  const sqlite = new Database(databasePath, { readonly: true })
+  try {
+    assert.deepEqual(
+      sqlite
+        .prepare(
+          'select name, first_name as firstName, last_name as lastName, display_name as displayName from user where id = ?'
+        )
+        .get('upgrade-user'),
+      { name: 'WCU account', firstName: null, lastName: null, displayName: 'Legacy Display' }
+    )
+    for (const [table, id] of [
+      ['account', 'upgrade-account'],
+      ['session', 'upgrade-session'],
+      ['billing_customers', 'upgrade-customer']
+    ]) {
+      assert.equal(sqlite.prepare(`select count(*) as count from ${table} where id = ?`).get(id).count, 1)
+    }
+    assert.equal(sqlite.prepare('select count(*) as count from __drizzle_migrations').get().count, finalMigrationCount)
+    assert.deepEqual(sqlite.pragma('foreign_key_check'), [])
   } finally {
     sqlite.close()
   }
@@ -219,7 +310,10 @@ test('the documented migration command uses maintenance for relative URLs and re
 
   const fresh = await runPublicMigration(freshRelativeUrl)
   assert.equal(fresh.code, 0, fresh.stderr)
-  assert.match(fresh.stdout, /1 newly applied; 1\/1 current/)
+  assert.match(
+    fresh.stdout,
+    new RegExp(`${finalMigrationCount} newly applied; ${finalMigrationCount}/${finalMigrationCount} current`)
+  )
 
   const failedFirstDatabasePath = join(sandbox, 'failed-first.db')
   const failedFirst = new Database(failedFirstDatabasePath)

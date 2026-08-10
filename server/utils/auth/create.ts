@@ -5,9 +5,10 @@ import type { DatabaseConnection } from '../../db/connect'
 import * as schema from '../../db/schema'
 import type { TransactionalEmailSender } from '../../services/email'
 import type { AppRuntimeConfig } from '../runtime'
-import { createAccountDeletionUserOptions, disabledAccountDeletionAuthPaths } from './account-deletion'
+import { disabledAccountDeletionAuthPaths } from './account-deletion'
 import { createAuthenticationBeforeHook, createMagicLinkDelivery, disabledNonMagicLinkAuthPaths } from './passwordless'
 import { createBetterAuthSecurityOptions } from './security'
+import { createAuthenticationUserOptions } from './user-options'
 
 export function createAuthentication(
   config: AppRuntimeConfig,
@@ -23,7 +24,7 @@ export function createAuthentication(
       // documented transaction functions are synchronous and reject promises.
       transaction: false
     }),
-    user: createAccountDeletionUserOptions(database),
+    user: createAuthenticationUserOptions(database),
     disabledPaths: [...disabledNonMagicLinkAuthPaths, ...disabledAccountDeletionAuthPaths],
     emailAndPassword: {
       enabled: false

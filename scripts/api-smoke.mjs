@@ -74,8 +74,8 @@ const checks = [
       const otherJar = new Map()
       const suffix = nextFixtureSuffix('private-identity')
       const ownerEmail = `owner-${suffix}@example.com`
-      const owner = await signUpSmokeUser(ownerJar, ownerEmail, 'Smoke Owner')
-      const other = await signUpSmokeUser(otherJar, `other-${suffix}@example.com`, 'Smoke Other')
+      const owner = await signUpSmokeUser(ownerJar, ownerEmail)
+      const other = await signUpSmokeUser(otherJar, `other-${suffix}@example.com`)
 
       const anonymousMe = await requestWithCookies('/api/me')
       assert(anonymousMe.status === 401, `expected anonymous identity 401, received ${anonymousMe.status}`)
@@ -89,7 +89,7 @@ const checks = [
       assert(appEntry.status === 200, `expected authenticated /app shell 200, received ${appEntry.status}`)
       assert(appEntry.headers.get('cache-control') === 'private, no-store', 'expected /app to disable shared caching')
       const appHtml = await appEntry.text()
-      assert(appHtml.includes(owner.user.name), 'expected /app shell to render the authenticated user name')
+      assert(appHtml.includes('Welcome back'), 'expected /app shell to render the unnamed account greeting')
       assert(appHtml.includes(owner.user.email), 'expected /app shell to render the authenticated user email')
       assert(!appHtml.includes('/w/'), 'expected /app shell to avoid visible workspace routing')
       assert(!/workspace|capabilit(?:y|ies)/i.test(appHtml), 'expected /app shell to omit workspace authority details')
@@ -106,7 +106,7 @@ const checks = [
 
       assert(signOutResponse.ok, `expected sign out 2xx, received ${signOutResponse.status}`)
 
-      const returning = await signUpSmokeUser(ownerJar, ownerEmail, 'Smoke Owner')
+      const returning = await signUpSmokeUser(ownerJar, ownerEmail)
       assert(returning.user.id === owner.user.id, 'expected returning authentication to reuse the user identity')
       const returningMe = await requestJson('/api/me', {}, ownerJar)
       assertMinimalMeProjection(returningMe, owner.user)
@@ -117,7 +117,7 @@ const checks = [
     run: async () => {
       const authenticatedJar = new Map()
       const suffix = nextFixtureSuffix('excluded-capabilities')
-      await signUpSmokeUser(authenticatedJar, `excluded-${suffix}@example.com`, 'Excluded Capability User')
+      await signUpSmokeUser(authenticatedJar, `excluded-${suffix}@example.com`)
 
       for (const jar of [undefined, authenticatedJar]) {
         for (const [path, init] of [
@@ -230,13 +230,19 @@ function assertMinimalMeProjection(body, expectedUser) {
     'expected /api/me to expose only user identity'
   )
   assert(
-    JSON.stringify(Object.keys(body.user ?? {}).sort()) === JSON.stringify(['email', 'id', 'image', 'name']),
+    JSON.stringify(Object.keys(body.user ?? {}).sort()) ===
+      JSON.stringify(['displayName', 'email', 'firstName', 'id', 'image', 'lastName']),
     'expected /api/me to expose only the minimal user identity fields'
   )
   assert(body.user.id === expectedUser.id, 'expected /api/me user id to match the authenticated caller')
-  assert(body.user.name === expectedUser.name, 'expected /api/me user name to match the authenticated caller')
   assert(body.user.email === expectedUser.email, 'expected /api/me user email to match the authenticated caller')
   assert(body.user.image === expectedUser.image, 'expected /api/me user image to match the authenticated caller')
+  assert(body.user.firstName === null, 'expected a new account to have no first name')
+  assert(body.user.lastName === null, 'expected a new account to have no last name')
+  assert(
+    body.user.displayName === expectedUser.displayName,
+    'expected /api/me display name to match the authenticated caller'
+  )
 }
 
 async function requestJson(path, init, cookieJar) {
@@ -249,7 +255,7 @@ async function requestJson(path, init, cookieJar) {
   return body
 }
 
-async function signUpSmokeUser(cookieJar, email, name) {
+async function signUpSmokeUser(cookieJar, email) {
   const requestBody = await requestJson(
     '/api/auth/sign-in/magic-link',
     {
@@ -259,7 +265,6 @@ async function signUpSmokeUser(cookieJar, email, name) {
         'x-turnstile-token': `isolated-turnstile-${randomUUID()}`
       },
       body: JSON.stringify({
-        name,
         email,
         callbackURL: '/app',
         errorCallbackURL: '/login',
@@ -285,6 +290,8 @@ async function signUpSmokeUser(cookieJar, email, name) {
   const body = await requestJson('/api/auth/get-session', {}, cookieJar)
 
   assert(body.user?.id, 'expected signed up user id')
+  assert(!('firstName' in body.user), 'expected the general auth session to omit the private first name')
+  assert(!('lastName' in body.user), 'expected the general auth session to omit the private last name')
   return body
 }
 
