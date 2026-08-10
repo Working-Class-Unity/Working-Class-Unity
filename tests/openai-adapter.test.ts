@@ -415,27 +415,19 @@ describe('direct OpenAI Responses adapter', () => {
     })
   })
 
-  it('guards, lazily constructs, caches, and resets the production adapter without making a live request', async () => {
-    const fakeFetch = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      jsonResponse(successResponse(), {
-        'x-request-id': 'request_openai_lazy'
-      })
-    )
+  it('rejects the production adapter before runtime configuration or a live request', () => {
+    const fakeFetch = vi.spyOn(globalThis, 'fetch')
     const readyConfig = adapterRuntimeConfig()
     const runtimeConfig = vi.spyOn(runtime, 'getAppRuntimeConfig').mockReturnValue(readyConfig)
-    const first = getOpenAIResponsesAdapter()
 
-    expect(getOpenAIResponsesAdapter(readyConfig)).toBe(first)
+    expect(() => getOpenAIResponsesAdapter()).toThrow(
+      expect.objectContaining({ statusCode: 404, statusMessage: 'Not Found' })
+    )
+    expect(() => getOpenAIResponsesAdapter(readyConfig)).toThrow(
+      expect.objectContaining({ statusCode: 404, statusMessage: 'Not Found' })
+    )
+    expect(runtimeConfig).not.toHaveBeenCalled()
     expect(fakeFetch).not.toHaveBeenCalled()
-    await expect(getOpenAIResponsesAdapter().createResponse(validInput())).resolves.toMatchObject({
-      kind: 'text',
-      requestId: 'request_openai_lazy'
-    })
-    expect(runtimeConfig).toHaveBeenCalledTimes(2)
-    expect(fakeFetch).toHaveBeenCalledOnce()
-
-    resetOpenAIResponsesAdapterForTests()
-    expect(getOpenAIResponsesAdapter(readyConfig)).not.toBe(first)
   })
 
   it.each([

@@ -29,7 +29,6 @@
     "ops:readiness": "node scripts/run-pnpm.mjs exec tsx scripts/production-readiness.ts",
     "ops:readiness:strict": "node scripts/run-pnpm.mjs exec tsx scripts/production-readiness.ts --strict",
     "ops:smoke": "node scripts/deployment-smoke.mjs",
-    "openai:corpus": "node scripts/openai-corpus.mjs",
     "api:smoke": "node scripts/isolated-api-smoke.mjs",
     "lint": "node scripts/run-pnpm.mjs exec eslint . --ignore-pattern \"scripts/**\" --ignore-pattern playwright.config.mjs",
     "stylelint": "node scripts/run-pnpm.mjs exec stylelint \"app/**/*.{css,vue}\"",

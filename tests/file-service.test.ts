@@ -19,12 +19,20 @@ import {
 } from '../server/services/account-deletion-billing'
 import type { BillingStripeRuntimeConfiguration } from '../server/services/payments/stripe/configuration'
 import {
+  completeFileUpload,
   completeFileUploadForConnection,
+  createFileUploadTarget,
   createFileUploadTargetForConnection,
+  createPrivateFileDownload,
   createPrivateFileDownloadForConnection,
+  deleteOwnedFile,
   deleteOwnedFileAndScheduleCleanup,
   fileCleanupSchedulingMarginMs,
   fileUploadTokenTtlMs,
+  getLocalFileDownload,
+  getOwnedFileMetadata,
+  listOwnedFiles,
+  putFileUploadContent,
   putVerifiedFileUploadContent
 } from '../server/services/storage/file-service'
 import { objectKeyForFileId } from '../server/services/storage/file-object-keys'
@@ -87,6 +95,30 @@ afterEach(async () => {
 })
 
 describe('private file service', () => {
+  it('rejects every production entry before runtime, database, or storage access', async () => {
+    const session = { user: { id: 'disabled-files-owner' } } as Parameters<typeof listOwnedFiles>[0]
+    const fileId = `file_${randomUUID()}`
+    const emptyBody = (async function* () {})()
+    const entries = [
+      () => listOwnedFiles(session),
+      () => getOwnedFileMetadata(session, fileId),
+      () => createFileUploadTarget(session, {} as Parameters<typeof createFileUploadTarget>[1]),
+      () => putFileUploadContent(session, fileId, 'unused-token', emptyBody, {}),
+      () => completeFileUpload(session, fileId),
+      () => createPrivateFileDownload(session, fileId),
+      () => getLocalFileDownload(session, fileId, 'unused-token'),
+      () => deleteOwnedFile(session, fileId)
+    ]
+
+    for (const entry of entries) {
+      await expect(entry()).rejects.toMatchObject({ statusCode: 404, statusMessage: 'Not Found' })
+    }
+
+    expect(runtime.getAppRuntimeConfig).not.toHaveBeenCalled()
+    expect(tableRowCount(fixture.connection, 'files')).toBe(0)
+    expect(tableRowCount(fixture.connection, 'job_queue')).toBe(0)
+  })
+
   it("conceals one user's private files from another user exactly like missing files", async () => {
     insertUser(fixture.connection, 'file-owner', 'file-owner@example.test')
     insertUser(fixture.connection, 'foreign-user', 'foreign-user@example.test')
@@ -1019,7 +1051,7 @@ describe('private file service', () => {
     expect(await fixture.local.headPersistedObject(readyKey)).toEqual({ key: readyKey, byteSize: content.length })
   })
 
-  it('deletes only the removed account objects and retries cleanup without delaying identity deletion', async () => {
+  it('removes dormant file rows without creating storage work or delaying identity deletion', async () => {
     insertUser(fixture.connection, 'removed-owner', 'removed-owner@example.test')
     insertUser(fixture.connection, 'retained-owner', 'retained-owner@example.test')
     const now = new Date()
@@ -1074,126 +1106,17 @@ describe('private file service', () => {
     })
     expect(await fixture.local.headPersistedObject(ownerKey)).not.toBeNull()
     expect(await fixture.local.headPersistedObject(retainedKey)).not.toBeNull()
-
-    const deferred: Array<{ payload: unknown; runAfter?: string }> = []
-    await cleanupOrphanedFileObjectsForConnection(
-      fixture.connection,
-      { phase: 'reconcile-v1' },
-      {
-        storage: fixture.storage,
-        now,
-        enqueueNext: (payload, options) => deferred.push({ payload, runAfter: options?.runAfter })
-      }
-    )
-    expect(deferred).toEqual([
-      {
-        payload: { phase: 'reconcile-v1' },
-        runAfter: new Date(now.getTime() + fileCleanupSchedulingMarginMs).toISOString()
-      }
-    ])
-
-    const deleteObjects = vi
-      .fn<(keys: readonly string[]) => Promise<void>>()
-      .mockRejectedValueOnce(new Error('provider unavailable'))
-      .mockImplementation((keys) => fixture.local.deleteObjects(keys))
-    const retryingStorage = {
-      kind: 'local',
-      bucketName: 'local',
-      local: {
-        listPage: fixture.local.listPage.bind(fixture.local),
-        deleteObjects
-      }
-    } as unknown as ObjectStorage
-    const cleanupAt = new Date(now.getTime() + fileCleanupSchedulingMarginMs + 1)
-
-    await expect(
-      cleanupOrphanedFileObjectsForConnection(
-        fixture.connection,
-        { phase: 'reconcile-v1' },
-        { storage: retryingStorage, now: cleanupAt, enqueueNext: () => undefined }
-      )
-    ).rejects.toThrow('provider unavailable')
-    expect(await fixture.local.headPersistedObject(ownerKey)).not.toBeNull()
-    expect(await fixture.local.headPersistedObject(retainedKey)).not.toBeNull()
-
-    await cleanupOrphanedFileObjectsForConnection(
-      fixture.connection,
-      { phase: 'reconcile-v1' },
-      { storage: retryingStorage, now: cleanupAt, enqueueNext: () => undefined }
-    )
-    expect(await fixture.local.headPersistedObject(ownerKey)).toBeNull()
-    expect(await fixture.local.headPersistedObject(retainedKey)).toEqual({
-      key: retainedKey,
-      byteSize: retainedContent.length
-    })
     expect(fixture.connection.sqlite.prepare('select owner_id from files').all()).toEqual([
       { owner_id: 'retained-owner' }
     ])
-  })
-
-  it('rechecks the account-deletion watermark atomically after provider listing', async () => {
-    const ownerId = 'listed-deletion-owner'
-    insertUser(fixture.connection, ownerId, 'listed-deletion-owner@example.test')
-    const now = new Date('2026-07-15T12:00:00.000Z')
-    const uploadExpiresAt = new Date(now.getTime() + 5 * 60_000)
-    const content = Buffer.from('listed before account deletion')
-    const fileId = newFileId()
-    const objectKey = objectKeyForFileId(fileId)
-    await insertFile(fixture.connection, {
-      id: fileId,
-      ownerId,
-      objectKey,
-      content,
-      status: 'ready',
-      createdAt: now,
-      uploadExpiresAt
-    })
-    await writeLocalObject(fixture.local, objectKey, content)
-    assertFileStorageBinding(fixture.connection, fixture.storage, { initialize: true })
-    const scheduled: Array<{ payload: unknown; runAfter?: string }> = []
-    const deletionProof = await prepareAccountDeletionBilling(
-      fixture.connection,
-      ownerId,
-      accountDeletionBillingConfiguration
-    )
-
-    await expect(
-      cleanupOrphanedFileObjectsForConnection(
-        fixture.connection,
-        { phase: 'reconcile-v1' },
-        {
-          storage: fixture.storage,
-          now,
-          checkpoint: async (checkpoint) => {
-            if (checkpoint !== 'reconcile-v1-listed') return
-            await expect(
-              withAccountDeletionBillingProof(ownerId, deletionProof, async () =>
-                deleteAccountAtomically(
-                  fixture.connection,
-                  { id: ownerId, email: 'listed-deletion-owner@example.test' },
-                  { deletedAt: now.toISOString() }
-                )
-              )
-            ).resolves.toMatchObject({ status: 'deleted', deletedFiles: 1 })
-          },
-          enqueueNext: (payload, options) => scheduled.push({ payload, runAfter: options?.runAfter })
-        }
-      )
-    ).resolves.toMatchObject({
-      phase: 'reconcile-v1',
-      deletedObjects: 0,
-      nextScheduled: true,
-      deferredUntil: new Date(uploadExpiresAt.getTime() + fileCleanupSchedulingMarginMs).toISOString()
-    })
-
-    expect(await fixture.local.headPersistedObject(objectKey)).toEqual({ key: objectKey, byteSize: content.length })
-    expect(fixture.connection.sqlite.prepare('select id from files where id = ?').get(fileId)).toBeUndefined()
-    expect(scheduled).toEqual([
-      {
-        payload: { phase: 'reconcile-v1' },
-        runAfter: new Date(uploadExpiresAt.getTime() + fileCleanupSchedulingMarginMs).toISOString()
-      }
-    ])
+    expect(
+      fixture.connection.sqlite.prepare("select id from job_queue where type = 'files.cleanup-orphans'").all()
+    ).toEqual([])
+    expect(
+      fixture.connection.sqlite
+        .prepare("select value from app_settings where key = 'files.reconcile-not-before.v1'")
+        .get()
+    ).toBeUndefined()
   })
 })
 
@@ -1866,6 +1789,10 @@ function insertUser(connection: DatabaseConnection, id: string, email: string) {
   connection.sqlite
     .prepare('insert into user (id, name, email, email_verified, created_at, updated_at) values (?, ?, ?, 1, ?, ?)')
     .run(id, id, email, Date.now(), Date.now())
+}
+
+function tableRowCount(connection: DatabaseConnection, table: 'files' | 'job_queue') {
+  return (connection.sqlite.prepare(`select count(*) as count from ${table}`).get() as { count: number }).count
 }
 
 async function insertFile(

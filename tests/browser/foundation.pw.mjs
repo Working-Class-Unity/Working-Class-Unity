@@ -887,12 +887,16 @@ async function assertCleanPage(page, observations) {
   const hydrationWarnings = observations.allConsole.filter((message) =>
     /hydration|mismatch|\[?vue warn\]?/i.test(message)
   )
+  const excludedCapabilityRequests = observations.sameOriginRequests.filter((request) =>
+    /\/api\/(?:ai|files)(?:[/?]|$)/.test(request)
+  )
   expect(observations.console, 'console warning/error output').toEqual([])
   expect(hydrationWarnings, 'hydration warning output').toEqual([])
   expect(observations.pageErrors, 'uncaught page errors').toEqual([])
   expect(observations.failedRequests, 'failed browser requests').toEqual([])
   expect(observations.errorResponses, 'same-origin HTTP error responses').toEqual([])
   expect(observations.externalRequests, 'external browser requests').toEqual([])
+  expect(excludedCapabilityRequests, 'AI/Files browser requests').toEqual([])
   expect(observations.crashes, 'page crashes').toBe(0)
 }
 

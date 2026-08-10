@@ -202,11 +202,11 @@ describe('immediate account deletion', () => {
         expect(count(fixture, table, `${where} = ?`, fixture.userId), `${table} owned rows`).toBe(0)
       }
       expect(count(fixture, 'verification')).toBe(1)
-      expect(count(fixture, 'job_queue', "type = 'files.cleanup-orphans'")).toBe(1)
+      expect(count(fixture, 'job_queue', "type = 'files.cleanup-orphans'")).toBe(0)
       expect(count(fixture, 'job_queue', "type like 'billing.%'")).toBe(0)
       expect(
         fixture.sqlite.prepare("select value from app_settings where key = 'files.reconcile-not-before.v1'").get()
-      ).toEqual({ value: JSON.stringify('2026-08-04T12:16:00.000Z') })
+      ).toBeUndefined()
 
       expect(count(fixture, 'user', 'id = ?', fixture.foreignUserId)).toBe(1)
       expect(count(fixture, 'files', 'owner_id = ?', fixture.foreignUserId)).toBe(1)

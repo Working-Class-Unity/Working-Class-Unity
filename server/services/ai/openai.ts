@@ -16,6 +16,7 @@ import OpenAI, {
 import { isIP } from 'node:net'
 import { domainToASCII } from 'node:url'
 import type { Response, ResponseCreateParamsNonStreaming, ResponseUsage } from 'openai/resources/responses/responses'
+import { assertBasicReleaseCapabilityAvailable } from '../../../shared/basic-release-policy'
 import { getAppRuntimeConfig, type AppRuntimeConfig } from '../../utils/runtime'
 import { aiPolicy } from './ai-policy'
 
@@ -212,8 +213,10 @@ export function createOpenAIResponsesAdapter(
   })
 }
 
-export function getOpenAIResponsesAdapter(config: AppRuntimeConfig = getAppRuntimeConfig()): OpenAIResponsesAdapter {
-  productionAdapter ??= createOpenAIResponsesAdapter(config.openai)
+export function getOpenAIResponsesAdapter(config?: AppRuntimeConfig): OpenAIResponsesAdapter {
+  assertBasicReleaseCapabilityAvailable('ai')
+  const runtimeConfig = config ?? getAppRuntimeConfig()
+  productionAdapter ??= createOpenAIResponsesAdapter(runtimeConfig.openai)
   return productionAdapter
 }
 

@@ -10,7 +10,7 @@ after(async () => {
   await Promise.all([...openServers].map((server) => closeServer(server)))
 })
 
-test('active capability checks produce only anonymous GET probes with no provider credentials', async (t) => {
+test('release-boundary checks produce only anonymous GET probes with no provider credentials', async (t) => {
   const fixture = await startRecorder()
   t.after(() => fixture.close())
   const logger = recordingLogger()
@@ -69,6 +69,17 @@ test('an active private boundary fails closed when its anonymous response is not
   assert.match(result.failures[0], /expected anonymous 401 for billing, received 200/)
   assert.equal(logger.errors.length, 1)
   assert.match(logger.errors[0], /^fail - GET \/api\/account\/billing/)
+})
+
+test('an excluded boundary fails when it is exposed or cacheable', async (t) => {
+  const fixture = await startRecorder({ '/api/ai/conversations': { body: '{}', status: 401 } })
+  t.after(() => fixture.close())
+
+  const result = await runDeploymentSmoke({ baseUrl: fixture.baseUrl, logger: recordingLogger() })
+
+  assert.equal(result.ok, false)
+  assert.equal(result.failures.length, 1)
+  assert.match(result.failures[0], /expected excluded ai 404, received 401/)
 })
 
 test('observability page receives a GET-only probe', async (t) => {
@@ -190,6 +201,8 @@ async function startRecorder(overrides = {}) {
       const [capabilityId] = capabilityEntry
       if (capabilityId === 'observability') {
         send(response, 200, '<h1>Client Event Test</h1>')
+      } else if (capabilityId === 'ai' || capabilityId === 'files') {
+        sendJson(response, 404, { statusCode: 404 }, { 'cache-control': 'no-store' })
       } else {
         sendJson(response, 401, { statusCode: 401 })
       }
@@ -219,8 +232,8 @@ function send(response, status, body, headers = {}) {
   response.end(body)
 }
 
-function sendJson(response, status, body) {
-  send(response, status, JSON.stringify(body), { 'content-type': 'application/json' })
+function sendJson(response, status, body, headers = {}) {
+  send(response, status, JSON.stringify(body), { 'content-type': 'application/json', ...headers })
 }
 
 function recordingLogger() {

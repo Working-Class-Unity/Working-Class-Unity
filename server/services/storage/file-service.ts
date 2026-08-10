@@ -1,5 +1,6 @@
 import type { Readable } from 'node:stream'
 import { createError } from 'h3'
+import { assertBasicReleaseCapabilityAvailable } from '../../../shared/basic-release-policy'
 import type { DatabaseConnection } from '../../db/connect'
 import type { CreateFileUploadRequest, FileMetadata } from '../../db/schema'
 import { contentTypeSchema } from '../../db/schema'
@@ -50,6 +51,7 @@ export type PublicFile = Readonly<{
 }>
 
 export async function listOwnedFiles(session: AppSession, options: Readonly<{ cursor?: string; limit?: number }> = {}) {
+  assertBasicReleaseCapabilityAvailable('files')
   const connection = useDatabase()
   const page = await listFilesForOwner(connection, session.user.id, {
     cursor: options.cursor ? decodeFileListCursor(options.cursor) : undefined,
@@ -70,6 +72,7 @@ export async function listOwnedFiles(session: AppSession, options: Readonly<{ cu
 }
 
 export async function getOwnedFileMetadata(session: AppSession, fileId: string) {
+  assertBasicReleaseCapabilityAvailable('files')
   const connection = useDatabase()
   const file = await requireOwnedFile(connection, session.user.id, fileId)
   const storage = useObjectStorage()
@@ -82,6 +85,7 @@ export async function getOwnedFileMetadata(session: AppSession, fileId: string) 
 }
 
 export async function createFileUploadTarget(session: AppSession, input: CreateFileUploadRequest) {
+  assertBasicReleaseCapabilityAvailable('files')
   const storage = useObjectStorage()
   try {
     return await createFileUploadTargetForConnection(useDatabase(), storage, session.user.id, input)
@@ -186,6 +190,7 @@ export async function putFileUploadContent(
   body: AsyncIterable<Uint8Array>,
   headers: Readonly<{ contentType?: string; contentMd5?: string; contentLength?: string }>
 ) {
+  assertBasicReleaseCapabilityAvailable('files')
   const storage = useObjectStorage()
   try {
     return await putVerifiedFileUploadContent(
@@ -275,6 +280,7 @@ export async function putVerifiedFileUploadContent(
 }
 
 export async function completeFileUpload(session: AppSession, fileId: string) {
+  assertBasicReleaseCapabilityAvailable('files')
   const storage = useObjectStorage()
   try {
     return await completeFileUploadForConnection(useDatabase(), storage, session.user.id, fileId)
@@ -308,6 +314,7 @@ export async function completeFileUploadForConnection(
 }
 
 export async function createPrivateFileDownload(session: AppSession, fileId: string) {
+  assertBasicReleaseCapabilityAvailable('files')
   const storage = useObjectStorage()
   try {
     return await createPrivateFileDownloadForConnection(useDatabase(), storage, session.user.id, fileId)
@@ -359,6 +366,7 @@ export async function getLocalFileDownload(
   fileId: string,
   token: string
 ): Promise<{ file: PublicFile; body: Readable; byteSize: number }> {
+  assertBasicReleaseCapabilityAvailable('files')
   const payload = verifyFileDownloadToken(token)
   if (payload.fileId !== fileId || payload.ownerId !== session.user.id) throw notFoundError('File download not found')
   const storage = useObjectStorage()
@@ -379,6 +387,7 @@ export async function getLocalFileDownload(
 }
 
 export async function deleteOwnedFile(session: AppSession, fileId: string) {
+  assertBasicReleaseCapabilityAvailable('files')
   const storage = useObjectStorage()
   try {
     const deleted = deleteOwnedFileAndScheduleCleanup(useDatabase(), storage, session.user.id, fileId)

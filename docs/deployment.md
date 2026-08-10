@@ -1,5 +1,8 @@
 # Deployment
 
+> Imported donor history; this is not an operational WCU runbook. Follow current repository
+> configuration and [`basic-release.md`](basic-release.md), which exclude OpenAI and user-file R2.
+
 ## Hosting Choice
 
 The baseline production target is a Coolify-managed Docker application on a DigitalOcean Droplet. This keeps the first deployment understandable: one server, Git-based deploys, container logs, environment variable management, and an explicit persistent storage mount for SQLite.

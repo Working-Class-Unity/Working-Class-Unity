@@ -5,7 +5,6 @@ import { runNextJobForConnection, type JobHandler } from './services/jobs/job-qu
 import { runWorkerLoop } from './services/jobs/worker-loop'
 import { billingStripeConfiguration } from './services/payments/stripe/app-composition'
 import { createBillingStripeJobHandlers, ensureBillingStripeJobs } from './services/payments/stripe/jobs'
-import { cleanupOrphanedFileObjects, ensureFileReconciliationSafetyJob } from './services/storage/orphan-cleanup'
 import { getAppRuntimeConfig, readDatabaseUrl } from './utils/runtime'
 
 const config = getAppRuntimeConfig()
@@ -22,7 +21,6 @@ const requestShutdown = (signal: NodeJS.Signals) => {
 }
 const onSigterm = () => requestShutdown('SIGTERM')
 const onSigint = () => requestShutdown('SIGINT')
-let nextFileSafetyCheckAt = 0
 let nextBillingSafetyCheckAt = 0
 const handlers: Record<string, JobHandler> = {
   ...createBillingStripeJobHandlers({
@@ -30,10 +28,7 @@ const handlers: Record<string, JobHandler> = {
     integration: undefined,
     sender: getTransactionalEmailSender(),
     connection
-  }),
-  'files.cleanup-orphans': async (payload) => {
-    await cleanupOrphanedFileObjects(connection, payload)
-  }
+  })
 }
 
 process.once('SIGTERM', onSigterm)
@@ -46,10 +41,6 @@ try {
     onResult: (result) => console.log(`Worker processed job ${result.jobId}: ${result.status}`),
     beforeClaim: () => {
       const now = new Date()
-      if (now.getTime() >= nextFileSafetyCheckAt) {
-        const state = ensureFileReconciliationSafetyJob(connection, now)
-        nextFileSafetyCheckAt = now.getTime() + (state === 'covered-active' ? 1_000 : 60_000)
-      }
       if (now.getTime() >= nextBillingSafetyCheckAt) {
         ensureBillingStripeJobs(connection, now)
         nextBillingSafetyCheckAt = now.getTime() + 60_000

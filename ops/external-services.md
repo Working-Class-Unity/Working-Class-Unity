@@ -1,5 +1,8 @@
 # External Services Readiness
 
+> Imported donor history; this is not an operational WCU checklist. The current release boundary is
+> [`docs/basic-release.md`](../docs/basic-release.md); do not provision OpenAI or user-file R2.
+
 These items require account-level actions outside the local repository. The app can provide adapters, docs, and environment validation, but the services are not complete until the real resources exist and production secrets are configured.
 
 ## Readiness Command

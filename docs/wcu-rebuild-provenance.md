@@ -26,33 +26,27 @@ its verification deliberately, then record the result below.
   before launch.
 - Do not transfer legacy WCU content, data, UI, or design in the platform-foundation phase.
 - Remove Family and generic Projects completely.
-- Remove product feature switches. Identity, Files, AI, Billing, email, jobs, and backups are part
-  of the application; tests may still use deterministic provider substitutes.
+- Remove product feature switches. Identity, Billing, email, Billing jobs, and database backups are
+  application infrastructure; AI and user Files remain source-disabled dormant code.
 - Allow open registration with email magic links only. New accounts begin as non-members.
 - Limit the initial profile model to a required identity display name and an optional avatar. WCU
   has no public profile or member directory; the authenticated account holder is the only initial
   consumer of these fields.
 - Keep a minimal operator-assigned administrator role separate from paid membership.
 - Keep self-service account deletion in the first launch scope.
-- Keep private, user-owned AI conversations using OpenAI Responses and make them available to all
-  authenticated users. Final usage quotas are deferred.
-- Keep OpenAI File Search backed by one deployment-owned, read-only WCU corpus. It may begin empty
-  and must not automatically index users' private R2 files.
-- Keep OpenAI Web Search behind a WCU-owned domain allowlist. Users cannot override it.
-- Treat Web Search as not production-ready until WCU approves the domain list and the UI renders
-  its citations visibly.
-- Offer File Search and Web Search with automatic selection and at most one built-in tool call per
-  response.
-- Keep private user file storage in Cloudflare R2 and private SQLite backups in a separate R2
-  bucket.
-- Permit PDFs, ordinary images, Microsoft Office documents, and Apple iWork documents. Exact
-  MIME/extension rules and low account quotas require documented implementation decisions.
+- Exclude AI chat, Files, File Search, Web Search, OpenAI resources, and user-file R2 from the basic
+  release for every audience. Preserve only dormant implementation where that keeps the diff small.
+- Later AI access requires a separately approved, content-grounded release: public users receive no
+  access, authenticated nonmembers receive a limited quota, and dues-paying members receive one
+  somewhat larger quota regardless of dues amount.
+- Keep private SQLite backups in their own R2 boundary; do not provision a user-file bucket.
 - Use Stripe Billing owned by the purchaser user, not the removed Family model. Defer the final
   one-membership/two-price catalog until the foundation is otherwise complete.
 - Defer paid-page authorization until after the initial platform foundation.
 - Use Resend as the email provider and Coolify for deployment.
-- Defer real provider credentials and hosted certification. Deterministic tests preserve the
-  application contracts but do not certify OpenAI, R2, Resend, Stripe, Sentry, or Coolify accounts.
+- Defer real enabled-provider credentials and hosted certification. Deterministic tests do not
+  certify database-backup R2, Resend, Stripe, Sentry, or Coolify accounts; no OpenAI or user-file R2
+  account is part of this release.
 - Retain the existing WCU subdomains, but do not retain the old site's other integrations.
 - Preserve behavioral verification for retained capabilities. Remove or rewrite tests only when an
   approved removed or changed contract makes the old assertion invalid.
