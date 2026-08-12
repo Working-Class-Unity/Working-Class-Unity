@@ -11,8 +11,20 @@
   "metadata": {
     "defaultDescription": "Working Class Unity.",
     "home": {
-      "title": "Home",
-      "description": "The Working Class Unity community website."
+      "title": "Working Class Unity",
+      "description": "Working people organizing together across San Joaquin County."
+    },
+    "about": {
+      "title": "About",
+      "description": "Learn about Working Class Unity in San Joaquin County."
+    },
+    "calendar": {
+      "title": "Calendar",
+      "description": "Find upcoming Working Class Unity events and meetings."
+    },
+    "forum": {
+      "title": "Forum",
+      "description": "Visit the Working Class Unity community forum."
     },
     "login": {
       "title": "Log in"
@@ -45,9 +57,13 @@
     "brandHome": "{appName} home",
     "primaryLabel": "Primary",
     "sessionUnavailable": "Session check unavailable",
+    "about": "About",
+    "calendar": "Calendar",
+    "forum": "Forum",
+    "menu": "Menu",
     "app": "App",
-    "login": "Log in",
-    "signup": "Sign up"
+    "login": "Log In",
+    "signup": "JOIN NOW"
   },
   "account": {
     "eyebrow": "Personal settings",
@@ -208,12 +224,33 @@
       }
     }
   },
+  "publicPages": {
+    "eyebrow": "Public site",
+    "about": {
+      "title": "About",
+      "description": "We are preparing the full story of Working Class Unity and how our member-run organization works."
+    },
+    "calendar": {
+      "title": "Calendar",
+      "description": "Our public meetings, events, and actions will appear here soon."
+    },
+    "forum": {
+      "title": "Forum",
+      "description": "The community discussion space is being prepared."
+    }
+  },
   "home": {
-    "eyebrow": "Working Class Unity",
-    "title": "Welcome to Working Class Unity.",
-    "introduction": "The WCU website is being rebuilt. Create an account or log in with an email magic link.",
-    "actionsLabel": "Account access",
-    "getStarted": "Create account"
+    "eyebrow": "WORKING CLASS UNITY · SAN JOAQUIN COUNTY",
+    "title": "Working People Need an Organization of Our Own",
+    "introduction": "WCU brings tenants, workers, and neighbors together to win concrete changes, develop new leaders, and build lasting power.",
+    "join": "JOIN WCU",
+    "nextEvent": "NEXT EVENT",
+    "newsletterHeading": "Stay informed about meetings and actions.",
+    "emailLabel": "Email address",
+    "emailPlaceholder": "Email address",
+    "newsletterSubmit": "STAY INFORMED",
+    "newsletterNote": "Newsletter signup is coming soon.",
+    "photoCaption": "Real WCU moments across San Joaquin County."
   },
   "personalApp": {
     "eyebrow": "Working Class Unity",

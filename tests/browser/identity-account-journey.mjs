@@ -17,13 +17,14 @@ async function assertPublicEntryAndLegalRoutes(context, helpers) {
     await expect(page.locator('html')).toHaveAttribute('lang', 'en-US')
     await expect(page.locator('html')).toHaveAttribute('dir', 'ltr')
     expect(new URL(page.url()).pathname).toBe('/')
-    await expect(page.getByRole('heading', { name: 'Welcome to Working Class Unity.' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Working People Need an Organization of Our Own' })).toBeVisible()
     await expect(
-      page.getByText('The WCU website is being rebuilt. Create an account or log in with an email magic link.', {
-        exact: true
-      })
+      page.getByText(
+        'WCU brings tenants, workers, and neighbors together to win concrete changes, develop new leaders, and build lasting power.',
+        { exact: true }
+      )
     ).toBeVisible()
-    const getStarted = page.getByRole('link', { name: 'Create account', exact: true })
+    const getStarted = page.getByRole('link', { name: 'JOIN WCU', exact: true })
     await getStarted.focus()
     await expect(getStarted).toBeFocused()
     await page.keyboard.press('Enter')
@@ -42,7 +43,10 @@ async function assertPublicEntryAndLegalRoutes(context, helpers) {
     await expect(page.getByRole('button', { name: 'Continue with Google' })).toHaveCount(0)
     await helpers.assertAccessibleWithoutOverflow(page)
 
-    await page.getByRole('link', { name: 'Log in', exact: true }).click()
+    if (await page.getByRole('button', { name: 'Menu', exact: true }).isVisible()) {
+      await page.getByRole('button', { name: 'Menu', exact: true }).click()
+    }
+    await page.getByRole('link', { name: 'Log In', exact: true }).click()
     await expect(page).toHaveURL(/\/login$/)
     await expect(page.getByRole('heading', { name: 'Log in' })).toBeVisible()
     await expect(page.getByText('Enter your email address to receive a passwordless sign-in link.')).toBeVisible()
@@ -54,7 +58,10 @@ async function assertPublicEntryAndLegalRoutes(context, helpers) {
     await expect(page.getByText(/customization prompt, not a production privacy policy/i)).toBeVisible()
     await helpers.assertAccessibleWithoutOverflow(page)
 
-    await page.getByRole('link', { name: 'Sign up', exact: true }).click()
+    if (await page.getByRole('button', { name: 'Menu', exact: true }).isVisible()) {
+      await page.getByRole('button', { name: 'Menu', exact: true }).click()
+    }
+    await page.getByRole('link', { name: 'JOIN NOW', exact: true }).click()
     await expect(page).toHaveURL(/\/signup$/)
     await page.getByRole('link', { name: 'Terms', exact: true }).click()
     await expect(page).toHaveURL(/\/legal\/terms$/)
@@ -101,7 +108,7 @@ async function assertNotFoundRecovery(context, helpers) {
     await expect(recovery).toBeFocused()
     await page.keyboard.press('Enter')
     await expect(page).toHaveURL(/\/$/)
-    await expect(page.getByRole('heading', { name: 'Welcome to Working Class Unity.' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Working People Need an Organization of Our Own' })).toBeVisible()
     await helpers.assertAccessibleWithoutOverflow(page)
 
     observations.errorResponses = observations.errorResponses.filter(

@@ -15,7 +15,9 @@ The root [`AGENTS.md`](../AGENTS.md) governs all work. The normative interface a
 ## Ownership
 
 - `assets/css/reset.css`: conservative normalization only.
-- `assets/css/tokens.css`: primitive and semantic design tokens.
+- `assets/css/color-primitives.generated.css`: Leonardo-generated primitive color scales; regenerate
+  with `pnpm tokens:generate` and never edit it by hand.
+- `assets/css/tokens.css`: manually reviewed semantic token mappings plus non-color design tokens.
 - `assets/css/base.css`: document, typography, native controls, focus, and selection defaults.
 - `assets/css/layout.css`: application shell and used flow, cluster, container, and grid primitives.
 - `assets/css/utilities.css`: the deliberately small accessibility and layout utility set.
@@ -26,13 +28,13 @@ The root [`AGENTS.md`](../AGENTS.md) governs all work. The normative interface a
 - `AppButton`: native command button; never navigation.
 - `AppField`: label, hint, required, and validation-message relationships for a slotted native control.
 - `AppNotice`: persistent visual feedback with explicit, opt-in announcement behavior.
-- `AppTopbar`: application-shell header and native primary navigation.
+- `AppTopbar`: application-shell header, Reka desktop primary navigation, and native mobile disclosure.
 - `AccountMenu`: feature-owned Reka dropdown for identity, account navigation, and sign-out.
 - `AuthEntryForm`, `TurnstileChallenge`, `AccountProfileForm`, and `AccountDeletionSection`: feature components, not shared primitives.
 
-Direct `reka-ui` imports are allowed only in `components/AccountMenu.vue`. Pages and unrelated
-components consume app-owned contracts. Do not add another Reka primitive or a generic wrapper
-without a documented product journey.
+Direct `reka-ui` imports are allowed only in `components/AccountMenu.vue` and
+`components/AppTopbar.vue`. Pages and unrelated components consume app-owned contracts. Do not add
+another Reka primitive or a generic wrapper without a documented product journey.
 
 ## Page and state requirements
 

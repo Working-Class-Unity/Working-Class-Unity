@@ -93,6 +93,7 @@ const isolatedTurnstileBrowserSource = `
 
 test('home presents the WCU foundation and preserves client navigation', async ({ page }) => {
   const observations = observePage(page)
+  await page.setViewportSize({ width: 1280, height: 900 })
   await page.route(
     `${runtimeUrl}/`,
     async (route) => {
@@ -107,25 +108,28 @@ test('home presents the WCU foundation and preserves client navigation', async (
   )
   const response = await page.goto('/')
   await assertContentSecurityPolicy(page, response, observations)
-  await expect(page.getByRole('heading', { name: 'Welcome to Working Class Unity.' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Working People Need an Organization of Our Own' })).toBeVisible()
   await expect(
-    page.getByText('The WCU website is being rebuilt. Create an account or log in with an email magic link.', {
-      exact: true
-    })
+    page.getByText(
+      'WCU brings tenants, workers, and neighbors together to win concrete changes, develop new leaders, and build lasting power.',
+      {
+        exact: true
+      }
+    )
   ).toBeVisible()
-  await expect(page.locator('.brand')).toContainText(runtimeName)
+  await expect(page.locator('.brand')).toHaveAccessibleName(`${runtimeName} home`)
   await expect(page.locator('.brand')).toHaveAttribute('aria-current', 'page')
-  await expect(page).toHaveTitle('Home')
+  await expect(page).toHaveTitle('Working Class Unity')
   await expect(page.locator('script[src*="challenges.cloudflare.com/turnstile"]')).toHaveCount(0)
   await assertRuntimePublicConfig(page)
   await assertAccessibleWithoutOverflow(page)
 
   const skipLink = page.getByRole('link', { name: 'Skip to main content' })
-  const primaryNavigation = page.getByRole('navigation', { name: 'Primary' })
+  const topbar = page.getByRole('banner', { name: 'Application' })
   await assertMinimumTargetSize(page.locator('.brand'))
-  await assertMinimumTargetSize(primaryNavigation.getByRole('link', { name: 'Log in', exact: true }))
-  await assertMinimumTargetSize(primaryNavigation.getByRole('link', { name: 'Sign up', exact: true }))
-  await assertMinimumTargetSize(page.getByRole('link', { name: 'Create account', exact: true }))
+  await assertMinimumTargetSize(topbar.getByRole('link', { name: 'Log In', exact: true }))
+  await assertMinimumTargetSize(topbar.getByRole('link', { name: 'JOIN NOW', exact: true }))
+  await assertMinimumTargetSize(page.getByRole('link', { name: 'JOIN WCU', exact: true }))
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.keyboard.press('Tab')
   await expect(skipLink).toBeFocused()
@@ -138,12 +142,12 @@ test('home presents the WCU foundation and preserves client navigation', async (
   await expect(page.locator('#main-content')).toBeFocused()
 
   const timeOrigin = await page.evaluate(() => performance.timeOrigin)
-  await page.getByRole('link', { name: 'Create account', exact: true }).click()
+  await page.getByRole('link', { name: 'JOIN WCU', exact: true }).click()
   await expect(page).toHaveURL(/\/signup$/)
   await expect(page.getByRole('heading', { name: 'Create your account' })).toBeVisible()
   await expect(page.getByRole('textbox', { name: 'Email', exact: true })).toBeVisible()
   await expect(page.getByRole('textbox', { name: /(?:first|last|display) name/i })).toHaveCount(0)
-  await expect(page.getByRole('link', { name: 'Sign up', exact: true })).toHaveAttribute('aria-current', 'page')
+  await expect(page.getByRole('link', { name: 'JOIN NOW', exact: true })).toHaveAttribute('aria-current', 'page')
   await expect(page).toHaveTitle('Sign up')
   await expect(page.getByLabel('Security check')).toBeVisible()
   await expect(page.locator(`script[src="${turnstileScriptUrl}"]`)).toHaveCount(1)
@@ -159,8 +163,78 @@ test('home presents the WCU foundation and preserves client navigation', async (
   await assertCleanPage(page, observations)
 })
 
+test('global public navigation exposes current routes and a route-closing mobile disclosure', async ({ page }) => {
+  const observations = observePage(page)
+  await page.setViewportSize({ width: 1024, height: 900 })
+
+  for (const destination of [
+    { path: '/about', label: 'About', title: 'About' },
+    { path: '/calendar', label: 'Calendar', title: 'Calendar' },
+    { path: '/forum', label: 'Forum', title: 'Forum' }
+  ]) {
+    await page.goto(destination.path)
+    const primaryNavigation = page.getByRole('navigation', { name: 'Primary' })
+    const currentLink = primaryNavigation.getByRole('link', { name: destination.label, exact: true })
+
+    await expect(page.getByRole('heading', { name: destination.title, exact: true })).toBeVisible()
+    await expect(page).toHaveTitle(destination.title)
+    await expect(currentLink).toHaveAttribute('href', destination.path)
+    await expect(currentLink).toHaveAttribute('aria-current', 'page')
+    await expect(primaryNavigation.locator('[aria-current="page"]')).toHaveCount(1)
+    await page.waitForLoadState('networkidle')
+  }
+
+  const desktopNavigation = page.locator('[data-reka-navigation-menu]')
+  const aboutLink = desktopNavigation.getByRole('link', { name: 'About', exact: true })
+  const calendarLink = desktopNavigation.getByRole('link', { name: 'Calendar', exact: true })
+  const forumLink = desktopNavigation.getByRole('link', { name: 'Forum', exact: true })
+
+  await expect(desktopNavigation).toHaveRole('navigation')
+  await expect(desktopNavigation).toHaveAttribute('data-orientation', 'horizontal')
+  await aboutLink.focus()
+  await page.keyboard.press('ArrowRight')
+  await expect(calendarLink).toBeFocused()
+  await page.keyboard.press('End')
+  await expect(forumLink).toBeFocused()
+  await page.keyboard.press('Home')
+  await expect(aboutLink).toBeFocused()
+
+  await page.setViewportSize({ width: 320, height: 800 })
+  const menuToggle = page.getByRole('button', { name: 'Menu', exact: true })
+  const navigationPanel = page.locator('#primary-navigation-panel')
+
+  await expect(menuToggle).toHaveAttribute('aria-expanded', 'false')
+  await expect(navigationPanel).toBeHidden()
+  await assertMinimumTargetSize(menuToggle)
+
+  await menuToggle.click()
+  await expect(menuToggle).toHaveAttribute('aria-expanded', 'true')
+  await expect(navigationPanel).toBeVisible()
+  await assertMinimumTargetSize(page.getByRole('link', { name: 'About', exact: true }))
+  await assertMinimumTargetSize(page.getByRole('link', { name: 'Calendar', exact: true }))
+  await assertMinimumTargetSize(page.getByRole('link', { name: 'Forum', exact: true }))
+  await assertMinimumTargetSize(page.getByRole('link', { name: 'Log In', exact: true }))
+  await assertMinimumTargetSize(page.getByRole('link', { name: 'JOIN NOW', exact: true }))
+  await assertNoHorizontalOverflow(page)
+
+  await page.getByRole('link', { name: 'About', exact: true }).focus()
+  await page.keyboard.press('Escape')
+  await expect(menuToggle).toHaveAttribute('aria-expanded', 'false')
+  await expect(navigationPanel).toBeHidden()
+  await expect(menuToggle).toBeFocused()
+
+  await menuToggle.click()
+  await page.getByRole('link', { name: 'About', exact: true }).click()
+  await expect(page).toHaveURL(/\/about$/)
+  await expect(menuToggle).toHaveAttribute('aria-expanded', 'false')
+  await expect(navigationPanel).toBeHidden()
+  await assertAccessibleWithoutOverflow(page)
+  await assertCleanPage(page, observations)
+})
+
 test('session retry announces progress and failure without losing focus', async ({ page }) => {
   const observations = observePage(page)
+  await page.setViewportSize({ width: 1024, height: 900 })
   await page.goto('/')
   await page.waitForLoadState('networkidle')
 
@@ -223,7 +297,7 @@ test('login is accessible before and after requesting a magic link', async ({ pa
   const observations = observePage(page)
   await page.goto('/login')
   await expect(page.getByRole('heading', { name: 'Log in' })).toBeVisible()
-  await expect(page.locator('.brand')).toContainText(runtimeName)
+  await expect(page.locator('.brand')).toHaveAccessibleName(`${runtimeName} home`)
   await expect(page).toHaveTitle('Log in')
   await assertRuntimePublicConfig(page)
   const emailInput = page.getByRole('textbox', { name: 'Email', exact: true })
@@ -354,15 +428,13 @@ privateBrowserTest(
     await expect(page.getByText('Your WCU account is ready.', { exact: true })).toBeVisible()
     await expect(page.getByRole('heading', { name: 'Welcome back', exact: true })).toBeVisible()
     await expect(page.getByText(`Signed in as ${email}`, { exact: true })).toBeVisible()
+    await openMobileNavigationIfNeeded(page)
     await expect(page.getByRole('button', { name: /^Account menu for / })).toBeVisible()
     await expect(page.getByText(/workspace/i)).toHaveCount(0)
     await expect(page.getByRole('link', { name: /workspace/i })).toHaveCount(0)
-    const primaryNavigation = page.getByRole('navigation', { name: 'Primary' })
-    await expect(primaryNavigation.locator('[aria-current="page"]')).toHaveCount(1)
-    await expect(primaryNavigation.getByRole('link', { name: 'App', exact: true })).toHaveAttribute(
-      'aria-current',
-      'page'
-    )
+    const topbar = page.getByRole('banner', { name: 'Application' })
+    await expect(topbar.locator('[aria-current="page"]')).toHaveCount(1)
+    await expect(topbar.getByRole('link', { name: 'App', exact: true })).toHaveAttribute('aria-current', 'page')
     expect(observations.sameOriginRequests.some((request) => request.includes('/api/workspaces'))).toBe(false)
     await page.waitForLoadState('networkidle')
     await assertAccountMenuContract(page, email, email, observations)
@@ -415,6 +487,7 @@ privateBrowserTest(
     await expect(page.getByText(email, { exact: true })).toBeVisible()
     await page.waitForLoadState('networkidle')
     await page.waitForFunction(() => window.useNuxtApp?.().isHydrating === false)
+    await openMobileNavigationIfNeeded(page)
 
     const firstNameInput = page.getByRole('textbox', { name: 'First name', exact: true })
     const lastNameInput = page.getByRole('textbox', { name: 'Last name', exact: true })
@@ -466,6 +539,7 @@ privateBrowserTest(
     await page.getByRole('textbox', { name: 'Display name', exact: true }).fill('')
     await page.getByRole('button', { name: 'Save profile', exact: true }).click()
     await expect(page.getByText('Profile saved.', { exact: true })).toBeVisible()
+    await openMobileNavigationIfNeeded(page)
     await expect(page.getByRole('button', { name: `Account menu for ${email}` })).toBeVisible()
     await page.waitForLoadState('networkidle')
 
@@ -473,6 +547,7 @@ privateBrowserTest(
     if (!clearedAppResponse) throw new Error('Cleared-profile navigation did not return a personal-app response')
     expect(clearedAppResponse.status()).toBe(200)
     await expect(page.getByRole('heading', { name: 'Welcome back', exact: true })).toBeVisible()
+    await openMobileNavigationIfNeeded(page)
     await expect(page.getByRole('button', { name: `Account menu for ${email}` })).toBeVisible()
     await page.waitForLoadState('networkidle')
 
@@ -519,6 +594,15 @@ test('observability route is active without sending a missing token', async ({ p
   await assertCleanPage(page, observations)
 })
 
+async function openMobileNavigationIfNeeded(page) {
+  const menuToggle = page.getByRole('button', { name: 'Menu', exact: true })
+  if (!(await menuToggle.isVisible())) return
+  if ((await menuToggle.getAttribute('aria-expanded')) === 'true') return
+  await page.waitForFunction(() => window.useNuxtApp?.().isHydrating === false)
+  await menuToggle.click()
+  await expect(menuToggle).toHaveAttribute('aria-expanded', 'true')
+}
+
 async function assertAccountMenuContract(page, displayName, email, observations) {
   const trigger = page.getByRole('button', { name: `Account menu for ${displayName}` })
   const menu = page.getByRole('menu')
@@ -558,6 +642,7 @@ async function assertAccountMenuContract(page, displayName, email, observations)
 
   const previousViewport = page.viewportSize()
   await page.setViewportSize({ width: 320, height: 800 })
+  await openMobileNavigationIfNeeded(page)
   await trigger.click()
   await expect(menu).toBeVisible()
   await assertNoHorizontalOverflow(page)

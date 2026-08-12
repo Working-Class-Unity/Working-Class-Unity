@@ -4,9 +4,14 @@
   margin-inline: auto;
 }
 
+.container.container--home,
+.page-shell.container--home {
+  inline-size: min(var(--home-content-max-width), calc(100% - (2 * var(--content-gutter))));
+}
+
 .app-frame {
   min-block-size: 100vh;
-  padding-block: var(--space-4) var(--space-6);
+  padding-block-end: var(--space-6);
 }
 
 .flow {
@@ -37,7 +42,12 @@
     inline-size: min(var(--content-max-width), calc(100% - (2 * var(--content-gutter-compact))));
   }
 
+  .container.container--home,
+  .page-shell.container--home {
+    inline-size: min(var(--home-content-max-width), calc(100% - (2 * var(--content-gutter-compact))));
+  }
+
   .app-frame {
-    padding-block-start: var(--space-2);
+    padding-block-start: 0;
   }
 }

@@ -7,8 +7,14 @@
     "bootstrap": "node scripts/run-pnpm.mjs install --frozen-lockfile",
     "pnpm": "node scripts/run-pnpm.mjs",
     "verify:pinned": "node scripts/run-pnpm.mjs run verify",
+    "tokens:generate": "node scripts/generate-color-tokens.mjs",
+    "tokens:check": "node scripts/generate-color-tokens.mjs --check",
+    "assets:generate": "node scripts/generate-hero-assets.mjs",
+    "assets:check": "node scripts/generate-hero-assets.mjs --check",
     "format:check": "node scripts/format-changed.mjs",
+    "predev": "pnpm run tokens:check && pnpm run assets:generate",
     "dev": "node --env-file-if-exists=.env scripts/run-pnpm.mjs exec nuxt dev",
+    "prebuild": "pnpm run tokens:check && pnpm run assets:generate",
     "build": "node scripts/run-pnpm.mjs exec nuxt build --dotenv .env.build",
     "postbuild": "node server/build-worker.mjs && node source-map-cleanup.mjs",
     "start": "node --env-file-if-exists=.env --import ./.output/server/sentry.server.config.mjs .output/server/index.mjs",
@@ -22,7 +28,7 @@
     "db:migrate:check": "node --env-file-if-exists=.env scripts/run-pnpm.mjs exec tsx server/db/migration-check.ts",
     "doctor": "node scripts/doctor.mjs",
     "check:toolchain": "node --test scripts/toolchain-contract.test.mjs",
-    "test:tooling": "node --test scripts/ci-browser-helpers.test.mjs scripts/ci-container-build.test.mjs scripts/ci-container-health.test.mjs scripts/compose-deployment.test.mjs scripts/container-maintenance.test.mjs scripts/deployment-smoke.test.mjs scripts/format-changed.test.mjs scripts/isolated-api-smoke.test.mjs scripts/off-host-backup.test.mjs scripts/openai-corpus.test.mjs scripts/playwright-foundation-reporter.test.mjs scripts/vitest-policy-reporter.test.mjs",
+    "test:tooling": "node --test scripts/ci-browser-helpers.test.mjs scripts/ci-container-build.test.mjs scripts/ci-container-health.test.mjs scripts/color-tokens.test.mjs scripts/compose-deployment.test.mjs scripts/container-maintenance.test.mjs scripts/deployment-smoke.test.mjs scripts/format-changed.test.mjs scripts/hero-assets.test.mjs scripts/isolated-api-smoke.test.mjs scripts/off-host-backup.test.mjs scripts/openai-corpus.test.mjs scripts/playwright-foundation-reporter.test.mjs scripts/vitest-policy-reporter.test.mjs",
     "check:supply-chain": "node --test scripts/supply-chain-policy.test.mjs && node scripts/supply-chain-policy.mjs",
     "scan:supply-chain": "node scripts/supply-chain-scan.mjs all",
     "test:framework-security": "node --test scripts/framework-security-helpers.test.mjs && node scripts/framework-security-smoke.mjs",
@@ -38,7 +44,7 @@
     "test:container-build": "node scripts/ci-container-build.mjs",
     "test:container-health": "node scripts/ci-container-health.mjs",
     "test:runtime": "node scripts/ci-runtime-smoke.mjs",
-    "check": "pnpm run format:check && pnpm run doctor && pnpm run check:toolchain && pnpm run test:tooling && pnpm run check:supply-chain && pnpm run test:framework-security && pnpm run lint && pnpm run stylelint && pnpm run db:migrate:check && pnpm run typecheck && pnpm run test",
+    "check": "pnpm run tokens:check && pnpm run assets:check && pnpm run format:check && pnpm run doctor && pnpm run check:toolchain && pnpm run test:tooling && pnpm run check:supply-chain && pnpm run test:framework-security && pnpm run lint && pnpm run stylelint && pnpm run db:migrate:check && pnpm run typecheck && pnpm run test",
     "verify": "pnpm run check && pnpm run scan:supply-chain && pnpm run build && pnpm run test:runtime && pnpm run test:browser && pnpm run api:smoke && pnpm run test:container-build && pnpm run test:container-health"
   },
   "engines": {
@@ -71,6 +77,7 @@
     "zod": "4.4.3"
   },
   "devDependencies": {
+    "@adobe/leonardo-contrast-colors": "1.1.0",
     "@axe-core/playwright": "4.12.1",
     "@nuxt/eslint": "1.16.0",
     "@playwright/test": "1.61.1",
@@ -83,6 +90,7 @@
     "eslint": "10.3.0",
     "happy-dom": "20.11.1",
     "prettier": "3.9.5",
+    "sharp": "0.35.3",
     "stylelint": "17.12.0",
     "stylelint-config-standard": "40.0.0",
     "stylelint-config-standard-vue": "1.0.0",

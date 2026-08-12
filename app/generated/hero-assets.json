@@ -1,0 +1,1205 @@
+{
+  "version": 1,
+  "backgrounds": [
+    {
+      "id": "landscape",
+      "source": "landscape.png",
+      "width": 1672,
+      "height": 941,
+      "aspectRatio": 1.776833,
+      "variants": {
+        "avif": [
+          {
+            "src": "/images/hero/landscape-768w-1b67f04232f1.avif",
+            "width": 768,
+            "height": 432
+          },
+          {
+            "src": "/images/hero/landscape-1280w-23dc59d5f04f.avif",
+            "width": 1280,
+            "height": 720
+          },
+          {
+            "src": "/images/hero/landscape-1672w-af6eeab2eb44.avif",
+            "width": 1672,
+            "height": 941
+          }
+        ],
+        "webp": [
+          {
+            "src": "/images/hero/landscape-768w-d519721e7951.webp",
+            "width": 768,
+            "height": 432
+          },
+          {
+            "src": "/images/hero/landscape-1280w-6ae64f1c4174.webp",
+            "width": 1280,
+            "height": 720
+          },
+          {
+            "src": "/images/hero/landscape-1672w-7f8053c51972.webp",
+            "width": 1672,
+            "height": 941
+          }
+        ]
+      }
+    },
+    {
+      "id": "portrait",
+      "source": "portrait.png",
+      "width": 1086,
+      "height": 1448,
+      "aspectRatio": 0.75,
+      "variants": {
+        "avif": [
+          {
+            "src": "/images/hero/portrait-768w-dab8dbabec05.avif",
+            "width": 768,
+            "height": 1024
+          },
+          {
+            "src": "/images/hero/portrait-1086w-f262d0c265a0.avif",
+            "width": 1086,
+            "height": 1448
+          }
+        ],
+        "webp": [
+          {
+            "src": "/images/hero/portrait-768w-42f854ff6404.webp",
+            "width": 768,
+            "height": 1024
+          },
+          {
+            "src": "/images/hero/portrait-1086w-6eaf1366571c.webp",
+            "width": 1086,
+            "height": 1448
+          }
+        ]
+      }
+    },
+    {
+      "id": "portrait-tall",
+      "source": "portrait-tall.png",
+      "width": 941,
+      "height": 1672,
+      "aspectRatio": 0.562799,
+      "variants": {
+        "avif": [
+          {
+            "src": "/images/hero/portrait-tall-768w-55de30af3865.avif",
+            "width": 768,
+            "height": 1365
+          },
+          {
+            "src": "/images/hero/portrait-tall-941w-32f4c7897986.avif",
+            "width": 941,
+            "height": 1672
+          }
+        ],
+        "webp": [
+          {
+            "src": "/images/hero/portrait-tall-768w-b9c73971d42d.webp",
+            "width": 768,
+            "height": 1365
+          },
+          {
+            "src": "/images/hero/portrait-tall-941w-5a1c1f9837c8.webp",
+            "width": 941,
+            "height": 1672
+          }
+        ]
+      }
+    }
+  ],
+  "photos": [
+    {
+      "id": "photo-edca1b354c5c2b91",
+      "source": "363838620_956580492286337_9151883237370816814_n.jpeg",
+      "width": 1440,
+      "height": 1440,
+      "aspectRatio": 1,
+      "variants": {
+        "avif": [
+          {
+            "src": "/images/hero-wall/photo-edca1b354c5c2b91-320w-e95aec385d28.avif",
+            "width": 320,
+            "height": 320
+          },
+          {
+            "src": "/images/hero-wall/photo-edca1b354c5c2b91-640w-200f20f115c7.avif",
+            "width": 640,
+            "height": 640
+          }
+        ],
+        "webp": [
+          {
+            "src": "/images/hero-wall/photo-edca1b354c5c2b91-320w-d7d233999cdf.webp",
+            "width": 320,
+            "height": 320
+          },
+          {
+            "src": "/images/hero-wall/photo-edca1b354c5c2b91-640w-5b61c8e317b3.webp",
+            "width": 640,
+            "height": 640
+          }
+        ]
+      }
+    },
+    {
+      "id": "photo-4177ccb32c71cae7",
+      "source": "431489667_930536031843629_4054686325244213786_n.jpeg",
+      "width": 1080,
+      "height": 1080,
+      "aspectRatio": 1,
+      "variants": {
+        "avif": [
+          {
+            "src": "/images/hero-wall/photo-4177ccb32c71cae7-320w-51eabe577df0.avif",
+            "width": 320,
+            "height": 320
+          },
+          {
+            "src": "/images/hero-wall/photo-4177ccb32c71cae7-640w-707b866ca68c.avif",
+            "width": 640,
+            "height": 640
+          }
+        ],
+        "webp": [
+          {
+            "src": "/images/hero-wall/photo-4177ccb32c71cae7-320w-bc2141171c9d.webp",
+            "width": 320,
+            "height": 320
+          },
+          {
+            "src": "/images/hero-wall/photo-4177ccb32c71cae7-640w-7cb6f0d12d15.webp",
+            "width": 640,
+            "height": 640
+          }
+        ]
+      }
+    },
+    {
+      "id": "photo-d44892112ca00291",
+      "source": "431500135_1134522594384441_8583764439149219001_n.jpeg",
+      "width": 1080,
+      "height": 1080,
+      "aspectRatio": 1,
+      "variants": {
+        "avif": [
+          {
+            "src": "/images/hero-wall/photo-d44892112ca00291-320w-ee3aa9ba5c0b.avif",
+            "width": 320,
+            "height": 320
+          },
+          {
+            "src": "/images/hero-wall/photo-d44892112ca00291-640w-b91594e530ec.avif",
+            "width": 640,
+            "height": 640
+          }
+        ],
+        "webp": [
+          {
+            "src": "/images/hero-wall/photo-d44892112ca00291-320w-ed2df84d09cb.webp",
+            "width": 320,
+            "height": 320
+          },
+          {
+            "src": "/images/hero-wall/photo-d44892112ca00291-640w-2f1def62568a.webp",
+            "width": 640,
+            "height": 640
+          }
+        ]
+      }
+    },
+    {
+      "id": "photo-9b41dba422222e34",
+      "source": "431502306_291795630595321_3347104868340597673_n.jpeg",
+      "width": 1080,
+      "height": 1080,
+      "aspectRatio": 1,
+      "variants": {
+        "avif": [
+          {
+            "src": "/images/hero-wall/photo-9b41dba422222e34-320w-7c1de5466051.avif",
+            "width": 320,
+            "height": 320
+          },
+          {
+            "src": "/images/hero-wall/photo-9b41dba422222e34-640w-389889d7a50e.avif",
+            "width": 640,
+            "height": 640
+          }
+        ],
+        "webp": [
+          {
+            "src": "/images/hero-wall/photo-9b41dba422222e34-320w-f95e63d5fbf4.webp",
+            "width": 320,
+            "height": 320
+          },
+          {
+            "src": "/images/hero-wall/photo-9b41dba422222e34-640w-f29148317a66.webp",
+            "width": 640,
+            "height": 640
+          }
+        ]
+      }
+    },
+    {
+      "id": "photo-3061a6c8cb2db5e5",
+      "source": "456042006_1215105842863510_7320402006812495033_n.jpg",
+      "width": 479,
+      "height": 319,
+      "aspectRatio": 1.501567,
+      "variants": {
+        "avif": [
+          {
+            "src": "/images/hero-wall/photo-3061a6c8cb2db5e5-320w-c474d0377ac3.avif",
+            "width": 320,
+            "height": 213
+          },
+          {
+            "src": "/images/hero-wall/photo-3061a6c8cb2db5e5-479w-2e60273ebe41.avif",
+            "width": 479,
+            "height": 319
+          }
+        ],
+        "webp": [
+          {
+            "src": "/images/hero-wall/photo-3061a6c8cb2db5e5-320w-3f2e3b46322d.webp",
+            "width": 320,
+            "height": 213
+          },
+          {
+            "src": "/images/hero-wall/photo-3061a6c8cb2db5e5-479w-23e126ab25f8.webp",
+            "width": 479,
+            "height": 319
+          }
+        ]
+      }
+    },
+    {
+      "id": "photo-e6e0d98e30ebfb83",
+      "source": "456080114_2381521855512409_8025786285721139927_n.jpg",
+      "width": 1080,
+      "height": 723,
+      "aspectRatio": 1.493776,
+      "variants": {
+        "avif": [
+          {
+            "src": "/images/hero-wall/photo-e6e0d98e30ebfb83-320w-dbf2636c24c9.avif",
+            "width": 320,
+            "height": 214
+          },
+          {
+            "src": "/images/hero-wall/photo-e6e0d98e30ebfb83-640w-07a928fd7525.avif",
+            "width": 640,
+            "height": 428
+          }
+        ],
+        "webp": [
+          {
+            "src": "/images/hero-wall/photo-e6e0d98e30ebfb83-320w-c2eefe533458.webp",
+            "width": 320,
+            "height": 214
+          },
+          {
+            "src": "/images/hero-wall/photo-e6e0d98e30ebfb83-640w-971a94987449.webp",
+            "width": 640,
+            "height": 428
+          }
+        ]
+      }
+    },
+    {
+      "id": "photo-3b9cb77b036ffca1",
+      "source": "518480103_17976199982900080_7471101169516890872_n.jpg",
+      "width": 1080,
+      "height": 1080,
+      "aspectRatio": 1,
+      "variants": {
+        "avif": [
+          {
+            "src": "/images/hero-wall/photo-3b9cb77b036ffca1-320w-a470c1eca4f8.avif",
+            "width": 320,
+            "height": 320
+          },
+          {
+            "src": "/images/hero-wall/photo-3b9cb77b036ffca1-640w-80becdc74072.avif",
+            "width": 640,
+            "height": 640
+          }
+        ],
+        "webp": [
+          {
+            "src": "/images/hero-wall/photo-3b9cb77b036ffca1-320w-96c927ddf575.webp",
+            "width": 320,
+            "height": 320
+          },
+          {
+            "src": "/images/hero-wall/photo-3b9cb77b036ffca1-640w-c0027372bb9b.webp",
+            "width": 640,
+            "height": 640
+          }
+        ]
+      }
+    },
+    {
+      "id": "photo-9530117a3ac5f1bd",
+      "source": "670782399_17895696273433160_538446502192841866_n.jpg",
+      "width": 912,
+      "height": 912,
+      "aspectRatio": 1,
+      "variants": {
+        "avif": [
+          {
+            "src": "/images/hero-wall/photo-9530117a3ac5f1bd-320w-64e521691a01.avif",
+            "width": 320,
+            "height": 320
+          },
+          {
+            "src": "/images/hero-wall/photo-9530117a3ac5f1bd-640w-9ff2ca5e5113.avif",
+            "width": 640,
+            "height": 640
+          }
+        ],
+        "webp": [
+          {
+            "src": "/images/hero-wall/photo-9530117a3ac5f1bd-320w-8d934ef12117.webp",
+            "width": 320,
+            "height": 320
+          },
+          {
+            "src": "/images/hero-wall/photo-9530117a3ac5f1bd-640w-5731ab37ac89.webp",
+            "width": 640,
+            "height": 640
+          }
+        ]
+      }
+    },
+    {
+      "id": "photo-5f71412f051d1381",
+      "source": "684266685_17898086007433160_3833760668679218081_n.jpg",
+      "width": 1122,
+      "height": 1122,
+      "aspectRatio": 1,
+      "variants": {
+        "avif": [
+          {
+            "src": "/images/hero-wall/photo-5f71412f051d1381-320w-bee383983221.avif",
+            "width": 320,
+            "height": 320
+          },
+          {
+            "src": "/images/hero-wall/photo-5f71412f051d1381-640w-2aed96fe0260.avif",
+            "width": 640,
+            "height": 640
+          }
+        ],
+        "webp": [
+          {
+            "src": "/images/hero-wall/photo-5f71412f051d1381-320w-7980fe630db8.webp",
+            "width": 320,
+            "height": 320
+          },
+          {
+            "src": "/images/hero-wall/photo-5f71412f051d1381-640w-c3a2bba67ee2.webp",
+            "width": 640,
+            "height": 640
+          }
+        ]
+      }
+    },
+    {
+      "id": "photo-6e3ceabf9793a714",
+      "source": "686177283_18012460787900080_4349868674414332750_n.jpg",
+      "width": 1080,
+      "height": 810,
+      "aspectRatio": 1.333333,
+      "variants": {
+        "avif": [
+          {
+            "src": "/images/hero-wall/photo-6e3ceabf9793a714-320w-695ccdd43592.avif",
+            "width": 320,
+            "height": 240
+          },
+          {
+            "src": "/images/hero-wall/photo-6e3ceabf9793a714-640w-c49b3f92fd5a.avif",
+            "width": 640,
+            "height": 480
+          }
+        ],
+        "webp": [
+          {
+            "src": "/images/hero-wall/photo-6e3ceabf9793a714-320w-3111978f476a.webp",
+            "width": 320,
+            "height": 240
+          },
+          {
+            "src": "/images/hero-wall/photo-6e3ceabf9793a714-640w-e998024acc90.webp",
+            "width": 640,
+            "height": 480
+          }
+        ]
+      }
+    },
+    {
+      "id": "photo-dd4addc5fc31c9e6",
+      "source": "686935992_18012460829900080_8230364012260028042_n.jpg",
+      "width": 768,
+      "height": 576,
+      "aspectRatio": 1.333333,
+      "variants": {
+        "avif": [
+          {
+            "src": "/images/hero-wall/photo-dd4addc5fc31c9e6-320w-edee45d845d6.avif",
+            "width": 320,
+            "height": 240
+          },
+          {
+            "src": "/images/hero-wall/photo-dd4addc5fc31c9e6-640w-76728f322844.avif",
+            "width": 640,
+            "height": 480
+          }
+        ],
+        "webp": [
+          {
+            "src": "/images/hero-wall/photo-dd4addc5fc31c9e6-320w-807f2058ebd3.webp",
+            "width": 320,
+            "height": 240
+          },
+          {
+            "src": "/images/hero-wall/photo-dd4addc5fc31c9e6-640w-5e66c21e3eb5.webp",
+            "width": 640,
+            "height": 480
+          }
+        ]
+      }
+    },
+    {
+      "id": "photo-7747cbd784207a24",
+      "source": "688076038_18012460814900080_6355055642099862382_n.jpg",
+      "width": 1080,
+      "height": 810,
+      "aspectRatio": 1.333333,
+      "variants": {
+        "avif": [
+          {
+            "src": "/images/hero-wall/photo-7747cbd784207a24-320w-5d19de1f3114.avif",
+            "width": 320,
+            "height": 240
+          },
+          {
+            "src": "/images/hero-wall/photo-7747cbd784207a24-640w-3f672f7b1763.avif",
+            "width": 640,
+            "height": 480
+          }
+        ],
+        "webp": [
+          {
+            "src": "/images/hero-wall/photo-7747cbd784207a24-320w-02262d0da9df.webp",
+            "width": 320,
+            "height": 240
+          },
+          {
+            "src": "/images/hero-wall/photo-7747cbd784207a24-640w-15b04c99656b.webp",
+            "width": 640,
+            "height": 480
+          }
+        ]
+      }
+    },
+    {
+      "id": "photo-75c983bfee7592d1",
+      "source": "f0fe3d78-55a3-407f-92d9-74a6bdeb634f.jpeg",
+      "width": 1600,
+      "height": 1200,
+      "aspectRatio": 1.333333,
+      "variants": {
+        "avif": [
+          {
+            "src": "/images/hero-wall/photo-75c983bfee7592d1-320w-df8992c74819.avif",
+            "width": 320,
+            "height": 240
+          },
+          {
+            "src": "/images/hero-wall/photo-75c983bfee7592d1-640w-889fcfead9dd.avif",
+            "width": 640,
+            "height": 480
+          }
+        ],
+        "webp": [
+          {
+            "src": "/images/hero-wall/photo-75c983bfee7592d1-320w-7fed745b289e.webp",
+            "width": 320,
+            "height": 240
+          },
+          {
+            "src": "/images/hero-wall/photo-75c983bfee7592d1-640w-8c4753def1cc.webp",
+            "width": 640,
+            "height": 480
+          }
+        ]
+      }
+    },
+    {
+      "id": "photo-68be8bc76836567c",
+      "source": "Image 11-1-23 at 8.29 PM.jpg",
+      "width": 1008,
+      "height": 945,
+      "aspectRatio": 1.066667,
+      "variants": {
+        "avif": [
+          {
+            "src": "/images/hero-wall/photo-68be8bc76836567c-320w-0508623faf76.avif",
+            "width": 320,
+            "height": 300
+          },
+          {
+            "src": "/images/hero-wall/photo-68be8bc76836567c-640w-32a1efc6dc5d.avif",
+            "width": 640,
+            "height": 600
+          }
+        ],
+        "webp": [
+          {
+            "src": "/images/hero-wall/photo-68be8bc76836567c-320w-13393acc21be.webp",
+            "width": 320,
+            "height": 300
+          },
+          {
+            "src": "/images/hero-wall/photo-68be8bc76836567c-640w-029a9e55c719.webp",
+            "width": 640,
+            "height": 600
+          }
+        ]
+      }
+    },
+    {
+      "id": "photo-d5c8f5bf02c8c461",
+      "source": "IMG_0106.jpg",
+      "width": 1536,
+      "height": 1152,
+      "aspectRatio": 1.333333,
+      "variants": {
+        "avif": [
+          {
+            "src": "/images/hero-wall/photo-d5c8f5bf02c8c461-320w-4ffe5c518cc8.avif",
+            "width": 320,
+            "height": 240
+          },
+          {
+            "src": "/images/hero-wall/photo-d5c8f5bf02c8c461-640w-cb8321d65fab.avif",
+            "width": 640,
+            "height": 480
+          }
+        ],
+        "webp": [
+          {
+            "src": "/images/hero-wall/photo-d5c8f5bf02c8c461-320w-2fe83fd03cfc.webp",
+            "width": 320,
+            "height": 240
+          },
+          {
+            "src": "/images/hero-wall/photo-d5c8f5bf02c8c461-640w-570ae0b39416.webp",
+            "width": 640,
+            "height": 480
+          }
+        ]
+      }
+    },
+    {
+      "id": "photo-ee970bcd133a2e0e",
+      "source": "IMG_0204.jpg",
+      "width": 1533,
+      "height": 1152,
+      "aspectRatio": 1.330729,
+      "variants": {
+        "avif": [
+          {
+            "src": "/images/hero-wall/photo-ee970bcd133a2e0e-320w-b348d7525631.avif",
+            "width": 320,
+            "height": 241
+          },
+          {
+            "src": "/images/hero-wall/photo-ee970bcd133a2e0e-640w-07d3a75990e5.avif",
+            "width": 640,
+            "height": 481
+          }
+        ],
+        "webp": [
+          {
+            "src": "/images/hero-wall/photo-ee970bcd133a2e0e-320w-dcfde3aa4139.webp",
+            "width": 320,
+            "height": 241
+          },
+          {
+            "src": "/images/hero-wall/photo-ee970bcd133a2e0e-640w-191fa122f78b.webp",
+            "width": 640,
+            "height": 481
+          }
+        ]
+      }
+    },
+    {
+      "id": "photo-061196d03f5f594d",
+      "source": "IMG_0605.jpg",
+      "width": 1635,
+      "height": 919,
+      "aspectRatio": 1.779108,
+      "variants": {
+        "avif": [
+          {
+            "src": "/images/hero-wall/photo-061196d03f5f594d-320w-b005a06bcec8.avif",
+            "width": 320,
+            "height": 180
+          },
+          {
+            "src": "/images/hero-wall/photo-061196d03f5f594d-640w-7c820ae6268d.avif",
+            "width": 640,
+            "height": 360
+          }
+        ],
+        "webp": [
+          {
+            "src": "/images/hero-wall/photo-061196d03f5f594d-320w-73cfa102556a.webp",
+            "width": 320,
+            "height": 180
+          },
+          {
+            "src": "/images/hero-wall/photo-061196d03f5f594d-640w-7459fe7cd29f.webp",
+            "width": 640,
+            "height": 360
+          }
+        ]
+      }
+    },
+    {
+      "id": "photo-a2b8e07f5e9841e0",
+      "source": "Photos on Website - Square - Canvassing A.png",
+      "width": 444,
+      "height": 444,
+      "aspectRatio": 1,
+      "variants": {
+        "avif": [
+          {
+            "src": "/images/hero-wall/photo-a2b8e07f5e9841e0-320w-0c59adb65581.avif",
+            "width": 320,
+            "height": 320
+          },
+          {
+            "src": "/images/hero-wall/photo-a2b8e07f5e9841e0-444w-26f32b985277.avif",
+            "width": 444,
+            "height": 444
+          }
+        ],
+        "webp": [
+          {
+            "src": "/images/hero-wall/photo-a2b8e07f5e9841e0-320w-8206f4ecc65c.webp",
+            "width": 320,
+            "height": 320
+          },
+          {
+            "src": "/images/hero-wall/photo-a2b8e07f5e9841e0-444w-6b675b4ba8c4.webp",
+            "width": 444,
+            "height": 444
+          }
+        ]
+      }
+    },
+    {
+      "id": "photo-32434ab3d4ba08c8",
+      "source": "Photos on Website - Square - Trash Pickup A.png",
+      "width": 444,
+      "height": 444,
+      "aspectRatio": 1,
+      "variants": {
+        "avif": [
+          {
+            "src": "/images/hero-wall/photo-32434ab3d4ba08c8-320w-e382ab883f22.avif",
+            "width": 320,
+            "height": 320
+          },
+          {
+            "src": "/images/hero-wall/photo-32434ab3d4ba08c8-444w-03e5f6af068f.avif",
+            "width": 444,
+            "height": 444
+          }
+        ],
+        "webp": [
+          {
+            "src": "/images/hero-wall/photo-32434ab3d4ba08c8-320w-4af9da5f1bf0.webp",
+            "width": 320,
+            "height": 320
+          },
+          {
+            "src": "/images/hero-wall/photo-32434ab3d4ba08c8-444w-fe243316536d.webp",
+            "width": 444,
+            "height": 444
+          }
+        ]
+      }
+    },
+    {
+      "id": "photo-22a31639a9f805fd",
+      "source": "Photos-on-Website-Square-Palestine-Rally-A.png",
+      "width": 673,
+      "height": 673,
+      "aspectRatio": 1,
+      "variants": {
+        "avif": [
+          {
+            "src": "/images/hero-wall/photo-22a31639a9f805fd-320w-502574590b98.avif",
+            "width": 320,
+            "height": 320
+          },
+          {
+            "src": "/images/hero-wall/photo-22a31639a9f805fd-640w-13f44d1f6d54.avif",
+            "width": 640,
+            "height": 640
+          }
+        ],
+        "webp": [
+          {
+            "src": "/images/hero-wall/photo-22a31639a9f805fd-320w-1deaec06db0b.webp",
+            "width": 320,
+            "height": 320
+          },
+          {
+            "src": "/images/hero-wall/photo-22a31639a9f805fd-640w-738e502cc781.webp",
+            "width": 640,
+            "height": 640
+          }
+        ]
+      }
+    },
+    {
+      "id": "photo-3c6f212e5b9d8c25",
+      "source": "PXL_20240302_232518768.RAW-01.COVER.jpg",
+      "width": 1260,
+      "height": 945,
+      "aspectRatio": 1.333333,
+      "variants": {
+        "avif": [
+          {
+            "src": "/images/hero-wall/photo-3c6f212e5b9d8c25-320w-bc804c05faad.avif",
+            "width": 320,
+            "height": 240
+          },
+          {
+            "src": "/images/hero-wall/photo-3c6f212e5b9d8c25-640w-067279fa3d88.avif",
+            "width": 640,
+            "height": 480
+          }
+        ],
+        "webp": [
+          {
+            "src": "/images/hero-wall/photo-3c6f212e5b9d8c25-320w-b9a616a84e10.webp",
+            "width": 320,
+            "height": 240
+          },
+          {
+            "src": "/images/hero-wall/photo-3c6f212e5b9d8c25-640w-49b35bce61d5.webp",
+            "width": 640,
+            "height": 480
+          }
+        ]
+      }
+    },
+    {
+      "id": "photo-4d3296e2fb5cab57",
+      "source": "PXL_20240502_010549515.RAW-01.COVER.jpg",
+      "width": 1260,
+      "height": 945,
+      "aspectRatio": 1.333333,
+      "variants": {
+        "avif": [
+          {
+            "src": "/images/hero-wall/photo-4d3296e2fb5cab57-320w-4b2f324be018.avif",
+            "width": 320,
+            "height": 240
+          },
+          {
+            "src": "/images/hero-wall/photo-4d3296e2fb5cab57-640w-9323ead29ff6.avif",
+            "width": 640,
+            "height": 480
+          }
+        ],
+        "webp": [
+          {
+            "src": "/images/hero-wall/photo-4d3296e2fb5cab57-320w-e248d6a231f3.webp",
+            "width": 320,
+            "height": 240
+          },
+          {
+            "src": "/images/hero-wall/photo-4d3296e2fb5cab57-640w-0a3a4bb1c776.webp",
+            "width": 640,
+            "height": 480
+          }
+        ]
+      }
+    },
+    {
+      "id": "photo-88af19d3d35c11ca",
+      "source": "PXL_20240721_004617154.RAW-01.COVER.jpg",
+      "width": 1260,
+      "height": 945,
+      "aspectRatio": 1.333333,
+      "variants": {
+        "avif": [
+          {
+            "src": "/images/hero-wall/photo-88af19d3d35c11ca-320w-8f251aef3135.avif",
+            "width": 320,
+            "height": 240
+          },
+          {
+            "src": "/images/hero-wall/photo-88af19d3d35c11ca-640w-ff1614e5d0a2.avif",
+            "width": 640,
+            "height": 480
+          }
+        ],
+        "webp": [
+          {
+            "src": "/images/hero-wall/photo-88af19d3d35c11ca-320w-71058508a488.webp",
+            "width": 320,
+            "height": 240
+          },
+          {
+            "src": "/images/hero-wall/photo-88af19d3d35c11ca-640w-50ccb6100eaa.webp",
+            "width": 640,
+            "height": 480
+          }
+        ]
+      }
+    },
+    {
+      "id": "photo-f7cdf4da286fef60",
+      "source": "PXL_20240804_014424030.RAW-01.COVER.jpg",
+      "width": 1260,
+      "height": 945,
+      "aspectRatio": 1.333333,
+      "variants": {
+        "avif": [
+          {
+            "src": "/images/hero-wall/photo-f7cdf4da286fef60-320w-2dc981b7455c.avif",
+            "width": 320,
+            "height": 240
+          },
+          {
+            "src": "/images/hero-wall/photo-f7cdf4da286fef60-640w-cf88fda27ec4.avif",
+            "width": 640,
+            "height": 480
+          }
+        ],
+        "webp": [
+          {
+            "src": "/images/hero-wall/photo-f7cdf4da286fef60-320w-063a190924d8.webp",
+            "width": 320,
+            "height": 240
+          },
+          {
+            "src": "/images/hero-wall/photo-f7cdf4da286fef60-640w-afe4519199c4.webp",
+            "width": 640,
+            "height": 480
+          }
+        ]
+      }
+    },
+    {
+      "id": "photo-f750b9e3c3831e37",
+      "source": "PXL_20240919_191129052.RAW-01.COVER.jpg",
+      "width": 709,
+      "height": 945,
+      "aspectRatio": 0.750265,
+      "variants": {
+        "avif": [
+          {
+            "src": "/images/hero-wall/photo-f750b9e3c3831e37-320w-7fcc44318cda.avif",
+            "width": 320,
+            "height": 427
+          },
+          {
+            "src": "/images/hero-wall/photo-f750b9e3c3831e37-640w-36a3d0b6435e.avif",
+            "width": 640,
+            "height": 853
+          }
+        ],
+        "webp": [
+          {
+            "src": "/images/hero-wall/photo-f750b9e3c3831e37-320w-230c38e41f4d.webp",
+            "width": 320,
+            "height": 427
+          },
+          {
+            "src": "/images/hero-wall/photo-f750b9e3c3831e37-640w-f9acd4bcf628.webp",
+            "width": 640,
+            "height": 853
+          }
+        ]
+      }
+    },
+    {
+      "id": "photo-d25afd4e46af9907",
+      "source": "PXL_20241005_192537041.RAW-01.COVER (1).jpg",
+      "width": 1536,
+      "height": 1152,
+      "aspectRatio": 1.333333,
+      "variants": {
+        "avif": [
+          {
+            "src": "/images/hero-wall/photo-d25afd4e46af9907-320w-099a42ea5f79.avif",
+            "width": 320,
+            "height": 240
+          },
+          {
+            "src": "/images/hero-wall/photo-d25afd4e46af9907-640w-5843c8db74a3.avif",
+            "width": 640,
+            "height": 480
+          }
+        ],
+        "webp": [
+          {
+            "src": "/images/hero-wall/photo-d25afd4e46af9907-320w-f15a5e4562f8.webp",
+            "width": 320,
+            "height": 240
+          },
+          {
+            "src": "/images/hero-wall/photo-d25afd4e46af9907-640w-914a9d1f395c.webp",
+            "width": 640,
+            "height": 480
+          }
+        ]
+      }
+    },
+    {
+      "id": "photo-d58401bd9cb5c36d",
+      "source": "PXL_20241029_023558588.RAW-01.COVER.jpg",
+      "width": 709,
+      "height": 945,
+      "aspectRatio": 0.750265,
+      "variants": {
+        "avif": [
+          {
+            "src": "/images/hero-wall/photo-d58401bd9cb5c36d-320w-8bc623fd6933.avif",
+            "width": 320,
+            "height": 427
+          },
+          {
+            "src": "/images/hero-wall/photo-d58401bd9cb5c36d-640w-f7095e4bbdb3.avif",
+            "width": 640,
+            "height": 853
+          }
+        ],
+        "webp": [
+          {
+            "src": "/images/hero-wall/photo-d58401bd9cb5c36d-320w-81ade202584f.webp",
+            "width": 320,
+            "height": 427
+          },
+          {
+            "src": "/images/hero-wall/photo-d58401bd9cb5c36d-640w-0a350825642b.webp",
+            "width": 640,
+            "height": 853
+          }
+        ]
+      }
+    },
+    {
+      "id": "photo-4a59c150aa2170a9",
+      "source": "PXL_20241101_021309382.RAW-01.COVER.jpg",
+      "width": 1260,
+      "height": 945,
+      "aspectRatio": 1.333333,
+      "variants": {
+        "avif": [
+          {
+            "src": "/images/hero-wall/photo-4a59c150aa2170a9-320w-c8fb4124e22a.avif",
+            "width": 320,
+            "height": 240
+          },
+          {
+            "src": "/images/hero-wall/photo-4a59c150aa2170a9-640w-9d7e268cac1a.avif",
+            "width": 640,
+            "height": 480
+          }
+        ],
+        "webp": [
+          {
+            "src": "/images/hero-wall/photo-4a59c150aa2170a9-320w-c323ecb2a171.webp",
+            "width": 320,
+            "height": 240
+          },
+          {
+            "src": "/images/hero-wall/photo-4a59c150aa2170a9-640w-392048cd05c6.webp",
+            "width": 640,
+            "height": 480
+          }
+        ]
+      }
+    },
+    {
+      "id": "photo-cd117022ba57b0c0",
+      "source": "PXL_20241109_234413074.RAW-01.COVER.jpg",
+      "width": 1536,
+      "height": 1152,
+      "aspectRatio": 1.333333,
+      "variants": {
+        "avif": [
+          {
+            "src": "/images/hero-wall/photo-cd117022ba57b0c0-320w-7ebfd60f49b1.avif",
+            "width": 320,
+            "height": 240
+          },
+          {
+            "src": "/images/hero-wall/photo-cd117022ba57b0c0-640w-c4487f526549.avif",
+            "width": 640,
+            "height": 480
+          }
+        ],
+        "webp": [
+          {
+            "src": "/images/hero-wall/photo-cd117022ba57b0c0-320w-7dbb25b4b7eb.webp",
+            "width": 320,
+            "height": 240
+          },
+          {
+            "src": "/images/hero-wall/photo-cd117022ba57b0c0-640w-359edde6bbee.webp",
+            "width": 640,
+            "height": 480
+          }
+        ]
+      }
+    },
+    {
+      "id": "photo-c8428619da423136",
+      "source": "PXL_20251018_232344634.RAW-01.jpg",
+      "width": 1536,
+      "height": 1152,
+      "aspectRatio": 1.333333,
+      "variants": {
+        "avif": [
+          {
+            "src": "/images/hero-wall/photo-c8428619da423136-320w-1eff338e822b.avif",
+            "width": 320,
+            "height": 240
+          },
+          {
+            "src": "/images/hero-wall/photo-c8428619da423136-640w-7f4c0ac3379e.avif",
+            "width": 640,
+            "height": 480
+          }
+        ],
+        "webp": [
+          {
+            "src": "/images/hero-wall/photo-c8428619da423136-320w-fa10a86dd4c7.webp",
+            "width": 320,
+            "height": 240
+          },
+          {
+            "src": "/images/hero-wall/photo-c8428619da423136-640w-6363fa905703.webp",
+            "width": 640,
+            "height": 480
+          }
+        ]
+      }
+    },
+    {
+      "id": "photo-a02e30d0dd97cb84",
+      "source": "PXL_20260228_043306416.TS-000.jpg",
+      "width": 1536,
+      "height": 1152,
+      "aspectRatio": 1.333333,
+      "variants": {
+        "avif": [
+          {
+            "src": "/images/hero-wall/photo-a02e30d0dd97cb84-320w-5d7f6ec0f231.avif",
+            "width": 320,
+            "height": 240
+          },
+          {
+            "src": "/images/hero-wall/photo-a02e30d0dd97cb84-640w-d0a57a156a44.avif",
+            "width": 640,
+            "height": 480
+          }
+        ],
+        "webp": [
+          {
+            "src": "/images/hero-wall/photo-a02e30d0dd97cb84-320w-e78d8f2ef4b8.webp",
+            "width": 320,
+            "height": 240
+          },
+          {
+            "src": "/images/hero-wall/photo-a02e30d0dd97cb84-640w-c3eec41c44aa.webp",
+            "width": 640,
+            "height": 480
+          }
+        ]
+      }
+    },
+    {
+      "id": "photo-b1e22e8b2687943d",
+      "source": "signal-2026-03-29-17-56-31-938.jpg",
+      "width": 1536,
+      "height": 1152,
+      "aspectRatio": 1.333333,
+      "variants": {
+        "avif": [
+          {
+            "src": "/images/hero-wall/photo-b1e22e8b2687943d-320w-f1274887b944.avif",
+            "width": 320,
+            "height": 240
+          },
+          {
+            "src": "/images/hero-wall/photo-b1e22e8b2687943d-640w-57fc92668dc8.avif",
+            "width": 640,
+            "height": 480
+          }
+        ],
+        "webp": [
+          {
+            "src": "/images/hero-wall/photo-b1e22e8b2687943d-320w-cf833e3bd019.webp",
+            "width": 320,
+            "height": 240
+          },
+          {
+            "src": "/images/hero-wall/photo-b1e22e8b2687943d-640w-213265bafde1.webp",
+            "width": 640,
+            "height": 480
+          }
+        ]
+      }
+    },
+    {
+      "id": "photo-6f10d56e5278dacf",
+      "source": "WhatsApp Image 2025-04-19 at 09.30.50_2f682ab6.jpg",
+      "width": 1200,
+      "height": 1600,
+      "aspectRatio": 0.75,
+      "variants": {
+        "avif": [
+          {
+            "src": "/images/hero-wall/photo-6f10d56e5278dacf-320w-5ff50b0fe9f7.avif",
+            "width": 320,
+            "height": 427
+          },
+          {
+            "src": "/images/hero-wall/photo-6f10d56e5278dacf-640w-c3c692cc709d.avif",
+            "width": 640,
+            "height": 853
+          }
+        ],
+        "webp": [
+          {
+            "src": "/images/hero-wall/photo-6f10d56e5278dacf-320w-e52493e8ed56.webp",
+            "width": 320,
+            "height": 427
+          },
+          {
+            "src": "/images/hero-wall/photo-6f10d56e5278dacf-640w-3aed1b6ef396.webp",
+            "width": 640,
+            "height": 853
+          }
+        ]
+      }
+    }
+  ]
+}

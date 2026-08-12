@@ -2,7 +2,7 @@ import withNuxt from './.nuxt/eslint.config.mjs'
 
 const objectStorageBoundaryMessage =
   'Only the reviewed Files and off-host-backup adapters may import the R2 provider SDK directly.'
-const rekaBoundaryMessage = 'Only AccountMenu may import Reka UI until another approved wrapper is added.'
+const rekaBoundaryMessage = 'Only AccountMenu and AppTopbar may import Reka UI until another approved wrapper is added.'
 
 export default withNuxt(
   {
@@ -38,7 +38,7 @@ export default withNuxt(
   {
     name: 'wcu/reka-ui-import-boundary',
     files: ['app/**/*.{js,jsx,mjs,cjs,ts,tsx,mts,cts,vue}'],
-    ignores: ['app/components/AccountMenu.vue'],
+    ignores: ['app/components/AccountMenu.vue', 'app/components/AppTopbar.vue'],
     rules: {
       'no-restricted-imports': [
         'error',
