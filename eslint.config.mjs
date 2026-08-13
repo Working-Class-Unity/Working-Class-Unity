@@ -2,7 +2,7 @@ import withNuxt from './.nuxt/eslint.config.mjs'
 
 const objectStorageBoundaryMessage =
   'Only the reviewed Files and off-host-backup adapters may import the R2 provider SDK directly.'
-const rekaBoundaryMessage = 'Only approved app-owned interaction components may import Reka UI directly.'
+const rekaBoundaryMessage = 'Only the app-owned interaction components listed in app/AGENTS.md may import Reka UI.'
 
 export default withNuxt(
   {
@@ -42,6 +42,8 @@ export default withNuxt(
       'app/components/AccountMenu.vue',
       'app/components/AppTopbar.vue',
       'app/components/BylawsPageOutline.vue',
+      'app/components/CampaignCitation.vue',
+      'app/components/CampaignPageOutline.vue',
       'app/components/calendar/CalendarDatePicker.vue',
       'app/components/calendar/EventDirectionsMenu.vue',
       'app/components/calendar/EventRsvpDialog.vue'

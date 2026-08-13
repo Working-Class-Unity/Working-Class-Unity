@@ -34,11 +34,15 @@ The root [`AGENTS.md`](../AGENTS.md) governs all work. The normative interface a
 - `calendar/EventDirectionsMenu`: feature-owned Reka dropdown for map and address actions.
 - `calendar/EventRsvpDialog`: feature-owned Reka dialog for the website RSVP journey.
 - `BylawsPageOutline`: feature-owned Reka drawer for the nested bylaws table of contents on narrow viewports.
+- `CampaignCitation`: feature-owned citation preview using a desktop Reka Hover Card and mobile Reka Drawer.
+- `CampaignPageOutline`: shared campaign page outline with a desktop index and mobile Reka Drawer.
 - `AuthEntryForm`, `TurnstileChallenge`, `AccountProfileForm`, and `AccountDeletionSection`: feature components, not shared primitives.
 
-Direct `reka-ui` imports are allowed only in the documented components above. Pages and unrelated
-components consume app-owned contracts. Do not add another Reka primitive or a generic wrapper
-without a documented product journey.
+Direct `reka-ui` imports are allowed only in `components/AccountMenu.vue`, `components/AppTopbar.vue`,
+`components/BylawsPageOutline.vue`, `components/CampaignCitation.vue`,
+`components/CampaignPageOutline.vue`, and the three documented `components/calendar/` integrations.
+Pages and unrelated components consume app-owned contracts. Do not add another Reka primitive or a
+generic wrapper without a documented product journey.
 
 ## Page and state requirements
 

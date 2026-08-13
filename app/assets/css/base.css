@@ -56,7 +56,7 @@ h3 {
 }
 
 a {
-  color: var(--color-action);
+  color: var(--anchor-color, var(--color-action));
   text-underline-offset: 0.18em;
 }
 

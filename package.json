@@ -28,7 +28,7 @@
     "db:migrate:check": "node --env-file-if-exists=.env scripts/run-pnpm.mjs exec tsx server/db/migration-check.ts",
     "doctor": "node scripts/doctor.mjs",
     "check:toolchain": "node --test scripts/toolchain-contract.test.mjs",
-    "test:tooling": "node --test scripts/ci-browser-helpers.test.mjs scripts/ci-container-build.test.mjs scripts/ci-container-health.test.mjs scripts/color-tokens.test.mjs scripts/compose-deployment.test.mjs scripts/container-maintenance.test.mjs scripts/deployment-smoke.test.mjs scripts/format-changed.test.mjs scripts/hero-assets.test.mjs scripts/isolated-api-smoke.test.mjs scripts/off-host-backup.test.mjs scripts/openai-corpus.test.mjs scripts/playwright-foundation-reporter.test.mjs scripts/vitest-policy-reporter.test.mjs",
+    "test:tooling": "node --test scripts/ci-browser-helpers.test.mjs scripts/ci-container-build.test.mjs scripts/ci-container-health.test.mjs scripts/color-tokens.test.mjs scripts/compose-deployment.test.mjs scripts/container-maintenance.test.mjs scripts/deployment-smoke.test.mjs scripts/flock-campaign-content.test.mjs scripts/format-changed.test.mjs scripts/hero-assets.test.mjs scripts/isolated-api-smoke.test.mjs scripts/off-host-backup.test.mjs scripts/openai-corpus.test.mjs scripts/playwright-foundation-reporter.test.mjs scripts/vitest-policy-reporter.test.mjs",
     "check:supply-chain": "node --test scripts/supply-chain-policy.test.mjs && node scripts/supply-chain-policy.mjs",
     "scan:supply-chain": "node scripts/supply-chain-scan.mjs all",
     "test:framework-security": "node --test scripts/framework-security-helpers.test.mjs && node scripts/framework-security-smoke.mjs",

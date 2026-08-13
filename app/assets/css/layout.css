@@ -4,8 +4,8 @@
   margin-inline: auto;
 }
 
-.container.container--home,
-.page-shell.container--home {
+.container.container--wide,
+.page-shell.container--wide {
   inline-size: min(var(--home-content-max-width), calc(100% - (2 * var(--content-gutter))));
 }
 
@@ -42,8 +42,8 @@
     inline-size: min(var(--content-max-width), calc(100% - (2 * var(--content-gutter-compact))));
   }
 
-  .container.container--home,
-  .page-shell.container--home {
+  .container.container--wide,
+  .page-shell.container--wide {
     inline-size: min(var(--home-content-max-width), calc(100% - (2 * var(--content-gutter-compact))));
   }
 
