@@ -84,7 +84,7 @@ useHead(() => ({
             <legend id="newsletter-heading">{{ t('home.newsletterHeading') }}</legend>
             <div class="newsletter-controls">
               <label class="visually-hidden" for="newsletter-email">{{ t('home.emailLabel') }}</label>
-              <input
+              <AppInput
                 id="newsletter-email"
                 type="email"
                 name="newsletter-email"
@@ -93,7 +93,7 @@ useHead(() => ({
                 :placeholder="t('home.emailPlaceholder')"
                 aria-describedby="newsletter-note"
               />
-              <button type="submit">{{ t('home.newsletterSubmit') }}</button>
+              <AppButton type="submit">{{ t('home.newsletterSubmit') }}</AppButton>
             </div>
           </fieldset>
           <p id="newsletter-note" class="newsletter-note">{{ t('home.newsletterNote') }}</p>

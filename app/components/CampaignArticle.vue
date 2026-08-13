@@ -25,16 +25,16 @@ function noteId(sourceId: string) {
 
 <template>
   <article class="campaign-article" :aria-labelledby="titleId">
-    <header class="campaign-article-header">
-      <p class="campaign-article-eyebrow">{{ content.eyebrow }}</p>
-      <h1 :id="titleId">{{ content.title }}</h1>
-      <p class="campaign-article-description">{{ content.description }}</p>
-      <p v-if="content.qualification" class="campaign-article-qualification">{{ content.qualification }}</p>
-      <p v-if="content.reviewedThrough" class="campaign-article-reviewed">
-        Last materially updated: {{ content.reviewedThrough }}.
-      </p>
+    <CampaignEditorialHeader
+      :title-id="titleId"
+      :eyebrow="content.eyebrow"
+      :title="content.title"
+      :description="content.description"
+      :qualification="content.qualification"
+      :reviewed-through="content.reviewedThrough"
+    >
       <slot name="after-header" />
-    </header>
+    </CampaignEditorialHeader>
 
     <div class="campaign-article-layout">
       <CampaignPageOutline :items="outlineItems" :label="`${content.title} sections`" />
@@ -95,70 +95,31 @@ function noteId(sourceId: string) {
 <style scoped>
 @layer components {
   .campaign-article {
-    --article-divider: rgb(4 51 79 / 18%);
+    --article-divider: var(--color-divider-strong);
 
     min-width: 0;
     padding-block-end: clamp(4rem, 8vw, 7rem);
   }
 
-  .campaign-article-header {
-    display: grid;
-    justify-items: start;
-    gap: var(--space-5);
-    border-block-end: var(--border-width) solid var(--article-divider);
-    padding-block: clamp(4rem, 9vw, 8rem);
-  }
-
-  .campaign-article-eyebrow,
   .campaign-article-section-heading > p:first-child {
     margin: 0;
     color: var(--color-accent-action);
-    font-family: ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', monospace;
+    font-family: var(--font-family-mono);
     font-size: 0.8125rem;
     font-weight: var(--font-weight-strong);
     letter-spacing: 0.08em;
   }
 
-  .campaign-article-header h1,
   .campaign-article-section h2 {
+    max-inline-size: 24ch;
     margin: 0;
     color: var(--color-brand-primary);
     font-family: var(--font-family-display);
+    font-size: clamp(2rem, 1.6rem + 1.5vw, 3.25rem);
     font-weight: 650;
     letter-spacing: -0.045em;
+    line-height: 1.02;
     text-wrap: balance;
-  }
-
-  .campaign-article-header h1 {
-    max-inline-size: 18ch;
-    font-size: clamp(3rem, 2.1rem + 3.5vw, 6rem);
-    line-height: 0.98;
-  }
-
-  .campaign-article-description {
-    max-inline-size: 62ch;
-    margin: 0;
-    color: var(--color-text);
-    font-size: clamp(1.25rem, 1.1rem + 0.45vw, 1.5rem);
-    line-height: 1.55;
-    text-wrap: pretty;
-  }
-
-  .campaign-article-qualification {
-    max-inline-size: 72ch;
-    margin: var(--space-2) 0 0;
-    border-inline-start: var(--border-width-accent) solid var(--color-brand-highlight);
-    padding-inline-start: var(--space-4);
-    color: var(--color-text-muted);
-    font-size: 1rem;
-    line-height: 1.75;
-    text-wrap: pretty;
-  }
-
-  .campaign-article-reviewed {
-    margin: 0;
-    color: var(--color-text-muted);
-    font-size: 1rem;
   }
 
   .campaign-article-layout {
@@ -183,12 +144,6 @@ function noteId(sourceId: string) {
   .campaign-article-section-heading {
     display: grid;
     gap: var(--space-4);
-  }
-
-  .campaign-article-section h2 {
-    max-inline-size: 24ch;
-    font-size: clamp(2rem, 1.6rem + 1.5vw, 3.25rem);
-    line-height: 1.02;
   }
 
   .campaign-article-section-heading > p:last-child {
@@ -247,11 +202,6 @@ function noteId(sourceId: string) {
   }
 
   @media (width <= 40rem) {
-    .campaign-article-header h1 {
-      font-size: clamp(2.75rem, 14vw, 4.25rem);
-    }
-
-    .campaign-article-eyebrow,
     .campaign-article-section-heading > p:first-child {
       font-size: 1rem;
     }

@@ -95,7 +95,7 @@ function currentPage(path: string) {
 <style scoped>
 @layer components {
   .campaign-shell {
-    --campaign-border: rgb(4 51 79 / 18%);
+    --campaign-border: var(--color-divider-strong);
     --campaign-content-inset: var(--home-content-inset);
 
     min-width: 0;
@@ -127,7 +127,7 @@ function currentPage(path: string) {
 
   .campaign-name-kicker {
     color: var(--color-accent-action);
-    font-family: ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', monospace;
+    font-family: var(--font-family-mono);
     font-size: 0.6875rem;
     font-weight: var(--font-weight-strong);
     letter-spacing: 0.08em;

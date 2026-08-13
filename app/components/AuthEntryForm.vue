@@ -7,6 +7,11 @@ type TurnstileChallengeHandle = {
   reset: () => void
 }
 
+type AppInputHandle = {
+  focus: () => void
+  isValid: () => boolean
+}
+
 const props = defineProps<{
   intent: AuthEntryIntent
   sessionError?: string
@@ -15,7 +20,7 @@ const props = defineProps<{
 const route = useRoute()
 const { t } = useI18n()
 const email = ref('')
-const emailInput = ref<HTMLInputElement | null>(null)
+const emailInput = ref<AppInputHandle | null>(null)
 const turnstileChallenge = ref<TurnstileChallengeHandle | null>(null)
 const turnstileToken = ref('')
 const fieldError = ref('')
@@ -94,7 +99,7 @@ async function focusFirstInvalidControl() {
 function validateAuthForm() {
   if (!email.value.trim()) {
     fieldError.value = t('auth.email.required')
-  } else if (emailInput.value && !emailInput.value.validity.valid) {
+  } else if (emailInput.value && !emailInput.value.isValid()) {
     fieldError.value = t('common.emailInvalid')
   }
 
@@ -128,8 +133,7 @@ function validateAuthForm() {
         :required-label="t('common.required')"
       >
         <template #default="{ id, describedBy, invalid, required }">
-          <!-- eslint-disable vue/html-self-closing -->
-          <input
+          <AppInput
             :id="id"
             ref="emailInput"
             v-model.trim="email"
@@ -141,7 +145,6 @@ function validateAuthForm() {
             :aria-invalid="invalid ? 'true' : undefined"
             :required="required"
           />
-          <!-- eslint-enable vue/html-self-closing -->
         </template>
       </AppField>
 

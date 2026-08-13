@@ -94,7 +94,7 @@ const noteId = computed(() => `${props.idPrefix}-note`)
 
   .campaign-newsletter[data-tone='light'] {
     max-inline-size: 40rem;
-    border-block-start-color: rgb(4 51 79 / 18%);
+    border-block-start-color: var(--color-divider-strong);
   }
 
   .campaign-newsletter[data-tone='light'] legend {

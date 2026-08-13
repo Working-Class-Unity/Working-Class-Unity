@@ -27,9 +27,11 @@ async function copyAddress() {
 <template>
   <div class="wcu-directions-root">
     <DropdownMenuRoot>
-      <DropdownMenuTrigger class="wcu-directions-trigger">
-        <span>Directions</span>
-        <span class="wcu-directions-chevron" aria-hidden="true" />
+      <DropdownMenuTrigger as-child>
+        <AppButton class="wcu-directions-trigger" size="compact" variant="secondary">
+          <span>Directions</span>
+          <span class="wcu-directions-chevron" aria-hidden="true" />
+        </AppButton>
       </DropdownMenuTrigger>
       <DropdownMenuPortal>
         <DropdownMenuContent
@@ -48,8 +50,10 @@ async function copyAddress() {
             <a class="wcu-directions-item" :href="appleMapsUrl" target="_blank" rel="noreferrer">Apple Maps</a>
           </DropdownMenuItem>
           <DropdownMenuSeparator class="wcu-directions-separator" />
-          <DropdownMenuItem class="wcu-directions-item" @select="copyAddress">
-            {{ copied ? 'Address copied' : 'Copy address' }}
+          <DropdownMenuItem as-child @select="copyAddress">
+            <AppButton class="wcu-directions-item" size="compact" variant="secondary">
+              {{ copied ? 'Address copied' : 'Copy address' }}
+            </AppButton>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenuPortal>
@@ -64,7 +68,7 @@ async function copyAddress() {
     inline-size: 100%;
   }
 
-  .wcu-directions-trigger {
+  .wcu-directions-root .wcu-directions-trigger[data-variant='secondary'] {
     display: inline-flex;
     inline-size: 100%;
     min-block-size: var(--control-min-block-size);
@@ -79,6 +83,7 @@ async function copyAddress() {
     font: inherit;
     font-size: 0.875rem;
     font-weight: 650;
+    filter: none;
     cursor: pointer;
   }
 
@@ -92,7 +97,7 @@ async function copyAddress() {
     transition: rotate var(--motion-duration-fast) ease;
   }
 
-  .wcu-directions-trigger[data-state='open'] .wcu-directions-chevron {
+  .wcu-directions-root .wcu-directions-trigger[data-variant='secondary'][data-state='open'] .wcu-directions-chevron {
     rotate: 225deg;
     translate: 0 0.1rem;
   }
@@ -142,12 +147,19 @@ async function copyAddress() {
     cursor: pointer;
   }
 
-  .wcu-directions-trigger:hover,
+  .wcu-directions-item[data-variant='secondary'] {
+    border: 0;
+    color: var(--color-action);
+    background: transparent;
+    filter: none;
+  }
+
+  .wcu-directions-root .wcu-directions-trigger[data-variant='secondary']:hover,
   .wcu-directions-item[data-highlighted] {
     background: var(--color-action-soft);
   }
 
-  .wcu-directions-trigger:focus-visible,
+  .wcu-directions-root .wcu-directions-trigger[data-variant='secondary']:focus-visible,
   .wcu-directions-item:focus-visible {
     outline: 2px solid var(--color-focus-ring);
     outline-offset: 2px;

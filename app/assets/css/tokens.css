@@ -22,6 +22,7 @@
   --color-accent-action-hover: var(--primitive-red-800);
   --color-accent-action-contrast: var(--primitive-white);
   --color-divider: rgb(4 51 79 / 12%);
+  --color-divider-strong: rgb(4 51 79 / 18%);
   --color-event-organizing-surface: var(--primitive-navy-100);
   --color-event-organizing-text: var(--primitive-brand-navy);
   --color-event-action-surface: var(--primitive-red-100);
@@ -69,7 +70,6 @@
   --radius-1: 0.25rem;
   --radius-2: 0.5rem;
   --radius-3: 0.75rem;
-  --radius-4: 1rem;
   --radius-round: 999px;
   --shadow-panel: 0 1rem 2.625rem rgb(35 55 58 / 10%);
   --shadow-dialog: 0 1.5rem 4rem rgb(4 20 31 / 28%);

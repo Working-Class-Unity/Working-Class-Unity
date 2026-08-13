@@ -147,7 +147,7 @@ useHead(() => ({
     align-items: baseline;
     gap: var(--space-3) var(--space-5);
     flex-wrap: wrap;
-    border-block-start: var(--border-width) solid rgb(4 51 79 / 15%);
+    border-block-start: var(--border-width) solid var(--color-divider-strong);
     padding-block-start: var(--space-4);
     color: var(--color-text-muted);
     font-size: 0.875rem;
@@ -175,7 +175,7 @@ useHead(() => ({
   .bylaws-article {
     display: grid;
     gap: var(--space-6);
-    border-block-start: var(--border-width) solid rgb(4 51 79 / 16%);
+    border-block-start: var(--border-width) solid var(--color-divider-strong);
     padding-block: clamp(3.5rem, 7vw, 6rem);
     scroll-margin-block-start: var(--space-5);
   }

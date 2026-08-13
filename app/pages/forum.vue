@@ -33,7 +33,7 @@ useHead(() => ({
 
   .public-page-eyebrow {
     color: var(--color-action);
-    font-family: ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', monospace;
+    font-family: var(--font-family-mono);
     font-weight: var(--font-weight-strong);
     letter-spacing: 0.08em;
     text-transform: uppercase;

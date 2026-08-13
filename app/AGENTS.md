@@ -27,20 +27,26 @@ The root [`AGENTS.md`](../AGENTS.md) governs all work. The normative interface a
 
 - `AppButton`: native command button; never navigation.
 - `AppField`: label, hint, required, and validation-message relationships for a slotted native control.
+- `AppInput`: native input contract with model, attribute, class, focus, and validity forwarding.
 - `AppNotice`: persistent visual feedback with explicit, opt-in announcement behavior.
 - `AppTopbar`: application-shell header, Reka desktop primary navigation, and native mobile disclosure.
 - `AccountMenu`: feature-owned Reka dropdown for identity, account navigation, and sign-out.
 - `calendar/CalendarDatePicker`: feature-owned Reka calendar and popover for agenda date navigation.
 - `calendar/EventDirectionsMenu`: feature-owned Reka dropdown for map and address actions.
 - `calendar/EventRsvpDialog`: feature-owned Reka dialog for the website RSVP journey.
-- `BylawsPageOutline`: feature-owned Reka drawer for the nested bylaws table of contents on narrow viewports.
+- `calendar/CalendarAgendaView`, `calendar/CalendarMonthView`, `calendar/CalendarEventActions`, and
+  `calendar/CalendarEventBadge`: calendar-owned views and recurring event presentation.
+- `PageOutline`: shared desktop index and mobile Reka drawer for flat or nested page outlines.
+- `BylawsPageOutline`: bylaws-owned configuration of `PageOutline`.
 - `CampaignCitation`: feature-owned citation preview using a desktop Reka Hover Card and mobile Reka Drawer.
-- `CampaignPageOutline`: shared campaign page outline with a desktop index and mobile Reka Drawer.
+- `CampaignPageOutline`: campaign-owned configuration of `PageOutline`.
+- `CampaignEditorialHeader`: shared long-form campaign page heading group.
+- `campaign/Landing*`: campaign-owned narrative sections composed by `CampaignLanding`.
 - `AuthEntryForm`, `TurnstileChallenge`, `AccountProfileForm`, and `AccountDeletionSection`: feature components, not shared primitives.
 
 Direct `reka-ui` imports are allowed only in `components/AccountMenu.vue`, `components/AppTopbar.vue`,
-`components/BylawsPageOutline.vue`, `components/CampaignCitation.vue`,
-`components/CampaignPageOutline.vue`, and the three documented `components/calendar/` integrations.
+`components/CampaignCitation.vue`, `components/PageOutline.vue`, and the three documented
+`components/calendar/` integrations.
 Pages and unrelated components consume app-owned contracts. Do not add another Reka primitive or a
 generic wrapper without a documented product journey.
 

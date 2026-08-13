@@ -73,8 +73,7 @@ function normalizeProfileValue(value: string): string | null {
 
       <AppField id="account-first-name" :label="t('account.profile.firstName')" :hint="t('account.profile.optional')">
         <template #default="{ id, describedBy }">
-          <!-- eslint-disable vue/html-self-closing -->
-          <input
+          <AppInput
             :id="id"
             v-model="firstName"
             name="firstName"
@@ -84,14 +83,12 @@ function normalizeProfileValue(value: string): string | null {
             :aria-describedby="describedBy"
             :disabled="isSubmitting"
           />
-          <!-- eslint-enable vue/html-self-closing -->
         </template>
       </AppField>
 
       <AppField id="account-last-name" :label="t('account.profile.lastName')" :hint="t('account.profile.optional')">
         <template #default="{ id, describedBy }">
-          <!-- eslint-disable vue/html-self-closing -->
-          <input
+          <AppInput
             :id="id"
             v-model="lastName"
             name="lastName"
@@ -101,7 +98,6 @@ function normalizeProfileValue(value: string): string | null {
             :aria-describedby="describedBy"
             :disabled="isSubmitting"
           />
-          <!-- eslint-enable vue/html-self-closing -->
         </template>
       </AppField>
 
@@ -111,8 +107,7 @@ function normalizeProfileValue(value: string): string | null {
         :hint="t('account.profile.displayNameHelp')"
       >
         <template #default="{ id, describedBy }">
-          <!-- eslint-disable vue/html-self-closing -->
-          <input
+          <AppInput
             :id="id"
             v-model="displayName"
             name="displayName"
@@ -122,7 +117,6 @@ function normalizeProfileValue(value: string): string | null {
             :aria-describedby="describedBy"
             :disabled="isSubmitting"
           />
-          <!-- eslint-enable vue/html-self-closing -->
         </template>
       </AppField>
 

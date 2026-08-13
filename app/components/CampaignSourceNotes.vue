@@ -56,7 +56,7 @@ function sourceTypeFor(source: CampaignSource) {
   .campaign-source-register > div > p:first-child {
     margin: 0;
     color: var(--color-accent-action);
-    font-family: ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', monospace;
+    font-family: var(--font-family-mono);
     font-size: 0.8125rem;
     font-weight: var(--font-weight-strong);
     letter-spacing: 0.08em;
@@ -113,7 +113,7 @@ function sourceTypeFor(source: CampaignSource) {
   .campaign-source-register li .campaign-source-type {
     margin-block: 0 var(--space-1);
     color: var(--color-accent-action);
-    font-family: ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', monospace;
+    font-family: var(--font-family-mono);
     font-size: 0.6875rem;
     font-weight: var(--font-weight-strong);
     letter-spacing: 0.06em;

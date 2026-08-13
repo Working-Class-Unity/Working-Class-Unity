@@ -75,8 +75,7 @@ function errorValues(error: unknown): unknown[] {
         :required-label="t('common.required')"
       >
         <template #default="{ id, describedBy, required }">
-          <!-- eslint-disable vue/html-self-closing -->
-          <input
+          <AppInput
             :id="id"
             v-model="confirmation"
             name="confirmation"
@@ -87,7 +86,6 @@ function errorValues(error: unknown): unknown[] {
             :required="required"
             :disabled="isDeleting"
           />
-          <!-- eslint-enable vue/html-self-closing -->
         </template>
       </AppField>
       <p id="delete-account-help" class="deletion-help">{{ t('account.deletion.help') }}</p>

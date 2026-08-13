@@ -49,67 +49,75 @@ function onDrawerCloseAutoFocus(event: Event) {
 </script>
 
 <template>
-  <HoverCardRoot :open-delay="180" :close-delay="120">
-    <HoverCardTrigger as-child>
-      <a
-        class="campaign-citation-trigger campaign-citation-trigger--desktop"
-        :href="`#${noteId}`"
-        :aria-label="`Citation ${number}: ${source.title}`"
-      >
-        <sup>{{ number }}</sup>
-      </a>
-    </HoverCardTrigger>
-    <HoverCardPortal>
-      <HoverCardContent
-        class="campaign-citation-card"
-        side="top"
-        align="start"
-        :side-offset="10"
-        :collision-padding="16"
-      >
-        <HoverCardArrow class="campaign-citation-card-arrow" :width="14" :height="7" />
-        <p class="campaign-citation-label">SOURCE {{ number }}</p>
-        <p class="campaign-citation-title">{{ source.title }}</p>
-        <p class="campaign-citation-meta">{{ sourceMetadata }}</p>
-        <p v-if="source.note" class="campaign-citation-note">{{ source.note }}</p>
-        <a class="campaign-citation-source-link" :href="source.url" target="_blank" rel="noreferrer"> View source </a>
-      </HoverCardContent>
-    </HoverCardPortal>
-  </HoverCardRoot>
-
-  <DrawerRoot v-model:open="drawerOpen">
-    <DrawerTrigger as-child>
-      <button
-        class="campaign-citation-trigger campaign-citation-trigger--mobile"
-        type="button"
-        :aria-label="`Open citation ${number}: ${source.title}`"
-      >
-        <sup>{{ number }}</sup>
-      </button>
-    </DrawerTrigger>
-    <DrawerPortal>
-      <DrawerOverlay class="campaign-citation-drawer-overlay" />
-      <DrawerContent class="campaign-citation-drawer" @close-auto-focus="onDrawerCloseAutoFocus">
-        <DrawerHandle class="campaign-citation-drawer-handle" />
-        <div class="campaign-citation-drawer-content">
+  <span class="campaign-citation">
+    <HoverCardRoot :open-delay="180" :close-delay="120">
+      <HoverCardTrigger as-child>
+        <a
+          class="campaign-citation-trigger campaign-citation-trigger--desktop"
+          :href="`#${noteId}`"
+          :aria-label="`Citation ${number}: ${source.title}`"
+        >
+          <sup>{{ number }}</sup>
+        </a>
+      </HoverCardTrigger>
+      <HoverCardPortal>
+        <HoverCardContent
+          class="campaign-citation-card"
+          side="top"
+          align="start"
+          :side-offset="10"
+          :collision-padding="16"
+        >
+          <HoverCardArrow class="campaign-citation-card-arrow" :width="14" :height="7" />
           <p class="campaign-citation-label">SOURCE {{ number }}</p>
-          <DrawerTitle class="campaign-citation-title">{{ source.title }}</DrawerTitle>
-          <DrawerDescription class="campaign-citation-meta">{{ sourceMetadata }}</DrawerDescription>
+          <p class="campaign-citation-title">{{ source.title }}</p>
+          <p class="campaign-citation-meta">{{ sourceMetadata }}</p>
           <p v-if="source.note" class="campaign-citation-note">{{ source.note }}</p>
-          <div class="campaign-citation-drawer-actions">
-            <a class="campaign-citation-source-link" :href="source.url" target="_blank" rel="noreferrer">
-              View source
-            </a>
-            <button class="campaign-citation-note-link" type="button" @click="readFullNote">Read the full note</button>
+          <a class="campaign-citation-source-link" :href="source.url" target="_blank" rel="noreferrer"> View source </a>
+        </HoverCardContent>
+      </HoverCardPortal>
+    </HoverCardRoot>
+
+    <DrawerRoot v-model:open="drawerOpen">
+      <DrawerTrigger as-child>
+        <button
+          class="campaign-citation-trigger campaign-citation-trigger--mobile"
+          type="button"
+          :aria-label="`Open citation ${number}: ${source.title}`"
+        >
+          <sup>{{ number }}</sup>
+        </button>
+      </DrawerTrigger>
+      <DrawerPortal>
+        <DrawerOverlay class="campaign-citation-drawer-overlay" />
+        <DrawerContent class="campaign-citation-drawer" @close-auto-focus="onDrawerCloseAutoFocus">
+          <DrawerHandle class="campaign-citation-drawer-handle" />
+          <div class="campaign-citation-drawer-content">
+            <p class="campaign-citation-label">SOURCE {{ number }}</p>
+            <DrawerTitle class="campaign-citation-title">{{ source.title }}</DrawerTitle>
+            <DrawerDescription class="campaign-citation-meta">{{ sourceMetadata }}</DrawerDescription>
+            <p v-if="source.note" class="campaign-citation-note">{{ source.note }}</p>
+            <div class="campaign-citation-drawer-actions">
+              <a class="campaign-citation-source-link" :href="source.url" target="_blank" rel="noreferrer">
+                View source
+              </a>
+              <button class="campaign-citation-note-link" type="button" @click="readFullNote">
+                Read the full note
+              </button>
+            </div>
           </div>
-        </div>
-      </DrawerContent>
-    </DrawerPortal>
-  </DrawerRoot>
+        </DrawerContent>
+      </DrawerPortal>
+    </DrawerRoot>
+  </span>
 </template>
 
 <style>
 @layer components {
+  .campaign-citation {
+    display: inline;
+  }
+
   .campaign-citation-trigger {
     display: inline-grid;
     place-items: center;
@@ -185,7 +193,7 @@ function onDrawerCloseAutoFocus(event: Event) {
 
   .campaign-citation-label {
     color: var(--color-accent-action);
-    font-family: ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', monospace;
+    font-family: var(--font-family-mono);
     font-size: 0.75rem;
     font-weight: var(--font-weight-strong);
     letter-spacing: 0.08em;
@@ -202,7 +210,7 @@ function onDrawerCloseAutoFocus(event: Event) {
 
   .campaign-citation-meta {
     color: var(--color-text-muted);
-    font-family: ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', monospace;
+    font-family: var(--font-family-mono);
     font-size: 0.75rem;
     line-height: 1.5;
     text-transform: uppercase;
@@ -258,7 +266,7 @@ function onDrawerCloseAutoFocus(event: Event) {
     position: fixed;
     z-index: 70;
     inset: 0;
-    background: rgb(4 51 79 / 58%);
+    background: var(--color-overlay);
   }
 
   .campaign-citation-drawer {

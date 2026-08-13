@@ -41,9 +41,8 @@ export default withNuxt(
     ignores: [
       'app/components/AccountMenu.vue',
       'app/components/AppTopbar.vue',
-      'app/components/BylawsPageOutline.vue',
       'app/components/CampaignCitation.vue',
-      'app/components/CampaignPageOutline.vue',
+      'app/components/PageOutline.vue',
       'app/components/calendar/CalendarDatePicker.vue',
       'app/components/calendar/EventDirectionsMenu.vue',
       'app/components/calendar/EventRsvpDialog.vue'

@@ -168,7 +168,7 @@ useHead(() => ({
 
   .about-eyebrow {
     color: var(--color-accent-action);
-    font-family: ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', monospace;
+    font-family: var(--font-family-mono);
     font-size: 0.9375rem;
     font-weight: var(--font-weight-strong);
     letter-spacing: 0.1em;
@@ -211,7 +211,7 @@ useHead(() => ({
   .about-photo picture {
     overflow: hidden;
     border-radius: min(1vw, 0.75rem);
-    outline: 1px solid rgb(4 51 79 / 10%);
+    outline: var(--border-width) solid var(--color-divider);
     outline-offset: -1px;
   }
 
@@ -239,7 +239,7 @@ useHead(() => ({
     gap: clamp(2.5rem, 5vw, 6rem);
     padding-inline: 0;
     padding-block: clamp(4rem, 8vw, 7rem);
-    border-block-start: var(--border-width) solid rgb(4 51 79 / 15%);
+    border-block-start: var(--border-width) solid var(--color-divider-strong);
   }
 
   .story-heading {
@@ -303,7 +303,7 @@ useHead(() => ({
     gap: clamp(2rem, 5vw, 5rem);
     align-items: end;
     padding-block: clamp(3.5rem, 7vw, 5.5rem);
-    border-block: var(--border-width) solid rgb(4 51 79 / 12%);
+    border-block: var(--border-width) solid var(--color-divider);
     box-shadow: inset var(--border-width-accent) 0 var(--color-brand-highlight);
     background: var(--color-surface-subtle);
   }

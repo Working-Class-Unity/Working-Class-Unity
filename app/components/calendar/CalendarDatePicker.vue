@@ -21,9 +21,10 @@ import {
 
 const emit = defineEmits<{ select: [date: string] }>()
 const open = ref(false)
-const selectedDate = ref<DateValue>(new CalendarDate(2026, 8, 20))
+const selectedDate = shallowRef<DateValue>(new CalendarDate(2026, 8, 20))
 
-function selectDate(date: DateValue) {
+function selectDate(date: DateValue | undefined) {
+  if (!date) return
   selectedDate.value = date
   emit('select', date.toString())
   open.value = false
@@ -33,7 +34,7 @@ function selectDate(date: DateValue) {
 <template>
   <PopoverRoot v-model:open="open">
     <PopoverTrigger as-child>
-      <button type="button" class="wcu-date-trigger">Jump to date</button>
+      <AppButton class="wcu-date-trigger" size="compact" variant="secondary">Jump to date</AppButton>
     </PopoverTrigger>
     <PopoverPortal>
       <PopoverContent
@@ -85,7 +86,7 @@ function selectDate(date: DateValue) {
 <style>
 /* stylelint-disable no-descending-specificity -- focus state intentionally follows hover state */
 @layer components {
-  .wcu-date-trigger {
+  .wcu-date-trigger[data-variant='secondary'] {
     min-block-size: var(--control-min-block-size);
     border: 1px solid var(--color-action);
     border-radius: var(--radius-2);
@@ -95,6 +96,7 @@ function selectDate(date: DateValue) {
     font: inherit;
     font-size: 0.875rem;
     font-weight: 650;
+    filter: none;
     cursor: pointer;
   }
 
@@ -195,11 +197,11 @@ function selectDate(date: DateValue) {
 
   .wcu-date-nav:hover,
   .wcu-date-day:hover:not([data-selected]),
-  .wcu-date-trigger:hover {
+  .wcu-date-trigger[data-variant='secondary']:hover {
     background: var(--color-surface-subtle);
   }
 
-  .wcu-date-trigger:focus-visible,
+  .wcu-date-trigger[data-variant='secondary']:focus-visible,
   .wcu-date-nav:focus-visible,
   .wcu-date-day:focus-visible {
     outline: 2px solid var(--color-focus-ring);

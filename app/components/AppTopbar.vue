@@ -380,7 +380,7 @@ function currentPage(path: string) {
       padding-block: var(--space-2) 0;
     }
 
-    .topbar--home .topbar-row {
+    .topbar--wide .topbar-row {
       padding-inline: var(--space-4);
     }
 
