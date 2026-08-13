@@ -5,6 +5,7 @@ import { authClient } from '~/lib/auth-client'
 
 const route = useRoute()
 const { t } = useI18n()
+const usesWideSurface = useWideSurfaceRoute()
 const responseCacheControl = useResponseHeader('cache-control')
 const clientSession = import.meta.client ? authClient.useSession() : null
 const { data: session, error: sessionError, status: sessionStatus, refresh: refreshSession } = await useAppSession()
@@ -84,7 +85,7 @@ function currentPage(path: string) {
 </script>
 
 <template>
-  <header class="topbar" :class="{ 'topbar--home': route.path === '/' }" :aria-label="t('navigation.applicationLabel')">
+  <header class="topbar" :class="{ 'topbar--wide': usesWideSurface }" :aria-label="t('navigation.applicationLabel')">
     <div class="topbar-row">
       <div class="topbar-brand-area">
         <NuxtLink
@@ -221,12 +222,8 @@ function currentPage(path: string) {
     padding-block: var(--space-2);
   }
 
-  .topbar--home .topbar-row {
+  .topbar--wide .topbar-row {
     padding-inline: var(--home-content-inset);
-  }
-
-  .topbar--home .brand {
-    padding-inline: 0;
   }
 
   .topbar-brand-area,
@@ -242,6 +239,10 @@ function currentPage(path: string) {
     border-radius: var(--radius-2);
     padding: var(--space-1) var(--space-2);
     text-decoration: none;
+  }
+
+  .topbar--wide .brand {
+    padding-inline: 0;
   }
 
   .brand-mark {

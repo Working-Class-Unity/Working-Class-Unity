@@ -26,6 +26,24 @@
       "title": "Forum",
       "description": "Visit the Working Class Unity community forum."
     },
+    "removeFlock": {
+      "overview": {
+        "title": "Remove Mass Surveillance from Stockton",
+        "description": "Working Class Unity's side-quest to remove Stockton's private mass-tracking system."
+      },
+      "whatStocktonBought": {
+        "title": "What Stockton Bought",
+        "description": "A sourced account of Stockton's Flock contracts, costs, tools, and unresolved questions."
+      },
+      "whySafeguards": {
+        "title": "Why Safeguards Are Not Enough",
+        "description": "Why immediate restrictions can reduce harm but cannot replace removal of Stockton's Flock system."
+      },
+      "faq": {
+        "title": "Stockton Flock FAQ",
+        "description": "Answers about safety, movement data, police technology, public spending, and removal."
+      }
+    },
     "login": {
       "title": "Log in"
     },
@@ -64,6 +82,27 @@
     "app": "App",
     "login": "Log In",
     "signup": "JOIN NOW"
+  },
+  "removeFlock": {
+    "campaignLabel": "Remove mass surveillance from Stockton side-quest",
+    "campaignHome": "Remove mass surveillance from Stockton overview",
+    "navigationLabel": "Side-quest",
+    "navigation": {
+      "overview": "Overview",
+      "whatStocktonBought": "What Stockton Bought",
+      "whySafeguards": "Why Removal",
+      "faq": "FAQ"
+    },
+    "petitionAction": "Sign Demand",
+    "footer": {
+      "description": "A Working Class Unity side-quest to remove Stockton's private mass-tracking system.",
+      "campaign": "Side-quest",
+      "wcu": "Working Class Unity",
+      "accountability": "Accountability",
+      "sourceNote": "Claims are tied to public records or named sources. Open questions remain marked as unknown.",
+      "privacy": "Privacy Policy",
+      "terms": "Terms"
+    }
   },
   "account": {
     "eyebrow": "Personal settings",
