@@ -58,6 +58,7 @@
     "@aws-sdk/client-s3": "3.1045.0",
     "@aws-sdk/s3-request-presigner": "3.1045.0",
     "@better-auth/drizzle-adapter": "1.6.23",
+    "@internationalized/date": "3.12.2",
     "@nuxtjs/i18n": "10.5.0",
     "@sentry/nuxt": "10.64.0",
     "better-auth": "1.6.23",

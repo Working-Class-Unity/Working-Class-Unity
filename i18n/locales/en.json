@@ -16,7 +16,11 @@
     },
     "about": {
       "title": "About",
-      "description": "Learn about Working Class Unity in San Joaquin County."
+      "description": "Learn why Working Class Unity is building a member-run working-class organization in San Joaquin County."
+    },
+    "bylaws": {
+      "title": "Bylaws",
+      "description": "Read the bylaws that govern Working Class Unity's membership, democratic decisions, elected leadership, campaigns, and committees."
     },
     "calendar": {
       "title": "Calendar",
@@ -227,8 +231,49 @@
   "publicPages": {
     "eyebrow": "Public site",
     "about": {
-      "title": "About",
-      "description": "We are preparing the full story of Working Class Unity and how our member-run organization works."
+      "eyebrow": "Our Story",
+      "title": "They Have Their Parties. We Need Our Own Organization",
+      "introduction": "The bosses and landlords have two political parties. The working class needs a fighting organization of its own.",
+      "photoAlt": "Working Class Unity members standing together at a community meeting.",
+      "photoCaption": "Working Class Unity members in San Joaquin County.",
+      "problem": {
+        "title": "The Problem",
+        "bodyOne": "Across San Joaquin, rents rise while our wages stall. Bosses demand more while giving less. Both the Democratic and Republican parties answer to their donors, not to us.",
+        "bodyTwo": "Our political and economic system is not broken; it is working exactly as designed to protect the profits of the wealthy by keeping the rest of us divided and powerless. It makes us too poor to live in and own the homes we've built, too poor to eat the food we've grown and served, too poor to benefit from the fruits of our labor."
+      },
+      "solution": {
+        "title": "Our Solution",
+        "bodyOne": "We refuse to accept this. We are organizing a mass working-class movement to build the genuine democracy we deserve – one where working people have real control over our lives, our communities, and our economy. We are not a political party. We organize collectively through mass membership. We do not have to continue relying on politicians, lobbying them, and hoping that they side with us over their donors.",
+        "bodyTwo": "Working Class Unity is just as the name suggests, an organization fighting to unite the working class, to give individuals in San Joaquin control over their lives. We demand truly affordable and safe housing, workplace autonomy, protection of our communities from police oppression, and accountability from our elected officials. Our mission is to strengthen working class power by forging alliances between labor and tenant unions and social movements through education, advocacy, and direct action.",
+        "bodyThree": "We fight for our families. For the future prosperity of our children. Whatever your race, your creed, your birthplace – don't stand by and let the wealthy tear down this country that each one of us has helped build."
+      },
+      "governance": {
+        "eyebrow": "Member-run by design",
+        "title": "How we govern ourselves",
+        "description": "Our bylaws set the rules for how members govern Working Class Unity, make collective decisions, and hold the organization accountable.",
+        "action": "Read our bylaws"
+      },
+      "cta": {
+        "eyebrow": "Build lasting power",
+        "title": "Organize with us",
+        "description": "Together, we can build a member-run movement in San Joaquin County that wins concrete victories, without the compromises and betrayals of politicians and their wealthy donors.",
+        "action": "JOIN WCU"
+      }
+    },
+    "bylaws": {
+      "eyebrow": "Member-Governed",
+      "title": "Working Class Unity Bylaws",
+      "introduction": "These bylaws describe how members govern Working Class Unity: who can participate, how decisions are made, and how our elected bodies, campaigns, and committees are accountable.",
+      "sourceAction": "View the source document",
+      "sourceUpdated": "Last updated February 12, 2026.",
+      "documentLabel": "Working Class Unity bylaws",
+      "outline": {
+        "label": "Bylaws contents",
+        "title": "On This Page",
+        "description": "Jump to an article or section.",
+        "trigger": "On this page",
+        "close": "Close bylaws contents"
+      }
     },
     "calendar": {
       "title": "Calendar",
