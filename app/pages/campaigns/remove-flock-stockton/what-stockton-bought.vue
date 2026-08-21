@@ -3,8 +3,74 @@ import {
   stocktonContractFacts,
   stocktonCostStack,
   stocktonTimeline,
-  whatStocktonBoughtPage
+  whatStocktonBoughtPage,
+  type CampaignCitationEntry,
+  type CampaignCitationSlotMap
 } from '~/content/remove-flock-stockton'
+
+const citationLocators: Readonly<Record<string, Readonly<Record<string, string>>>> = {
+  'contract-fact-1': {
+    'stockton-mar-2026-staff-report': 'Financial Summary, PDF p. 3',
+    'stockton-mar-2026-amendment': 'Standard Agreement Amendment No. 4, §§ 1–2.1, PDF p. 1'
+  },
+  'contract-fact-4': {
+    'stockton-mar-2026-staff-report': 'Discussion — Present Situation, PDF p. 2',
+    'stockton-mar-2026-amendment': 'Attachment A, Order Form, PDF p. 4'
+  },
+  'timeline-7': {
+    'stockton-mar-2026-staff-report': 'Financial Summary, PDF p. 3',
+    'stockton-mar-2026-amendment': 'Standard Agreement Amendment No. 4, §§ 1–2.1, PDF p. 1'
+  },
+  'cost-5': {
+    'stockton-mar-2026-amendment': 'Attachment A, Order Form, PDF p. 4'
+  }
+}
+
+function citationEntry(id: string, text: string, sourceIds: readonly string[]): CampaignCitationEntry {
+  const locators = citationLocators[id] ?? {}
+
+  return {
+    id,
+    content: {
+      parts: [
+        {
+          text,
+          citations: sourceIds.map((sourceId) => {
+            const locator = locators[sourceId]
+            return locator ? { sourceId, locator } : { sourceId }
+          })
+        }
+      ]
+    }
+  }
+}
+
+const contractFacts = stocktonContractFacts.map((fact, index) => ({
+  ...fact,
+  citation: citationEntry(`contract-fact-${index + 1}`, fact.detail, fact.sourceIds)
+}))
+const timeline = stocktonTimeline.map((entry, index) => ({
+  ...entry,
+  citation: citationEntry(`timeline-${index + 1}`, entry.description, entry.sourceIds)
+}))
+const costs = stocktonCostStack.map((cost, index) => ({
+  ...cost,
+  citation: citationEntry(`cost-${index + 1}`, cost.detail, cost.sourceIds)
+}))
+const costSection = whatStocktonBoughtPage.sections.find((section) => section.id === 'costs')
+const costSummaryContent = costSection?.paragraphs?.[0]
+
+if (!costSummaryContent) throw new Error('The campaign cost summary is required')
+
+const costSummary = {
+  id: 'cost-summary',
+  content: costSummaryContent
+} satisfies CampaignCitationEntry
+const slotCitations = {
+  'after-header': contractFacts.map((fact) => fact.citation),
+  'section-timeline': timeline.map((entry) => entry.citation),
+  'section-costs': [...costs.map((cost) => cost.citation), costSummary]
+} satisfies CampaignCitationSlotMap
 
 useHead({
   title: whatStocktonBoughtPage.title,
@@ -13,24 +79,44 @@ useHead({
 </script>
 
 <template>
-  <CampaignArticle :content="whatStocktonBoughtPage" title-id="what-stockton-bought-title">
-    <template #after-header>
+  <CampaignArticle
+    :content="whatStocktonBoughtPage"
+    :slot-citations="slotCitations"
+    title-id="what-stockton-bought-title"
+  >
+    <template #after-header="{ citationOccurrences, citationSources, sourceNoteIdPrefix }">
       <dl class="record-facts">
-        <div v-for="fact in stocktonContractFacts" :key="fact.label">
+        <div v-for="fact in contractFacts" :key="fact.label">
           <dt>{{ fact.label }}</dt>
           <dd>{{ fact.value }}</dd>
-          <dd>{{ fact.detail }}</dd>
+          <dd>
+            <CampaignCitedText
+              :citation-id-prefix="`${sourceNoteIdPrefix}-${fact.citation.id}`"
+              :content="fact.citation.content"
+              :occurrences="citationOccurrences"
+              :source-note-id-prefix="sourceNoteIdPrefix"
+              :sources="citationSources"
+            />
+          </dd>
         </div>
       </dl>
     </template>
 
-    <template #section-timeline>
+    <template #section-timeline="{ citationOccurrences, citationSources, sourceNoteIdPrefix }">
       <ol class="record-timeline">
-        <li v-for="entry in stocktonTimeline" :key="`${entry.date}-${entry.action}`">
+        <li v-for="entry in timeline" :key="`${entry.date}-${entry.action}`">
           <p>{{ entry.date }}</p>
           <div>
             <h3>{{ entry.action }}</h3>
-            <p>{{ entry.description }}</p>
+            <p>
+              <CampaignCitedText
+                :citation-id-prefix="`${sourceNoteIdPrefix}-${entry.citation.id}`"
+                :content="entry.citation.content"
+                :occurrences="citationOccurrences"
+                :source-note-id-prefix="sourceNoteIdPrefix"
+                :sources="citationSources"
+              />
+            </p>
             <p v-if="entry.status === 'reported-with-gap'" class="record-gap">
               The underlying amendment remains missing.
             </p>
@@ -39,18 +125,33 @@ useHead({
       </ol>
     </template>
 
-    <template #section-costs>
-      <dl class="record-costs">
-        <div v-for="cost in stocktonCostStack" :key="cost.label">
-          <dt>{{ cost.label }}</dt>
-          <dd>{{ cost.amount }}</dd>
-          <dd>{{ cost.detail }}</dd>
-        </div>
-      </dl>
-      <p class="record-cost-note">
-        The amendment amounts show how the agreement grew. They should not be added to the stated maximum as a second
-        total.
-      </p>
+    <template #section-costs="{ citationOccurrences, citationSources, sourceNoteIdPrefix }">
+      <div class="record-costs-layout">
+        <dl class="record-costs">
+          <div v-for="cost in costs" :key="cost.label">
+            <dt>{{ cost.label }}</dt>
+            <dd>{{ cost.amount }}</dd>
+            <dd>
+              <CampaignCitedText
+                :citation-id-prefix="`${sourceNoteIdPrefix}-${cost.citation.id}`"
+                :content="cost.citation.content"
+                :occurrences="citationOccurrences"
+                :source-note-id-prefix="sourceNoteIdPrefix"
+                :sources="citationSources"
+              />
+            </dd>
+          </div>
+        </dl>
+        <p class="record-cost-note">
+          <CampaignCitedText
+            :citation-id-prefix="`${sourceNoteIdPrefix}-${costSummary.id}`"
+            :content="costSummary.content"
+            :occurrences="citationOccurrences"
+            :source-note-id-prefix="sourceNoteIdPrefix"
+            :sources="citationSources"
+          />
+        </p>
+      </div>
     </template>
   </CampaignArticle>
 </template>
@@ -158,6 +259,10 @@ useHead({
     font-weight: 650;
   }
 
+  .record-costs-layout {
+    container-type: inline-size;
+  }
+
   .record-costs {
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -180,9 +285,27 @@ useHead({
     line-height: 1.75;
   }
 
-  @media (width <= 68rem) {
-    .record-facts,
+  @container (width <= 56rem) {
     .record-costs {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-5);
+    }
+  }
+
+  @container (width <= 36rem) {
+    .record-costs {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (width <= 56rem) {
+    .record-costs {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (width <= 68rem) {
+    .record-facts {
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: var(--space-5);
     }
@@ -198,7 +321,6 @@ useHead({
 
   @media (width <= 40rem) {
     .record-facts,
-    .record-costs,
     .record-timeline li {
       grid-template-columns: minmax(0, 1fr);
     }

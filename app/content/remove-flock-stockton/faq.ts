@@ -13,8 +13,21 @@ export const faqGroups = [
         question: 'What is Flock?',
         answer: [
           {
-            text: 'Flock Safety sells surveillance cameras and software to police departments, businesses, schools, neighborhoods, and homeowners associations. Its automated license-plate readers turn plates, vehicle details, time, and location into searchable records.',
-            sourceIds: ['flock-products', 'flock-license-plate-readers']
+            parts: [
+              {
+                text: 'Flock Safety sells surveillance cameras and software to police departments, businesses, schools, neighborhoods, and homeowners associations.',
+                citations: [{ sourceId: 'flock-products' }]
+              },
+              {
+                text: ' Its automated license-plate readers turn plates, vehicle details, time, and location into searchable records.',
+                citations: [
+                  {
+                    sourceId: 'flock-license-plate-readers',
+                    locator: 'FAQ — “What is an automated license plate reader (ALPR)?”'
+                  }
+                ]
+              }
+            ]
           },
           {
             text: 'The company sells drones, video cameras, audio detection, mobile trailers, 911 tools, and software that joins information from different systems. Flock is selling an expanding platform, not one stand-alone camera.',

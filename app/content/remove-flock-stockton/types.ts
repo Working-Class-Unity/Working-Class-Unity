@@ -7,6 +7,7 @@ export type CampaignSource = Readonly<{
     | 'Archived Flock portal'
     | 'Third-party analysis'
     | 'Official legal/policy source'
+    | 'Vendor source'
     | 'Press report'
     | 'Records requested'
     | 'WCU analysis'
@@ -16,10 +17,35 @@ export type CampaignSource = Readonly<{
   note?: string
 }>
 
-export type CitedText = Readonly<{
-  text: string
-  sourceIds?: readonly string[]
+export type CampaignCitationReference = Readonly<{
+  sourceId: string
+  locator?: string
+  note?: string
 }>
+
+export type CitedTextPart = Readonly<{
+  text: string
+  citations?: readonly CampaignCitationReference[]
+}>
+
+export type CitedText =
+  | Readonly<{
+      text: string
+      sourceIds?: readonly string[]
+      parts?: never
+    }>
+  | Readonly<{
+      parts: readonly CitedTextPart[]
+      text?: never
+      sourceIds?: never
+    }>
+
+export type CampaignCitationEntry = Readonly<{
+  id: string
+  content: CitedText
+}>
+
+export type CampaignCitationSlotMap = Readonly<Record<string, readonly CampaignCitationEntry[]>>
 
 export type CampaignSection = Readonly<{
   id: string

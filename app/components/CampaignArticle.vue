@@ -1,25 +1,55 @@
 <script setup lang="ts">
-import type { CampaignPageContent } from '~/content/remove-flock-stockton'
+import { useSlots } from 'vue'
+import {
+  campaignCitationOccurrences,
+  campaignSourcesForOccurrences,
+  type CampaignCitationEntry,
+  type CampaignCitationSlotMap,
+  type CampaignPageContent
+} from '~/content/remove-flock-stockton'
 
 const props = defineProps<{
   content: CampaignPageContent
+  slotCitations?: CampaignCitationSlotMap
   titleId: string
 }>()
 
-const sourceById = computed(() => new Map(props.content.sources.map((source) => [source.id, source])))
+const slots = useSlots()
 const articleSections = computed(() => props.content.sections.filter((section) => section.id !== 'sources'))
 const outlineItems = computed(() => [
   ...articleSections.value.map((section) => ({ id: section.id, label: section.title })),
   { id: `${props.titleId}-source-register-title`, label: 'Sources and notes' }
 ])
-const sourceNumberById = computed(() => new Map(props.content.sources.map((source, index) => [source.id, index + 1])))
+const citationOccurrences = computed(() => [
+  ...slotCitationOccurrences('after-header'),
+  ...articleSections.value.flatMap((section) => {
+    const slotName = `section-${section.id}`
+    if (slots[slotName]) return slotCitationOccurrences(slotName)
 
-function sourcesFor(sourceIds: readonly string[] | undefined) {
-  return (sourceIds ?? []).map((id) => sourceById.value.get(id)).filter((source) => source !== undefined)
+    return [
+      ...(section.paragraphs ?? []).flatMap((paragraph, paragraphIndex) =>
+        campaignCitationOccurrences(paragraph, citationIdPrefix(section.id, 'paragraph', paragraphIndex))
+      ),
+      ...(section.points ?? []).flatMap((point, pointIndex) =>
+        campaignCitationOccurrences(point, citationIdPrefix(section.id, 'point', pointIndex))
+      )
+    ]
+  })
+])
+const citedSources = computed(() => campaignSourcesForOccurrences(props.content.sources, citationOccurrences.value))
+
+function citationIdPrefix(sectionId: string, kind: 'paragraph' | 'point', index: number) {
+  return `${props.titleId}-${sectionId}-${kind}-${index + 1}`
 }
 
-function noteId(sourceId: string) {
-  return `${props.titleId}-note-${sourceId}`
+function slotCitationIdPrefix(entry: CampaignCitationEntry) {
+  return `${props.titleId}-${entry.id}`
+}
+
+function slotCitationOccurrences(slotName: string) {
+  return (props.slotCitations?.[slotName] ?? []).flatMap((entry) =>
+    campaignCitationOccurrences(entry.content, slotCitationIdPrefix(entry))
+  )
 }
 </script>
 
@@ -33,7 +63,12 @@ function noteId(sourceId: string) {
       :qualification="content.qualification"
       :reviewed-through="content.reviewedThrough"
     >
-      <slot name="after-header" />
+      <slot
+        name="after-header"
+        :citation-occurrences="citationOccurrences"
+        :citation-sources="citedSources"
+        :source-note-id-prefix="titleId"
+      />
     </CampaignEditorialHeader>
 
     <div class="campaign-article-layout">
@@ -53,32 +88,43 @@ function noteId(sourceId: string) {
             <p>{{ section.summary }}</p>
           </div>
 
-          <slot :name="`section-${section.id}`" :section="section">
+          <slot
+            :name="`section-${section.id}`"
+            :citation-occurrences="citationOccurrences"
+            :citation-sources="citedSources"
+            :section="section"
+            :source-note-id-prefix="titleId"
+          >
             <div v-if="section.paragraphs?.length" class="campaign-article-prose">
-              <div v-for="paragraph in section.paragraphs" :key="paragraph.text" class="campaign-cited-paragraph">
+              <div
+                v-for="(paragraph, paragraphIndex) in section.paragraphs"
+                :key="citationIdPrefix(section.id, 'paragraph', paragraphIndex)"
+                class="campaign-cited-paragraph"
+              >
                 <p>
-                  {{ paragraph.text }}
-                  <CampaignCitation
-                    v-for="source in sourcesFor(paragraph.sourceIds)"
-                    :key="source.id"
-                    :number="sourceNumberById.get(source.id)!"
-                    :note-id="noteId(source.id)"
-                    :source="source"
+                  <CampaignCitedText
+                    :citation-id-prefix="citationIdPrefix(section.id, 'paragraph', paragraphIndex)"
+                    :content="paragraph"
+                    :occurrences="citationOccurrences"
+                    :source-note-id-prefix="titleId"
+                    :sources="citedSources"
                   />
                 </p>
               </div>
             </div>
 
             <ul v-if="section.points?.length" class="campaign-article-points" role="list">
-              <li v-for="point in section.points" :key="point.text">
+              <li
+                v-for="(point, pointIndex) in section.points"
+                :key="citationIdPrefix(section.id, 'point', pointIndex)"
+              >
                 <p>
-                  {{ point.text }}
-                  <CampaignCitation
-                    v-for="source in sourcesFor(point.sourceIds)"
-                    :key="source.id"
-                    :number="sourceNumberById.get(source.id)!"
-                    :note-id="noteId(source.id)"
-                    :source="source"
+                  <CampaignCitedText
+                    :citation-id-prefix="citationIdPrefix(section.id, 'point', pointIndex)"
+                    :content="point"
+                    :occurrences="citationOccurrences"
+                    :source-note-id-prefix="titleId"
+                    :sources="citedSources"
                   />
                 </p>
               </li>
@@ -88,7 +134,7 @@ function noteId(sourceId: string) {
       </div>
     </div>
 
-    <CampaignSourceNotes :id-prefix="titleId" :sources="content.sources" />
+    <CampaignSourceNotes :citations="citationOccurrences" :id-prefix="titleId" :sources="citedSources" />
   </article>
 </template>
 

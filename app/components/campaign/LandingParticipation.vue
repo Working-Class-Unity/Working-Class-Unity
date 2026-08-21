@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import CampaignLandingSectionHeading from '~/components/campaign/LandingSectionHeading.vue'
-import type { CampaignSection } from '~/content/remove-flock-stockton'
+import { citedTextPlainText, type CampaignSection } from '~/content/remove-flock-stockton'
 
 defineProps<{
   section: CampaignSection
@@ -18,8 +18,8 @@ defineProps<{
     />
 
     <div class="campaign-participate-content">
-      <ol class="campaign-participate-list">
-        <li v-for="point in section.points" :key="point.text">{{ point.text }}</li>
+      <ol class="campaign-participate-list" role="list">
+        <li v-for="point in section.points" :key="citedTextPlainText(point)">{{ citedTextPlainText(point) }}</li>
       </ol>
 
       <NuxtLink class="campaign-participate-action" to="/signup">Join Working Class Unity</NuxtLink>

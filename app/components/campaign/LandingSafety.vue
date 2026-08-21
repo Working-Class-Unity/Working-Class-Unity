@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import CampaignLandingSectionHeading from '~/components/campaign/LandingSectionHeading.vue'
-import type { CampaignSection } from '~/content/remove-flock-stockton'
+import { citedTextPlainText, type CampaignSection } from '~/content/remove-flock-stockton'
 
 defineProps<{
   section: CampaignSection
@@ -24,9 +24,9 @@ function pointDetail(text: string) {
     />
 
     <dl class="campaign-safety-list">
-      <div v-for="(point, index) in section.points" :key="point.text">
+      <div v-for="(point, index) in section.points" :key="citedTextPlainText(point)">
         <dt>{{ safetyLabels[index] }}</dt>
-        <dd>{{ pointDetail(point.text) }}</dd>
+        <dd>{{ pointDetail(citedTextPlainText(point)) }}</dd>
       </div>
     </dl>
   </section>

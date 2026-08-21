@@ -7,27 +7,61 @@ import {
   DrawerPortal,
   DrawerRoot,
   DrawerTitle,
-  DrawerTrigger,
   HoverCardArrow,
   HoverCardContent,
   HoverCardPortal,
   HoverCardRoot,
   HoverCardTrigger
 } from 'reka-ui'
-import type { CampaignSource } from '~/content/remove-flock-stockton'
+import type { CampaignCitationReference, CampaignSource } from '~/content/remove-flock-stockton'
 
 const props = defineProps<{
+  citationId: string
   number: number
   noteId: string
+  occurrenceLabel: string
+  reference: CampaignCitationReference
   source: CampaignSource
 }>()
 
 const sourceMetadata = computed(() =>
-  [props.source.publisher, props.source.published].filter((value) => Boolean(value)).join(' · ')
+  [
+    props.source.publisher,
+    props.source.published ? `Published ${props.source.published}` : undefined,
+    props.source.reviewed ? `Reviewed ${props.source.reviewed}` : undefined
+  ]
+    .filter((value) => Boolean(value))
+    .join(' · ')
+)
+const citationLabel = computed(() =>
+  [`Source ${props.occurrenceLabel}: ${props.source.title}`, props.reference.locator]
+    .filter((value) => Boolean(value))
+    .join(', ')
 )
 
 const drawerOpen = ref(false)
 const noteJumpPending = ref(false)
+const citationTrigger = ref<HTMLAnchorElement | null>(null)
+
+function focusNote() {
+  const target = document.getElementById(props.noteId)
+  if (!target) return
+
+  target.scrollIntoView({ block: 'start' })
+  target.focus({ preventScroll: true })
+}
+
+function onCitationClick(event: MouseEvent) {
+  if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+
+  if (window.matchMedia('(width <= 56rem)').matches) {
+    event.preventDefault()
+    drawerOpen.value = true
+    return
+  }
+
+  requestAnimationFrame(focusNote)
+}
 
 function readFullNote() {
   noteJumpPending.value = true
@@ -35,16 +69,15 @@ function readFullNote() {
 }
 
 function onDrawerCloseAutoFocus(event: Event) {
-  if (!noteJumpPending.value) return
-
   event.preventDefault()
-  noteJumpPending.value = false
-  const target = document.getElementById(props.noteId)
-  if (!target) return
+  if (!noteJumpPending.value) {
+    citationTrigger.value?.focus()
+    return
+  }
 
+  noteJumpPending.value = false
   history.pushState(null, '', `#${props.noteId}`)
-  target.scrollIntoView({ block: 'start' })
-  target.focus({ preventScroll: true })
+  focusNote()
 }
 </script>
 
@@ -53,11 +86,16 @@ function onDrawerCloseAutoFocus(event: Event) {
     <HoverCardRoot :open-delay="180" :close-delay="120">
       <HoverCardTrigger as-child>
         <a
-          class="campaign-citation-trigger campaign-citation-trigger--desktop"
+          :id="citationId"
+          ref="citationTrigger"
+          class="campaign-citation-trigger"
           :href="`#${noteId}`"
-          :aria-label="`Citation ${number}: ${source.title}`"
+          :aria-label="citationLabel"
+          role="doc-biblioref"
+          @click="onCitationClick"
         >
-          <sup>{{ number }}</sup>
+          <span class="campaign-citation-hit-target" aria-hidden="true" />
+          <sup aria-hidden="true">[{{ number }}]</sup>
         </a>
       </HoverCardTrigger>
       <HoverCardPortal>
@@ -69,41 +107,33 @@ function onDrawerCloseAutoFocus(event: Event) {
           :collision-padding="16"
         >
           <HoverCardArrow class="campaign-citation-card-arrow" :width="14" :height="7" />
-          <p class="campaign-citation-label">SOURCE {{ number }}</p>
+          <p class="campaign-citation-label">SOURCE {{ occurrenceLabel }}</p>
           <p class="campaign-citation-title">{{ source.title }}</p>
           <p class="campaign-citation-meta">{{ sourceMetadata }}</p>
+          <p v-if="reference.locator" class="campaign-citation-locator">Location: {{ reference.locator }}</p>
+          <p v-if="reference.note" class="campaign-citation-note">{{ reference.note }}</p>
           <p v-if="source.note" class="campaign-citation-note">{{ source.note }}</p>
-          <a class="campaign-citation-source-link" :href="source.url" target="_blank" rel="noreferrer"> View source </a>
         </HoverCardContent>
       </HoverCardPortal>
     </HoverCardRoot>
 
     <DrawerRoot v-model:open="drawerOpen">
-      <DrawerTrigger as-child>
-        <button
-          class="campaign-citation-trigger campaign-citation-trigger--mobile"
-          type="button"
-          :aria-label="`Open citation ${number}: ${source.title}`"
-        >
-          <sup>{{ number }}</sup>
-        </button>
-      </DrawerTrigger>
       <DrawerPortal>
         <DrawerOverlay class="campaign-citation-drawer-overlay" />
         <DrawerContent class="campaign-citation-drawer" @close-auto-focus="onDrawerCloseAutoFocus">
           <DrawerHandle class="campaign-citation-drawer-handle" />
           <div class="campaign-citation-drawer-content">
-            <p class="campaign-citation-label">SOURCE {{ number }}</p>
+            <p class="campaign-citation-label">SOURCE {{ occurrenceLabel }}</p>
             <DrawerTitle class="campaign-citation-title">{{ source.title }}</DrawerTitle>
             <DrawerDescription class="campaign-citation-meta">{{ sourceMetadata }}</DrawerDescription>
+            <p v-if="reference.locator" class="campaign-citation-locator">Location: {{ reference.locator }}</p>
+            <p v-if="reference.note" class="campaign-citation-note">{{ reference.note }}</p>
             <p v-if="source.note" class="campaign-citation-note">{{ source.note }}</p>
             <div class="campaign-citation-drawer-actions">
-              <a class="campaign-citation-source-link" :href="source.url" target="_blank" rel="noreferrer">
+              <a class="campaign-citation-source-link" :href="source.url" target="_blank" rel="noopener noreferrer">
                 View source
               </a>
-              <button class="campaign-citation-note-link" type="button" @click="readFullNote">
-                Read the full note
-              </button>
+              <button class="campaign-citation-note-link" type="button" @click="readFullNote">Go to source note</button>
             </div>
           </div>
         </DrawerContent>
@@ -119,6 +149,7 @@ function onDrawerCloseAutoFocus(event: Event) {
   }
 
   .campaign-citation-trigger {
+    position: relative;
     display: inline-grid;
     place-items: center;
     min-inline-size: 1.35rem;
@@ -142,6 +173,10 @@ function onDrawerCloseAutoFocus(event: Event) {
     line-height: 1;
   }
 
+  .campaign-citation-hit-target {
+    display: none;
+  }
+
   .campaign-citation-trigger:hover,
   .campaign-citation-trigger:focus-visible,
   .campaign-citation-trigger[data-state='open'] {
@@ -154,10 +189,6 @@ function onDrawerCloseAutoFocus(event: Event) {
   .campaign-citation-trigger:focus-visible {
     outline: var(--focus-outline);
     outline-offset: var(--focus-offset);
-  }
-
-  .campaign-citation-trigger--mobile {
-    display: none;
   }
 
   .campaign-citation-card {
@@ -187,6 +218,7 @@ function onDrawerCloseAutoFocus(event: Event) {
   .campaign-citation-label,
   .campaign-citation-title,
   .campaign-citation-meta,
+  .campaign-citation-locator,
   .campaign-citation-note {
     margin: 0;
   }
@@ -224,7 +256,14 @@ function onDrawerCloseAutoFocus(event: Event) {
     line-height: 1.6;
   }
 
-  .campaign-citation-card .campaign-citation-source-link,
+  .campaign-citation-locator {
+    color: var(--color-text);
+    font-family: var(--font-family-mono);
+    font-size: 0.8125rem;
+    font-weight: var(--font-weight-strong);
+    line-height: 1.5;
+  }
+
   .campaign-citation-drawer .campaign-citation-source-link,
   .campaign-citation-drawer .campaign-citation-note-link {
     display: inline-flex;
@@ -250,8 +289,6 @@ function onDrawerCloseAutoFocus(event: Event) {
     background: transparent;
   }
 
-  .campaign-citation-card .campaign-citation-source-link:hover,
-  .campaign-citation-card .campaign-citation-source-link:focus-visible,
   .campaign-citation-drawer .campaign-citation-source-link:hover,
   .campaign-citation-drawer .campaign-citation-source-link:focus-visible,
   .campaign-citation-drawer .campaign-citation-note-link:hover,
@@ -340,14 +377,27 @@ function onDrawerCloseAutoFocus(event: Event) {
   }
 
   @media (width <= 56rem) {
-    .campaign-citation-trigger--desktop {
-      display: none;
+    .campaign-citation-drawer .campaign-citation-meta,
+    .campaign-citation-drawer .campaign-citation-locator,
+    .campaign-citation-drawer .campaign-citation-note {
+      font-size: 1rem;
     }
 
-    .campaign-citation-trigger--mobile {
-      display: inline-grid;
-      min-inline-size: 2rem;
-      min-block-size: 2rem;
+    .campaign-citation-drawer .campaign-citation-source-link,
+    .campaign-citation-drawer .campaign-citation-note-link {
+      min-block-size: 3rem;
+    }
+  }
+
+  @media (width <= 56rem), (pointer: coarse) {
+    .campaign-citation-hit-target {
+      position: absolute;
+      display: block;
+      inline-size: max(100%, 3rem);
+      block-size: max(100%, 3rem);
+      inset-block-start: 50%;
+      inset-inline-start: 50%;
+      translate: -50% -50%;
     }
   }
 

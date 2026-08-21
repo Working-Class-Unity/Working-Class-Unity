@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import CampaignLandingSectionHeading from '~/components/campaign/LandingSectionHeading.vue'
-import type { CampaignSection } from '~/content/remove-flock-stockton'
+import { citedTextPlainText, type CampaignSection } from '~/content/remove-flock-stockton'
 
 type ImageVariant = Readonly<{
   src: string
@@ -49,12 +49,12 @@ function fallbackVariant(image: CampaignImage) {
       />
 
       <dl class="campaign-argument-list">
-        <div v-for="(point, index) in section.points" :key="point.text" class="campaign-argument-item">
+        <div v-for="(point, index) in section.points" :key="citedTextPlainText(point)" class="campaign-argument-item">
           <dt>
             <span aria-hidden="true">0{{ index + 1 }}</span>
             {{ argumentLabels[index] }}
           </dt>
-          <dd>{{ point.text }}</dd>
+          <dd>{{ citedTextPlainText(point) }}</dd>
         </div>
       </dl>
 

@@ -38,7 +38,8 @@ The root [`AGENTS.md`](../AGENTS.md) governs all work. The normative interface a
   `calendar/CalendarEventBadge`: calendar-owned views and recurring event presentation.
 - `PageOutline`: shared desktop index and mobile Reka drawer for flat or nested page outlines.
 - `BylawsPageOutline`: bylaws-owned configuration of `PageOutline`.
-- `CampaignCitation`: feature-owned citation preview using a desktop Reka Hover Card and mobile Reka Drawer.
+- `CampaignCitedText`: feature-owned renderer for claim-level citation parts and deterministic occurrences.
+- `CampaignCitation`: feature-owned semantic source link using a desktop Reka Hover Card and mobile Reka Drawer.
 - `CampaignPageOutline`: campaign-owned configuration of `PageOutline`.
 - `CampaignEditorialHeader`: shared long-form campaign page heading group.
 - `campaign/Landing*`: campaign-owned narrative sections composed by `CampaignLanding`.

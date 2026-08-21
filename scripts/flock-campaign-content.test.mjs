@@ -5,6 +5,13 @@ import { dirname, resolve } from 'node:path'
 import test from 'node:test'
 import { fileURLToPath } from 'node:url'
 
+import {
+  campaignCitationOccurrenceLabel,
+  campaignCitationOccurrences,
+  campaignSourcesForOccurrences,
+  citedTextParts,
+  citedTextPlainText
+} from '../app/content/remove-flock-stockton/citations.ts'
 import { petitionDemand, petitionDemandCanonicalText } from '../app/content/remove-flock-stockton/petition.ts'
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
@@ -72,6 +79,77 @@ test('campaign source links are clean and unique', async () => {
       assert.doesNotMatch(parameter, trackingParameters, `${sourceUrl} contains a tracking parameter`)
     }
   }
+})
+
+test('campaign citation references resolve to unique source records', async () => {
+  const [sourceModule, ...contentModules] = await Promise.all([
+    readContentFile('sources.ts'),
+    ...publicContentFiles.map(readContentFile)
+  ])
+  const sourceIds = [...sourceModule.matchAll(/\bid:\s*'([^']+)'/g)].map((match) => match[1])
+  const content = contentModules.join('\n')
+  const legacyReferenceIds = [...content.matchAll(/\bsourceIds:\s*\[([\s\S]*?)\]/g)].flatMap((match) =>
+    [...match[1].matchAll(/'([^']+)'/g)].map((sourceMatch) => sourceMatch[1])
+  )
+  const claimReferenceIds = [...content.matchAll(/\bsourceId:\s*'([^']+)'/g)].map((match) => match[1])
+  const claimLocators = [...content.matchAll(/\blocator:\s*'([^']+)'/g)].map((match) => match[1])
+  const knownSourceIds = new Set(sourceIds)
+
+  assert.ok(sourceIds.length > 40, 'expected the complete campaign source inventory')
+  assert.equal(knownSourceIds.size, sourceIds.length, 'campaign source IDs must be unique')
+  assert.ok(legacyReferenceIds.length + claimReferenceIds.length > 80, 'expected the campaign citation inventory')
+  assert.ok(claimLocators.length > 0, 'expected at least one production claim locator')
+
+  for (const locator of claimLocators) {
+    assert.equal(locator, locator.trim(), 'campaign locators must not contain outer whitespace')
+    assert.ok(locator.length >= 5, 'campaign locators must identify a useful page or section')
+  }
+
+  for (const sourceId of [...legacyReferenceIds, ...claimReferenceIds]) {
+    assert.ok(knownSourceIds.has(sourceId), `campaign content references unknown source ${sourceId}`)
+  }
+})
+
+test('claim-level citations preserve prose and create stable source occurrences', () => {
+  const citedText = {
+    parts: [
+      { text: 'First claim.', citations: [{ sourceId: 'first-source', locator: 'p. 14' }] },
+      { text: ' Second claim.', citations: [{ sourceId: 'second-source' }] }
+    ]
+  }
+  const occurrences = campaignCitationOccurrences(citedText, 'faq-basics-what-is-flock-answer-1')
+  const sources = [
+    { id: 'second-source', publisher: 'Second publisher', title: 'Second source', url: 'https://example.com/2' },
+    { id: 'first-source', publisher: 'First publisher', title: 'First source', url: 'https://example.com/1' }
+  ]
+
+  assert.equal(citedTextPlainText(citedText), 'First claim. Second claim.')
+  assert.equal(citedTextParts(citedText)[0].citations[0].locator, 'p. 14')
+  assert.deepEqual(
+    occurrences.map((occurrence) => occurrence.id),
+    ['faq-basics-what-is-flock-answer-1-citation-1-1', 'faq-basics-what-is-flock-answer-1-citation-2-1']
+  )
+  assert.deepEqual(
+    campaignSourcesForOccurrences(sources, occurrences).map((source) => source.id),
+    ['first-source', 'second-source']
+  )
+  const repeatedOccurrences = [
+    { id: 'citation-1', sourceId: 'first-source' },
+    { id: 'citation-2', sourceId: 'first-source' },
+    { id: 'citation-3', sourceId: 'second-source' }
+  ]
+
+  assert.equal(campaignCitationOccurrenceLabel(1, repeatedOccurrences[0], repeatedOccurrences), '1.1')
+  assert.equal(campaignCitationOccurrenceLabel(1, repeatedOccurrences[1], repeatedOccurrences), '1.2')
+  assert.equal(campaignCitationOccurrenceLabel(2, repeatedOccurrences[2], repeatedOccurrences), '2')
+  assert.throws(
+    () => campaignCitationOccurrenceLabel(1, { id: 'missing-citation', sourceId: 'first-source' }, repeatedOccurrences),
+    /Unknown campaign citation occurrence: missing-citation/
+  )
+  assert.throws(
+    () => campaignSourcesForOccurrences(sources, [{ id: 'missing-citation', sourceId: 'missing-source' }]),
+    /Unknown campaign source: missing-source/
+  )
 })
 
 test('campaign prose avoids the writing SOP banned terms', async () => {

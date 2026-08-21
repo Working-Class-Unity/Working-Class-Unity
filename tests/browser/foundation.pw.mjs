@@ -232,6 +232,181 @@ test('global public navigation exposes current routes and a route-closing mobile
   await assertCleanPage(page, observations)
 })
 
+test('campaign citations preview, navigate, and return at desktop and mobile widths', async ({ page }) => {
+  const observations = observePage(page)
+  const campaignPath = '/campaigns/remove-flock-stockton/faq'
+  const sourceNoteId = 'stockton-flock-faq-title-note-flock-products'
+
+  await page.setViewportSize({ width: 1280, height: 900 })
+  await page.goto(campaignPath)
+  await page.getByText('What is Flock?', { exact: true }).click()
+
+  const firstCitation = page.locator('[role="doc-biblioref"]').first()
+  await expect(firstCitation).toBeVisible()
+  await expect(firstCitation).toHaveAccessibleName('Source 1.1: Flock products')
+  await expect(firstCitation).toHaveAttribute('href', `#${sourceNoteId}`)
+  await expect(firstCitation).toHaveAttribute(
+    'id',
+    'stockton-flock-faq-title-basics-what-is-flock-answer-1-citation-1-1'
+  )
+
+  await firstCitation.hover()
+  const sourcePreview = page.locator('.campaign-citation-card')
+  await expect(sourcePreview).toBeVisible()
+  await expect(sourcePreview.locator('.campaign-citation-label')).toHaveText('SOURCE 1.1')
+  await expect(sourcePreview).toContainText('Flock products')
+  await expect(sourcePreview.locator('a, button')).toHaveCount(0)
+
+  const locatedCitation = page.locator('[role="doc-biblioref"]').nth(1)
+  await expect(locatedCitation).toHaveAccessibleName(
+    'Source 2.1: License plate readers, FAQ — “What is an automated license plate reader (ALPR)?”'
+  )
+  await locatedCitation.hover()
+  const locatedSourcePreview = page.locator('.campaign-citation-card').filter({ hasText: 'License plate readers' })
+  await expect(locatedSourcePreview).toContainText(
+    'Location: FAQ — “What is an automated license plate reader (ALPR)?”'
+  )
+
+  await firstCitation.click()
+  const sourceNote = page.locator(`#${sourceNoteId}`)
+  await expect(page).toHaveURL(new RegExp(`#${sourceNoteId}$`))
+  await expect(sourceNote).toBeFocused()
+  await expect(sourceNote).toBeInViewport()
+  await expect(page.locator('[role="doc-bibliography"]')).toContainText('Reviewed')
+
+  const firstBacklink = sourceNote.locator('[role="doc-backlink"]').first()
+  await expect(firstBacklink).toHaveAccessibleName('Return to citation 1.1')
+  await firstBacklink.click()
+  await expect(firstCitation).toBeFocused()
+
+  await page.goto('/campaigns/remove-flock-stockton/what-stockton-bought')
+  const costGridColumnCounts = []
+  for (const width of [1600, 1280, 920, 880, 600]) {
+    await page.setViewportSize({ width, height: 900 })
+    costGridColumnCounts.push(
+      await page
+        .locator('.record-costs')
+        .evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(' ').length)
+    )
+  }
+  expect(costGridColumnCounts).toEqual([5, 2, 1, 1, 1])
+  await page.setViewportSize({ width: 1280, height: 900 })
+
+  const customSectionCitation = page.locator('#what-stockton-bought-title-contract-fact-1-citation-1-1')
+  await expect(customSectionCitation).toHaveAccessibleName(
+    'Source 1.1: File 26-0269 staff report, Financial Summary, PDF p. 3'
+  )
+  await customSectionCitation.hover()
+  const customSourcePreview = page.locator('.campaign-citation-card').filter({ hasText: 'Financial Summary, PDF p. 3' })
+  await expect(customSourcePreview).toBeVisible()
+  await expect(customSourcePreview.locator('.campaign-citation-label')).toHaveText('SOURCE 1.1')
+
+  const repeatedCitation = page.locator('#what-stockton-bought-title-timeline-2-citation-1-3')
+  await expect(repeatedCitation).toHaveAccessibleName('Source 9.2: Flock Amendment No. 1')
+  await repeatedCitation.hover()
+  const repeatedSourcePreview = page.locator('.campaign-citation-card').filter({ hasText: 'Flock Amendment No. 1' })
+  await expect(repeatedSourcePreview).toBeVisible()
+  await expect(repeatedSourcePreview.locator('.campaign-citation-label')).toHaveText('SOURCE 9.2')
+
+  const repeatedSourceNote = page.locator('#what-stockton-bought-title-note-stockton-jul-2024-amendment')
+  const repeatedSourceBacklink = repeatedSourceNote.locator('[role="doc-backlink"]').nth(1)
+  await expect(repeatedSourceBacklink).toHaveAccessibleName('Return to citation 9.2')
+  await expect(repeatedSourceBacklink).toHaveText('↑ 9.2')
+  const backlinkRestingColor = await repeatedSourceBacklink.evaluate((element) => getComputedStyle(element).color)
+  await repeatedSourceBacklink.hover()
+  const backlinkHoverColor = await repeatedSourceBacklink.evaluate((element) => getComputedStyle(element).color)
+  expect(backlinkHoverColor).not.toBe(backlinkRestingColor)
+  expect(backlinkHoverColor).toBe('rgb(255, 255, 255)')
+
+  const ceqaSourceNote = page.locator('#what-stockton-bought-title-note-stockton-ceqa-2025')
+  await expect(ceqaSourceNote).toHaveCount(1)
+  await expect(ceqaSourceNote.locator('[role="doc-backlink"]')).toHaveAttribute(
+    'href',
+    '#what-stockton-bought-title-timeline-5-citation-1-1'
+  )
+
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto(campaignPath)
+  await page.getByText('What is Flock?', { exact: true }).click()
+
+  const mobileCitation = page.locator('[role="doc-biblioref"]').first()
+  await expect(mobileCitation).toHaveJSProperty('tagName', 'A')
+  const mobileHitTarget = mobileCitation.locator('.campaign-citation-hit-target')
+  const mobileHitTargetSize = await mobileHitTarget.evaluate((element) => {
+    const bounds = element.getBoundingClientRect()
+    return { height: bounds.height, width: bounds.width }
+  })
+  expect(mobileHitTargetSize.height).toBeGreaterThanOrEqual(48)
+  expect(mobileHitTargetSize.width).toBeGreaterThanOrEqual(48)
+
+  const multiSourceCluster = page.locator('.campaign-citation-cluster').nth(2)
+  await multiSourceCluster.scrollIntoViewIfNeeded()
+  const clusteredCitations = multiSourceCluster.locator('[role="doc-biblioref"]')
+  await expect(clusteredCitations).toHaveCount(2)
+  const firstClusterTarget = clusteredCitations.nth(0).locator('.campaign-citation-hit-target')
+  const secondClusterTarget = clusteredCitations.nth(1).locator('.campaign-citation-hit-target')
+  const [firstTargetBounds, secondTargetBounds] = await Promise.all([
+    firstClusterTarget.boundingBox(),
+    secondClusterTarget.boundingBox()
+  ])
+
+  expect(firstTargetBounds).not.toBeNull()
+  expect(secondTargetBounds).not.toBeNull()
+  expect(firstTargetBounds.x + firstTargetBounds.width).toBeLessThanOrEqual(secondTargetBounds.x)
+
+  const firstTargetPoint = {
+    x: firstTargetBounds.x + 6,
+    y: firstTargetBounds.y + firstTargetBounds.height / 2
+  }
+  await expect
+    .poll(() =>
+      page.evaluate(
+        ({ x, y }) => document.elementFromPoint(x, y)?.classList.contains('campaign-citation-hit-target'),
+        firstTargetPoint
+      )
+    )
+    .toBe(true)
+  await page.mouse.click(firstTargetPoint.x, firstTargetPoint.y)
+  const citationDrawer = page.locator('.campaign-citation-drawer')
+  await expect(citationDrawer).toBeVisible()
+  await expect(citationDrawer).toContainText('Flock products')
+  await page.keyboard.press('Escape')
+  await expect(citationDrawer).toBeHidden()
+
+  const secondTargetBoundsAfterClose = await secondClusterTarget.boundingBox()
+  expect(secondTargetBoundsAfterClose).not.toBeNull()
+  const secondTargetPoint = {
+    x: secondTargetBoundsAfterClose.x + secondTargetBoundsAfterClose.width - 6,
+    y: secondTargetBoundsAfterClose.y + secondTargetBoundsAfterClose.height / 2
+  }
+  await expect
+    .poll(() =>
+      page.evaluate(
+        ({ x, y }) => document.elementFromPoint(x, y)?.classList.contains('campaign-citation-hit-target'),
+        secondTargetPoint
+      )
+    )
+    .toBe(true)
+  await page.mouse.click(secondTargetPoint.x, secondTargetPoint.y)
+  await expect(citationDrawer).toBeVisible()
+  await expect(citationDrawer).toContainText('FlockOS')
+  await page.keyboard.press('Escape')
+  await expect(citationDrawer).toBeHidden()
+
+  await mobileCitation.click()
+  await expect(citationDrawer).toBeVisible()
+  await expect(citationDrawer.getByRole('link', { name: 'View source' })).toBeVisible()
+  await expect(citationDrawer.getByRole('button', { name: 'Go to source note' })).toBeVisible()
+  await assertAccessibleWithoutOverflow(page)
+
+  await citationDrawer.getByRole('button', { name: 'Go to source note' }).click()
+  await expect(citationDrawer).toBeHidden()
+  await expect(page.locator(`#${sourceNoteId}`)).toBeFocused()
+  await expect(page).toHaveURL(new RegExp(`#${sourceNoteId}$`))
+  await assertNoHorizontalOverflow(page)
+  await assertCleanPage(page, observations)
+})
+
 test('session retry announces progress and failure without losing focus', async ({ page }) => {
   const observations = observePage(page)
   await page.setViewportSize({ width: 1024, height: 900 })

@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import CampaignLandingSectionHeading from '~/components/campaign/LandingSectionHeading.vue'
-import type { CampaignSection, CampaignSource } from '~/content/remove-flock-stockton'
+import {
+  citedTextParts,
+  citedTextPlainText,
+  type CampaignSection,
+  type CampaignSource,
+  type CitedText
+} from '~/content/remove-flock-stockton'
 
 const props = defineProps<{
   section: CampaignSection
@@ -9,8 +15,16 @@ const props = defineProps<{
 
 const sourcesById = new Map(props.sources.map((source) => [source.id, source]))
 
-function sourcesFor(sourceIds: readonly string[] | undefined) {
-  return (sourceIds ?? []).map((id) => sourcesById.get(id)).filter((source) => source !== undefined)
+function sourcesFor(content: CitedText) {
+  const sourceIds = new Set(
+    citedTextParts(content).flatMap((part) => (part.citations ?? []).map((citation) => citation.sourceId))
+  )
+
+  return [...sourceIds].map((sourceId) => {
+    const source = sourcesById.get(sourceId)
+    if (!source) throw new Error(`Unknown campaign source: ${sourceId}`)
+    return source
+  })
 }
 </script>
 
@@ -24,15 +38,15 @@ function sourcesFor(sourceIds: readonly string[] | undefined) {
 
     <div class="campaign-safeguards-copy">
       <p class="campaign-safeguards-lead">{{ section.summary }}</p>
-      <div v-for="paragraph in section.paragraphs" :key="paragraph.text" class="campaign-cited-copy">
-        <p>{{ paragraph.text }}</p>
-        <p v-if="sourcesFor(paragraph.sourceIds).length" class="campaign-source-links">
+      <div v-for="paragraph in section.paragraphs" :key="citedTextPlainText(paragraph)" class="campaign-cited-copy">
+        <p>{{ citedTextPlainText(paragraph) }}</p>
+        <p v-if="sourcesFor(paragraph).length" class="campaign-source-links">
           <a
-            v-for="source in sourcesFor(paragraph.sourceIds)"
+            v-for="source in sourcesFor(paragraph)"
             :key="source.id"
             :href="source.url"
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
           >
             {{ source.title }}
           </a>

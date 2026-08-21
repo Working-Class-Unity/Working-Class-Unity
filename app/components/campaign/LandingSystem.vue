@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import CampaignLandingSectionHeading from '~/components/campaign/LandingSectionHeading.vue'
-import type { CampaignSection } from '~/content/remove-flock-stockton'
+import { citedTextPlainText, type CampaignSection } from '~/content/remove-flock-stockton'
 
 defineProps<{
   section: CampaignSection
@@ -31,12 +31,12 @@ function pointDetail(text: string) {
     </div>
 
     <dl class="campaign-system-map">
-      <div v-for="(point, index) in section.points" :key="point.text" class="campaign-system-node">
+      <div v-for="(point, index) in section.points" :key="citedTextPlainText(point)" class="campaign-system-node">
         <dt>
           <span class="campaign-system-node-index" aria-hidden="true">0{{ index + 1 }}</span>
           {{ systemLabels[index] }}
         </dt>
-        <dd>{{ pointDetail(point.text) }}</dd>
+        <dd>{{ pointDetail(citedTextPlainText(point)) }}</dd>
         <div :class="`campaign-system-visual campaign-system-visual--${index + 1}`" aria-hidden="true">
           <template v-if="index === 0">
             <span class="campaign-system-visual-item">PLATE</span>

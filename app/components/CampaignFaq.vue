@@ -1,19 +1,30 @@
 <script setup lang="ts">
-import { campaignFaqPage, faqGroups as campaignFaqGroups } from '~/content/remove-flock-stockton'
-import type { CampaignFaqGroup, CampaignSource } from '~/content/remove-flock-stockton'
+import {
+  campaignCitationOccurrences,
+  campaignFaqPage,
+  campaignSourcesForOccurrences,
+  faqGroups as campaignFaqGroups,
+  type CampaignFaqGroup,
+  type CampaignSource
+} from '~/content/remove-flock-stockton'
 
 const faqGroups: readonly CampaignFaqGroup[] = campaignFaqGroups
 const faqSources: readonly CampaignSource[] = campaignFaqPage.sources
-const sourceById = new Map(faqSources.map((source) => [source.id, source]))
-const sourceNumberById = new Map(faqSources.map((source, index) => [source.id, index + 1]))
 const outlineItems = faqGroups.map((group) => ({ id: group.id, label: group.title }))
+const citationOccurrences = faqGroups.flatMap((group) =>
+  group.items.flatMap((item) => [
+    ...item.answer.flatMap((paragraph, paragraphIndex) =>
+      campaignCitationOccurrences(paragraph, citationIdPrefix(group.id, item.id, 'answer', paragraphIndex))
+    ),
+    ...(item.points ?? []).flatMap((point, pointIndex) =>
+      campaignCitationOccurrences(point, citationIdPrefix(group.id, item.id, 'point', pointIndex))
+    )
+  ])
+)
+const citedSources = campaignSourcesForOccurrences(faqSources, citationOccurrences)
 
-function sourcesFor(sourceIds: readonly string[] | undefined) {
-  return (sourceIds ?? []).map((id) => sourceById.get(id)).filter((source) => source !== undefined)
-}
-
-function noteId(sourceId: string) {
-  return `stockton-flock-faq-title-note-${sourceId}`
+function citationIdPrefix(groupId: string, itemId: string, kind: 'answer' | 'point', index: number) {
+  return `stockton-flock-faq-title-${groupId}-${itemId}-${kind}-${index + 1}`
 }
 </script>
 
@@ -49,27 +60,32 @@ function noteId(sourceId: string) {
             <details v-for="item in group.items" :key="item.id" :name="`faq-${group.id}`">
               <summary>{{ item.question }}</summary>
               <div class="campaign-faq-answer">
-                <div v-for="paragraph in item.answer" :key="paragraph.text" class="campaign-faq-paragraph">
+                <div
+                  v-for="(paragraph, paragraphIndex) in item.answer"
+                  :key="citationIdPrefix(group.id, item.id, 'answer', paragraphIndex)"
+                  class="campaign-faq-paragraph"
+                >
                   <p>
-                    {{ paragraph.text }}
-                    <CampaignCitation
-                      v-for="source in sourcesFor(paragraph.sourceIds)"
-                      :key="source.id"
-                      :number="sourceNumberById.get(source.id)!"
-                      :note-id="noteId(source.id)"
-                      :source="source"
+                    <CampaignCitedText
+                      :citation-id-prefix="citationIdPrefix(group.id, item.id, 'answer', paragraphIndex)"
+                      :content="paragraph"
+                      :occurrences="citationOccurrences"
+                      source-note-id-prefix="stockton-flock-faq-title"
+                      :sources="citedSources"
                     />
                   </p>
                 </div>
-                <ol v-if="item.points?.length">
-                  <li v-for="point in item.points" :key="point.text">
-                    {{ point.text }}
-                    <CampaignCitation
-                      v-for="source in sourcesFor(point.sourceIds)"
-                      :key="source.id"
-                      :number="sourceNumberById.get(source.id)!"
-                      :note-id="noteId(source.id)"
-                      :source="source"
+                <ol v-if="item.points?.length" role="list">
+                  <li
+                    v-for="(point, pointIndex) in item.points"
+                    :key="citationIdPrefix(group.id, item.id, 'point', pointIndex)"
+                  >
+                    <CampaignCitedText
+                      :citation-id-prefix="citationIdPrefix(group.id, item.id, 'point', pointIndex)"
+                      :content="point"
+                      :occurrences="citationOccurrences"
+                      source-note-id-prefix="stockton-flock-faq-title"
+                      :sources="citedSources"
                     />
                   </li>
                 </ol>
@@ -80,7 +96,11 @@ function noteId(sourceId: string) {
       </div>
     </div>
 
-    <CampaignSourceNotes id-prefix="stockton-flock-faq-title" :sources="faqSources" />
+    <CampaignSourceNotes
+      :citations="citationOccurrences"
+      id-prefix="stockton-flock-faq-title"
+      :sources="citedSources"
+    />
   </article>
 </template>
 

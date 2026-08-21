@@ -3,6 +3,14 @@ export { campaignFacts, campaignLandingPage } from './landing'
 export { petitionDemand, petitionDemandCanonicalText } from './petition'
 export { allCampaignSources, faqSources, safeguardsSources, stocktonSources } from './sources'
 export {
+  campaignCitationOccurrenceLabel,
+  campaignCitationOccurrenceId,
+  campaignCitationOccurrences,
+  campaignSourcesForOccurrences,
+  citedTextPlainText,
+  citedTextParts
+} from './citations'
+export {
   stocktonContractFacts,
   stocktonCostStack,
   stocktonTimeline,
@@ -10,6 +18,9 @@ export {
 } from './what-stockton-bought'
 export { whySafeguardsPage } from './why-safeguards'
 export type {
+  CampaignCitationEntry,
+  CampaignCitationReference,
+  CampaignCitationSlotMap,
   CampaignFact,
   CampaignFaqGroup,
   CampaignFaqItem,
@@ -17,5 +28,7 @@ export type {
   CampaignSection,
   CampaignSource,
   CampaignTimelineEntry,
-  CitedText
+  CitedText,
+  CitedTextPart
 } from './types'
+export type { CampaignCitationOccurrence } from './citations'
