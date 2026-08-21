@@ -130,7 +130,7 @@ export default defineNuxtConfig({
       // nuxt-security imports its optional XSS middleware dependency at module
       // initialization even when the middleware is disabled. Bundle it so the
       // standalone Nitro output does not depend on a workspace node_modules.
-      inline: ['xss']
+      inline: ['xss', /shared\/basic-release-policy(?:\.js)?$/]
     },
     experimental: {
       envExpansion: false
