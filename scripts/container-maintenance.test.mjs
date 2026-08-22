@@ -138,7 +138,7 @@ test('production maintenance preserves user-owned rows while upgrading the basel
   assert.match(
     upgraded.stdout,
     new RegExp(
-      `1 newly applied; ${finalMigrationCount}/${finalMigrationCount} current; pre-migration backup written as app-pre-migrate-`
+      `${finalMigrationCount - 1} newly applied; ${finalMigrationCount}/${finalMigrationCount} current; pre-migration backup written as app-pre-migrate-`
     )
   )
 
