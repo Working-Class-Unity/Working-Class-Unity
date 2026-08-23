@@ -10,6 +10,7 @@ import {
 } from './solidarity-import'
 
 const requiredRsvpHeaders = ['RSVP ID', 'User ID', 'Session ID', 'RSVP Status', 'Created At', 'Updated At'] as const
+const sessionMetadataHeaders = ['Session Title', 'Session Start', 'Session End', 'Session Location'] as const
 
 type SourceBytes = Uint8Array
 
@@ -86,9 +87,21 @@ export function convertSolidarityEventReports(input: SolidarityReportConversionI
     rawRsvpCount += rows.length
     for (const row of rows) {
       const id = requiredValue(row, 'RSVP ID')
-      const sessionId = requiredValue(row, 'Session ID')
       const userId = requiredValue(row, 'User ID')
-      if (!sessionIds.has(sessionId) || !personIds.has(userId)) {
+      if (!personIds.has(userId)) {
+        throw new TypeError('Solidarity RSVP report contains an unknown session or person')
+      }
+      const sessionId = clean(row['Session ID'])
+      if (!sessionId) {
+        const isSessionlessRecurringRsvp =
+          clean(row.Source) === 'recurring_auto_rsvp' && sessionMetadataHeaders.every((header) => !clean(row[header]))
+        if (isSessionlessRecurringRsvp) {
+          issueCodes.push('rsvp_session_missing')
+          continue
+        }
+        throw new TypeError('Solidarity RSVP Session ID is required')
+      }
+      if (!sessionIds.has(sessionId)) {
         throw new TypeError('Solidarity RSVP report contains an unknown session or person')
       }
       const status = rsvpStatus(row['RSVP Status'])
