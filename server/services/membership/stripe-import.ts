@@ -2,6 +2,7 @@ import { createHash, randomUUID } from 'node:crypto'
 import type Database from 'better-sqlite3'
 import type Stripe from 'stripe'
 import type { DatabaseConnection } from '../../db/connect'
+import { recalculateMembershipStandingInTransaction } from './membership-standing'
 import type { StripeMembershipImportDataset } from './stripe-import-source'
 
 type Sqlite = InstanceType<typeof Database>
@@ -1340,188 +1341,19 @@ function persistMembershipsAndStanding(
 }
 
 function persistStanding(sqlite: Sqlite, context: ApplyContext, snapshotIds: ReadonlyMap<string, string>): void {
-  const policy = sqlite
-    .prepare(
-      `select id, dues_grace_days as duesGraceDays from membership_policies
-       where julianday(effective_from) <= julianday(?)
-         and (effective_to is null or julianday(effective_to) > julianday(?))
-       order by effective_from desc limit 1`
-    )
-    .get(context.observedAt, context.observedAt) as { duesGraceDays: number; id: string } | undefined
-  if (!policy) {
-    issue(context.issues, 'membership_policy_missing', 'membership.policy', context.observedAt)
-    return
-  }
-
-  const coverage = paidCoverageBySubscription(context.dataset, context.qualifyingPriceIds)
-  const membershipRow = sqlite.prepare('select status from memberships where id = ?')
-  const currentStanding = sqlite.prepare(
-    `select id, status, dues_status as duesStatus, attendance_status as attendanceStatus,
-       eligibility_status as eligibilityStatus, conduct_status as conductStatus,
-       grace_ends_at as graceEndsAt, effective_from as effectiveFrom
-     from membership_standing_periods where membership_id = ? and effective_to is null`
-  )
-  const closeStanding = sqlite.prepare(
-    `update membership_standing_periods set effective_to = ? where id = ? and effective_to is null`
-  )
-  const updateStanding = sqlite.prepare(
-    `update membership_standing_periods set policy_id = ?, status = ?, dues_status = ?,
-       attendance_status = ?, eligibility_status = ?, conduct_status = ?,
-       grace_ends_at = ?, source_snapshot_id = ? where id = ?`
-  )
-  const insertStanding = sqlite.prepare(
-    `insert into membership_standing_periods
-       (id, membership_id, policy_id, status, dues_status, attendance_status,
-        eligibility_status, conduct_status, grace_ends_at, effective_from,
-        source_snapshot_id, created_at)
-     values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-  )
-
   for (const plan of context.membershipPlans) {
-    const membership = membershipRow.get(plan.membershipId) as { status: 'active' | 'ended' | 'pending' } | undefined
-    if (!membership || membership.status === 'ended') continue
-    const live = currentStanding.get(plan.membershipId) as StandingRow | undefined
-    const coverageEnd = latestCoverageEnd(plan.subscriptionIds, coverage)
-    const dues = duesFactor(coverageEnd, context.observedAt, policy.duesGraceDays)
-
-    let attendanceStatus: StandingFactor
-    let eligibilityStatus: StandingFactor
-    let conductStatus: StandingFactor
-    if (live) {
-      attendanceStatus = live.attendanceStatus
-      eligibilityStatus = live.eligibilityStatus
-      conductStatus = live.conductStatus
-    } else if (membership.status === 'active' && plan.membershipId.startsWith('membership_stripe_')) {
-      attendanceStatus = 'not_applicable'
-      eligibilityStatus = 'not_applicable'
-      conductStatus = 'not_applicable'
-    } else {
-      attendanceStatus = 'pending'
-      eligibilityStatus = 'pending'
-      conductStatus = 'pending'
-    }
-
-    const duesStatus: StandingFactor = membership.status === 'pending' && !coverageEnd ? 'pending' : dues.status
-    const status = standingStatus(duesStatus, attendanceStatus, eligibilityStatus, conductStatus, dues.inGrace)
-    const graceEndsAt = status === 'grace' ? dues.graceEndsAt : null
     const sourceSnapshotId = plan.subscriptionIds[0]
       ? snapshotId(snapshotIds, 'stripe.subscription', plan.subscriptionIds[0])
       : null
-
-    if (
-      live &&
-      live.status === status &&
-      live.duesStatus === duesStatus &&
-      live.attendanceStatus === attendanceStatus &&
-      live.eligibilityStatus === eligibilityStatus &&
-      live.conductStatus === conductStatus &&
-      live.graceEndsAt === graceEndsAt
-    ) {
-      continue
-    }
-
-    if (live && live.effectiveFrom >= context.observedAt) {
-      updateStanding.run(
-        policy.id,
-        status,
-        duesStatus,
-        attendanceStatus,
-        eligibilityStatus,
-        conductStatus,
-        graceEndsAt,
-        sourceSnapshotId,
-        live.id
-      )
-      continue
-    }
-    if (live) closeStanding.run(context.observedAt, live.id)
-    const signature = [status, duesStatus, attendanceStatus, eligibilityStatus, conductStatus, graceEndsAt].join('\0')
-    insertStanding.run(
-      deterministicId('membership_standing', `${plan.membershipId}\0${context.observedAt}\0${signature}`),
-      plan.membershipId,
-      policy.id,
-      status,
-      duesStatus,
-      attendanceStatus,
-      eligibilityStatus,
-      conductStatus,
-      graceEndsAt,
-      context.observedAt,
-      sourceSnapshotId,
-      context.observedAt
-    )
-  }
-}
-
-type StandingFactor = 'met' | 'not_applicable' | 'pending' | 'unmet'
-type StandingRow = Readonly<{
-  attendanceStatus: StandingFactor
-  conductStatus: StandingFactor
-  duesStatus: StandingFactor
-  effectiveFrom: string
-  eligibilityStatus: StandingFactor
-  graceEndsAt: string | null
-  id: string
-  status: 'good' | 'grace' | 'not_good' | 'pending'
-}>
-
-function paidCoverageBySubscription(
-  dataset: StripeMembershipImportDataset,
-  qualifyingPriceIds: ReadonlySet<string>
-): ReadonlyMap<string, string> {
-  const coverage = new Map<string, string>()
-  for (const invoice of dataset.invoices) {
-    if (invoice.status !== 'paid') continue
-    const subscriptionId = invoiceSubscriptionId(invoice)
-    if (!subscriptionId) continue
-    const qualifyingLines = (dataset.invoiceLines.get(invoice.id) ?? []).filter((line) => {
-      const priceId = linePriceId(line)
-      return priceId ? qualifyingPriceIds.has(priceId) : false
+    const result = recalculateMembershipStandingInTransaction(sqlite, {
+      membershipId: plan.membershipId,
+      observedAt: context.observedAt,
+      sourceSnapshotId
     })
-    for (const line of qualifyingLines) {
-      const end = timestamp(line.period.end)
-      if (!end) continue
-      const current = coverage.get(subscriptionId)
-      if (!current || end > current) coverage.set(subscriptionId, end)
+    if (result.outcome === 'policy_missing') {
+      issue(context.issues, 'membership_policy_missing', 'membership.policy', context.observedAt)
     }
   }
-  return coverage
-}
-
-function latestCoverageEnd(subscriptionIds: readonly string[], coverage: ReadonlyMap<string, string>): string | null {
-  let latest: string | null = null
-  for (const subscriptionId of subscriptionIds) {
-    const value = coverage.get(subscriptionId)
-    if (value && (!latest || value > latest)) latest = value
-  }
-  return latest
-}
-
-function duesFactor(coverageEnd: string | null, observedAt: string, graceDays: number) {
-  if (!coverageEnd) return { graceEndsAt: null, inGrace: false, status: 'unmet' as const }
-  if (coverageEnd >= observedAt) return { graceEndsAt: null, inGrace: false, status: 'met' as const }
-  const graceEndsAt = addDays(coverageEnd, graceDays)
-  return { graceEndsAt, inGrace: observedAt <= graceEndsAt, status: 'unmet' as const }
-}
-
-function standingStatus(
-  dues: StandingFactor,
-  attendance: StandingFactor,
-  eligibility: StandingFactor,
-  conduct: StandingFactor,
-  duesInGrace: boolean
-): StandingRow['status'] {
-  const factors = [dues, attendance, eligibility, conduct]
-  if (factors.includes('pending')) return 'pending'
-  if (factors.every((value) => value === 'met' || value === 'not_applicable')) return 'good'
-  if (
-    dues === 'unmet' &&
-    duesInGrace &&
-    [attendance, eligibility, conduct].every((value) => value === 'met' || value === 'not_applicable')
-  ) {
-    return 'grace'
-  }
-  return 'not_good'
 }
 
 function fetchedCounts(dataset: StripeMembershipImportDataset, discounts: readonly DiscountContext[]) {
@@ -1700,12 +1532,6 @@ function timestamp(value: number | null | undefined): string | null {
 
 function laterTimestamp(left: string, right: string): string {
   return left > right ? left : right
-}
-
-function addDays(value: string, days: number): string {
-  const date = new Date(value)
-  date.setUTCDate(date.getUTCDate() + days)
-  return date.toISOString()
 }
 
 function snapshotId(snapshotIds: ReadonlyMap<string, string>, objectType: string, externalId: string): string {

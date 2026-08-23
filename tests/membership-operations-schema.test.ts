@@ -571,16 +571,16 @@ function insertMeetingFixture(sqlite: Sqlite) {
   sqlite
     .prepare(
       `insert into events (id, title, kind)
-       values ('event-1', 'WCU General Meeting', 'general_meeting')`
+       values ('event-1', 'WCU General Meeting', 'meeting')`
     )
     .run()
   sqlite
     .prepare(
-      `insert into event_sessions (id, event_id, starts_at, ends_at, timezone)
-       values ('session-1', 'event-1', '2026-08-22T19:00:00.000Z', '2026-08-22T21:00:00.000Z',
-                 'America/Los_Angeles'),
-              ('session-2', 'event-1', '2026-09-26T19:00:00.000Z', '2026-09-26T21:00:00.000Z',
-                 'America/Los_Angeles')`
+      `insert into event_sessions (id, event_id, delivery_mode, starts_at, ends_at, timezone)
+       values ('session-1', 'event-1', 'in_person', '2026-08-22T19:00:00.000Z',
+                 '2026-08-22T21:00:00.000Z', 'America/Los_Angeles'),
+              ('session-2', 'event-1', 'in_person', '2026-09-26T19:00:00.000Z',
+                 '2026-09-26T21:00:00.000Z', 'America/Los_Angeles')`
     )
     .run()
   sqlite.prepare("insert into meetings (event_session_id, kind) values ('session-1', 'general')").run()

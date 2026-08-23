@@ -177,6 +177,56 @@ describe('Stripe membership import', () => {
     })
   })
 
+  it('recalculates the annual attendance requirement during later Stripe synchronization', () => {
+    withMigratedDatabase('attendance-refresh', (sqlite, connection) => {
+      const input = {
+        chargeAmount: 1000,
+        customerId: 'cus_attendance_refresh',
+        email: 'attendance-refresh@example.test',
+        refundAmount: 0,
+        subscriptionId: 'sub_attendance_refresh',
+        subscriptionStartedAt: '2025-06-01T00:00:00.000Z'
+      }
+      const grandfatheredBefore = new Date('2026-08-22T00:00:00.000Z')
+      importStripeMembershipDataset(
+        connection,
+        membershipDataset({ ...input, coverageEnd: '2026-09-01T00:00:00.000Z' }),
+        {
+          apply: true,
+          grandfatheredBefore,
+          observedAt: new Date('2026-08-22T12:00:00.000Z')
+        }
+      )
+      expect(
+        sqlite
+          .prepare(
+            `select status, attendance_status as attendanceStatus
+             from membership_standing_periods where effective_to is null`
+          )
+          .get()
+      ).toEqual({ attendanceStatus: 'not_applicable', status: 'good' })
+
+      importStripeMembershipDataset(
+        connection,
+        membershipDataset({ ...input, coverageEnd: '2027-10-01T00:00:00.000Z' }),
+        {
+          apply: true,
+          grandfatheredBefore,
+          observedAt: new Date('2027-08-22T12:00:00.000Z')
+        }
+      )
+      expect(
+        sqlite
+          .prepare(
+            `select status, dues_status as duesStatus, attendance_status as attendanceStatus
+             from membership_standing_periods where effective_to is null`
+          )
+          .get()
+      ).toEqual({ attendanceStatus: 'unmet', duesStatus: 'met', status: 'not_good' })
+      expect(count(sqlite, 'membership_standing_periods')).toBe(2)
+    })
+  })
+
   it('imports canceled subscription history without grandfathering it as a current membership', () => {
     withMigratedDatabase('canceled-history', (sqlite, connection) => {
       const dataset = membershipDataset({

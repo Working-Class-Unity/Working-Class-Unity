@@ -33,9 +33,8 @@ The root [`AGENTS.md`](../AGENTS.md) governs all work. The normative interface a
 - `AccountMenu`: feature-owned Reka dropdown for identity, account navigation, and sign-out.
 - `calendar/CalendarDatePicker`: feature-owned Reka calendar and popover for agenda date navigation.
 - `calendar/EventDirectionsMenu`: feature-owned Reka dropdown for map and address actions.
-- `calendar/EventRsvpDialog`: feature-owned Reka dialog for the website RSVP journey.
 - `calendar/CalendarAgendaView`, `calendar/CalendarMonthView`, `calendar/CalendarEventActions`, and
-  `calendar/CalendarEventBadge`: calendar-owned views and recurring event presentation.
+  `calendar/CalendarEventBadge`: calendar-owned views, recurring event presentation, and outbound Solidarity RSVP links.
 - `PageOutline`: shared desktop index and mobile Reka drawer for flat or nested page outlines.
 - `BylawsPageOutline`: bylaws-owned configuration of `PageOutline`.
 - `CampaignCitedText`: feature-owned renderer for claim-level citation parts and deterministic occurrences.

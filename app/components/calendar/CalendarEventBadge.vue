@@ -22,7 +22,7 @@ const kindClass = computed(() => `type-${props.kind.toLowerCase()}`)
     font-weight: 650;
   }
 
-  .type-organizing {
+  .type-meeting {
     color: var(--color-event-organizing-text);
     background: var(--color-event-organizing-surface);
   }
@@ -32,12 +32,12 @@ const kindClass = computed(() => `type-${props.kind.toLowerCase()}`)
     background: var(--color-event-action-surface);
   }
 
-  .type-community {
+  .type-social {
     color: var(--color-event-community-text);
     background: var(--color-event-community-surface);
   }
 
-  .type-training {
+  .type-learning {
     color: var(--color-event-training-text);
     background: var(--color-event-training-surface);
   }

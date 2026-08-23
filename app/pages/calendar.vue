@@ -1,24 +1,78 @@
 <script setup lang="ts">
 import CalendarAgendaView from '~/components/calendar/CalendarAgendaView.vue'
 import CalendarMonthView from '~/components/calendar/CalendarMonthView.vue'
-import EventRsvpDialog from '~/components/calendar/EventRsvpDialog.vue'
-import { calendarEvents, calendarMonthCells, type CalendarFilter, type CalendarViewId } from '~/content/calendar'
+import {
+  eventKindByCategory,
+  type CalendarApiResponse,
+  type CalendarEvent,
+  type CalendarFilter,
+  type CalendarViewId
+} from '~/content/calendar'
 
 const { t } = useI18n()
 const activeView = ref<CalendarViewId>('agenda')
 const activeFilter = ref<CalendarFilter>('Everything')
-const rsvpOpen = ref(false)
-const selectedEventName = ref('WCU General Meeting')
-const selectedMonthEventId = ref('general-meeting')
+const selectedMonthEventId = ref('')
 const jumpMessage = ref('')
+const jumpDate = ref<string | null>(null)
+const { data, error, refresh, status } = await useFetch<CalendarApiResponse>('/api/events')
 
-function openRsvp(eventName: string) {
-  selectedEventName.value = eventName
-  rsvpOpen.value = true
+const calendarEvents = computed<readonly CalendarEvent[]>(() =>
+  (data.value?.events ?? []).flatMap((event) =>
+    event.sessions.map((session, index) => ({
+      address: session.locationAddress ?? '',
+      dateLabel: formatDate(session.startsAt, session.timezone),
+      description: event.description ?? '',
+      endsAt: session.endsAt,
+      eventPageUrl: event.eventPageUrl,
+      id: `${event.id}:${session.id}`,
+      kind: eventKindByCategory[event.category],
+      place: session.locationName ?? deliveryLabel(session.deliveryMode),
+      recurring: index === 0 && event.sessions.length > 1 ? `${event.sessions.length} upcoming dates` : undefined,
+      rsvpUrl: session.rsvpUrl ?? event.eventPageUrl,
+      startsAt: session.startsAt,
+      time: formatTimeRange(session.startsAt, session.endsAt, session.timezone),
+      timezone: session.timezone,
+      title: event.title
+    }))
+  )
+)
+const visibleEvents = computed(() =>
+  jumpDate.value
+    ? calendarEvents.value.filter((event) => eventDateKey(event.startsAt, event.timezone) >= jumpDate.value!)
+    : calendarEvents.value
+)
+function jumpToDate(date: string) {
+  jumpDate.value = date
+  jumpMessage.value = `Showing events from ${date}.`
 }
 
-function jumpToDate(date: string) {
-  jumpMessage.value = `Showing events from ${date}.`
+function formatDate(value: string, timeZone: string) {
+  return new Intl.DateTimeFormat('en-US', { day: 'numeric', month: 'short', timeZone, weekday: 'short' }).format(
+    new Date(value)
+  )
+}
+
+function formatTimeRange(startsAt: string, endsAt: string | null, timeZone: string) {
+  const formatter = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit', timeZone })
+  return endsAt ? formatter.formatRange(new Date(startsAt), new Date(endsAt)) : formatter.format(new Date(startsAt))
+}
+
+function deliveryLabel(deliveryMode: 'hybrid' | 'in_person' | 'virtual') {
+  if (deliveryMode === 'virtual') return 'Online'
+  if (deliveryMode === 'hybrid') return 'In person and online'
+  return 'Location shared by organizer'
+}
+
+function eventDateKey(value: string, timeZone: string) {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    day: '2-digit',
+    month: '2-digit',
+    timeZone,
+    year: 'numeric'
+  }).formatToParts(new Date(value))
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]))
+  return `${values.year}-${values.month}-${values.day}`
 }
 
 useHead(() => ({
@@ -35,22 +89,9 @@ useHead(() => ({
         <h1 id="calendar-title">Find your place in the work</h1>
         <p>
           Come to an organizing meeting, take action with your neighbors, or meet people at a community gathering.
-          Newcomers are welcome at every event shown here.
+          Public events are open to newcomers. Signed-in members may also see member meetings.
         </p>
       </div>
-
-      <details class="subscribe-menu">
-        <summary>
-          <span>Sync calendar</span>
-          <span class="disclosure-chevron" aria-hidden="true" />
-        </summary>
-        <div class="subscribe-options">
-          <a href="#">Google Calendar</a>
-          <a href="#">Apple Calendar</a>
-          <a href="#">Outlook</a>
-          <AppButton class="subscribe-action" size="compact" variant="secondary">Copy calendar link</AppButton>
-        </div>
-      </details>
     </header>
 
     <div class="calendar-controls">
@@ -76,23 +117,20 @@ useHead(() => ({
       </div>
     </div>
 
+    <div v-if="status === 'pending'" class="calendar-state" aria-live="polite">Loading upcoming events…</div>
+    <div v-else-if="error" class="calendar-state" role="alert">
+      <p>We couldn’t load the calendar.</p>
+      <AppButton size="compact" variant="secondary" @click="refresh()">Try again</AppButton>
+    </div>
+    <div v-else-if="visibleEvents.length === 0" class="calendar-state">No upcoming events are published yet.</div>
     <CalendarAgendaView
-      v-if="activeView === 'agenda'"
+      v-else-if="activeView === 'agenda'"
       v-model:active-filter="activeFilter"
-      :events="calendarEvents"
+      :events="visibleEvents"
       :jump-message="jumpMessage"
       @jump="jumpToDate"
-      @rsvp="openRsvp"
     />
-    <CalendarMonthView
-      v-else
-      v-model:selected-event-id="selectedMonthEventId"
-      :cells="calendarMonthCells"
-      :events="calendarEvents"
-      @rsvp="openRsvp"
-    />
-
-    <EventRsvpDialog v-model:open="rsvpOpen" :event-name="selectedEventName" />
+    <CalendarMonthView v-else v-model:selected-event-id="selectedMonthEventId" :events="visibleEvents" />
   </section>
 </template>
 
@@ -139,77 +177,6 @@ useHead(() => ({
     text-transform: uppercase;
   }
 
-  .subscribe-menu {
-    position: relative;
-    flex: 0 0 auto;
-  }
-
-  .subscribe-menu summary {
-    display: inline-flex;
-    min-block-size: var(--control-min-block-size);
-    align-items: center;
-    gap: var(--space-2);
-    border: 1px solid var(--color-action);
-    border-radius: var(--radius-2);
-    padding: 0.6rem 0.8rem;
-    color: var(--color-action);
-    background: var(--color-surface);
-    font-weight: 650;
-    list-style: none;
-    cursor: pointer;
-  }
-
-  .subscribe-menu summary::-webkit-details-marker {
-    display: none;
-  }
-
-  .disclosure-chevron {
-    inline-size: 0.45rem;
-    block-size: 0.45rem;
-    border-block-end: 1.5px solid currentcolor;
-    border-inline-end: 1.5px solid currentcolor;
-    rotate: 45deg;
-    translate: 0 -0.1rem;
-  }
-
-  .subscribe-menu[open] .disclosure-chevron {
-    rotate: 225deg;
-    translate: 0 0.1rem;
-  }
-
-  .subscribe-options {
-    position: absolute;
-    z-index: var(--z-menu);
-    inset-block-start: calc(100% + var(--space-2));
-    inset-inline-end: 0;
-    display: grid;
-    min-inline-size: 14rem;
-    border-radius: var(--radius-3);
-    padding: var(--space-2);
-    background: var(--color-surface);
-    box-shadow: var(--shadow-panel);
-    outline: 1px solid var(--color-divider);
-  }
-
-  .subscribe-options a,
-  .subscribe-options .subscribe-action[data-variant='secondary'] {
-    display: flex;
-    min-block-size: var(--control-min-block-size);
-    align-items: center;
-    border: 0;
-    border-radius: var(--radius-2);
-    padding: 0.65rem 0.75rem;
-    color: var(--color-action);
-    background: transparent;
-    font: inherit;
-    font-size: 0.875rem;
-    font-weight: 650;
-    text-align: start;
-    text-decoration: none;
-    filter: none;
-    cursor: pointer;
-  }
-
   .calendar-controls {
     border-block-end: 1px solid var(--color-divider);
   }
@@ -230,12 +197,6 @@ useHead(() => ({
     font-weight: 650;
     filter: none;
     cursor: pointer;
-  }
-
-  .subscribe-menu summary:hover,
-  .subscribe-options a:hover,
-  .subscribe-options .subscribe-action[data-variant='secondary']:hover {
-    background: var(--color-action-soft);
   }
 
   .view-tabs .view-action[data-variant='secondary'][aria-pressed='true'] {
@@ -265,18 +226,6 @@ useHead(() => ({
       font-size: 1rem;
     }
 
-    .subscribe-menu {
-      align-self: start;
-    }
-
-    .subscribe-options {
-      inset-inline: 0 auto;
-      inline-size: min(15rem, calc(100vw - 2rem));
-      min-inline-size: 0;
-    }
-
-    .subscribe-options a,
-    .subscribe-options .subscribe-action,
     .view-tabs .view-action {
       font-size: 1rem;
     }

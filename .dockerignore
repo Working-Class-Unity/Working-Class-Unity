@@ -15,6 +15,7 @@ scripts/**
 !scripts/generate-color-tokens.mjs
 !scripts/generate-hero-assets.mjs
 !scripts/import-stripe-membership.ts
+!scripts/import-solidarity-events.ts
 
 !nuxt.config.ts
 !sentry.client.config.ts

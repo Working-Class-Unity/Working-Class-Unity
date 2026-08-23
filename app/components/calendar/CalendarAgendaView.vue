@@ -10,17 +10,30 @@ const props = defineProps<{
 }>()
 
 const activeFilter = defineModel<CalendarFilter>('activeFilter', { required: true })
-const emit = defineEmits<{
-  jump: [date: string]
-  rsvp: [eventName: string]
-}>()
+const emit = defineEmits<{ jump: [date: string] }>()
 
-const featuredEvent = computed(() => props.events[0]!)
-const recurringEvents = computed(() => props.events.filter((event) => event.recurring))
-const agendaEvents = computed(() => {
-  const upcoming = props.events.filter((event) => event.id !== 'general-meeting' && event.id !== 'coffee')
-  if (activeFilter.value === 'Everything') return upcoming
-  return upcoming.filter((event) => event.kind === activeFilter.value)
+const filteredEvents = computed(() => {
+  if (activeFilter.value === 'Everything') return props.events
+  return props.events.filter((event) => event.kind === activeFilter.value)
+})
+const featuredEvent = computed(() => filteredEvents.value[0] ?? null)
+const recurringEvents = computed(() => filteredEvents.value.filter((event) => event.recurring))
+const agendaEvents = computed(() => filteredEvents.value.slice(1))
+const featuredDate = computed(() => {
+  const event = featuredEvent.value
+  if (!event) return null
+  const date = new Date(event.startsAt)
+  const options = { timeZone: event.timezone } as const
+  return {
+    day: new Intl.DateTimeFormat('en-US', { ...options, day: 'numeric' }).format(date),
+    month: new Intl.DateTimeFormat('en-US', { ...options, month: 'short' }).format(date),
+    weekday: new Intl.DateTimeFormat('en-US', { ...options, weekday: 'long' }).format(date)
+  }
+})
+const agendaMonth = computed(() => {
+  const event = agendaEvents.value[0] ?? featuredEvent.value
+  if (!event) return ''
+  return new Intl.DateTimeFormat('en-US', { month: 'long', timeZone: event.timezone }).format(new Date(event.startsAt))
 })
 
 function eventStartTime(time: string) {
@@ -39,17 +52,17 @@ function recurrenceSchedule(event: CalendarEvent) {
     <div class="view-heading">
       <div>
         <h2 id="agenda-title">Upcoming events</h2>
-        <p>Recurring programs appear once, so the next useful opportunity stays easy to find.</p>
+        <p>Each dated occurrence appears here, including every upcoming date in a recurring series.</p>
       </div>
       <CalendarDatePicker @select="emit('jump', $event)" />
     </div>
     <p v-if="jumpMessage" class="jump-message" aria-live="polite">{{ jumpMessage }}</p>
 
-    <article class="featured-event">
+    <article v-if="featuredEvent" class="featured-event">
       <time :datetime="featuredEvent.startsAt" class="featured-date">
-        <span>Aug</span>
-        <strong>20</strong>
-        <span>Thursday</span>
+        <span>{{ featuredDate?.month }}</span>
+        <strong>{{ featuredDate?.day }}</strong>
+        <span>{{ featuredDate?.weekday }}</span>
       </time>
       <div class="featured-copy">
         <div class="event-labels">
@@ -64,16 +77,11 @@ function recurrenceSchedule(event: CalendarEvent) {
           </div>
           <div>
             <dt>Meet at</dt>
-            <dd>{{ featuredEvent.place }}, Stockton</dd>
+            <dd>{{ featuredEvent.place }}</dd>
           </div>
         </dl>
       </div>
-      <CalendarEventActions
-        class="featured-actions"
-        :event="featuredEvent"
-        show-directions
-        @rsvp="emit('rsvp', $event.title)"
-      />
+      <CalendarEventActions class="featured-actions" :event="featuredEvent" show-directions />
     </article>
 
     <div class="agenda-filter-row">
@@ -93,12 +101,13 @@ function recurrenceSchedule(event: CalendarEvent) {
       </div>
     </div>
 
-    <div class="agenda-layout">
+    <p v-if="!featuredEvent" class="empty-state">No events match this filter yet.</p>
+    <div v-else class="agenda-layout">
       <section aria-labelledby="up-next-title">
         <div class="section-heading-row">
           <div>
             <p class="section-label">Up next</p>
-            <h3 id="up-next-title">August</h3>
+            <h3 id="up-next-title">{{ agendaMonth }}</h3>
           </div>
         </div>
         <ol class="event-list" role="list">
@@ -114,18 +123,11 @@ function recurrenceSchedule(event: CalendarEvent) {
               </div>
               <h4>{{ event.title }}</h4>
               <p>{{ event.description }}</p>
-              <AppButton v-if="event.recurring" class="text-action" size="compact" variant="secondary">
-                {{ event.recurring }}
-              </AppButton>
+              <p v-if="event.recurring" class="recurrence-copy">{{ event.recurring }}</p>
             </div>
-            <CalendarEventActions
-              class="row-actions"
-              :event="event"
-              rsvp-variant="secondary"
-              @rsvp="emit('rsvp', $event.title)"
-            />
+            <CalendarEventActions class="row-actions" :event="event" rsvp-variant="secondary" />
           </li>
-          <li v-if="agendaEvents.length === 0" class="empty-state">No events match this filter yet.</li>
+          <li v-if="agendaEvents.length === 0" class="empty-state">No additional events in this view.</li>
         </ol>
       </section>
 
@@ -136,7 +138,6 @@ function recurrenceSchedule(event: CalendarEvent) {
           <CalendarEventBadge :kind="event.kind" />
           <h4>{{ event.title }}</h4>
           <p>{{ recurrenceSchedule(event) }} · {{ eventStartTime(event.time) }}</p>
-          <AppButton class="text-action" size="compact" variant="secondary">See 4 upcoming dates</AppButton>
         </div>
       </aside>
     </div>
@@ -388,26 +389,6 @@ function recurrenceSchedule(event: CalendarEvent) {
     line-height: 1.5;
   }
 
-  .text-action[data-variant='secondary'] {
-    min-block-size: var(--control-min-block-size);
-    border: 0;
-    padding: 0.6rem 0;
-    color: var(--color-action);
-    background: transparent;
-    font: inherit;
-    font-size: 0.875rem;
-    font-weight: 650;
-    text-align: start;
-    text-decoration: underline;
-    text-underline-offset: 0.2em;
-    filter: none;
-    cursor: pointer;
-  }
-
-  .text-action[data-variant='secondary']:hover {
-    color: var(--color-accent-action-hover);
-  }
-
   .series-panel {
     display: grid;
     gap: var(--space-4);
@@ -455,8 +436,7 @@ function recurrenceSchedule(event: CalendarEvent) {
       font-size: 1rem;
     }
 
-    .event-filters .filter-action,
-    .text-action {
+    .event-filters .filter-action {
       font-size: 1rem;
     }
 
@@ -498,8 +478,7 @@ function recurrenceSchedule(event: CalendarEvent) {
 
     .event-details dt,
     .event-details dd,
-    .event-row time span,
-    .text-action {
+    .event-row time span {
       font-size: 0.875rem;
     }
 
