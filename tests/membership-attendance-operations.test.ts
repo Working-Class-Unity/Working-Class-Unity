@@ -26,7 +26,7 @@ describe('membership attendance operations', () => {
       })
       sqlite.prepare("insert into people (id, display_name) values ('person-guest', 'Community Guest')").run()
 
-      const input = attendanceInput({
+      const input = attendanceInput(sqlite, {
         attendance: [
           { id: 'attendance-member', personId: 'person-member', status: 'attended' },
           { id: 'attendance-guest', personId: 'person-guest', status: 'attended' }
@@ -40,7 +40,7 @@ describe('membership attendance operations', () => {
       recordEventSessionAttendance(connection, input)
       recordEventSessionAttendance(connection, input)
 
-      const recurringSession = attendanceInput({
+      const recurringSession = attendanceInput(sqlite, {
         attendance: [{ id: 'attendance-member-second', personId: 'person-member', status: 'attended' }],
         eventId: 'event-general',
         observedAt: '2028-04-01T00:00:00.000Z',
@@ -55,6 +55,9 @@ describe('membership attendance operations', () => {
       expect(count(sqlite, 'meetings')).toBe(2)
       expect(count(sqlite, 'attendance')).toBe(3)
       expect(count(sqlite, 'people')).toBe(2)
+      expect(sqlite.prepare("select visibility from events where id = 'event-general'").get()).toEqual({
+        visibility: 'members'
+      })
       expect(currentStanding(sqlite, 'membership-member')).toEqual({
         attendanceStatus: 'met',
         duesStatus: 'met',
@@ -65,20 +68,14 @@ describe('membership attendance operations', () => {
       expect(() =>
         recordEventSessionAttendance(connection, {
           ...recurringSession,
-          event: { ...recurringSession.event, id: 'event-reparented' }
+          eventSessionId: 'session-not-imported'
         })
-      ).toThrow(/cannot be reassigned/)
-      expect(
-        sqlite.prepare('select event_id as eventId from event_sessions where id = ?').get(recurringSession.session.id)
-      ).toEqual({ eventId: 'event-general' })
-      expect(sqlite.prepare("select count(*) as count from events where id = 'event-reparented'").get()).toEqual({
-        count: 0
-      })
+      ).toThrow(/existing Solidarity event session/)
 
       expect(() =>
         recordEventSessionAttendance(
           connection,
-          attendanceInput({
+          attendanceInput(sqlite, {
             attendance: [{ id: 'attendance-missing', personId: 'person-missing', status: 'attended' }],
             eventId: 'event-rollback',
             observedAt: '2028-03-02T00:00:00.000Z',
@@ -87,14 +84,9 @@ describe('membership attendance operations', () => {
           })
         )
       ).toThrow(/FOREIGN KEY constraint failed/)
-      expect(sqlite.prepare("select count(*) as count from events where id = 'event-rollback'").get()).toEqual({
-        count: 0
-      })
       expect(
-        sqlite.prepare("select count(*) as count from event_sessions where id = 'session-rollback'").get()
-      ).toEqual({
-        count: 0
-      })
+        sqlite.prepare("select count(*) as count from attendance where event_session_id = 'session-rollback'").get()
+      ).toEqual({ count: 0 })
     })
   })
 
@@ -119,7 +111,7 @@ describe('membership attendance operations', () => {
 
       recordEventSessionAttendance(
         connection,
-        attendanceInput({
+        attendanceInput(sqlite, {
           attendance: [{ id: 'attendance-steering', personId: 'person-window', status: 'attended' }],
           eventId: 'event-steering',
           meetingKind: 'steering',
@@ -130,7 +122,7 @@ describe('membership attendance operations', () => {
       )
       recordEventSessionAttendance(
         connection,
-        attendanceInput({
+        attendanceInput(sqlite, {
           attendance: [{ id: 'attendance-excused', personId: 'person-window', status: 'excused' }],
           eventId: 'event-excused',
           observedAt: '2028-03-01T00:00:00.000Z',
@@ -140,7 +132,7 @@ describe('membership attendance operations', () => {
       )
       recordEventSessionAttendance(
         connection,
-        attendanceInput({
+        attendanceInput(sqlite, {
           attendance: [{ id: 'attendance-scheduled', personId: 'person-window', status: 'attended' }],
           eventId: 'event-scheduled',
           observedAt: '2028-03-01T00:00:00.000Z',
@@ -151,7 +143,7 @@ describe('membership attendance operations', () => {
       )
       recordEventSessionAttendance(
         connection,
-        attendanceInput({
+        attendanceInput(sqlite, {
           attendance: [{ id: 'attendance-too-old', personId: 'person-window', status: 'attended' }],
           eventId: 'event-too-old',
           observedAt: '2028-03-01T00:00:00.000Z',
@@ -165,7 +157,7 @@ describe('membership attendance operations', () => {
         status: 'not_good'
       })
 
-      const upperBoundary = attendanceInput({
+      const upperBoundary = attendanceInput(sqlite, {
         attendance: [{ id: 'attendance-upper-boundary', personId: 'person-window', status: 'attended' }],
         eventId: 'event-upper-boundary',
         observedAt: '2028-03-01T00:00:00.000Z',
@@ -190,7 +182,7 @@ describe('membership attendance operations', () => {
 
       recordEventSessionAttendance(
         connection,
-        attendanceInput({
+        attendanceInput(sqlite, {
           attendance: [{ id: 'attendance-boundary', personId: 'person-window', status: 'attended' }],
           eventId: 'event-boundary',
           observedAt: '2028-03-01T00:00:00.000Z',
@@ -215,7 +207,7 @@ describe('membership attendance operations', () => {
         personId: 'person-correction',
         priceId: 'membership-10-1month'
       })
-      const base = attendanceInput({
+      const base = attendanceInput(sqlite, {
         attendance: [{ id: 'attendance-correction', personId: 'person-correction', status: 'attended' }],
         eventId: 'event-correction',
         observedAt: '2028-03-01T00:00:00.000Z',
@@ -294,36 +286,66 @@ describe('membership attendance operations', () => {
   })
 })
 
-function attendanceInput(input: {
-  attendance: Array<{ id: string; personId: string; status: 'absent' | 'attended' | 'excused' | 'unknown' }>
-  eventId: string
-  meetingKind?: 'general' | 'steering'
-  observedAt: string
-  sessionId: string
-  sessionStatus?: 'canceled' | 'completed' | 'scheduled'
-  startsAt: string
-}) {
+function attendanceInput(
+  sqlite: Sqlite,
+  input: {
+    attendance: Array<{ id: string; personId: string; status: 'absent' | 'attended' | 'excused' | 'unknown' }>
+    eventId: string
+    meetingKind?: 'general' | 'steering'
+    observedAt: string
+    sessionId: string
+    sessionStatus?: 'canceled' | 'completed' | 'scheduled'
+    startsAt: string
+  }
+) {
+  seedSolidarityEventSession(sqlite, input)
   return {
     attendance: input.attendance.map((value) => ({
       ...value,
       recordedAt: input.observedAt,
       source: 'manual' as const
     })),
-    event: {
-      id: input.eventId,
-      kind: input.meetingKind === 'steering' ? 'steering_meeting' : 'general_meeting',
-      title: input.meetingKind === 'steering' ? 'WCU Steering Meeting' : 'WCU General Meeting'
-    },
-    meetingKind: input.meetingKind ?? ('general' as const),
-    observedAt: input.observedAt,
-    session: {
-      endsAt: input.startsAt,
-      id: input.sessionId,
-      startsAt: input.startsAt,
-      status: input.sessionStatus ?? ('completed' as const),
-      timezone: 'America/Los_Angeles'
-    }
+    eventSessionId: input.sessionId,
+    observedAt: input.observedAt
   }
+}
+
+function seedSolidarityEventSession(
+  sqlite: Sqlite,
+  input: {
+    eventId: string
+    meetingKind?: 'general' | 'steering'
+    sessionId: string
+    sessionStatus?: 'canceled' | 'completed' | 'scheduled'
+    startsAt: string
+  }
+) {
+  sqlite
+    .prepare(
+      `insert into events (id, title, kind, visibility)
+       values (?, ?, 'meeting', 'members') on conflict(id) do nothing`
+    )
+    .run(input.eventId, input.meetingKind === 'steering' ? 'WCU Steering Meeting' : 'WCU General Meeting')
+  sqlite
+    .prepare(
+      `insert into event_sessions
+         (id, event_id, status, delivery_mode, starts_at, ends_at, timezone)
+       values (?, ?, ?, 'in_person', ?, ?, 'America/Los_Angeles') on conflict(id) do nothing`
+    )
+    .run(input.sessionId, input.eventId, input.sessionStatus ?? 'completed', input.startsAt, input.startsAt)
+  sqlite
+    .prepare(
+      `insert into event_session_provider_links
+         (id, event_session_id, provider, external_id, last_seen_at)
+       values (?, ?, 'solidarity', ?, '2028-01-01T00:00:00.000Z') on conflict(provider, external_id) do nothing`
+    )
+    .run(`provider-${input.sessionId}`, input.sessionId, input.sessionId)
+  sqlite
+    .prepare(
+      `insert into meetings (event_session_id, kind)
+       values (?, ?) on conflict(event_session_id) do nothing`
+    )
+    .run(input.sessionId, input.meetingKind ?? 'general')
 }
 
 function seedMemberWithPaidDues(

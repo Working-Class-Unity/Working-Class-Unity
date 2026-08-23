@@ -1,7 +1,6 @@
 import type Database from 'better-sqlite3'
 import type { DatabaseConnection } from '../../db/connect'
-import type { AttendanceStatus, EventSessionStatus, EventStatus } from '../../db/schema/events'
-import type { MeetingKind } from '../../db/schema/governance'
+import type { AttendanceStatus } from '../../db/schema/events'
 import {
   recalculateMembershipStandingInTransaction,
   type MembershipStandingProjectionResult
@@ -21,27 +20,8 @@ export type RecordEventSessionAttendanceInput = Readonly<{
       status: AttendanceStatus
     }>
   >
-  event: Readonly<{
-    defaultTimezone?: string
-    description?: string | null
-    id: string
-    kind: string
-    sourceSnapshotId?: string | null
-    status?: EventStatus
-    title: string
-  }>
-  meetingKind?: MeetingKind
+  eventSessionId: string
   observedAt: string
-  session: Readonly<{
-    endsAt?: string | null
-    id: string
-    location?: string | null
-    sourceSnapshotId?: string | null
-    startsAt: string
-    status: EventSessionStatus
-    timezone: string
-    virtualUrl?: string | null
-  }>
 }>
 
 export function recalculateMembershipStanding(
@@ -62,15 +42,13 @@ export function recordEventSessionAttendance(
 
   connection.sqlite
     .transaction(() => {
-      persistEvent(connection.sqlite, input, observedAt)
-      persistSession(connection.sqlite, input, observedAt)
-      persistMeeting(connection.sqlite, input, observedAt)
+      const eventSourceSnapshotId = requireSolidarityEventSession(connection.sqlite, input.eventSessionId)
 
       const affectedPeople = new Set(
         (
           connection.sqlite
             .prepare('select person_id as personId from attendance where event_session_id = ?')
-            .all(input.session.id) as Array<{ personId: string }>
+            .all(input.eventSessionId) as Array<{ personId: string }>
         ).map((row) => row.personId)
       )
       const sourceSnapshotByPerson = new Map<string, string | null>()
@@ -86,7 +64,7 @@ export function recordEventSessionAttendance(
       for (const attendance of input.attendance) {
         upsertAttendance.run(
           attendance.id,
-          input.session.id,
+          input.eventSessionId,
           attendance.personId,
           attendance.status,
           attendance.source,
@@ -110,11 +88,7 @@ export function recordEventSessionAttendance(
           recalculateMembershipStandingInTransaction(connection.sqlite, {
             membershipId: membership.id,
             observedAt,
-            sourceSnapshotId:
-              sourceSnapshotByPerson.get(personId) ??
-              input.session.sourceSnapshotId ??
-              input.event.sourceSnapshotId ??
-              null
+            sourceSnapshotId: sourceSnapshotByPerson.get(personId) ?? eventSourceSnapshotId
           })
         )
       }
@@ -122,82 +96,19 @@ export function recordEventSessionAttendance(
     .immediate()
 }
 
-function persistEvent(sqlite: Sqlite, input: RecordEventSessionAttendanceInput, observedAt: string): void {
-  sqlite
+function requireSolidarityEventSession(sqlite: Sqlite, eventSessionId: string): string | null {
+  const row = sqlite
     .prepare(
-      `insert into events
-        (id, title, description, kind, status, default_timezone,
-         source_snapshot_id, created_at, updated_at)
-       values (?, ?, ?, ?, ?, ?, ?, ?, ?)
-       on conflict(id) do update set title = excluded.title, description = excluded.description,
-         kind = excluded.kind, status = excluded.status,
-         default_timezone = excluded.default_timezone,
-         source_snapshot_id = excluded.source_snapshot_id, updated_at = excluded.updated_at`
+      `select coalesce(s.source_snapshot_id, e.source_snapshot_id) as sourceSnapshotId
+       from event_sessions s
+       join events e on e.id = s.event_id
+       join event_session_provider_links provider on provider.event_session_id = s.id
+         and provider.provider = 'solidarity'
+       where s.id = ? limit 1`
     )
-    .run(
-      input.event.id,
-      input.event.title,
-      input.event.description ?? null,
-      input.event.kind,
-      input.event.status ?? 'active',
-      input.event.defaultTimezone ?? input.session.timezone,
-      input.event.sourceSnapshotId ?? null,
-      observedAt,
-      observedAt
-    )
-}
-
-function persistSession(sqlite: Sqlite, input: RecordEventSessionAttendanceInput, observedAt: string): void {
-  const existing = sqlite
-    .prepare('select event_id as eventId from event_sessions where id = ?')
-    .get(input.session.id) as { eventId: string } | undefined
-  if (existing && existing.eventId !== input.event.id) {
-    throw new Error('An existing event session cannot be reassigned to another event')
-  }
-  sqlite
-    .prepare(
-      `insert into event_sessions
-        (id, event_id, status, starts_at, ends_at, timezone, location, virtual_url,
-         source_snapshot_id, created_at, updated_at)
-       values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-       on conflict(id) do update set status = excluded.status,
-         starts_at = excluded.starts_at, ends_at = excluded.ends_at,
-         timezone = excluded.timezone, location = excluded.location,
-         virtual_url = excluded.virtual_url, source_snapshot_id = excluded.source_snapshot_id,
-         updated_at = excluded.updated_at`
-    )
-    .run(
-      input.session.id,
-      input.event.id,
-      input.session.status,
-      input.session.startsAt,
-      input.session.endsAt ?? null,
-      input.session.timezone,
-      input.session.location ?? null,
-      input.session.virtualUrl ?? null,
-      input.session.sourceSnapshotId ?? null,
-      observedAt,
-      observedAt
-    )
-}
-
-function persistMeeting(sqlite: Sqlite, input: RecordEventSessionAttendanceInput, observedAt: string): void {
-  if (!input.meetingKind) return
-  sqlite
-    .prepare(
-      `insert into meetings
-        (event_session_id, kind, source_snapshot_id, created_at, updated_at)
-       values (?, ?, ?, ?, ?)
-       on conflict(event_session_id) do update set kind = excluded.kind,
-         source_snapshot_id = excluded.source_snapshot_id, updated_at = excluded.updated_at`
-    )
-    .run(
-      input.session.id,
-      input.meetingKind,
-      input.session.sourceSnapshotId ?? input.event.sourceSnapshotId ?? null,
-      observedAt,
-      observedAt
-    )
+    .get(eventSessionId) as { sourceSnapshotId: string | null } | undefined
+  if (!row) throw new Error('Attendance can be recorded only for an existing Solidarity event session')
+  return row.sourceSnapshotId
 }
 
 function assertDistinctPeople(attendance: RecordEventSessionAttendanceInput['attendance']): void {

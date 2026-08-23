@@ -14,7 +14,8 @@ const expectedMigrationTags = [
   '0000_wcu_initial',
   '0001_wcu_account_profile',
   '0002_membership_operations',
-  '0003_stripe_charge_ids'
+  '0003_stripe_charge_ids',
+  '0004_event_operations'
 ] as const
 const expectedRuntimeTables = [
   'account',
@@ -39,7 +40,10 @@ const expectedRuntimeTables = [
   'budgets',
   'cash_ledger_entries',
   'detached_billing_subjects',
+  'event_provider_links',
+  'event_session_provider_links',
   'event_sessions',
+  'event_tags',
   'events',
   'external_record_snapshots',
   'files',
@@ -95,6 +99,7 @@ const expectedBillingTriggers = [
   'billing_transition_subscription_purchaser_insert',
   'billing_transition_subscription_purchaser_update'
 ] as const
+const expectedEventTriggers = ['events_category_insert', 'events_category_update'] as const
 
 try {
   requireCurrentMigrationPackage()
@@ -117,7 +122,7 @@ try {
   verifySqliteIntegrityAndForeignKeys(sqlite, 'Repeat migration', fail)
   requirePopulatedStripeChargeUpgrade()
 
-  console.log('Fresh and repeat WCU migration check passed with 65 tables and 10 Billing triggers.')
+  console.log('Fresh and repeat WCU migration check passed with 68 tables and 12 integrity triggers.')
 } finally {
   sqlite.close()
   rmSync(tempDir, { recursive: true, force: true })
@@ -136,6 +141,20 @@ function requirePopulatedStripeChargeUpgrade() {
         `insert into stripe_charges
            (id, status, revenue_category, amount, amount_captured, amount_refunded, currency, paid, disputed)
          values ('ch_upgrade', 'succeeded', 'dues', 100, 100, 25, 'USD', 1, 1)`
+      )
+      .run()
+    upgrade
+      .prepare(
+        `insert into events (id, title, kind, status, default_timezone)
+         values ('event_upgrade', 'Legacy community event', 'community', 'active', 'America/Los_Angeles')`
+      )
+      .run()
+    upgrade
+      .prepare(
+        `insert into event_sessions
+           (id, event_id, status, starts_at, timezone, location, virtual_url)
+         values ('session_upgrade', 'event_upgrade', 'scheduled', '2026-09-01T02:00:00.000Z',
+           'America/Los_Angeles', 'OF Hall', 'https://meet.example.test/legacy')`
       )
       .run()
     upgrade
@@ -164,6 +183,21 @@ function requirePopulatedStripeChargeUpgrade() {
       .get() as { charges: number; disputes: number; refunds: number }
     if (preserved.charges !== 1 || preserved.refunds !== 1 || preserved.disputes !== 1) {
       fail('Populated Stripe charge migration did not preserve charges, refunds, and disputes.')
+    }
+    const preservedEvent = upgrade
+      .prepare(
+        `select e.kind as category, e.visibility, s.delivery_mode as deliveryMode, s.location
+         from events e join event_sessions s on s.event_id = e.id where e.id = 'event_upgrade'`
+      )
+      .get()
+    if (
+      !preservedEvent ||
+      preservedEvent.category !== 'social' ||
+      preservedEvent.deliveryMode !== 'hybrid' ||
+      preservedEvent.location !== 'OF Hall' ||
+      preservedEvent.visibility !== 'hidden'
+    ) {
+      fail('Populated event migration did not preserve and safely classify the legacy event session.')
     }
     upgrade
       .prepare(
@@ -215,10 +249,9 @@ function requireCurrentRuntimeSchema(label: string) {
       name: string
     }>
   ).map(({ name }) => name)
-  if (JSON.stringify(triggerNames) !== JSON.stringify(expectedBillingTriggers)) {
-    fail(
-      `${label} produced triggers ${JSON.stringify(triggerNames)}; expected ${JSON.stringify(expectedBillingTriggers)}.`
-    )
+  const expectedTriggers = [...expectedBillingTriggers, ...expectedEventTriggers].sort()
+  if (JSON.stringify(triggerNames) !== JSON.stringify(expectedTriggers)) {
+    fail(`${label} produced triggers ${JSON.stringify(triggerNames)}; expected ${JSON.stringify(expectedTriggers)}.`)
   }
 
   const userColumns = sqlite.prepare("pragma table_info('user')").all() as Array<{

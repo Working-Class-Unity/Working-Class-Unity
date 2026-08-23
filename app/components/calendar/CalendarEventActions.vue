@@ -13,22 +13,29 @@ const props = withDefaults(
     showDirections: false
   }
 )
-
-const emit = defineEmits<{ rsvp: [event: CalendarEvent] }>()
 </script>
 
 <template>
   <div class="calendar-event-actions">
-    <AppButton
-      size="compact"
-      :variant="props.rsvpVariant === 'primary' ? 'primary' : 'secondary'"
+    <a
+      v-if="event.rsvpUrl"
+      :href="event.rsvpUrl"
       :class="props.rsvpVariant === 'primary' ? 'primary-action' : 'secondary-action'"
-      @click="emit('rsvp', event)"
+      target="_blank"
+      rel="noreferrer"
     >
       RSVP
-    </AppButton>
-    <a v-if="event.discussionUrl" class="secondary-action" :href="event.discussionUrl">Join discussion</a>
-    <EventDirectionsMenu v-if="props.showDirections" :address="event.address" />
+    </a>
+    <a
+      v-if="event.eventPageUrl && event.eventPageUrl !== event.rsvpUrl"
+      class="secondary-action"
+      :href="event.eventPageUrl"
+      target="_blank"
+      rel="noreferrer"
+    >
+      Event details
+    </a>
+    <EventDirectionsMenu v-if="props.showDirections && event.address" :address="event.address" />
   </div>
 </template>
 
@@ -56,24 +63,24 @@ const emit = defineEmits<{ rsvp: [event: CalendarEvent] }>()
     cursor: pointer;
   }
 
-  .calendar-event-actions .primary-action[data-variant='primary'] {
+  .calendar-event-actions .primary-action {
     border: 1px solid var(--color-accent-action);
     color: var(--color-accent-action-contrast);
     background: var(--color-accent-action);
   }
 
-  .calendar-event-actions .primary-action[data-variant='primary']:hover {
+  .calendar-event-actions .primary-action:hover {
     border-color: var(--color-accent-action-hover);
     background: var(--color-accent-action-hover);
   }
 
-  .calendar-event-actions :is(a.secondary-action, .secondary-action[data-variant='secondary']) {
+  .calendar-event-actions .secondary-action {
     border: 1px solid var(--color-action);
     color: var(--color-action);
     background: transparent;
   }
 
-  .calendar-event-actions :is(a.secondary-action, .secondary-action[data-variant='secondary']):hover {
+  .calendar-event-actions .secondary-action:hover {
     background: var(--color-action-soft);
   }
 

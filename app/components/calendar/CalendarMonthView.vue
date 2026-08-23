@@ -5,16 +5,70 @@ import { calendarWeekdays, type CalendarEvent, type CalendarMonthCell } from '~/
 
 const props = defineProps<{
   events: readonly CalendarEvent[]
-  cells: readonly CalendarMonthCell[]
 }>()
 
 const selectedEventId = defineModel<string>('selectedEventId', { required: true })
-const emit = defineEmits<{ rsvp: [eventName: string] }>()
+const selectedEvent = computed(() => eventById(selectedEventId.value))
+const visibleMonth = ref(monthKey(props.events[0] ?? null))
+const monthLabel = computed(() => {
+  const [year, month] = visibleMonth.value.split('-').map(Number)
+  return new Intl.DateTimeFormat('en-US', { month: 'long', timeZone: 'UTC', year: 'numeric' }).format(
+    new Date(Date.UTC(year!, month! - 1, 1))
+  )
+})
+const cells = computed<readonly CalendarMonthCell[]>(() => {
+  const [year, month] = visibleMonth.value.split('-').map(Number)
+  const first = new Date(Date.UTC(year!, month! - 1, 1))
+  const gridStart = new Date(first)
+  gridStart.setUTCDate(1 - first.getUTCDay())
+  return Array.from({ length: 42 }, (_, index) => {
+    const date = new Date(gridStart)
+    date.setUTCDate(gridStart.getUTCDate() + index)
+    const dateKey = date.toISOString().slice(0, 10)
+    return {
+      date: dateKey,
+      day: String(date.getUTCDate()),
+      eventIds: props.events.filter((event) => eventDateKey(event) === dateKey).map(({ id }) => id),
+      outsideMonth: date.getUTCMonth() !== month! - 1
+    }
+  })
+})
 
-const selectedEvent = computed(() => eventById(selectedEventId.value) ?? props.events[0]!)
+watch(
+  () => props.events,
+  (events) => {
+    if (events[0] && !events.some(({ id }) => id === selectedEventId.value)) {
+      visibleMonth.value = monthKey(events[0])
+      selectedEventId.value = events[0].id
+    }
+  },
+  { immediate: true }
+)
 
 function eventById(eventId: string) {
   return props.events.find((event) => event.id === eventId)
+}
+
+function changeMonth(offset: number) {
+  const [year, month] = visibleMonth.value.split('-').map(Number)
+  const next = new Date(Date.UTC(year!, month! - 1 + offset, 1))
+  visibleMonth.value = `${next.getUTCFullYear()}-${String(next.getUTCMonth() + 1).padStart(2, '0')}`
+  selectedEventId.value = props.events.find((event) => eventDateKey(event).startsWith(visibleMonth.value))?.id ?? ''
+}
+
+function monthKey(event: CalendarEvent | null) {
+  return event ? eventDateKey(event).slice(0, 7) : new Date().toISOString().slice(0, 7)
+}
+
+function eventDateKey(event: CalendarEvent) {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    day: '2-digit',
+    month: '2-digit',
+    timeZone: event.timezone,
+    year: 'numeric'
+  }).formatToParts(new Date(event.startsAt))
+  const value = Object.fromEntries(parts.map(({ type, value }) => [type, value]))
+  return `${value.year}-${value.month}-${value.day}`
 }
 </script>
 
@@ -27,13 +81,13 @@ function eventById(eventId: string) {
       </div>
     </div>
     <div class="month-toolbar">
-      <AppButton class="month-action" size="compact" variant="secondary">Previous</AppButton>
-      <h3>August 2026</h3>
-      <AppButton class="month-action" size="compact" variant="secondary">Next</AppButton>
+      <AppButton class="month-action" size="compact" variant="secondary" @click="changeMonth(-1)">Previous</AppButton>
+      <h3>{{ monthLabel }}</h3>
+      <AppButton class="month-action" size="compact" variant="secondary" @click="changeMonth(1)">Next</AppButton>
     </div>
     <div class="month-layout">
       <div class="month-grid-wrap">
-        <div class="month-grid" aria-label="August 2026 events">
+        <div class="month-grid" :aria-label="`${monthLabel} events`">
           <div v-for="day in calendarWeekdays" :key="day" class="weekday">
             {{ day }}
           </div>
@@ -52,7 +106,7 @@ function eventById(eventId: string) {
               variant="secondary"
               :class="`event-${eventById(eventId)?.kind.toLowerCase()}`"
               :aria-pressed="selectedEventId === eventId"
-              :aria-label="`${eventById(eventId)?.title}, August ${cell.day}`"
+              :aria-label="`${eventById(eventId)?.title}, ${cell.date}`"
               @click="selectedEventId = eventId"
             >
               {{ eventById(eventId)?.title }}
@@ -61,19 +115,18 @@ function eventById(eventId: string) {
         </div>
       </div>
 
-      <aside class="event-inspector" aria-labelledby="selected-event-title">
+      <aside v-if="selectedEvent" class="event-inspector" aria-labelledby="selected-event-title">
         <h3 id="selected-event-title">{{ selectedEvent.title }}</h3>
         <CalendarEventBadge :kind="selectedEvent.kind" />
         <p class="selected-time">{{ selectedEvent.dateLabel }} · {{ selectedEvent.time }}</p>
         <p>{{ selectedEvent.place }} · {{ selectedEvent.address }}</p>
         <p>{{ selectedEvent.description }}</p>
         <p v-if="selectedEvent.recurring" class="recurrence-note">{{ selectedEvent.recurring }}</p>
-        <CalendarEventActions
-          class="inspector-actions"
-          :event="selectedEvent"
-          show-directions
-          @rsvp="emit('rsvp', $event.title)"
-        />
+        <CalendarEventActions class="inspector-actions" :event="selectedEvent" show-directions />
+      </aside>
+      <aside v-else class="event-inspector" aria-live="polite">
+        <h3>No events this month</h3>
+        <p>Use Previous or Next to browse another month.</p>
       </aside>
     </div>
   </section>
@@ -224,7 +277,7 @@ function eventById(eventId: string) {
     margin-block-start: var(--space-1);
   }
 
-  .calendar-event[data-variant='secondary'].event-organizing {
+  .calendar-event[data-variant='secondary'].event-meeting {
     background: var(--color-event-organizing-surface);
   }
 
@@ -232,11 +285,11 @@ function eventById(eventId: string) {
     background: var(--color-event-action-surface);
   }
 
-  .calendar-event[data-variant='secondary'].event-community {
+  .calendar-event[data-variant='secondary'].event-social {
     background: var(--color-event-community-surface);
   }
 
-  .calendar-event[data-variant='secondary'].event-training {
+  .calendar-event[data-variant='secondary'].event-learning {
     background: var(--color-event-training-surface);
   }
 
