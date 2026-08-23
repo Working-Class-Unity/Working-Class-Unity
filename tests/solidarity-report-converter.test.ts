@@ -142,6 +142,56 @@ describe('Solidarity report converter', () => {
     )
   })
 
+  it('quarantines only known recurring auto-RSVPs that have no occurrence', () => {
+    const inputs = syntheticInputs()
+    const sessionless = rsvpRow({
+      id: 'sessionless-recurring-rsvp',
+      sessionId: '',
+      source: 'recurring_auto_rsvp',
+      userId: 'person-1'
+    }).map((value, index) => (sessionMetadataHeadersForTest.has(csvHeaders[index]!) ? '' : value))
+    const firstReport = inputs.reports[0]!
+    const converted = convertSolidarityEventReports({
+      ...inputs,
+      reports: [
+        {
+          ...firstReport,
+          rsvps: bytes(csv([csvHeaders, sessionless]))
+        },
+        ...inputs.reports.slice(1)
+      ]
+    })
+
+    expect(converted.bundle.rsvps.map(({ id }) => id)).toEqual(['rsvp-2'])
+    expect(converted.manifest).toMatchObject({
+      bundleCounts: { rsvps: 1 },
+      issueCounts: { rsvp_session_missing: 1 },
+      rawCounts: { rsvps: 2 }
+    })
+
+    const unexpectedSource = sessionless.map((value, index) =>
+      index === csvHeaders.indexOf('Source') ? 'web_form' : value
+    )
+    expect(() =>
+      convertSolidarityEventReports({
+        ...inputs,
+        reports: [{ ...firstReport, rsvps: bytes(csv([csvHeaders, unexpectedSource])) }, ...inputs.reports.slice(1)]
+      })
+    ).toThrow('Solidarity RSVP Session ID is required')
+
+    for (const header of sessionMetadataHeadersForTest) {
+      const unexpectedMetadata = sessionless.map((value, index) =>
+        index === csvHeaders.indexOf(header) ? 'unexpected occurrence metadata' : value
+      )
+      expect(() =>
+        convertSolidarityEventReports({
+          ...inputs,
+          reports: [{ ...firstReport, rsvps: bytes(csv([csvHeaders, unexpectedMetadata])) }, ...inputs.reports.slice(1)]
+        })
+      ).toThrow('Solidarity RSVP Session ID is required')
+    }
+  })
+
   it('rejects malformed cross-references without leaving either output behind', () => {
     const root = mkdtempSync(join(tmpdir(), 'wcu-solidarity-converter-invalid-'))
     try {
@@ -379,6 +429,7 @@ function rsvpRow({
   id,
   name = 'Synthetic Name',
   sessionId,
+  source = 'Event Page',
   status = 'Yes',
   updatedAt = '2026-08-23 18:02:03 -0700',
   userId
@@ -386,6 +437,7 @@ function rsvpRow({
   id: string
   name?: string
   sessionId: string
+  source?: string
   status?: string
   updatedAt?: string
   userId: string
@@ -404,11 +456,13 @@ function rsvpRow({
     'Example Hall - 100 Example Street',
     status,
     'true',
-    'Event Page',
+    source,
     '2026-08-23 17:02:03 -0700',
     updatedAt
   ]
 }
+
+const sessionMetadataHeadersForTest = new Set(['Session Title', 'Session Start', 'Session End', 'Session Location'])
 
 function csv(rows: readonly (readonly string[])[]): string {
   return `${rows.map((row) => row.map(csvField).join(',')).join('\r\n')}\r\n`
