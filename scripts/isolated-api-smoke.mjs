@@ -1,6 +1,6 @@
 import { randomBytes } from 'node:crypto'
 import { once } from 'node:events'
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readdirSync } from 'node:fs'
 import { createServer } from 'node:http'
 import { createRequire } from 'node:module'
 import { tmpdir } from 'node:os'
@@ -213,12 +213,6 @@ function applicationEnvironment(baseUrl, port) {
     NUXT_EMAIL_TRANSPORT: 'capture',
     NUXT_EMAIL_FROM: 'baseline@example.test',
     NUXT_EMAIL_CAPTURE_DIRECTORY: emailCaptureDirectory,
-    NUXT_FILES_DRIVER: 'local',
-    NUXT_OPENAI_API_KEY: 'isolated-openai-key-not-a-provider-credential',
-    NUXT_OPENAI_PROJECT_ID: 'proj_isolated_api_smoke',
-    NUXT_OPENAI_MODEL: 'gpt-5.6-luna',
-    NUXT_OPENAI_FILE_SEARCH_VECTOR_STORE_ID: 'vs_isolated_empty',
-    NUXT_OPENAI_WEB_SEARCH_ALLOWED_DOMAINS: 'example.test',
     NUXT_CLOUDFLARE_TURNSTILE_SECRET_KEY: 'isolated-turnstile-secret-not-a-provider-credential',
     NUXT_PUBLIC_TURNSTILE_SITE_KEY: 'isolated-turnstile-site-not-a-provider-credential',
     NUXT_SENTRY_DSN: 'http://public@127.0.0.1:9/1',
@@ -275,16 +269,24 @@ function assertFixtureRecorded() {
         'select count(*) as count from billing_events where stripe_event_id like ?',
         likeFixture
       ),
+      aiAttempts: count(sqlite, 'select count(*) as count from ai_generation_attempts'),
+      aiConversations: count(sqlite, 'select count(*) as count from ai_conversations'),
+      aiMessages: count(sqlite, 'select count(*) as count from ai_messages'),
+      aiUsageBuckets: count(sqlite, 'select count(*) as count from ai_usage_buckets'),
+      fileCleanupJobs: count(sqlite, "select count(*) as count from job_queue where type = 'files.cleanup-orphans'"),
       files: count(sqlite, 'select count(*) as count from files'),
       users: count(sqlite, 'select count(*) as count from user where email like ?', likeFixture)
     }
     assert(counts.users > 0, 'Expected isolated users to be recorded.')
-    assert(counts.files >= 1, 'Expected an isolated file metadata fixture.')
     assert(counts.billingEvents === 1, 'Expected one packaged Stripe webhook receipt fixture.')
+    for (const [name, value] of Object.entries(counts).filter(
+      ([name]) => name !== 'billingEvents' && name !== 'users'
+    )) {
+      assert(value === 0, `Expected excluded ${name} state to remain empty, received ${value}.`)
+    }
 
     const objectFiles = listFiles(join(dirname(databasePath), 'objects'))
-    assert(objectFiles.length === 1, `Expected one isolated local object, received ${objectFiles.length}.`)
-    assert(readFileSync(objectFiles[0], 'utf8') === 'hello', 'Isolated local object bytes did not match the fixture.')
+    assert(objectFiles.length === 0, `Expected no user-file objects, received ${objectFiles.length}.`)
     return { ...counts, localObjects: objectFiles.length }
   } finally {
     sqlite.close()

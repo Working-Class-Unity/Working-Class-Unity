@@ -1,9 +1,11 @@
 import assert from 'node:assert/strict'
+import { execFile } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { lstat, mkdir, mkdtemp, readFile, rm, symlink, truncate, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { test } from 'node:test'
+import { promisify } from 'node:util'
 
 import {
   OPENAI_CORPUS_BASE_URL,
@@ -17,7 +19,27 @@ const credentials = {
   OPENAI_CORPUS_OPERATOR_API_KEY: 'operator-test-key',
   OPENAI_CORPUS_PROJECT_ID: 'proj_operator_test'
 }
+const execFileAsync = promisify(execFile)
 const markerUuid = '4bcd1f2a-5988-4f00-9661-4d52ca0d9894'
+
+test('basic-release CLI exits before reading credentials or contacting OpenAI', async () => {
+  await assert.rejects(
+    execFileAsync(process.execPath, ['scripts/openai-corpus.mjs', 'verify', 'vs_unavailable'], {
+      cwd: process.cwd(),
+      env: {
+        PATH: process.env.PATH,
+        OPENAI_CORPUS_OPERATOR_API_KEY: 'must-not-be-read',
+        OPENAI_CORPUS_PROJECT_ID: 'must-not-be-read'
+      }
+    }),
+    (error) => {
+      assert.equal(error.code, 1)
+      assert.match(error.stderr, /OpenAI corpus command failed: Not Found/)
+      assert.doesNotMatch(error.stderr, /must-not-be-read/)
+      return true
+    }
+  )
+})
 
 test('CLI grammar is closed before credentials or fetch can be used', async () => {
   assert.deepEqual(parseCorpusCommand(['verify', 'vs_abc']), { command: 'verify', storeId: 'vs_abc' })

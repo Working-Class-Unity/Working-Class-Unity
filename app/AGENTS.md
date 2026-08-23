@@ -15,7 +15,9 @@ The root [`AGENTS.md`](../AGENTS.md) governs all work. The normative interface a
 ## Ownership
 
 - `assets/css/reset.css`: conservative normalization only.
-- `assets/css/tokens.css`: primitive and semantic design tokens.
+- `assets/css/color-primitives.generated.css`: Leonardo-generated primitive color scales; regenerate
+  with `pnpm tokens:generate` and never edit it by hand.
+- `assets/css/tokens.css`: manually reviewed semantic token mappings plus non-color design tokens.
 - `assets/css/base.css`: document, typography, native controls, focus, and selection defaults.
 - `assets/css/layout.css`: application shell and used flow, cluster, container, and grid primitives.
 - `assets/css/utilities.css`: the deliberately small accessibility and layout utility set.
@@ -25,14 +27,29 @@ The root [`AGENTS.md`](../AGENTS.md) governs all work. The normative interface a
 
 - `AppButton`: native command button; never navigation.
 - `AppField`: label, hint, required, and validation-message relationships for a slotted native control.
+- `AppInput`: native input contract with model, attribute, class, focus, and validity forwarding.
 - `AppNotice`: persistent visual feedback with explicit, opt-in announcement behavior.
-- `AppTopbar`: application-shell header and native primary navigation.
+- `AppTopbar`: application-shell header, Reka desktop primary navigation, and native mobile disclosure.
 - `AccountMenu`: feature-owned Reka dropdown for identity, account navigation, and sign-out.
-- `AuthEntryForm`, `TurnstileChallenge`, and `AccountDeletionSection`: feature components, not shared primitives.
+- `calendar/CalendarDatePicker`: feature-owned Reka calendar and popover for agenda date navigation.
+- `calendar/EventDirectionsMenu`: feature-owned Reka dropdown for map and address actions.
+- `calendar/EventRsvpDialog`: feature-owned Reka dialog for the website RSVP journey.
+- `calendar/CalendarAgendaView`, `calendar/CalendarMonthView`, `calendar/CalendarEventActions`, and
+  `calendar/CalendarEventBadge`: calendar-owned views and recurring event presentation.
+- `PageOutline`: shared desktop index and mobile Reka drawer for flat or nested page outlines.
+- `BylawsPageOutline`: bylaws-owned configuration of `PageOutline`.
+- `CampaignCitedText`: feature-owned renderer for claim-level citation parts and deterministic occurrences.
+- `CampaignCitation`: feature-owned semantic source link using a desktop Reka Hover Card and mobile Reka Drawer.
+- `CampaignPageOutline`: campaign-owned configuration of `PageOutline`.
+- `CampaignEditorialHeader`: shared long-form campaign page heading group.
+- `campaign/Landing*`: campaign-owned narrative sections composed by `CampaignLanding`.
+- `AuthEntryForm`, `TurnstileChallenge`, `AccountProfileForm`, and `AccountDeletionSection`: feature components, not shared primitives.
 
-Direct `reka-ui` imports are allowed only in `components/AccountMenu.vue`. Pages and unrelated
-components consume app-owned contracts. Do not add another Reka primitive or a generic wrapper
-without a documented product journey.
+Direct `reka-ui` imports are allowed only in `components/AccountMenu.vue`, `components/AppTopbar.vue`,
+`components/CampaignCitation.vue`, `components/PageOutline.vue`, and the three documented
+`components/calendar/` integrations.
+Pages and unrelated components consume app-owned contracts. Do not add another Reka primitive or a
+generic wrapper without a documented product journey.
 
 ## Page and state requirements
 
@@ -40,7 +57,7 @@ without a documented product journey.
   user-triggered mutations.
 - Every applicable asynchronous surface handles unresolved authentication, pending, error, empty,
   and success states. Recoverable errors provide a safe retry.
-- Do not render private identity or family information until authentication is resolved.
+- Do not render private identity or account information until authentication is resolved.
 - Each route supplies one clear `h1` and meaningful page title. The default layout owns the stable
   `main-content` landmark and skip-link target.
 - Forms use native controls, stable names and IDs, associated labels, descriptions, visible errors,

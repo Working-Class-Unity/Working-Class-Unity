@@ -1,5 +1,4 @@
 export const authenticatedAppPath = '/app' as const
-export const displayNameMaxLength = 100
 
 export const authEntryPaths = {
   login: '/login',

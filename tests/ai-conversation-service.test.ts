@@ -1183,28 +1183,34 @@ describe('private AI conversation service', () => {
     ).rejects.toMatchObject({ statusCode: 504 })
   })
 
-  it('binds every production entry point to the authenticated user and lazy OpenAI adapter', async () => {
-    insertUser(connection, 'production-owner', 'production-owner@example.test')
+  it('rejects every production entry before runtime, database, quota, or provider access', async () => {
     const session = { user: { id: 'production-owner' } } as AppSession
+    const conversationId = `ai_conversation_${randomUUID()}`
 
-    const conversation = createOwnedAiConversation(session)
-    expect(listOwnedAiConversations(session)).toEqual({ conversations: [conversation], nextCursor: null })
-    expect(getOwnedAiConversation(session, conversation.id)).toEqual(conversation)
-    expect(productionMocks.getOpenAIResponsesAdapter).not.toHaveBeenCalled()
+    for (const entry of [
+      () => createOwnedAiConversation(session),
+      () => listOwnedAiConversations(session),
+      () => getOwnedAiConversation(session, conversationId),
+      () => deleteOwnedAiConversation(session, conversationId),
+      () => clearOwnedAiConversation(session, conversationId),
+      () => listOwnedAiMessages(session, conversationId)
+    ]) {
+      expect(entry).toThrow(expect.objectContaining({ statusCode: 404, statusMessage: 'Not Found' }))
+    }
 
     await expect(
-      createOwnedAiMessage(session, conversation.id, {
+      createOwnedAiMessage(session, conversationId, {
         clientRequestId: randomUUID(),
-        content: 'The production boundary dispatches through the lazy adapter.'
+        content: 'The disabled production boundary must not dispatch.'
       })
-    ).resolves.toMatchObject({ replayed: false })
-    expect(productionMocks.getOpenAIResponsesAdapter).toHaveBeenCalledOnce()
-    expect(listOwnedAiMessages(session, conversation.id).messages).toHaveLength(2)
+    ).rejects.toMatchObject({ statusCode: 404, statusMessage: 'Not Found' })
 
-    clearOwnedAiConversation(session, conversation.id)
-    expect(listOwnedAiMessages(session, conversation.id).messages).toEqual([])
-    deleteOwnedAiConversation(session, conversation.id)
-    expect(() => getOwnedAiConversation(session, conversation.id)).toThrow(expect.objectContaining({ statusCode: 404 }))
+    expect(productionMocks.getAppRuntimeConfig).not.toHaveBeenCalled()
+    expect(productionMocks.useDatabase).not.toHaveBeenCalled()
+    expect(productionMocks.getOpenAIResponsesAdapter).not.toHaveBeenCalled()
+    expect(
+      (connection.sqlite.prepare('select count(*) as count from ai_usage_buckets').get() as { count: number }).count
+    ).toBe(0)
   })
 })
 

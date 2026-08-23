@@ -48,7 +48,7 @@ export default defineNuxtConfig({
       },
       meta: [
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { name: 'theme-color', content: '#f7f3ea' }
+        { name: 'theme-color', content: '#f7f9fc' }
       ],
       link: [{ rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' }]
     }
@@ -130,7 +130,7 @@ export default defineNuxtConfig({
       // nuxt-security imports its optional XSS middleware dependency at module
       // initialization even when the middleware is disabled. Bundle it so the
       // standalone Nitro output does not depend on a workspace node_modules.
-      inline: ['xss']
+      inline: ['xss', /shared\/basic-release-policy(?:\.js)?$/]
     },
     experimental: {
       envExpansion: false

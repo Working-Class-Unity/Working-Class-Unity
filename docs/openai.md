@@ -1,6 +1,9 @@
 # OpenAI baseline
 
-This guide is the active implementation and operations reference for the optional AI module. [ADR 0012](adr/0012-direct-openai-responses-and-local-history.md) owns the provider and history decision; [ADR 0013](adr/0013-deployment-owned-openai-file-search.md) owns the optional deployment corpus; and [ADR 0014](adr/0014-server-owned-openai-web-search.md) owns optional domain-restricted Web Search.
+> Imported donor history; this is not an active WCU implementation or operations guide. OpenAI and
+> every AI/search product surface are excluded by [`basic-release.md`](basic-release.md).
+
+This guide records the donor implementation and operations reference for the optional AI module. [ADR 0012](adr/0012-direct-openai-responses-and-local-history.md) owns the provider and history decision; [ADR 0013](adr/0013-deployment-owned-openai-file-search.md) owns the optional deployment corpus; and [ADR 0014](adr/0014-server-owned-openai-web-search.md) owns optional domain-restricted Web Search.
 
 The baseline calls OpenAI directly through exact `openai@6.47.0` and the Responses API. It does not use Cloudflare AI Gateway, a generic provider framework, OpenAI-managed Conversations, or `previous_response_id`. SQLite is authoritative for application-visible history.
 

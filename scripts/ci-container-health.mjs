@@ -1,8 +1,12 @@
 import { execFile, spawnSync } from 'node:child_process'
 import { randomBytes } from 'node:crypto'
+import { readFileSync } from 'node:fs'
 import { promisify } from 'node:util'
 
 const execFileAsync = promisify(execFile)
+const migrationCount = JSON.parse(
+  readFileSync(new URL('../server/db/migrations/meta/_journal.json', import.meta.url), 'utf8')
+).entries.length
 const image = parseImageArgument(process.argv.slice(2))
 const deadline = Date.now() + 180_000
 const containerName = `swl-container-health-${process.pid}-${randomBytes(5).toString('hex')}`
@@ -33,12 +37,6 @@ const applicationEnvironment = {
   NUXT_STRIPE_PERSONAL_ANNUAL_PRICE_ID: 'price_container_personal_annual',
   NUXT_STRIPE_FAMILY_MONTHLY_PRICE_ID: 'price_container_family_monthly',
   NUXT_STRIPE_FAMILY_ANNUAL_PRICE_ID: 'price_container_family_annual',
-  NUXT_FILES_DRIVER: 'local',
-  NUXT_OPENAI_API_KEY: 'container-openai-key-not-a-provider-credential',
-  NUXT_OPENAI_PROJECT_ID: 'proj_container_health',
-  NUXT_OPENAI_MODEL: 'gpt-5.6-luna',
-  NUXT_OPENAI_FILE_SEARCH_VECTOR_STORE_ID: 'vs_container_empty',
-  NUXT_OPENAI_WEB_SEARCH_ALLOWED_DOMAINS: 'example.test',
   NUXT_CLOUDFLARE_TURNSTILE_SECRET_KEY: 'container-turnstile-secret-not-a-provider-credential',
   NUXT_PUBLIC_TURNSTILE_SITE_KEY: 'container-turnstile-site-not-a-provider-credential',
   NUXT_SENTRY_DSN: 'http://public@127.0.0.1:9/1',
@@ -88,13 +86,17 @@ async function run() {
   })
   const freshMigration = await runMaintenance(['migrate', '--confirm-app-stopped'], 'fresh named-volume migration')
   assert(
-    freshMigration.stdout.includes('1 newly applied; 1/1 current; pre-migration backup not required'),
-    'Fresh migration did not report the exact one-entry package and no-backup boundary'
+    freshMigration.stdout.includes(
+      `${migrationCount} newly applied; ${migrationCount}/${migrationCount} current; pre-migration backup not required`
+    ),
+    'Fresh migration did not report the exact current package and no-backup boundary'
   )
   const repeatMigration = await runMaintenance(['migrate', '--confirm-app-stopped'], 'repeat named-volume migration')
   assert(
-    repeatMigration.stdout.includes('0 newly applied; 1/1 current; pre-migration backup written as'),
-    'Repeat migration did not report the exact one-entry package and verified pre-migration backup'
+    repeatMigration.stdout.includes(
+      `0 newly applied; ${migrationCount}/${migrationCount} current; pre-migration backup written as`
+    ),
+    'Repeat migration did not report the exact current package and verified pre-migration backup'
   )
   await runOffHostFailure(['backup'], {
     label: 'credential-free off-host backup operator'

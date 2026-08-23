@@ -1,7 +1,5 @@
 import type { DatabaseConnection } from '../db/connect'
 import { deleteBillingStripeAccountData } from './payments/stripe/account-deletion'
-import { fileCleanupMaxAttempts, fileCleanupSchedulingMarginMs, fileUploadTokenTtlMs } from './storage/file-service'
-import { deferFileStorageReconciliation } from './storage/file-storage-binding'
 
 export type DeletingAccount = Readonly<{
   id: string
@@ -27,10 +25,8 @@ type AccountDeletionOptions = Readonly<{
  * this function runs; the Billing proof context prevents deletion when that
  * provider fence is missing or stale.
  *
- * File metadata is removed here and an orphan-cleanup job is committed with
- * it. The storage reconciliation watermark delays object cleanup until any
- * outstanding upload capability has expired without retaining a user's object
- * keys or filenames.
+ * Dormant AI and Files rows are removed for privacy. The basic release has no
+ * user-file provider or Files worker, so deletion creates no storage work.
  */
 export function deleteAccountAtomically(
   connection: DatabaseConnection,
@@ -57,26 +53,7 @@ export function deleteAccountAtomically(
       connection.sqlite.prepare('delete from ai_conversations where owner_user_id = ?').run(account.id)
       connection.sqlite.prepare('delete from ai_usage_buckets where owner_user_id = ?').run(account.id)
 
-      const ownedFileState = connection.sqlite
-        .prepare('select max(upload_expires_at) as latestUploadExpiresAt from files where owner_id = ?')
-        .get(account.id) as { latestUploadExpiresAt: string | null }
       const deletedFiles = connection.sqlite.prepare('delete from files where owner_id = ?').run(account.id).changes
-      if (deletedFiles > 0) {
-        const deletedAtMs = Date.parse(deletedAt)
-        const latestCapabilityExpiry = Math.min(
-          ownedFileState.latestUploadExpiresAt ? Date.parse(ownedFileState.latestUploadExpiresAt) : deletedAtMs,
-          deletedAtMs + fileUploadTokenTtlMs
-        )
-        const runAfter = new Date(
-          Math.max(deletedAtMs, latestCapabilityExpiry) + fileCleanupSchedulingMarginMs
-        ).toISOString()
-        deferFileStorageReconciliation(connection, runAfter)
-        connection.sqlite
-          .prepare(
-            "insert into job_queue (type, payload, max_attempts, run_after) values ('files.cleanup-orphans', '{}', ?, ?)"
-          )
-          .run(fileCleanupMaxAttempts, runAfter)
-      }
       options.checkpoint?.('private-data-deleted')
 
       connection.sqlite

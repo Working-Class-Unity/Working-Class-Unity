@@ -1,5 +1,5 @@
 import { readdirSync, readFileSync, rmSync } from 'node:fs'
-import { createHash, randomUUID } from 'node:crypto'
+import { randomUUID } from 'node:crypto'
 import { createRequire } from 'node:module'
 import { isAbsolute, join } from 'node:path'
 
@@ -60,17 +60,6 @@ const checks = [
     }
   },
   {
-    name: 'private file upload initiation authenticates before parsing',
-    run: async () => {
-      const response = await requestWithCookies('/api/files/uploads', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: '{malformed'
-      })
-      assert(response.status === 401, `expected anonymous 401, received ${response.status}`)
-    }
-  },
-  {
     name: 'GET /api/auth/get-session returns anonymous session state',
     run: async () => {
       const response = await requestWithCookies('/api/auth/get-session')
@@ -85,8 +74,8 @@ const checks = [
       const otherJar = new Map()
       const suffix = nextFixtureSuffix('private-identity')
       const ownerEmail = `owner-${suffix}@example.com`
-      const owner = await signUpSmokeUser(ownerJar, ownerEmail, 'Smoke Owner')
-      const other = await signUpSmokeUser(otherJar, `other-${suffix}@example.com`, 'Smoke Other')
+      const owner = await signUpSmokeUser(ownerJar, ownerEmail)
+      const other = await signUpSmokeUser(otherJar, `other-${suffix}@example.com`)
 
       const anonymousMe = await requestWithCookies('/api/me')
       assert(anonymousMe.status === 401, `expected anonymous identity 401, received ${anonymousMe.status}`)
@@ -100,7 +89,7 @@ const checks = [
       assert(appEntry.status === 200, `expected authenticated /app shell 200, received ${appEntry.status}`)
       assert(appEntry.headers.get('cache-control') === 'private, no-store', 'expected /app to disable shared caching')
       const appHtml = await appEntry.text()
-      assert(appHtml.includes(owner.user.name), 'expected /app shell to render the authenticated user name')
+      assert(appHtml.includes('Welcome back'), 'expected /app shell to render the unnamed account greeting')
       assert(appHtml.includes(owner.user.email), 'expected /app shell to render the authenticated user email')
       assert(!appHtml.includes('/w/'), 'expected /app shell to avoid visible workspace routing')
       assert(!/workspace|capabilit(?:y|ies)/i.test(appHtml), 'expected /app shell to omit workspace authority details')
@@ -117,117 +106,40 @@ const checks = [
 
       assert(signOutResponse.ok, `expected sign out 2xx, received ${signOutResponse.status}`)
 
-      const returning = await signUpSmokeUser(ownerJar, ownerEmail, 'Smoke Owner')
+      const returning = await signUpSmokeUser(ownerJar, ownerEmail)
       assert(returning.user.id === owner.user.id, 'expected returning authentication to reuse the user identity')
       const returningMe = await requestJson('/api/me', {}, ownerJar)
       assertMinimalMeProjection(returningMe, owner.user)
     }
   },
   {
-    name: 'private AI collection requires authentication',
+    name: 'excluded AI and Files APIs stay unavailable before and after authentication',
     run: async () => {
-      const response = await requestWithCookies('/api/ai/conversations')
-      assert(response.status === 401, `expected anonymous AI collection 401, received ${response.status}`)
-    }
-  },
-  {
-    name: 'private file flow stores metadata and protects downloads',
-    run: async () => {
-      const ownerJar = new Map()
-      const otherJar = new Map()
-      const suffix = nextFixtureSuffix('files')
-      await signUpSmokeUser(ownerJar, `file-owner-${suffix}@example.com`, 'File Owner')
-      await signUpSmokeUser(otherJar, `file-other-${suffix}@example.com`, 'File Other')
-      const content = 'hello'
-      const contentMd5 = createHash('md5').update(content).digest('base64')
+      const authenticatedJar = new Map()
+      const suffix = nextFixtureSuffix('excluded-capabilities')
+      await signUpSmokeUser(authenticatedJar, `excluded-${suffix}@example.com`)
 
-      const anonymousUpload = await requestWithCookies('/api/files/uploads', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          filename: 'private 🗒️ note.txt',
-          contentType: 'text/plain',
-          byteSize: 5,
-          contentMd5
-        })
-      })
-
-      assert(anonymousUpload.status === 401, `expected anonymous 401, received ${anonymousUpload.status}`)
-
-      const uploadTarget = await requestJson(
-        '/api/files/uploads',
-        {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({
-            filename: 'private 🗒️ note.txt',
-            contentType: 'text/plain',
-            byteSize: 5,
-            contentMd5
-          })
-        },
-        ownerJar
-      )
-
-      assert(uploadTarget.file?.status === 'pending', 'expected pending file metadata')
-      assert(uploadTarget.upload?.method === 'PUT', 'expected upload target')
-
-      const uploadResponse = await requestWithCookies(
-        uploadTarget.upload.url,
-        {
-          method: 'PUT',
-          headers: uploadTarget.upload.headers,
-          body: content
-        },
-        ownerJar
-      )
-
-      assert(uploadResponse.ok, `expected upload 2xx, received ${uploadResponse.status}`)
-
-      const completed = await requestJson(
-        `/api/files/${uploadTarget.file.id}/complete`,
-        {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({})
-        },
-        ownerJar
-      )
-
-      assert(completed.file?.status === 'ready', 'expected completed file metadata')
-
-      const listed = await requestJson('/api/files?limit=1', {}, ownerJar)
-      assert(listed.files?.length === 1, 'expected owner file list to include the completed file')
-      assert(listed.files[0].id === uploadTarget.file.id, 'expected owner list to return the immutable file id')
-      assert(!('ownerId' in listed.files[0]), 'expected minimized public file metadata')
-      assert(!('objectKey' in listed.files[0]), 'expected storage keys to remain private')
-
-      const metadata = await requestJson(`/api/files/${uploadTarget.file.id}`, {}, ownerJar)
-      assert(metadata.file?.id === uploadTarget.file.id, 'expected owner metadata read')
-
-      const forbiddenDownload = await requestWithCookies(`/api/files/${uploadTarget.file.id}/download`, {}, otherJar)
-
-      assert(
-        forbiddenDownload.status === 404,
-        `expected concealed foreign file 404, received ${forbiddenDownload.status}`
-      )
-
-      const downloadTarget = await requestJson(`/api/files/${uploadTarget.file.id}/download`, {}, ownerJar)
-      assert(downloadTarget.download?.method === 'GET', 'expected a short-lived download capability')
-      const download = await requestWithCookies(downloadTarget.download.url, {}, ownerJar)
-      const downloadedText = await download.text()
-
-      assert(download.ok, `expected download 2xx, received ${download.status}`)
-      assert(download.headers.get('content-disposition') === 'attachment', 'expected a safe attachment response')
-      assert(downloadedText === content, 'expected downloaded file content')
-
-      const deleted = await requestWithCookies(`/api/files/${uploadTarget.file.id}`, { method: 'DELETE' }, ownerJar)
-      assert(deleted.status === 204, `expected file deletion 204, received ${deleted.status}`)
-      const deletedMetadata = await requestWithCookies(`/api/files/${uploadTarget.file.id}`, {}, ownerJar)
-      assert(
-        deletedMetadata.status === 404,
-        `expected deleted file concealment 404, received ${deletedMetadata.status}`
-      )
+      for (const jar of [undefined, authenticatedJar]) {
+        for (const [path, init] of [
+          ['/api/ai/conversations', {}],
+          [
+            '/api/ai/conversations',
+            { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{malformed' }
+          ],
+          ['/api/files', {}],
+          [
+            '/api/files/uploads',
+            { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{malformed' }
+          ]
+        ]) {
+          const response = await requestWithCookies(path, init, jar)
+          assert(response.status === 404, `expected excluded ${path} 404, received ${response.status}`)
+          assert(
+            response.headers.get('cache-control')?.includes('no-store'),
+            `expected excluded ${path} to disable caching`
+          )
+        }
+      }
     }
   },
   {
@@ -318,13 +230,19 @@ function assertMinimalMeProjection(body, expectedUser) {
     'expected /api/me to expose only user identity'
   )
   assert(
-    JSON.stringify(Object.keys(body.user ?? {}).sort()) === JSON.stringify(['email', 'id', 'image', 'name']),
+    JSON.stringify(Object.keys(body.user ?? {}).sort()) ===
+      JSON.stringify(['displayName', 'email', 'firstName', 'id', 'image', 'lastName']),
     'expected /api/me to expose only the minimal user identity fields'
   )
   assert(body.user.id === expectedUser.id, 'expected /api/me user id to match the authenticated caller')
-  assert(body.user.name === expectedUser.name, 'expected /api/me user name to match the authenticated caller')
   assert(body.user.email === expectedUser.email, 'expected /api/me user email to match the authenticated caller')
   assert(body.user.image === expectedUser.image, 'expected /api/me user image to match the authenticated caller')
+  assert(body.user.firstName === null, 'expected a new account to have no first name')
+  assert(body.user.lastName === null, 'expected a new account to have no last name')
+  assert(
+    body.user.displayName === expectedUser.displayName,
+    'expected /api/me display name to match the authenticated caller'
+  )
 }
 
 async function requestJson(path, init, cookieJar) {
@@ -337,7 +255,7 @@ async function requestJson(path, init, cookieJar) {
   return body
 }
 
-async function signUpSmokeUser(cookieJar, email, name) {
+async function signUpSmokeUser(cookieJar, email) {
   const requestBody = await requestJson(
     '/api/auth/sign-in/magic-link',
     {
@@ -347,7 +265,6 @@ async function signUpSmokeUser(cookieJar, email, name) {
         'x-turnstile-token': `isolated-turnstile-${randomUUID()}`
       },
       body: JSON.stringify({
-        name,
         email,
         callbackURL: '/app',
         errorCallbackURL: '/login',
@@ -373,6 +290,8 @@ async function signUpSmokeUser(cookieJar, email, name) {
   const body = await requestJson('/api/auth/get-session', {}, cookieJar)
 
   assert(body.user?.id, 'expected signed up user id')
+  assert(!('firstName' in body.user), 'expected the general auth session to omit the private first name')
+  assert(!('lastName' in body.user), 'expected the general auth session to omit the private last name')
   return body
 }
 

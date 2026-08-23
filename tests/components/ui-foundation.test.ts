@@ -5,6 +5,7 @@ import { h } from 'vue'
 import { describe, expect, it } from 'vitest'
 import AppButton from '../../app/components/AppButton.vue'
 import AppField from '../../app/components/AppField.vue'
+import AppInput from '../../app/components/AppInput.vue'
 import AppNotice from '../../app/components/AppNotice.vue'
 
 describe('the shared UI foundation', () => {
@@ -60,6 +61,52 @@ describe('the shared UI foundation', () => {
     expect(wrapper.get('input').attributes('id')).toBe(generatedId)
     expect(wrapper.get('input').attributes('aria-describedby')).toBe(`${generatedId}-hint`)
     expect(wrapper.get('input').attributes('aria-invalid')).toBeUndefined()
+  })
+
+  it('keeps AppInput native while forwarding the caller contract', async () => {
+    const updates: Array<string | number | boolean | null | undefined> = []
+    const wrapper = mount(AppInput, {
+      props: {
+        modelValue: 'member@example.org',
+        'onUpdate:modelValue': (value) => updates.push(value)
+      },
+      attrs: {
+        id: 'member-email',
+        class: 'newsletter-input',
+        name: 'email',
+        type: 'email',
+        autocomplete: 'email',
+        required: true
+      }
+    })
+    const input = wrapper.get('input')
+
+    expect(input.attributes('id')).toBe('member-email')
+    expect(input.attributes('name')).toBe('email')
+    expect(input.attributes('type')).toBe('email')
+    expect(input.attributes('autocomplete')).toBe('email')
+    expect(input.attributes('required')).toBeDefined()
+    expect(input.classes()).toEqual(expect.arrayContaining(['app-input', 'newsletter-input']))
+    expect(input.element.value).toBe('member@example.org')
+
+    await input.setValue('organizer@example.org')
+
+    expect(updates).toContain('organizer@example.org')
+  })
+
+  it('preserves native checkbox values through AppInput', async () => {
+    const updates: Array<string | number | boolean | null | undefined> = []
+    const wrapper = mount(AppInput, {
+      props: {
+        modelValue: false,
+        'onUpdate:modelValue': (value) => updates.push(value)
+      },
+      attrs: { name: 'sms_permission', type: 'checkbox' }
+    })
+
+    await wrapper.get('input').setValue(true)
+
+    expect(updates).toContain(true)
   })
 
   it('announces AppNotice content only when the caller requests it', () => {

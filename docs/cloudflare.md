@@ -1,5 +1,8 @@
 # Cloudflare Baseline
 
+> Imported donor history; this is not an operational WCU runbook. The current WCU boundary is
+> [`basic-release.md`](basic-release.md). Do not provision user-file R2 for the basic release.
+
 Cloudflare wraps the Nuxt/Coolify/DigitalOcean core. It should protect, route, and observe traffic without becoming the default application runtime.
 
 ## DNS and Proxying

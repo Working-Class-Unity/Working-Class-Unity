@@ -5,6 +5,7 @@ import { createRequire } from 'node:module'
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from 'node:path'
 import { setTimeout as delay } from 'node:timers/promises'
 import { fileURLToPath, pathToFileURL } from 'node:url'
+import { assertBasicReleaseCapabilityAvailable } from '../shared/basic-release-policy.js'
 
 export const OPENAI_CORPUS_BASE_URL = 'https://api.openai.com/v1'
 export const OPENAI_CORPUS_OPERATION_TIMEOUT_MS = 30 * 60 * 1_000
@@ -525,6 +526,7 @@ function sleep(milliseconds, signal) {
 
 async function main() {
   try {
+    assertBasicReleaseCapabilityAvailable('ai')
     await runCorpusCommand({ argv: process.argv.slice(2) })
   } catch (error) {
     console.error(`OpenAI corpus command failed: ${message(error)}`)

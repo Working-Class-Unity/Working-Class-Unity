@@ -6,6 +6,8 @@ document a current WCU contract.
 
 ## Current WCU sources
 
+- [`basic-release.md`](basic-release.md) records the source-owned exclusion of inherited AI and
+  user-file capabilities and distinguishes user-file R2 from database-backup R2.
 - [`wcu-rebuild-provenance.md`](wcu-rebuild-provenance.md) records the approved product direction,
   history boundary, and selective-port ledger.
 - The root [`README.md`](../README.md) describes the current application foundation and local entry
@@ -21,7 +23,8 @@ different points in its history. They include deliberate WCU non-features such a
 Family authority, Projects, Google login, SMTP, and runtime module switches. Treat them as research
 and provenance only unless a WCU decision explicitly carries a behavior forward.
 
-The other top-level guides and `ops/` runbooks were also imported. Some still contain Baseline
-names, old migration counts, removed routes, or provider-switch language. Validate them against the
-current application before operational use. Hosted deployment remains blocked on the WCU UI,
-credentials, provider certification, and a separately approved cutover.
+The other top-level guides and `ops/` runbooks were also imported and are non-operational donor
+history. Some still contain Baseline names, old migration counts, removed routes, or excluded
+provider instructions. Do not use them to provision or operate WCU unless a current WCU source
+explicitly adopts the instruction. Hosted deployment remains blocked on the WCU UI, enabled-provider
+certification, and a separately approved cutover.

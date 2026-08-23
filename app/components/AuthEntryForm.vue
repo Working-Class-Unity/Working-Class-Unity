@@ -1,10 +1,15 @@
 <script setup lang="ts">
-import { displayNameMaxLength, resolveAuthCallbacks, type AuthEntryIntent } from '#shared/auth-routes'
+import { resolveAuthCallbacks, type AuthEntryIntent } from '#shared/auth-routes'
 import { turnstileActions, turnstileHeaderName } from '#shared/turnstile'
 import { authClient } from '~/lib/auth-client'
 
 type TurnstileChallengeHandle = {
   reset: () => void
+}
+
+type AppInputHandle = {
+  focus: () => void
+  isValid: () => boolean
 }
 
 const props = defineProps<{
@@ -14,11 +19,8 @@ const props = defineProps<{
 
 const route = useRoute()
 const { t } = useI18n()
-const displayName = ref('')
-const displayNameInput = ref<HTMLInputElement | null>(null)
-const displayNameError = ref('')
 const email = ref('')
-const emailInput = ref<HTMLInputElement | null>(null)
+const emailInput = ref<AppInputHandle | null>(null)
 const turnstileChallenge = ref<TurnstileChallengeHandle | null>(null)
 const turnstileToken = ref('')
 const fieldError = ref('')
@@ -40,13 +42,8 @@ const copy = computed(() =>
       }
 )
 const callbacks = computed(() => resolveAuthCallbacks(props.intent))
-const displayNameInputId = computed(() => `${props.intent}-display-name`)
 const emailInputId = computed(() => `${props.intent}-email`)
 const formStatusId = computed(() => `${props.intent}-form-status`)
-
-watch(displayName, () => {
-  displayNameError.value = ''
-})
 
 watch(email, () => {
   fieldError.value = ''
@@ -55,7 +52,6 @@ watch(email, () => {
 async function submitAuth() {
   formError.value = ''
   formSuccess.value = ''
-  displayNameError.value = ''
   fieldError.value = ''
 
   if (!validateAuthForm()) {
@@ -73,7 +69,6 @@ async function submitAuth() {
 
   try {
     const request = {
-      name: displayName.value,
       email: email.value,
       ...callbacks.value
     }
@@ -87,7 +82,6 @@ async function submitAuth() {
     }
 
     formSuccess.value = t('auth.status.emailLinkSent')
-    displayName.value = ''
     email.value = ''
   } catch {
     formError.value = t('auth.errors.emailLink')
@@ -99,27 +93,17 @@ async function submitAuth() {
 
 async function focusFirstInvalidControl() {
   await nextTick()
-  if (displayNameError.value) {
-    displayNameInput.value?.focus()
-    return
-  }
   emailInput.value?.focus()
 }
 
 function validateAuthForm() {
-  if (!displayName.value.trim()) {
-    displayNameError.value = t('auth.displayName.required')
-  } else if (displayName.value.length > displayNameMaxLength) {
-    displayNameError.value = t('auth.displayName.tooLong', { max: displayNameMaxLength })
-  }
-
   if (!email.value.trim()) {
     fieldError.value = t('auth.email.required')
-  } else if (emailInput.value && !emailInput.value.validity.valid) {
+  } else if (emailInput.value && !emailInput.value.isValid()) {
     fieldError.value = t('common.emailInvalid')
   }
 
-  return !displayNameError.value && !fieldError.value
+  return !fieldError.value
 }
 </script>
 
@@ -142,32 +126,6 @@ function validateAuthForm() {
       @submit.prevent="submitAuth"
     >
       <AppField
-        :id="displayNameInputId"
-        :label="t('auth.displayName.label')"
-        :hint="t('auth.displayName.help')"
-        :error="displayNameError"
-        required
-        :required-label="t('common.required')"
-      >
-        <template #default="{ id, describedBy, invalid, required }">
-          <!-- eslint-disable vue/html-self-closing -->
-          <input
-            :id="id"
-            ref="displayNameInput"
-            v-model.trim="displayName"
-            name="name"
-            type="text"
-            autocomplete="name"
-            :maxlength="displayNameMaxLength"
-            :aria-describedby="describedBy"
-            :aria-invalid="invalid ? 'true' : undefined"
-            :required="required"
-          />
-          <!-- eslint-enable vue/html-self-closing -->
-        </template>
-      </AppField>
-
-      <AppField
         :id="emailInputId"
         :label="t('common.email')"
         :error="fieldError"
@@ -175,8 +133,7 @@ function validateAuthForm() {
         :required-label="t('common.required')"
       >
         <template #default="{ id, describedBy, invalid, required }">
-          <!-- eslint-disable vue/html-self-closing -->
-          <input
+          <AppInput
             :id="id"
             ref="emailInput"
             v-model.trim="email"
@@ -188,7 +145,6 @@ function validateAuthForm() {
             :aria-invalid="invalid ? 'true' : undefined"
             :required="required"
           />
-          <!-- eslint-enable vue/html-self-closing -->
         </template>
       </AppField>
 

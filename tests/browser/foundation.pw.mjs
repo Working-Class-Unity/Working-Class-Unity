@@ -93,6 +93,7 @@ const isolatedTurnstileBrowserSource = `
 
 test('home presents the WCU foundation and preserves client navigation', async ({ page }) => {
   const observations = observePage(page)
+  await page.setViewportSize({ width: 1280, height: 900 })
   await page.route(
     `${runtimeUrl}/`,
     async (route) => {
@@ -107,25 +108,28 @@ test('home presents the WCU foundation and preserves client navigation', async (
   )
   const response = await page.goto('/')
   await assertContentSecurityPolicy(page, response, observations)
-  await expect(page.getByRole('heading', { name: 'Welcome to Working Class Unity.' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Working People Need an Organization of Our Own' })).toBeVisible()
   await expect(
-    page.getByText('The WCU website is being rebuilt. Create an account or log in with an email magic link.', {
-      exact: true
-    })
+    page.getByText(
+      'WCU brings tenants, workers, and neighbors together to win concrete changes, develop new leaders, and build lasting power.',
+      {
+        exact: true
+      }
+    )
   ).toBeVisible()
-  await expect(page.locator('.brand')).toContainText(runtimeName)
+  await expect(page.locator('.brand')).toHaveAccessibleName(`${runtimeName} home`)
   await expect(page.locator('.brand')).toHaveAttribute('aria-current', 'page')
-  await expect(page).toHaveTitle('Home')
+  await expect(page).toHaveTitle('Working Class Unity')
   await expect(page.locator('script[src*="challenges.cloudflare.com/turnstile"]')).toHaveCount(0)
   await assertRuntimePublicConfig(page)
   await assertAccessibleWithoutOverflow(page)
 
   const skipLink = page.getByRole('link', { name: 'Skip to main content' })
-  const primaryNavigation = page.getByRole('navigation', { name: 'Primary' })
+  const topbar = page.getByRole('banner', { name: 'Application' })
   await assertMinimumTargetSize(page.locator('.brand'))
-  await assertMinimumTargetSize(primaryNavigation.getByRole('link', { name: 'Log in', exact: true }))
-  await assertMinimumTargetSize(primaryNavigation.getByRole('link', { name: 'Sign up', exact: true }))
-  await assertMinimumTargetSize(page.getByRole('link', { name: 'Create account', exact: true }))
+  await assertMinimumTargetSize(topbar.getByRole('link', { name: 'Log In', exact: true }))
+  await assertMinimumTargetSize(topbar.getByRole('link', { name: 'JOIN NOW', exact: true }))
+  await assertMinimumTargetSize(page.getByRole('link', { name: 'JOIN WCU', exact: true }))
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.keyboard.press('Tab')
   await expect(skipLink).toBeFocused()
@@ -138,11 +142,12 @@ test('home presents the WCU foundation and preserves client navigation', async (
   await expect(page.locator('#main-content')).toBeFocused()
 
   const timeOrigin = await page.evaluate(() => performance.timeOrigin)
-  await page.getByRole('link', { name: 'Create account', exact: true }).click()
+  await page.getByRole('link', { name: 'JOIN WCU', exact: true }).click()
   await expect(page).toHaveURL(/\/signup$/)
   await expect(page.getByRole('heading', { name: 'Create your account' })).toBeVisible()
-  await expect(page.getByRole('textbox', { name: 'Display name', exact: true })).toBeVisible()
-  await expect(page.getByRole('link', { name: 'Sign up', exact: true })).toHaveAttribute('aria-current', 'page')
+  await expect(page.getByRole('textbox', { name: 'Email', exact: true })).toBeVisible()
+  await expect(page.getByRole('textbox', { name: /(?:first|last|display) name/i })).toHaveCount(0)
+  await expect(page.getByRole('link', { name: 'JOIN NOW', exact: true })).toHaveAttribute('aria-current', 'page')
   await expect(page).toHaveTitle('Sign up')
   await expect(page.getByLabel('Security check')).toBeVisible()
   await expect(page.locator(`script[src="${turnstileScriptUrl}"]`)).toHaveCount(1)
@@ -158,8 +163,258 @@ test('home presents the WCU foundation and preserves client navigation', async (
   await assertCleanPage(page, observations)
 })
 
+test('global public navigation exposes current routes and a route-closing mobile disclosure', async ({ page }) => {
+  const observations = observePage(page)
+  await page.setViewportSize({ width: 1024, height: 900 })
+
+  for (const destination of [
+    {
+      path: '/about',
+      label: 'About',
+      heading: 'They Have Their Parties. We Need Our Own Organization',
+      title: 'About'
+    },
+    { path: '/calendar', label: 'Calendar', heading: 'Find your place in the work', title: 'Calendar' },
+    { path: '/forum', label: 'Forum', heading: 'Forum', title: 'Forum' }
+  ]) {
+    await page.goto(destination.path)
+    const primaryNavigation = page.getByRole('navigation', { name: 'Primary' })
+    const currentLink = primaryNavigation.getByRole('link', { name: destination.label, exact: true })
+
+    await expect(page.getByRole('heading', { name: destination.heading, exact: true })).toBeVisible()
+    await expect(page).toHaveTitle(destination.title)
+    await expect(currentLink).toHaveAttribute('href', destination.path)
+    await expect(currentLink).toHaveAttribute('aria-current', 'page')
+    await expect(primaryNavigation.locator('[aria-current="page"]')).toHaveCount(1)
+    await page.waitForLoadState('networkidle')
+  }
+
+  const desktopNavigation = page.locator('[data-reka-navigation-menu]')
+  const aboutLink = desktopNavigation.getByRole('link', { name: 'About', exact: true })
+  const calendarLink = desktopNavigation.getByRole('link', { name: 'Calendar', exact: true })
+  const forumLink = desktopNavigation.getByRole('link', { name: 'Forum', exact: true })
+
+  await expect(desktopNavigation).toHaveRole('navigation')
+  await expect(desktopNavigation).toHaveAttribute('data-orientation', 'horizontal')
+  await aboutLink.focus()
+  await page.keyboard.press('ArrowRight')
+  await expect(calendarLink).toBeFocused()
+  await page.keyboard.press('End')
+  await expect(forumLink).toBeFocused()
+  await page.keyboard.press('Home')
+  await expect(aboutLink).toBeFocused()
+
+  await page.setViewportSize({ width: 320, height: 800 })
+  const menuToggle = page.getByRole('button', { name: 'Menu', exact: true })
+  const navigationPanel = page.locator('#primary-navigation-panel')
+
+  await expect(menuToggle).toHaveAttribute('aria-expanded', 'false')
+  await expect(navigationPanel).toBeHidden()
+  await assertMinimumTargetSize(menuToggle)
+
+  await menuToggle.click()
+  await expect(menuToggle).toHaveAttribute('aria-expanded', 'true')
+  await expect(navigationPanel).toBeVisible()
+  await assertMinimumTargetSize(page.getByRole('link', { name: 'About', exact: true }))
+  await assertMinimumTargetSize(page.getByRole('link', { name: 'Calendar', exact: true }))
+  await assertMinimumTargetSize(page.getByRole('link', { name: 'Forum', exact: true }))
+  await assertMinimumTargetSize(page.getByRole('link', { name: 'Log In', exact: true }))
+  await assertMinimumTargetSize(page.getByRole('link', { name: 'JOIN NOW', exact: true }))
+  await assertNoHorizontalOverflow(page)
+
+  await page.getByRole('link', { name: 'About', exact: true }).focus()
+  await page.keyboard.press('Escape')
+  await expect(menuToggle).toHaveAttribute('aria-expanded', 'false')
+  await expect(navigationPanel).toBeHidden()
+  await expect(menuToggle).toBeFocused()
+
+  await menuToggle.click()
+  await page.getByRole('link', { name: 'About', exact: true }).click()
+  await expect(page).toHaveURL(/\/about$/)
+  await expect(menuToggle).toHaveAttribute('aria-expanded', 'false')
+  await expect(navigationPanel).toBeHidden()
+  await assertAccessibleWithoutOverflow(page)
+  await assertCleanPage(page, observations)
+})
+
+test('campaign citations preview, navigate, and return at desktop and mobile widths', async ({ page }) => {
+  const observations = observePage(page)
+  const campaignPath = '/campaigns/remove-flock-stockton/faq'
+  const sourceNoteId = 'stockton-flock-faq-title-note-flock-products'
+
+  await page.setViewportSize({ width: 1280, height: 900 })
+  await page.goto(campaignPath)
+  await page.getByText('What is Flock?', { exact: true }).click()
+
+  const firstCitation = page.locator('[role="doc-biblioref"]').first()
+  await expect(firstCitation).toBeVisible()
+  await expect(firstCitation).toHaveAccessibleName('Source 1.1: Flock products')
+  await expect(firstCitation).toHaveAttribute('href', `#${sourceNoteId}`)
+  await expect(firstCitation).toHaveAttribute(
+    'id',
+    'stockton-flock-faq-title-basics-what-is-flock-answer-1-citation-1-1'
+  )
+
+  await firstCitation.hover()
+  const sourcePreview = page.locator('.campaign-citation-card')
+  await expect(sourcePreview).toBeVisible()
+  await expect(sourcePreview.locator('.campaign-citation-label')).toHaveText('SOURCE 1.1')
+  await expect(sourcePreview).toContainText('Flock products')
+  await expect(sourcePreview.locator('a, button')).toHaveCount(0)
+
+  const locatedCitation = page.locator('[role="doc-biblioref"]').nth(1)
+  await expect(locatedCitation).toHaveAccessibleName(
+    'Source 2.1: License plate readers, FAQ — “What is an automated license plate reader (ALPR)?”'
+  )
+  await locatedCitation.hover()
+  const locatedSourcePreview = page.locator('.campaign-citation-card').filter({ hasText: 'License plate readers' })
+  await expect(locatedSourcePreview).toContainText(
+    'Location: FAQ — “What is an automated license plate reader (ALPR)?”'
+  )
+
+  await firstCitation.click()
+  const sourceNote = page.locator(`#${sourceNoteId}`)
+  await expect(page).toHaveURL(new RegExp(`#${sourceNoteId}$`))
+  await expect(sourceNote).toBeFocused()
+  await expect(sourceNote).toBeInViewport()
+  await expect(page.locator('[role="doc-bibliography"]')).toContainText('Reviewed')
+
+  const firstBacklink = sourceNote.locator('[role="doc-backlink"]').first()
+  await expect(firstBacklink).toHaveAccessibleName('Return to citation 1.1')
+  await firstBacklink.click()
+  await expect(firstCitation).toBeFocused()
+
+  await page.goto('/campaigns/remove-flock-stockton/what-stockton-bought')
+  const costGridColumnCounts = []
+  for (const width of [1600, 1280, 920, 880, 600]) {
+    await page.setViewportSize({ width, height: 900 })
+    costGridColumnCounts.push(
+      await page
+        .locator('.record-costs')
+        .evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(' ').length)
+    )
+  }
+  expect(costGridColumnCounts).toEqual([5, 2, 1, 1, 1])
+  await page.setViewportSize({ width: 1280, height: 900 })
+
+  const customSectionCitation = page.locator('#what-stockton-bought-title-contract-fact-1-citation-1-1')
+  await expect(customSectionCitation).toHaveAccessibleName(
+    'Source 1.1: File 26-0269 staff report, Financial Summary, PDF p. 3'
+  )
+  await customSectionCitation.hover()
+  const customSourcePreview = page.locator('.campaign-citation-card').filter({ hasText: 'Financial Summary, PDF p. 3' })
+  await expect(customSourcePreview).toBeVisible()
+  await expect(customSourcePreview.locator('.campaign-citation-label')).toHaveText('SOURCE 1.1')
+
+  const repeatedCitation = page.locator('#what-stockton-bought-title-timeline-2-citation-1-3')
+  await expect(repeatedCitation).toHaveAccessibleName('Source 9.2: Flock Amendment No. 1')
+  await repeatedCitation.hover()
+  const repeatedSourcePreview = page.locator('.campaign-citation-card').filter({ hasText: 'Flock Amendment No. 1' })
+  await expect(repeatedSourcePreview).toBeVisible()
+  await expect(repeatedSourcePreview.locator('.campaign-citation-label')).toHaveText('SOURCE 9.2')
+
+  const repeatedSourceNote = page.locator('#what-stockton-bought-title-note-stockton-jul-2024-amendment')
+  const repeatedSourceBacklink = repeatedSourceNote.locator('[role="doc-backlink"]').nth(1)
+  await expect(repeatedSourceBacklink).toHaveAccessibleName('Return to citation 9.2')
+  await expect(repeatedSourceBacklink).toHaveText('↑ 9.2')
+  const backlinkRestingColor = await repeatedSourceBacklink.evaluate((element) => getComputedStyle(element).color)
+  await repeatedSourceBacklink.hover()
+  const backlinkHoverColor = await repeatedSourceBacklink.evaluate((element) => getComputedStyle(element).color)
+  expect(backlinkHoverColor).not.toBe(backlinkRestingColor)
+  expect(backlinkHoverColor).toBe('rgb(255, 255, 255)')
+
+  const ceqaSourceNote = page.locator('#what-stockton-bought-title-note-stockton-ceqa-2025')
+  await expect(ceqaSourceNote).toHaveCount(1)
+  await expect(ceqaSourceNote.locator('[role="doc-backlink"]')).toHaveAttribute(
+    'href',
+    '#what-stockton-bought-title-timeline-5-citation-1-1'
+  )
+
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto(campaignPath)
+  await page.getByText('What is Flock?', { exact: true }).click()
+
+  const mobileCitation = page.locator('[role="doc-biblioref"]').first()
+  await expect(mobileCitation).toHaveJSProperty('tagName', 'A')
+  const mobileHitTarget = mobileCitation.locator('.campaign-citation-hit-target')
+  const mobileHitTargetSize = await mobileHitTarget.evaluate((element) => {
+    const bounds = element.getBoundingClientRect()
+    return { height: bounds.height, width: bounds.width }
+  })
+  expect(mobileHitTargetSize.height).toBeGreaterThanOrEqual(48)
+  expect(mobileHitTargetSize.width).toBeGreaterThanOrEqual(48)
+
+  const multiSourceCluster = page.locator('.campaign-citation-cluster').nth(2)
+  await multiSourceCluster.scrollIntoViewIfNeeded()
+  const clusteredCitations = multiSourceCluster.locator('[role="doc-biblioref"]')
+  await expect(clusteredCitations).toHaveCount(2)
+  const firstClusterTarget = clusteredCitations.nth(0).locator('.campaign-citation-hit-target')
+  const secondClusterTarget = clusteredCitations.nth(1).locator('.campaign-citation-hit-target')
+  const [firstTargetBounds, secondTargetBounds] = await Promise.all([
+    firstClusterTarget.boundingBox(),
+    secondClusterTarget.boundingBox()
+  ])
+
+  expect(firstTargetBounds).not.toBeNull()
+  expect(secondTargetBounds).not.toBeNull()
+  expect(firstTargetBounds.x + firstTargetBounds.width).toBeLessThanOrEqual(secondTargetBounds.x)
+
+  const firstTargetPoint = {
+    x: firstTargetBounds.x + 6,
+    y: firstTargetBounds.y + firstTargetBounds.height / 2
+  }
+  await expect
+    .poll(() =>
+      page.evaluate(
+        ({ x, y }) => document.elementFromPoint(x, y)?.classList.contains('campaign-citation-hit-target'),
+        firstTargetPoint
+      )
+    )
+    .toBe(true)
+  await page.mouse.click(firstTargetPoint.x, firstTargetPoint.y)
+  const citationDrawer = page.locator('.campaign-citation-drawer')
+  await expect(citationDrawer).toBeVisible()
+  await expect(citationDrawer).toContainText('Flock products')
+  await page.keyboard.press('Escape')
+  await expect(citationDrawer).toBeHidden()
+
+  const secondTargetBoundsAfterClose = await secondClusterTarget.boundingBox()
+  expect(secondTargetBoundsAfterClose).not.toBeNull()
+  const secondTargetPoint = {
+    x: secondTargetBoundsAfterClose.x + secondTargetBoundsAfterClose.width - 6,
+    y: secondTargetBoundsAfterClose.y + secondTargetBoundsAfterClose.height / 2
+  }
+  await expect
+    .poll(() =>
+      page.evaluate(
+        ({ x, y }) => document.elementFromPoint(x, y)?.classList.contains('campaign-citation-hit-target'),
+        secondTargetPoint
+      )
+    )
+    .toBe(true)
+  await page.mouse.click(secondTargetPoint.x, secondTargetPoint.y)
+  await expect(citationDrawer).toBeVisible()
+  await expect(citationDrawer).toContainText('FlockOS')
+  await page.keyboard.press('Escape')
+  await expect(citationDrawer).toBeHidden()
+
+  await mobileCitation.click()
+  await expect(citationDrawer).toBeVisible()
+  await expect(citationDrawer.getByRole('link', { name: 'View source' })).toBeVisible()
+  await expect(citationDrawer.getByRole('button', { name: 'Go to source note' })).toBeVisible()
+  await assertAccessibleWithoutOverflow(page)
+
+  await citationDrawer.getByRole('button', { name: 'Go to source note' }).click()
+  await expect(citationDrawer).toBeHidden()
+  await expect(page.locator(`#${sourceNoteId}`)).toBeFocused()
+  await expect(page).toHaveURL(new RegExp(`#${sourceNoteId}$`))
+  await assertNoHorizontalOverflow(page)
+  await assertCleanPage(page, observations)
+})
+
 test('session retry announces progress and failure without losing focus', async ({ page }) => {
   const observations = observePage(page)
+  await page.setViewportSize({ width: 1024, height: 900 })
   await page.goto('/')
   await page.waitForLoadState('networkidle')
 
@@ -222,13 +477,12 @@ test('login is accessible before and after requesting a magic link', async ({ pa
   const observations = observePage(page)
   await page.goto('/login')
   await expect(page.getByRole('heading', { name: 'Log in' })).toBeVisible()
-  await expect(page.locator('.brand')).toContainText(runtimeName)
+  await expect(page.locator('.brand')).toHaveAccessibleName(`${runtimeName} home`)
   await expect(page).toHaveTitle('Log in')
   await assertRuntimePublicConfig(page)
   const emailInput = page.getByRole('textbox', { name: 'Email', exact: true })
-  const displayNameInput = page.getByRole('textbox', { name: 'Display name', exact: true })
-  await expect(displayNameInput).toBeVisible()
   await expect(emailInput).toBeVisible()
+  await expect(page.getByRole('textbox', { name: /(?:first|last|display) name/i })).toHaveCount(0)
   await expect(page.locator('input[type="password"]')).toHaveCount(0)
   await expect(page.locator('.mode-tabs')).toHaveCount(0)
   await expect(page.getByRole('button', { name: 'Continue with Google' })).toHaveCount(0)
@@ -239,19 +493,10 @@ test('login is accessible before and after requesting a magic link', async ({ pa
   const submitButton = page.getByRole('button', { name: 'Send email link' })
   await expect(submitButton).toBeEnabled()
   await assertMinimumTargetSize(emailInput)
-  await assertMinimumTargetSize(displayNameInput)
   await assertMinimumTargetSize(submitButton)
   await assertControlBoundaryContrast(emailInput)
   await assertAccessibleWithoutOverflow(page)
 
-  await submitButton.click()
-  await expect(displayNameInput).toBeFocused()
-  await expect(displayNameInput).toHaveAttribute('aria-invalid', 'true')
-  await expect(page.locator('#login-form-status[role="alert"]')).toHaveText(
-    'Check the highlighted field and try again.'
-  )
-
-  await displayNameInput.fill('Browser Login')
   await submitButton.click()
   await expect(emailInput).toBeFocused()
   await expect(emailInput).toHaveAttribute('aria-invalid', 'true')
@@ -306,13 +551,15 @@ test('signed-out private routes reach login before private data is requested', a
 const privateBrowserTest = test.extend({ screenshot: 'off', trace: 'off', video: 'off' })
 
 privateBrowserTest(
-  'real magic-link signup preserves the display name through app and account views',
+  'real email-only signup keeps account profile fields optional and editable later',
   async ({ page }, testInfo) => {
-    testInfo.setTimeout(45_000)
+    testInfo.setTimeout(60_000)
     const observations = observePage(page)
     const project = testInfo.project.name.replaceAll(/[^a-z0-9]/gi, '-').toLowerCase()
     const email = `browser.login+${project}.${authEmailMarker}@example.test`
-    const displayName = `Browser ${testInfo.project.name} member with a deliberately long account display name`
+    const firstName = `Given ${project}`
+    const lastName = `Surname ${project}`
+    const displayName = `Browser ${testInfo.project.name} member`
     const clientAddress = testInfo.project.name === 'desktop-chromium' ? '192.0.2.10' : '192.0.2.11'
 
     await page.setExtraHTTPHeaders({ 'cf-connecting-ip': clientAddress })
@@ -320,12 +567,22 @@ privateBrowserTest(
     await page.goto('/signup')
     await page.waitForLoadState('networkidle')
     const manifestUrl = await nuxtManifestUrl(page)
-    await page.getByRole('textbox', { name: 'Display name', exact: true }).fill(displayName)
+    await expect(page.getByRole('textbox', { name: /(?:first|last|display) name/i })).toHaveCount(0)
     await page.getByRole('textbox', { name: 'Email', exact: true }).fill(email)
     await expect(page.getByText('Security check complete.', { exact: true })).toBeVisible()
     const sendEmailLink = page.getByRole('button', { name: 'Send email link' })
     await expect(sendEmailLink).toBeEnabled()
+    const magicLinkRequestPromise = page.waitForRequest(
+      (request) => new URL(request.url()).pathname === '/api/auth/sign-in/magic-link'
+    )
     await sendEmailLink.click()
+    const magicLinkRequest = await magicLinkRequestPromise
+    expect(magicLinkRequest.postDataJSON()).toEqual({
+      email,
+      callbackURL: '/app',
+      newUserCallbackURL: '/app',
+      errorCallbackURL: '/signup'
+    })
     await expect(page.locator('#signup-form-status[role="status"]')).toBeVisible()
     await expect(page.getByText('Security check complete.', { exact: true })).toBeVisible()
 
@@ -345,24 +602,22 @@ privateBrowserTest(
     expect(appResponse.headers()['cache-control']).toBe('private, no-store')
     expect(appHtml.includes('Your WCU account is ready.'), 'initial app HTML contains the WCU shell').toBe(true)
     expect(appHtml.includes(email), 'initial app HTML contains the authenticated identity').toBe(true)
-    expect(appHtml.includes(displayName), 'initial app HTML contains the required display name').toBe(true)
+    expect(appHtml.includes(displayName), 'initial app HTML excludes profile data that was never collected').toBe(false)
     expect(appHtml.includes('/w/'), 'initial app HTML excludes visible workspace navigation').toBe(false)
     expect(appHtml.includes('activeOrganizationId'), 'initial app HTML excludes active-organization state').toBe(false)
     await expect(page.getByText('Your WCU account is ready.', { exact: true })).toBeVisible()
-    await expect(page.getByRole('heading', { name: `Welcome back, ${displayName}` })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Welcome back', exact: true })).toBeVisible()
     await expect(page.getByText(`Signed in as ${email}`, { exact: true })).toBeVisible()
+    await openMobileNavigationIfNeeded(page)
     await expect(page.getByRole('button', { name: /^Account menu for / })).toBeVisible()
     await expect(page.getByText(/workspace/i)).toHaveCount(0)
     await expect(page.getByRole('link', { name: /workspace/i })).toHaveCount(0)
-    const primaryNavigation = page.getByRole('navigation', { name: 'Primary' })
-    await expect(primaryNavigation.locator('[aria-current="page"]')).toHaveCount(1)
-    await expect(primaryNavigation.getByRole('link', { name: 'App', exact: true })).toHaveAttribute(
-      'aria-current',
-      'page'
-    )
+    const topbar = page.getByRole('banner', { name: 'Application' })
+    await expect(topbar.locator('[aria-current="page"]')).toHaveCount(1)
+    await expect(topbar.getByRole('link', { name: 'App', exact: true })).toHaveAttribute('aria-current', 'page')
     expect(observations.sameOriginRequests.some((request) => request.includes('/api/workspaces'))).toBe(false)
     await page.waitForLoadState('networkidle')
-    await assertAccountMenuContract(page, displayName, email, observations)
+    await assertAccountMenuContract(page, email, email, observations)
 
     if (testInfo.project.name === 'desktop-chromium') {
       const signedInHomeResponse = await gotoForInitialResponse(page, '/', manifestUrl)
@@ -410,8 +665,70 @@ privateBrowserTest(
     ).toBe(false)
     await expect(page.getByRole('heading', { name: 'Account', exact: true, level: 1 })).toBeVisible()
     await expect(page.getByText(email, { exact: true })).toBeVisible()
-    await expect(page.getByText(displayName, { exact: true })).toBeVisible()
-    await expect(page.getByRole('button', { name: /^Account menu for / })).toBeVisible()
+    await page.waitForLoadState('networkidle')
+    await page.waitForFunction(() => window.useNuxtApp?.().isHydrating === false)
+    await openMobileNavigationIfNeeded(page)
+
+    const firstNameInput = page.getByRole('textbox', { name: 'First name', exact: true })
+    const lastNameInput = page.getByRole('textbox', { name: 'Last name', exact: true })
+    const displayNameInput = page.getByRole('textbox', { name: 'Display name', exact: true })
+    await expect(firstNameInput).toHaveValue('')
+    await expect(lastNameInput).toHaveValue('')
+    await expect(displayNameInput).toHaveValue('')
+    await expect(page.getByText('They are not required to use your account.', { exact: false })).toBeVisible()
+    await expect(page.getByRole('button', { name: `Account menu for ${email}` })).toBeVisible()
+
+    await firstNameInput.fill(`  ${firstName}  `)
+    await lastNameInput.fill(`  ${lastName}  `)
+    await displayNameInput.fill(`  ${displayName}  `)
+    await page.getByRole('button', { name: 'Save profile', exact: true }).click()
+    await expect(page.getByText('Profile saved.', { exact: true })).toBeVisible()
+    await expect(firstNameInput).toHaveValue(firstName)
+    await expect(lastNameInput).toHaveValue(lastName)
+    await expect(displayNameInput).toHaveValue(displayName)
+
+    const namedMenuTrigger = page.getByRole('button', { name: `Account menu for ${displayName}` })
+    await expect(namedMenuTrigger).toBeVisible()
+    await namedMenuTrigger.click()
+    await expect(page.getByRole('menu').getByText(displayName, { exact: true })).toBeVisible()
+    await expect(page.getByRole('menu').getByText(email, { exact: true })).toBeVisible()
+    await page.keyboard.press('Escape')
+    await page.waitForLoadState('networkidle')
+
+    const namedAppResponse = await gotoForInitialResponse(page, '/app', manifestUrl)
+    if (!namedAppResponse) throw new Error('Named-profile navigation did not return a personal-app response')
+    const namedAppHtml = await namedAppResponse.text()
+    expect(namedAppResponse.status()).toBe(200)
+    expect(namedAppHtml.includes(displayName), 'named app HTML contains the explicit display name').toBe(true)
+    expect(namedAppHtml.includes(firstName), 'named app HTML excludes the private first name').toBe(false)
+    expect(namedAppHtml.includes(lastName), 'named app HTML excludes the private last name').toBe(false)
+    await expect(page.getByRole('heading', { name: `Welcome back, ${displayName}` })).toBeVisible()
+    await expect(page.getByText(firstName, { exact: true })).toHaveCount(0)
+    await expect(page.getByText(lastName, { exact: true })).toHaveCount(0)
+    await page.waitForLoadState('networkidle')
+
+    const savedAccountResponse = await gotoForInitialResponse(page, '/account', manifestUrl)
+    if (!savedAccountResponse) throw new Error('Saved-profile navigation did not return an account response')
+    expect(savedAccountResponse.status()).toBe(200)
+    await page.waitForFunction(() => window.useNuxtApp?.().isHydrating === false)
+    await expect(page.getByRole('textbox', { name: 'First name', exact: true })).toHaveValue(firstName)
+    await expect(page.getByRole('textbox', { name: 'Last name', exact: true })).toHaveValue(lastName)
+    await expect(page.getByRole('textbox', { name: 'Display name', exact: true })).toHaveValue(displayName)
+    await page.getByRole('textbox', { name: 'First name', exact: true }).fill('')
+    await page.getByRole('textbox', { name: 'Last name', exact: true }).fill('')
+    await page.getByRole('textbox', { name: 'Display name', exact: true }).fill('')
+    await page.getByRole('button', { name: 'Save profile', exact: true }).click()
+    await expect(page.getByText('Profile saved.', { exact: true })).toBeVisible()
+    await openMobileNavigationIfNeeded(page)
+    await expect(page.getByRole('button', { name: `Account menu for ${email}` })).toBeVisible()
+    await page.waitForLoadState('networkidle')
+
+    const clearedAppResponse = await gotoForInitialResponse(page, '/app', manifestUrl)
+    if (!clearedAppResponse) throw new Error('Cleared-profile navigation did not return a personal-app response')
+    expect(clearedAppResponse.status()).toBe(200)
+    await expect(page.getByRole('heading', { name: 'Welcome back', exact: true })).toBeVisible()
+    await openMobileNavigationIfNeeded(page)
+    await expect(page.getByRole('button', { name: `Account menu for ${email}` })).toBeVisible()
     await page.waitForLoadState('networkidle')
 
     const deletionAccountResponse = await gotoForInitialResponse(page, '/account', manifestUrl)
@@ -457,6 +774,15 @@ test('observability route is active without sending a missing token', async ({ p
   await assertCleanPage(page, observations)
 })
 
+async function openMobileNavigationIfNeeded(page) {
+  const menuToggle = page.getByRole('button', { name: 'Menu', exact: true })
+  if (!(await menuToggle.isVisible())) return
+  if ((await menuToggle.getAttribute('aria-expanded')) === 'true') return
+  await page.waitForFunction(() => window.useNuxtApp?.().isHydrating === false)
+  await menuToggle.click()
+  await expect(menuToggle).toHaveAttribute('aria-expanded', 'true')
+}
+
 async function assertAccountMenuContract(page, displayName, email, observations) {
   const trigger = page.getByRole('button', { name: `Account menu for ${displayName}` })
   const menu = page.getByRole('menu')
@@ -467,6 +793,7 @@ async function assertAccountMenuContract(page, displayName, email, observations)
   await expect(menu).toBeVisible()
   await expect(menu.getByText(displayName, { exact: true })).toBeVisible()
   await expect(menu.getByText(email, { exact: true })).toBeVisible()
+  await page.evaluate(() => new Promise((resolveDelay) => window.setTimeout(resolveDelay, 0)))
   await page.mouse.click(1, 1)
   await expect(menu).toBeHidden()
   await expect(trigger).toHaveAttribute('aria-expanded', 'false')
@@ -496,6 +823,7 @@ async function assertAccountMenuContract(page, displayName, email, observations)
 
   const previousViewport = page.viewportSize()
   await page.setViewportSize({ width: 320, height: 800 })
+  await openMobileNavigationIfNeeded(page)
   await trigger.click()
   await expect(menu).toBeVisible()
   await assertNoHorizontalOverflow(page)
@@ -887,12 +1215,16 @@ async function assertCleanPage(page, observations) {
   const hydrationWarnings = observations.allConsole.filter((message) =>
     /hydration|mismatch|\[?vue warn\]?/i.test(message)
   )
+  const excludedCapabilityRequests = observations.sameOriginRequests.filter((request) =>
+    /\/api\/(?:ai|files)(?:[/?]|$)/.test(request)
+  )
   expect(observations.console, 'console warning/error output').toEqual([])
   expect(hydrationWarnings, 'hydration warning output').toEqual([])
   expect(observations.pageErrors, 'uncaught page errors').toEqual([])
   expect(observations.failedRequests, 'failed browser requests').toEqual([])
   expect(observations.errorResponses, 'same-origin HTTP error responses').toEqual([])
   expect(observations.externalRequests, 'external browser requests').toEqual([])
+  expect(excludedCapabilityRequests, 'AI/Files browser requests').toEqual([])
   expect(observations.crashes, 'page crashes').toBe(0)
 }
 

@@ -1,5 +1,5 @@
 import { APIError, createAuthMiddleware } from 'better-auth/api'
-import { displayNameMaxLength, isAllowedAuthCallback, type AuthCallbackParameter } from '../../../shared/auth-routes'
+import { isAllowedAuthCallback, type AuthCallbackParameter } from '../../../shared/auth-routes'
 import { turnstileActions, turnstileHeaderName } from '../../../shared/turnstile'
 import { createMagicLinkEmail, type TransactionalEmailSender } from '../../services/email'
 import { verifyTurnstileToken } from '../../services/security/turnstile'
@@ -32,6 +32,8 @@ const callbackParameters = [
   'errorCallbackURL'
 ] as const satisfies readonly AuthCallbackParameter[]
 
+const authenticationCompatibilityName = 'WCU account'
+
 export { isAllowedAuthCallback }
 
 export function createMagicLinkDelivery(
@@ -61,7 +63,10 @@ function createPasswordlessAuthBeforeHook(authUrl: string) {
 
   return createAuthMiddleware(async (context) => {
     if (context.path === '/sign-in/magic-link') {
-      assertValidDisplayName(context.body?.name)
+      // Better Auth 1.6.23 persists its core `name` during first magic-link
+      // verification. Keep that compatibility field server-owned so auth
+      // requests contain no user-facing profile data.
+      if (context.body) context.body.name = authenticationCompatibilityName
       const requestOrigin = context.headers?.get('origin')
       if (requestOrigin && requestOrigin !== authOrigin) {
         throw new APIError('FORBIDDEN', {
@@ -72,7 +77,10 @@ function createPasswordlessAuthBeforeHook(authUrl: string) {
     }
 
     if (context.path === '/update-user' && context.body && 'name' in context.body) {
-      assertValidDisplayName(context.body.name)
+      throw new APIError('BAD_REQUEST', {
+        code: 'INVALID_PROFILE_UPDATE',
+        message: 'Invalid profile update.'
+      })
     }
 
     // disabledPaths matches exact request paths. Reject parameterized password
@@ -143,20 +151,6 @@ export function createAuthenticationBeforeHook(config: AppRuntimeConfig) {
     await passwordlessBeforeHook(context)
     await magicLinkTurnstileBeforeHook(context)
   })
-}
-
-function assertValidDisplayName(value: unknown): asserts value is string {
-  if (
-    typeof value !== 'string' ||
-    value !== value.trim() ||
-    value.length === 0 ||
-    value.length > displayNameMaxLength
-  ) {
-    throw new APIError('BAD_REQUEST', {
-      code: 'INVALID_DISPLAY_NAME',
-      message: 'Display name must be nonblank and at most 100 characters.'
-    })
-  }
 }
 
 function hasStatusCode(error: unknown, statusCode: number): boolean {

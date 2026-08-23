@@ -1,5 +1,8 @@
 # Prerequisites
 
+> Imported donor history; this is not a current WCU provisioning checklist. Check the root
+> environment examples and [`basic-release.md`](basic-release.md) before creating any resource.
+
 This baseline assumes the project can move from local development to a small production deployment without changing its core architecture. Confirm these before building an app on top of it.
 
 ## Accounts

@@ -11,6 +11,13 @@ ce833c307793ee0fbca476b2b55e906d41bef15f:apps/web/tests/billing-projection.test.
 ce833c307793ee0fbca476b2b55e906d41bef15f:apps/web/tests/billing-transition.test.ts:stripe-access-token:23
 ce833c307793ee0fbca476b2b55e906d41bef15f:apps/web/tests/module-states.test.ts:stripe-access-token:159
 
+# Reviewed 2026-08-22 by Working Class Unity maintainers.
+# The rebuilt baseline contains test-only restricted-key placeholders, not
+# credentials issued by Stripe or used by Working Class Unity.
+c010ede07f73b405fd522ae3f97c8057a51867f9:tests/billing/billing-service-race.test.ts:stripe-access-token:26
+c010ede07f73b405fd522ae3f97c8057a51867f9:tests/billing/transition-convergence-race.test.ts:stripe-access-token:26
+c010ede07f73b405fd522ae3f97c8057a51867f9:tests/billing/transition.test.ts:stripe-access-token:31
+
 # Reviewed 2026-08-04 by Working Class Unity maintainers.
 # Legacy WCU history contains copied public developer-documentation examples,
 # not credentials issued to or used by WCU.
