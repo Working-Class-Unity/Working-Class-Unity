@@ -1,1 +1,190 @@
-docker-compose.yml
+# Coolify replaces literal empty service values with same-named resource values.
+# Keep this reserved indirection unset so cleared provider boundaries stay empty.
+x-cleared-application-secrets: &cleared-application-secrets
+  NUXT_READINESS_TOKEN: '${WCU_CLEARED_ENVIRONMENT:-}'
+  NUXT_BETTER_AUTH_SECRET: '${WCU_CLEARED_ENVIRONMENT:-}'
+  NUXT_EMAIL_RESEND_API_KEY: '${WCU_CLEARED_ENVIRONMENT:-}'
+  NUXT_STRIPE_SECRET_KEY: '${WCU_CLEARED_ENVIRONMENT:-}'
+  NUXT_STRIPE_WEBHOOK_SECRET: '${WCU_CLEARED_ENVIRONMENT:-}'
+  NUXT_CLOUDFLARE_ACCOUNT_ID: '${WCU_CLEARED_ENVIRONMENT:-}'
+  NUXT_FILES_DRIVER: '${WCU_CLEARED_ENVIRONMENT:-}'
+  NUXT_CLOUDFLARE_R2_BUCKET: '${WCU_CLEARED_ENVIRONMENT:-}'
+  NUXT_CLOUDFLARE_R2_ENDPOINT: '${WCU_CLEARED_ENVIRONMENT:-}'
+  NUXT_CLOUDFLARE_R2_ACCESS_KEY_ID: '${WCU_CLEARED_ENVIRONMENT:-}'
+  NUXT_CLOUDFLARE_R2_SECRET_ACCESS_KEY: '${WCU_CLEARED_ENVIRONMENT:-}'
+  NUXT_OPENAI_API_KEY: '${WCU_CLEARED_ENVIRONMENT:-}'
+  NUXT_OPENAI_PROJECT_ID: '${WCU_CLEARED_ENVIRONMENT:-}'
+  NUXT_OPENAI_MODEL: '${WCU_CLEARED_ENVIRONMENT:-}'
+  NUXT_OPENAI_FILE_SEARCH_VECTOR_STORE_ID: '${WCU_CLEARED_ENVIRONMENT:-}'
+  NUXT_OPENAI_WEB_SEARCH_ALLOWED_DOMAINS: '${WCU_CLEARED_ENVIRONMENT:-}'
+  NUXT_CLOUDFLARE_TURNSTILE_SECRET_KEY: '${WCU_CLEARED_ENVIRONMENT:-}'
+  NUXT_SENTRY_DSN: '${WCU_CLEARED_ENVIRONMENT:-}'
+  NUXT_OBSERVABILITY_TEST_TOKEN: '${WCU_CLEARED_ENVIRONMENT:-}'
+  WCU_STRIPE_MEMBERSHIP_SYNC_KEY: '${WCU_CLEARED_ENVIRONMENT:-}'
+  WCU_STRIPE_MEMBERSHIP_SYNC_MODE: '${WCU_CLEARED_ENVIRONMENT:-}'
+  WCU_MEMBERSHIP_GRANDFATHERED_BEFORE: '${WCU_CLEARED_ENVIRONMENT:-}'
+x-runtime-environment: &runtime-environment
+  NODE_ENV: production
+  NUXT_PUBLIC_APP_NAME: '${NUXT_PUBLIC_APP_NAME:-Working Class Unity}'
+  NUXT_PUBLIC_APP_URL: '${NUXT_PUBLIC_APP_URL:?}'
+  NUXT_DATABASE_URL: file:/app/data/app.db
+  NUXT_READINESS_TOKEN: '${NUXT_READINESS_TOKEN:?}'
+  NUXT_BETTER_AUTH_SECRET: '${NUXT_BETTER_AUTH_SECRET:?}'
+  NUXT_BETTER_AUTH_URL: '${NUXT_BETTER_AUTH_URL:?}'
+  NUXT_EMAIL_TRANSPORT: '${NUXT_EMAIL_TRANSPORT:?}'
+  NUXT_EMAIL_FROM: '${NUXT_EMAIL_FROM:?}'
+  NUXT_EMAIL_CAPTURE_DIRECTORY: '${NUXT_EMAIL_CAPTURE_DIRECTORY-}'
+  NUXT_EMAIL_RESEND_API_KEY: '${NUXT_EMAIL_RESEND_API_KEY-}'
+  NUXT_STRIPE_SECRET_KEY: '${NUXT_STRIPE_SECRET_KEY:?}'
+  NUXT_STRIPE_WEBHOOK_SECRET: '${NUXT_STRIPE_WEBHOOK_SECRET:?}'
+  NUXT_STRIPE_PORTAL_CONFIGURATION_ID: '${NUXT_STRIPE_PORTAL_CONFIGURATION_ID:?}'
+  NUXT_STRIPE_PERSONAL_WEEKLY_PRICE_ID: '${NUXT_STRIPE_PERSONAL_WEEKLY_PRICE_ID:?}'
+  NUXT_STRIPE_PERSONAL_MONTHLY_PRICE_ID: '${NUXT_STRIPE_PERSONAL_MONTHLY_PRICE_ID:?}'
+  NUXT_STRIPE_PERSONAL_ANNUAL_PRICE_ID: '${NUXT_STRIPE_PERSONAL_ANNUAL_PRICE_ID:?}'
+  NUXT_STRIPE_FAMILY_MONTHLY_PRICE_ID: '${NUXT_STRIPE_FAMILY_MONTHLY_PRICE_ID:?}'
+  NUXT_STRIPE_FAMILY_ANNUAL_PRICE_ID: '${NUXT_STRIPE_FAMILY_ANNUAL_PRICE_ID:?}'
+  NUXT_CLOUDFLARE_ACCOUNT_ID: '${WCU_CLEARED_ENVIRONMENT:-}'
+  NUXT_FILES_DRIVER: '${WCU_CLEARED_ENVIRONMENT:-}'
+  NUXT_CLOUDFLARE_R2_BUCKET: '${WCU_CLEARED_ENVIRONMENT:-}'
+  NUXT_CLOUDFLARE_R2_ENDPOINT: '${WCU_CLEARED_ENVIRONMENT:-}'
+  NUXT_CLOUDFLARE_R2_ACCESS_KEY_ID: '${WCU_CLEARED_ENVIRONMENT:-}'
+  NUXT_CLOUDFLARE_R2_SECRET_ACCESS_KEY: '${WCU_CLEARED_ENVIRONMENT:-}'
+  NUXT_OPENAI_API_KEY: '${WCU_CLEARED_ENVIRONMENT:-}'
+  NUXT_OPENAI_PROJECT_ID: '${WCU_CLEARED_ENVIRONMENT:-}'
+  NUXT_OPENAI_MODEL: '${WCU_CLEARED_ENVIRONMENT:-}'
+  NUXT_OPENAI_FILE_SEARCH_VECTOR_STORE_ID: '${WCU_CLEARED_ENVIRONMENT:-}'
+  NUXT_OPENAI_WEB_SEARCH_ALLOWED_DOMAINS: '${WCU_CLEARED_ENVIRONMENT:-}'
+  NUXT_CLOUDFLARE_TURNSTILE_SECRET_KEY: '${NUXT_CLOUDFLARE_TURNSTILE_SECRET_KEY:?}'
+  NUXT_PUBLIC_TURNSTILE_SITE_KEY: '${NUXT_PUBLIC_TURNSTILE_SITE_KEY:?}'
+  NUXT_SENTRY_DSN: '${NUXT_SENTRY_DSN:?}'
+  NUXT_PUBLIC_SENTRY_DSN: '${NUXT_PUBLIC_SENTRY_DSN:?}'
+  NUXT_SENTRY_ENVIRONMENT: '${NUXT_SENTRY_ENVIRONMENT-}'
+  NUXT_PUBLIC_SENTRY_ENVIRONMENT: '${NUXT_PUBLIC_SENTRY_ENVIRONMENT-}'
+  NUXT_SENTRY_RELEASE: '${NUXT_SENTRY_RELEASE-}'
+  NUXT_PUBLIC_SENTRY_RELEASE: '${NUXT_PUBLIC_SENTRY_RELEASE-}'
+  NUXT_SENTRY_TRACES_SAMPLE_RATE: '${NUXT_SENTRY_TRACES_SAMPLE_RATE:-0.05}'
+  NUXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE: '${NUXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE:-0.05}'
+  NUXT_OBSERVABILITY_TEST_TOKEN: '${NUXT_OBSERVABILITY_TEST_TOKEN-}'
+  WCU_STRIPE_MEMBERSHIP_SYNC_KEY: '${WCU_CLEARED_ENVIRONMENT:-}'
+  WCU_STRIPE_MEMBERSHIP_SYNC_MODE: '${WCU_CLEARED_ENVIRONMENT:-}'
+  WCU_MEMBERSHIP_GRANDFATHERED_BEFORE: '${WCU_CLEARED_ENVIRONMENT:-}'
+  BACKUP_R2_ACCOUNT_ID: '${WCU_CLEARED_ENVIRONMENT:-}'
+  BACKUP_R2_BUCKET: '${WCU_CLEARED_ENVIRONMENT:-}'
+  BACKUP_R2_ENDPOINT: '${WCU_CLEARED_ENVIRONMENT:-}'
+  BACKUP_R2_ACCESS_KEY_ID: '${WCU_CLEARED_ENVIRONMENT:-}'
+  BACKUP_R2_SECRET_ACCESS_KEY: '${WCU_CLEARED_ENVIRONMENT:-}'
+x-app-image: &app-image
+  image: '${COMPOSE_PROJECT_NAME}_app:${SOURCE_COMMIT:?Set SOURCE_COMMIT to the selected Git commit}'
+  pull_policy: never
+services:
+  migrate:
+    <<: *app-image
+    build: .
+    command:
+      - node
+      - .output/server/maintenance.mjs
+      - migrate
+      - --confirm-app-stopped
+    restart: 'no'
+    healthcheck:
+      disable: true
+    environment:
+      <<: *cleared-application-secrets
+      NUXT_DATABASE_URL: file:/app/data/app.db
+      BACKUP_R2_ACCOUNT_ID: '${WCU_CLEARED_ENVIRONMENT:-}'
+      BACKUP_R2_BUCKET: '${WCU_CLEARED_ENVIRONMENT:-}'
+      BACKUP_R2_ENDPOINT: '${WCU_CLEARED_ENVIRONMENT:-}'
+      BACKUP_R2_ACCESS_KEY_ID: '${WCU_CLEARED_ENVIRONMENT:-}'
+      BACKUP_R2_SECRET_ACCESS_KEY: '${WCU_CLEARED_ENVIRONMENT:-}'
+    volumes:
+      - app-data:/app/data
+
+  web:
+    <<: *app-image
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+    environment: *runtime-environment
+    expose:
+      - '3000'
+    volumes:
+      - app-data:/app/data
+
+  worker:
+    <<: *app-image
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    command:
+      - node
+      - --import
+      - ./.output/server/worker-sentry.server.config.mjs
+      - .output/server/worker.mjs
+    restart: unless-stopped
+    init: true
+    stop_grace_period: 360s
+    healthcheck:
+      disable: true
+    environment: *runtime-environment
+    volumes:
+      - app-data:/app/data
+
+  backup-runner:
+    <<: *app-image
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    command:
+      - sh
+      - -ec
+      - |
+        node .output/server/off-host-backup.mjs validate-config
+        exec sleep infinity
+    restart: unless-stopped
+    init: true
+    healthcheck:
+      disable: true
+    environment:
+      <<: *cleared-application-secrets
+      NUXT_DATABASE_URL: file:/app/data/app.db
+      BACKUP_R2_ACCOUNT_ID: '${BACKUP_R2_ACCOUNT_ID:?}'
+      BACKUP_R2_BUCKET: '${BACKUP_R2_BUCKET:?}'
+      BACKUP_R2_ENDPOINT: '${BACKUP_R2_ENDPOINT:?}'
+      BACKUP_R2_ACCESS_KEY_ID: '${BACKUP_R2_ACCESS_KEY_ID:?}'
+      BACKUP_R2_SECRET_ACCESS_KEY: '${BACKUP_R2_SECRET_ACCESS_KEY:?}'
+    volumes:
+      - app-data:/app/data
+
+  stripe-sync-runner:
+    <<: *app-image
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    command:
+      - sh
+      - -ec
+      - |
+        node .output/server/import-stripe-membership.mjs --validate-config
+        exec sleep infinity
+    restart: unless-stopped
+    init: true
+    healthcheck:
+      disable: true
+    environment:
+      <<: *cleared-application-secrets
+      NODE_ENV: production
+      NUXT_DATABASE_URL: file:/app/data/app.db
+      WCU_STRIPE_MEMBERSHIP_SYNC_KEY: '${WCU_STRIPE_MEMBERSHIP_SYNC_KEY:?}'
+      WCU_STRIPE_MEMBERSHIP_SYNC_MODE: '${WCU_STRIPE_MEMBERSHIP_SYNC_MODE:?}'
+      WCU_MEMBERSHIP_GRANDFATHERED_BEFORE: '${WCU_MEMBERSHIP_GRANDFATHERED_BEFORE:?}'
+      BACKUP_R2_ACCOUNT_ID: '${WCU_CLEARED_ENVIRONMENT:-}'
+      BACKUP_R2_BUCKET: '${WCU_CLEARED_ENVIRONMENT:-}'
+      BACKUP_R2_ENDPOINT: '${WCU_CLEARED_ENVIRONMENT:-}'
+      BACKUP_R2_ACCESS_KEY_ID: '${WCU_CLEARED_ENVIRONMENT:-}'
+      BACKUP_R2_SECRET_ACCESS_KEY: '${WCU_CLEARED_ENVIRONMENT:-}'
+    volumes:
+      - app-data:/app/data
+
+volumes:
+  app-data:
