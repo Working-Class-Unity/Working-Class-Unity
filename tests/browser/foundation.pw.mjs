@@ -168,15 +168,20 @@ test('global public navigation exposes current routes and a route-closing mobile
   await page.setViewportSize({ width: 1024, height: 900 })
 
   for (const destination of [
-    { path: '/about', label: 'About', title: 'About' },
-    { path: '/calendar', label: 'Calendar', title: 'Calendar' },
-    { path: '/forum', label: 'Forum', title: 'Forum' }
+    {
+      path: '/about',
+      label: 'About',
+      heading: 'They Have Their Parties. We Need Our Own Organization',
+      title: 'About'
+    },
+    { path: '/calendar', label: 'Calendar', heading: 'Find your place in the work', title: 'Calendar' },
+    { path: '/forum', label: 'Forum', heading: 'Forum', title: 'Forum' }
   ]) {
     await page.goto(destination.path)
     const primaryNavigation = page.getByRole('navigation', { name: 'Primary' })
     const currentLink = primaryNavigation.getByRole('link', { name: destination.label, exact: true })
 
-    await expect(page.getByRole('heading', { name: destination.title, exact: true })).toBeVisible()
+    await expect(page.getByRole('heading', { name: destination.heading, exact: true })).toBeVisible()
     await expect(page).toHaveTitle(destination.title)
     await expect(currentLink).toHaveAttribute('href', destination.path)
     await expect(currentLink).toHaveAttribute('aria-current', 'page')
@@ -788,6 +793,7 @@ async function assertAccountMenuContract(page, displayName, email, observations)
   await expect(menu).toBeVisible()
   await expect(menu.getByText(displayName, { exact: true })).toBeVisible()
   await expect(menu.getByText(email, { exact: true })).toBeVisible()
+  await page.evaluate(() => new Promise((resolveDelay) => window.setTimeout(resolveDelay, 0)))
   await page.mouse.click(1, 1)
   await expect(menu).toBeHidden()
   await expect(trigger).toHaveAttribute('aria-expanded', 'false')

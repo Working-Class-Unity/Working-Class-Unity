@@ -1,8 +1,12 @@
 import { execFile, spawnSync } from 'node:child_process'
 import { randomBytes } from 'node:crypto'
+import { readFileSync } from 'node:fs'
 import { promisify } from 'node:util'
 
 const execFileAsync = promisify(execFile)
+const migrationCount = JSON.parse(
+  readFileSync(new URL('../server/db/migrations/meta/_journal.json', import.meta.url), 'utf8')
+).entries.length
 const image = parseImageArgument(process.argv.slice(2))
 const deadline = Date.now() + 180_000
 const containerName = `swl-container-health-${process.pid}-${randomBytes(5).toString('hex')}`
@@ -82,13 +86,17 @@ async function run() {
   })
   const freshMigration = await runMaintenance(['migrate', '--confirm-app-stopped'], 'fresh named-volume migration')
   assert(
-    freshMigration.stdout.includes('1 newly applied; 1/1 current; pre-migration backup not required'),
-    'Fresh migration did not report the exact one-entry package and no-backup boundary'
+    freshMigration.stdout.includes(
+      `${migrationCount} newly applied; ${migrationCount}/${migrationCount} current; pre-migration backup not required`
+    ),
+    'Fresh migration did not report the exact current package and no-backup boundary'
   )
   const repeatMigration = await runMaintenance(['migrate', '--confirm-app-stopped'], 'repeat named-volume migration')
   assert(
-    repeatMigration.stdout.includes('0 newly applied; 1/1 current; pre-migration backup written as'),
-    'Repeat migration did not report the exact one-entry package and verified pre-migration backup'
+    repeatMigration.stdout.includes(
+      `0 newly applied; ${migrationCount}/${migrationCount} current; pre-migration backup written as`
+    ),
+    'Repeat migration did not report the exact current package and verified pre-migration backup'
   )
   await runOffHostFailure(['backup'], {
     label: 'credential-free off-host backup operator'

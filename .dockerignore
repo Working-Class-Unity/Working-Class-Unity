@@ -12,6 +12,8 @@
 scripts/**
 !scripts/run-pnpm.mjs
 !scripts/toolchain-contract.mjs
+!scripts/generate-color-tokens.mjs
+!scripts/generate-hero-assets.mjs
 
 !nuxt.config.ts
 !sentry.client.config.ts

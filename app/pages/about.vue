@@ -313,6 +313,10 @@ useHead(() => ({
     gap: var(--space-4);
   }
 
+  .governance .about-eyebrow {
+    color: var(--color-accent-action-hover);
+  }
+
   .governance h2 {
     max-inline-size: 24ch;
     font-size: clamp(2rem, 1.65rem + 1.15vw, 3rem);
