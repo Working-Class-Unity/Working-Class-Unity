@@ -10,7 +10,12 @@ const tempDir = mkdtempSync(join(tmpdir(), 'wcu-migration-check-'))
 const databasePath = join(tempDir, 'app.db')
 const migrationsFolder = resolve('server/db/migrations')
 const sqlite = new Database(databasePath)
-const expectedMigrationTags = ['0000_wcu_initial', '0001_wcu_account_profile', '0002_membership_operations'] as const
+const expectedMigrationTags = [
+  '0000_wcu_initial',
+  '0001_wcu_account_profile',
+  '0002_membership_operations',
+  '0003_stripe_charge_ids'
+] as const
 const expectedRuntimeTables = [
   'account',
   'agenda_items',
@@ -110,11 +115,67 @@ try {
   requireCurrentRuntimeSchema('Repeat migration')
   requireMembershipSeedData('Repeat migration')
   verifySqliteIntegrityAndForeignKeys(sqlite, 'Repeat migration', fail)
+  requirePopulatedStripeChargeUpgrade()
 
   console.log('Fresh and repeat WCU migration check passed with 65 tables and 10 Billing triggers.')
 } finally {
   sqlite.close()
   rmSync(tempDir, { recursive: true, force: true })
+}
+
+function requirePopulatedStripeChargeUpgrade() {
+  const upgradePath = join(tempDir, 'populated-stripe-charge-upgrade.db')
+  const upgrade = new Database(upgradePath)
+  try {
+    upgrade.pragma('foreign_keys = ON')
+    for (const tag of expectedMigrationTags.slice(0, -1)) {
+      upgrade.exec(readFileSync(join(migrationsFolder, `${tag}.sql`), 'utf8'))
+    }
+    upgrade
+      .prepare(
+        `insert into stripe_charges
+           (id, status, revenue_category, amount, amount_captured, amount_refunded, currency, paid, disputed)
+         values ('ch_upgrade', 'succeeded', 'dues', 100, 100, 25, 'USD', 1, 1)`
+      )
+      .run()
+    upgrade
+      .prepare(
+        `insert into stripe_refunds (id, charge_id, status, amount, currency)
+         values ('re_upgrade', 'ch_upgrade', 'succeeded', 25, 'USD')`
+      )
+      .run()
+    upgrade
+      .prepare(
+        `insert into stripe_disputes (id, charge_id, status, amount, currency)
+         values ('dp_upgrade', 'ch_upgrade', 'under_review', 100, 'USD')`
+      )
+      .run()
+
+    const upgradeMigration = readFileSync(join(migrationsFolder, `${expectedMigrationTags.at(-1)}.sql`), 'utf8')
+    upgrade.transaction(() => upgrade.exec(upgradeMigration))()
+
+    const preserved = upgrade
+      .prepare(
+        `select
+           (select count(*) from stripe_charges where id = 'ch_upgrade') as charges,
+           (select count(*) from stripe_refunds where id = 're_upgrade' and charge_id = 'ch_upgrade') as refunds,
+           (select count(*) from stripe_disputes where id = 'dp_upgrade' and charge_id = 'ch_upgrade') as disputes`
+      )
+      .get() as { charges: number; disputes: number; refunds: number }
+    if (preserved.charges !== 1 || preserved.refunds !== 1 || preserved.disputes !== 1) {
+      fail('Populated Stripe charge migration did not preserve charges, refunds, and disputes.')
+    }
+    upgrade
+      .prepare(
+        `insert into stripe_charges
+           (id, status, revenue_category, amount, amount_captured, amount_refunded, currency, paid, disputed)
+         values ('py_upgrade', 'succeeded', 'dues', 100, 100, 0, 'USD', 1, 0)`
+      )
+      .run()
+    verifySqliteIntegrityAndForeignKeys(upgrade, 'Populated Stripe charge migration', fail)
+  } finally {
+    upgrade.close()
+  }
 }
 
 function requireCurrentMigrationLedger(label: string) {

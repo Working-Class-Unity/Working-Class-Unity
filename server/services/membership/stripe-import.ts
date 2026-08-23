@@ -502,21 +502,25 @@ function planMemberships(
       continue
     }
 
+    const currentSubscriptions = subscriptions.filter(
+      (subscription) => subscription.status === 'active' && subscription.pause_collection == null
+    )
     const history = sqlite
       .prepare('select count(*) as count, max(ended_at) as endedAt from memberships where person_id = ?')
       .get(personId) as { count: number; endedAt: string | null }
-    let episodeSubscriptions = subscriptions
+    let episodeSubscriptions = currentSubscriptions
     if (history.count > 0) {
-      episodeSubscriptions = subscriptions.filter((subscription) => {
+      episodeSubscriptions = currentSubscriptions.filter((subscription) => {
         const startedAt = timestamp(subscription.start_date)
         return history.endedAt !== null && startedAt !== null && startedAt > history.endedAt
       })
-      if (episodeSubscriptions.length === 0) {
-        for (const subscription of subscriptions) {
-          issue(issues, 'membership_history_requires_review', 'stripe.subscription', subscription.id)
-        }
-        continue
+    }
+    if (episodeSubscriptions.length === 0) {
+      const code = history.count > 0 ? 'membership_history_requires_review' : 'membership_subscription_not_current'
+      for (const subscription of subscriptions) {
+        issue(issues, code, 'stripe.subscription', subscription.id)
       }
+      continue
     }
 
     const firstSubscription = episodeSubscriptions[0]!
@@ -1737,7 +1741,9 @@ function canonicalValue(value: unknown): unknown {
   if (typeof value !== 'object') return null
   return Object.fromEntries(
     Object.entries(value as Record<string, unknown>)
-      .filter(([key, item]) => key !== 'lastResponse' && item !== undefined)
+      .filter(
+        ([key, item]) => !['hosted_invoice_url', 'invoice_pdf', 'lastResponse'].includes(key) && item !== undefined
+      )
       .sort(([left], [right]) => left.localeCompare(right))
       .map(([key, item]) => [key, canonicalValue(item)])
   )

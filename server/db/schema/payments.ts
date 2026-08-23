@@ -404,7 +404,7 @@ export const stripeCharges = sqliteTable(
     index('stripe_charges_customer_created_idx').on(table.customerId, table.providerCreatedAt),
     index('stripe_charges_invoice_idx').on(table.invoiceId),
     index('stripe_charges_revenue_idx').on(table.revenueCategory, table.status, table.providerCreatedAt),
-    check('stripe_charges_id_check', sql`${table.id} glob 'ch_*'`),
+    check('stripe_charges_id_check', sql`${table.id} glob 'ch_*' or ${table.id} glob 'py_*'`),
     check('stripe_charges_status_check', sql`${table.status} in ('pending', 'succeeded', 'failed')`),
     check(
       'stripe_charges_revenue_check',

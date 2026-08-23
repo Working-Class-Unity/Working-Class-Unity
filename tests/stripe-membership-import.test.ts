@@ -29,6 +29,7 @@ describe('Stripe membership import', () => {
         .run()
       const dataset = membershipDataset({
         chargeAmount: 100,
+        chargeId: 'py_member',
         coverageEnd: '2026-09-01T00:00:00.000Z',
         customerId: 'cus_member',
         email: 'MEMBER@example.test',
@@ -106,8 +107,20 @@ describe('Stripe membership import', () => {
           .get()
       ).toEqual({ priceId: 'price_membership_10_monthly' })
       const normalizedCounts = operationalCounts(sqlite)
+      const repeatedDataset = Object.freeze({
+        ...dataset,
+        invoices: Object.freeze(
+          dataset.invoices.map((invoice) =>
+            stripe<Stripe.Invoice>({
+              ...invoice,
+              hosted_invoice_url: 'https://invoice.stripe.example/rotated',
+              invoice_pdf: 'https://invoice.stripe.example/rotated.pdf'
+            })
+          )
+        )
+      })
 
-      const second = importStripeMembershipDataset(connection, dataset, { ...options, apply: true })
+      const second = importStripeMembershipDataset(connection, repeatedDataset, { ...options, apply: true })
       expect(second.snapshots).toEqual({ changed: 0, unchanged: first.snapshots.changed })
       expect(operationalCounts(sqlite)).toEqual(normalizedCounts)
       expect(count(sqlite, 'import_batches')).toBe(2)
@@ -161,6 +174,34 @@ describe('Stripe membership import', () => {
         endedAt: null,
         status: 'active'
       })
+    })
+  })
+
+  it('imports canceled subscription history without grandfathering it as a current membership', () => {
+    withMigratedDatabase('canceled-history', (sqlite, connection) => {
+      const dataset = membershipDataset({
+        chargeAmount: 1000,
+        coverageEnd: '2026-01-01T00:00:00.000Z',
+        customerId: 'cus_canceled_history',
+        email: 'canceled@example.test',
+        refundAmount: 0,
+        subscriptionId: 'sub_canceled_history',
+        subscriptionStartedAt: '2025-01-01T00:00:00.000Z',
+        subscriptionStatus: 'canceled'
+      })
+
+      const report = importStripeMembershipDataset(connection, dataset, {
+        apply: true,
+        grandfatheredBefore: new Date('2026-08-22T00:00:00.000Z'),
+        observedAt: new Date('2026-08-22T12:00:00.000Z')
+      })
+
+      expect(report.memberships).toEqual({ blocked: 0, createdActive: 0, createdPending: 0, existing: 0 })
+      expect(report.issues.map((value) => value.code)).toContain('membership_subscription_not_current')
+      expect(report.revenue.duesCaptured).toBe(1000)
+      expect(count(sqlite, 'people')).toBe(1)
+      expect(count(sqlite, 'memberships')).toBe(0)
+      expect(sqlite.prepare('select status from stripe_subscriptions').get()).toEqual({ status: 'canceled' })
     })
   })
 
@@ -428,18 +469,20 @@ describe('Stripe membership import', () => {
 
 function membershipDataset(input: {
   chargeAmount: number
+  chargeId?: string
   coverageEnd: string
   customerId: string
   email: string
   refundAmount: number
   subscriptionId: string
   subscriptionStartedAt: string
+  subscriptionStatus?: Stripe.Subscription['status']
 }): StripeMembershipImportDataset {
   const productId = 'prod_PhJCFImeXD5okX'
   const priceId = 'price_membership_10_monthly'
   const invoiceId = `in_${input.subscriptionId}`
   const paymentIntentId = `pi_${input.subscriptionId}`
-  const chargeId = `ch_${input.subscriptionId}`
+  const chargeId = input.chargeId ?? `ch_${input.subscriptionId}`
   const subscriptionStart = seconds(input.subscriptionStartedAt)
   const periodEnd = seconds(input.coverageEnd)
   const periodStart = periodEnd - 2_678_400
@@ -503,7 +546,7 @@ function membershipDataset(input: {
     id: input.subscriptionId,
     object: 'subscription',
     start_date: subscriptionStart,
-    status: 'active'
+    status: input.subscriptionStatus ?? 'active'
   })
   const subscriptionItem = stripe<Stripe.SubscriptionItem>({
     created: subscriptionStart,
