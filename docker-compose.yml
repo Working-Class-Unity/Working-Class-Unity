@@ -20,6 +20,9 @@ x-cleared-application-secrets: &cleared-application-secrets
   NUXT_CLOUDFLARE_TURNSTILE_SECRET_KEY: '${WCU_CLEARED_ENVIRONMENT:-}'
   NUXT_SENTRY_DSN: '${WCU_CLEARED_ENVIRONMENT:-}'
   NUXT_OBSERVABILITY_TEST_TOKEN: '${WCU_CLEARED_ENVIRONMENT:-}'
+  WCU_STRIPE_MEMBERSHIP_SYNC_KEY: '${WCU_CLEARED_ENVIRONMENT:-}'
+  WCU_STRIPE_MEMBERSHIP_SYNC_MODE: '${WCU_CLEARED_ENVIRONMENT:-}'
+  WCU_MEMBERSHIP_GRANDFATHERED_BEFORE: '${WCU_CLEARED_ENVIRONMENT:-}'
 x-runtime-environment: &runtime-environment
   NODE_ENV: production
   NUXT_PUBLIC_APP_NAME: '${NUXT_PUBLIC_APP_NAME:-Working Class Unity}'
@@ -62,6 +65,9 @@ x-runtime-environment: &runtime-environment
   NUXT_SENTRY_TRACES_SAMPLE_RATE: '${NUXT_SENTRY_TRACES_SAMPLE_RATE:-0.05}'
   NUXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE: '${NUXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE:-0.05}'
   NUXT_OBSERVABILITY_TEST_TOKEN: '${NUXT_OBSERVABILITY_TEST_TOKEN-}'
+  WCU_STRIPE_MEMBERSHIP_SYNC_KEY: '${WCU_CLEARED_ENVIRONMENT:-}'
+  WCU_STRIPE_MEMBERSHIP_SYNC_MODE: '${WCU_CLEARED_ENVIRONMENT:-}'
+  WCU_MEMBERSHIP_GRANDFATHERED_BEFORE: '${WCU_CLEARED_ENVIRONMENT:-}'
   BACKUP_R2_ACCOUNT_ID: '${WCU_CLEARED_ENVIRONMENT:-}'
   BACKUP_R2_BUCKET: '${WCU_CLEARED_ENVIRONMENT:-}'
   BACKUP_R2_ENDPOINT: '${WCU_CLEARED_ENVIRONMENT:-}'
@@ -147,6 +153,36 @@ services:
       BACKUP_R2_ENDPOINT: '${BACKUP_R2_ENDPOINT:?}'
       BACKUP_R2_ACCESS_KEY_ID: '${BACKUP_R2_ACCESS_KEY_ID:?}'
       BACKUP_R2_SECRET_ACCESS_KEY: '${BACKUP_R2_SECRET_ACCESS_KEY:?}'
+    volumes:
+      - app-data:/app/data
+
+  stripe-sync-runner:
+    <<: *app-image
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    command:
+      - sh
+      - -ec
+      - |
+        node .output/server/import-stripe-membership.mjs --validate-config
+        exec sleep infinity
+    restart: unless-stopped
+    init: true
+    healthcheck:
+      disable: true
+    environment:
+      <<: *cleared-application-secrets
+      NODE_ENV: production
+      NUXT_DATABASE_URL: file:/app/data/app.db
+      WCU_STRIPE_MEMBERSHIP_SYNC_KEY: '${WCU_STRIPE_MEMBERSHIP_SYNC_KEY:?}'
+      WCU_STRIPE_MEMBERSHIP_SYNC_MODE: '${WCU_STRIPE_MEMBERSHIP_SYNC_MODE:?}'
+      WCU_MEMBERSHIP_GRANDFATHERED_BEFORE: '${WCU_MEMBERSHIP_GRANDFATHERED_BEFORE:?}'
+      BACKUP_R2_ACCOUNT_ID: '${WCU_CLEARED_ENVIRONMENT:-}'
+      BACKUP_R2_BUCKET: '${WCU_CLEARED_ENVIRONMENT:-}'
+      BACKUP_R2_ENDPOINT: '${WCU_CLEARED_ENVIRONMENT:-}'
+      BACKUP_R2_ACCESS_KEY_ID: '${WCU_CLEARED_ENVIRONMENT:-}'
+      BACKUP_R2_SECRET_ACCESS_KEY: '${WCU_CLEARED_ENVIRONMENT:-}'
     volumes:
       - app-data:/app/data
 

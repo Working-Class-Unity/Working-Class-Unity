@@ -133,7 +133,7 @@ function validateOptions(options: StripeMembershipImportOptions): void {
   }
 }
 
-function assertMembershipSchema(sqlite: Sqlite): void {
+export function assertMembershipSchema(sqlite: Sqlite): void {
   const required = [
     'external_record_snapshots',
     'import_batches',
@@ -620,7 +620,7 @@ function applyImport(sqlite: Sqlite, context: ApplyContext): void {
   })
 
   try {
-    transaction()
+    transaction.immediate()
   } catch (error) {
     sqlite
       .prepare(`update import_batches set status = 'failed', completed_at = ?, updated_at = ? where id = ?`)

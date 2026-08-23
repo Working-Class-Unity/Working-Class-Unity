@@ -93,6 +93,15 @@ async function run() {
   assert(!inspect.stdout.includes(sentryAuthTokenCanary), 'Production image configuration retained the Sentry token')
   assert(!history.stdout.includes(sentryAuthTokenCanary), 'Production image history retained the Sentry token')
 
+  const stripeImporterHelp = await docker(
+    ['run', '--rm', '--entrypoint', 'node', image, '.output/server/import-stripe-membership.mjs', '--help'],
+    20_000
+  )
+  assert(
+    stripeImporterHelp.stdout.includes('Usage: node .output/server/import-stripe-membership.mjs'),
+    'Production image is missing the packaged Stripe membership importer'
+  )
+
   await docker(
     [
       'run',
@@ -110,7 +119,7 @@ async function run() {
   )
 
   console.log(
-    'Container build proof passed: configured Sentry upload failures stop the build, BuildKit keeps the token out of diagnostics and the runtime image, deployable output contains no source maps, the build context excludes private state, and the image defaults to node:node.'
+    'Container build proof passed: configured Sentry upload failures stop the build, BuildKit keeps the token out of diagnostics and the runtime image, deployable output contains no source maps, the build context excludes private state, the Stripe membership importer is packaged, and the image defaults to node:node.'
   )
 }
 

@@ -96,11 +96,11 @@ Keep the complete object key, hash, chosen incident time, and resulting local ba
 Continue with [the restore runbook](restore-runbook.md). In summary:
 
 1. Temporarily suspend the approved `master` auto-deploy trigger and every restart policy.
-2. Stop migration, web, worker, any enabled backup runner, and every SQLite writer. Prove none can restart or still uses the volume.
+2. Suspend the Stripe membership synchronization task, then stop migration, web, worker, any enabled backup or synchronization runner, and every SQLite writer. Prove none can restart or still uses the volume.
 3. Run the exact selected image's network-disabled `maintenance.mjs restore --confirm-app-stopped` against the fetched file.
 4. Require isolated validation/migration, exact schema/ledger, integrity, foreign keys, and the successful staged replacement. Restored sessions and one-time verification records are deliberately invalidated before replacement.
 5. Keep all writers stopped while reconciling users/accounts, family state, projects, billing/tombstones, R2 Files objects, AI/provider configuration, and deletions/security events after the snapshot time.
-6. Start the Compose resource only after the restored database is eligible. Require its one-shot migration to complete before web, worker, and any enabled backup runner start. Users must sign in again.
+6. Start the Compose resource only after the restored database is eligible. Require its one-shot migration to complete before web, worker, and any enabled backup or synchronization runner start. Resume the synchronization task only after provider reconciliation is complete. Users must sign in again.
 
 Record elapsed restore time as an observation. Do not turn it into an RTO commitment.
 

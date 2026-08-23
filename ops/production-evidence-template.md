@@ -134,6 +134,7 @@ The event destination must use Stripe API v1 snapshot events at the account scop
 - Coolify worker name:
 - Backup capability selected (`COMPOSE_PROFILES=backup`) or explicitly omitted:
 - Coolify private backup-runner name when selected:
+- Coolify private stripe-sync-runner name:
 - Standalone Docker destination recorded; Connect to Predefined Network off; no custom network:
 - Coolify version `v4.1.2`, host Compose version, and rendered configuration recorded:
 - Raw Compose Deployment and Consistent Container Names off; custom container/internal names and Compose build/start commands blank:
@@ -146,6 +147,7 @@ The event destination must use Stripe API v1 snapshot events at the account scop
 - Migration, web, worker, and every enabled backup runner use the same local same-host `/app/data` volume:
 - Effective runtime UID/GID:
 - Production environment variables configured, including the exact eight private `NUXT_STRIPE_*` values when Billing is enabled:
+- Separate Stripe synchronization key/mode/fixed cutoff configured only on its runner; mode/key match and billing-key isolation proved:
 - Runtime-only variables Build disabled; enabled Observability build/runtime controls and Docker Build Secret recorded:
 - Preview Deployments disabled; approved-merge `master` auto-deploy enabled through Coolify; no-overlap maintenance ordering and temporary incident suspension confirmed:
 - Staging pause probe proved old long-lived containers absent and dependents stopped while migration ran:
@@ -159,6 +161,8 @@ The event destination must use Stripe API v1 snapshot events at the account scop
 - Enabled backup runner exposes no port/domain, has inherited health check disabled, validates its five values, and uses init-backed shutdown; disabled deployment has no runner/task:
 - Private receipt sink and dead-man scheduler/state survive loss of the Coolify host:
 - Enabled-runner `BACKUP_R2_*` values are Runtime-only/Build-disabled, migration/web/worker override them to empty, and only explicit operator execution consumes them; disabled deployment omits them:
+- Stripe synchronization dry-run duration/snapshot growth, restricted-read/denied-write proof, first apply/repeat, daily task/timezone/timeout, private notifications, and 26-hour freshness alert recorded:
+- Latest synchronization result and issue-code counts reviewed without provider IDs or member PII:
 - Jobs state recorded; disabled worker stable/inert; Billing/Files-enabled dependencies satisfied:
 - Oldest-due backlog, pending cancellation age, and scheduled-effect deadline monitoring configured:
 - Files storage binding matches driver, bucket, and normalized R2 endpoint:
@@ -168,7 +172,7 @@ The event destination must use Stripe API v1 snapshot events at the account scop
 - Production deployed:
 - Production migrations run:
 - Selected-commit migration result:
-- Web, worker, and every enabled backup runner started only after migration:
+- Web, worker, backup runner, and Stripe synchronization runner started only after migration:
 - Migration ledger current:
 - Exact current four-entry ledger and 30-trigger schema verified:
 - Baseline commit and local image IDs recorded before persistent staging:
