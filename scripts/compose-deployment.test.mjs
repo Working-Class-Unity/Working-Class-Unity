@@ -7,9 +7,10 @@ import test from 'node:test'
 import { parse } from 'yaml'
 
 const compose = parse(readFileSync(resolve('docker-compose.yml'), 'utf8'), { merge: true })
+const productionEnvironmentExample = readFileSync(resolve('.env.production.example'), 'utf8')
 const services = compose.services
-const serviceNames = ['migrate', 'web', 'worker', 'backup-runner']
-const databaseServiceNames = ['web', 'worker', 'backup-runner']
+const serviceNames = ['migrate', 'web', 'worker', 'backup-runner', 'stripe-sync-runner']
+const databaseServiceNames = ['web', 'worker', 'backup-runner', 'stripe-sync-runner']
 const sourceCommit = '0123456789abcdef0123456789abcdef01234567'
 const composeProjectName = 'baseline-compose-test'
 const clearedEnvironmentName = 'WCU_CLEARED_ENVIRONMENT'
@@ -37,7 +38,16 @@ const excludedProviderEnvironmentNames = [
   'NUXT_OPENAI_FILE_SEARCH_VECTOR_STORE_ID',
   'NUXT_OPENAI_WEB_SEARCH_ALLOWED_DOMAINS'
 ]
-const clearedApplicationEnvironmentNames = [...applicationSecretNames, ...excludedProviderEnvironmentNames]
+const stripeSyncEnvironmentNames = [
+  'WCU_STRIPE_MEMBERSHIP_SYNC_KEY',
+  'WCU_STRIPE_MEMBERSHIP_SYNC_MODE',
+  'WCU_MEMBERSHIP_GRANDFATHERED_BEFORE'
+]
+const clearedApplicationEnvironmentNames = [
+  ...applicationSecretNames,
+  ...excludedProviderEnvironmentNames,
+  ...stripeSyncEnvironmentNames
+]
 const backupEnvironmentNames = [
   'BACKUP_R2_ACCOUNT_ID',
   'BACKUP_R2_BUCKET',
@@ -51,6 +61,11 @@ const validBackupEnvironment = {
   BACKUP_R2_ENDPOINT: 'https://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.r2.cloudflarestorage.com',
   BACKUP_R2_ACCESS_KEY_ID: 'test-access-key',
   BACKUP_R2_SECRET_ACCESS_KEY: 'test-secret-key'
+}
+const validStripeSyncEnvironment = {
+  WCU_STRIPE_MEMBERSHIP_SYNC_KEY: 'rk_test_sync_restricted',
+  WCU_STRIPE_MEMBERSHIP_SYNC_MODE: 'test',
+  WCU_MEMBERSHIP_GRANDFATHERED_BEFORE: '2026-08-01T00:00:00.000Z'
 }
 const requiredEnvironmentNames = [
   'NUXT_PUBLIC_APP_URL',
@@ -114,12 +129,33 @@ test('backup is unconditional with fail-closed runtime configuration', () => {
   assert.match(backupRunner.command[2], /exec sleep infinity/)
 })
 
-test('rendered Compose requires configured backup and always includes it', () => {
+test('Stripe membership synchronization is an inert, fail-closed, isolated runner', () => {
+  const stripeRunner = services['stripe-sync-runner']
+  assert(!Object.hasOwn(stripeRunner, 'profiles'))
+  assert.equal(stripeRunner.init, true)
+  assert.equal(stripeRunner.environment.NODE_ENV, 'production')
+  for (const name of stripeSyncEnvironmentNames) {
+    assert.equal(stripeRunner.environment[name], '${' + name + ':?}')
+    assert(!productionEnvironmentExample.includes(`${name}=`))
+    for (const serviceName of ['migrate', 'web', 'worker', 'backup-runner']) {
+      assert.equal(services[serviceName].environment[name], clearedEnvironmentExpression)
+    }
+  }
+  assert.deepEqual(stripeRunner.command.slice(0, 2), ['sh', '-ec'])
+  assert.match(stripeRunner.command[2], /node \.output\/server\/import-stripe-membership\.mjs --validate-config/)
+  assert.match(stripeRunner.command[2], /exec sleep infinity/)
+})
+
+test('rendered Compose requires both private runners and always includes them', () => {
   assert.throws(
     () => renderedCompose(),
     /BACKUP_R2_(?:ACCOUNT_ID|BUCKET|ENDPOINT|ACCESS_KEY_ID|SECRET_ACCESS_KEY).*required variable.*missing a value/i
   )
-  const configuredCompose = renderedCompose(validBackupEnvironment)
+  assert.throws(
+    () => renderedCompose(validBackupEnvironment),
+    /WCU_(?:STRIPE_MEMBERSHIP_SYNC_(?:KEY|MODE)|MEMBERSHIP_GRANDFATHERED_BEFORE).*required variable.*missing a value/i
+  )
+  const configuredCompose = renderedCompose({ ...validBackupEnvironment, ...validStripeSyncEnvironment })
 
   assert.deepEqual(Object.keys(configuredCompose.services).sort(), serviceNames.toSorted())
 
@@ -137,6 +173,7 @@ test('service environment overrides Coolify shared env-file backup credentials',
     ...Object.fromEntries(requiredEnvironmentNames.map((name) => [name, `test-${name.toLowerCase()}`])),
     ...Object.fromEntries(applicationSecretNames.map((name) => [name, `private-${name.toLowerCase()}`])),
     ...Object.fromEntries(excludedProviderEnvironmentNames.map((name) => [name, `excluded-${name.toLowerCase()}`])),
+    ...validStripeSyncEnvironment,
     SOURCE_COMMIT: sourceCommit,
     ...validBackupEnvironment
   }
@@ -176,7 +213,7 @@ test('service environment overrides Coolify shared env-file backup credentials',
     )
 
     for (const name of backupEnvironmentNames) {
-      for (const serviceName of ['migrate', 'web', 'worker']) {
+      for (const serviceName of ['migrate', 'web', 'worker', 'stripe-sync-runner']) {
         assert.equal(rendered.services[serviceName].environment[name], '')
       }
       assert.equal(rendered.services['backup-runner'].environment[name], validBackupEnvironment[name])
@@ -184,6 +221,7 @@ test('service environment overrides Coolify shared env-file backup credentials',
     for (const name of applicationSecretNames) {
       assert.equal(rendered.services.migrate.environment[name], '')
       assert.equal(rendered.services['backup-runner'].environment[name], '')
+      assert.equal(rendered.services['stripe-sync-runner'].environment[name], '')
       assert.equal(rendered.services.web.environment[name], runtimeEnvironment[name])
       assert.equal(rendered.services.worker.environment[name], runtimeEnvironment[name])
     }
@@ -192,6 +230,13 @@ test('service environment overrides Coolify shared env-file backup credentials',
         assert.equal(rendered.services[serviceName].environment[name], '')
       }
     }
+    for (const name of stripeSyncEnvironmentNames) {
+      for (const serviceName of ['migrate', 'web', 'worker', 'backup-runner']) {
+        assert.equal(rendered.services[serviceName].environment[name], '')
+      }
+      assert.equal(rendered.services['stripe-sync-runner'].environment[name], validStripeSyncEnvironment[name])
+    }
+    assert.equal(rendered.services['stripe-sync-runner'].environment.NODE_ENV, 'production')
   } finally {
     rmSync(directory, { recursive: true, force: true })
   }
@@ -225,6 +270,10 @@ test('one-shot operators do not receive application provider credentials', () =>
   }
   assert.equal(services.migrate.environment.NUXT_DATABASE_URL, 'file:/app/data/app.db')
   assert.equal(services['backup-runner'].environment.NUXT_DATABASE_URL, 'file:/app/data/app.db')
+  assert.equal(services['stripe-sync-runner'].environment.NUXT_DATABASE_URL, 'file:/app/data/app.db')
+  for (const name of [...applicationSecretNames, ...excludedProviderEnvironmentNames]) {
+    assert.equal(services['stripe-sync-runner'].environment[name], clearedEnvironmentExpression)
+  }
 })
 
 test('Coolify-cleared values use only the reserved unset indirection', () => {
@@ -235,18 +284,27 @@ test('Coolify-cleared values use only the reserved unset indirection', () => {
     assert.equal(services.migrate.environment[name], clearedEnvironmentExpression)
     assert.equal(services.web.environment[name], clearedEnvironmentExpression)
     assert.equal(services.worker.environment[name], clearedEnvironmentExpression)
+    assert.equal(services['stripe-sync-runner'].environment[name], clearedEnvironmentExpression)
   }
 
   const reservedValue = 'reserved-value-must-never-be-configured'
-  const rendered = renderedCompose({ [clearedEnvironmentName]: reservedValue, ...validBackupEnvironment })
+  const rendered = renderedCompose({
+    [clearedEnvironmentName]: reservedValue,
+    ...validBackupEnvironment,
+    ...validStripeSyncEnvironment
+  })
   for (const name of clearedApplicationEnvironmentNames) {
     assert.equal(rendered.services.migrate.environment[name], reservedValue)
     assert.equal(rendered.services['backup-runner'].environment[name], reservedValue)
+    if (!stripeSyncEnvironmentNames.includes(name)) {
+      assert.equal(rendered.services['stripe-sync-runner'].environment[name], reservedValue)
+    }
   }
   for (const name of backupEnvironmentNames) {
     assert.equal(rendered.services.migrate.environment[name], reservedValue)
     assert.equal(rendered.services.web.environment[name], reservedValue)
     assert.equal(rendered.services.worker.environment[name], reservedValue)
+    assert.equal(rendered.services['stripe-sync-runner'].environment[name], reservedValue)
   }
 })
 
@@ -272,6 +330,7 @@ test('Compose keeps the deployment surface minimal', () => {
   assert.equal(services.worker.stop_grace_period, '360s')
   assert.deepEqual(services.worker.healthcheck, { disable: true })
   assert.deepEqual(services['backup-runner'].healthcheck, { disable: true })
+  assert.deepEqual(services['stripe-sync-runner'].healthcheck, { disable: true })
 })
 
 function renderedCompose(overrides = {}) {
@@ -279,6 +338,7 @@ function renderedCompose(overrides = {}) {
     ...cleanComposeEnvironment(),
     ...Object.fromEntries(requiredEnvironmentNames.map((name) => [name, `test-${name.toLowerCase()}`])),
     ...Object.fromEntries(backupEnvironmentNames.map((name) => [name, ''])),
+    ...Object.fromEntries(stripeSyncEnvironmentNames.map((name) => [name, ''])),
     SOURCE_COMMIT: sourceCommit,
     ...overrides
   }
@@ -296,6 +356,7 @@ function cleanComposeEnvironment() {
   const environment = { ...process.env }
   for (const name of [
     ...backupEnvironmentNames,
+    ...stripeSyncEnvironmentNames,
     ...clearedApplicationEnvironmentNames,
     clearedEnvironmentName,
     'SOURCE_COMMIT'

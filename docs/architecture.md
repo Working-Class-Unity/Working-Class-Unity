@@ -125,7 +125,7 @@ operational observability routes retain their own narrower authentication bounda
 required for magic-link issuance. Sentry is initialized only with complete production settings and
 continues to use privacy filtering at the app boundary.
 
-The Docker/Coolify shape uses one selected build for migration, web, worker, and backup commands.
+The Docker/Coolify shape uses one selected build for migration, web, worker, backup, and Stripe membership synchronization commands.
 The web and worker share one persistent `/app/data` volume and must not run against different
 database revisions. Migration completes before long-lived processes start. Coolify supplies one
 shared resource environment to every Compose service, so provider values intentionally withheld
