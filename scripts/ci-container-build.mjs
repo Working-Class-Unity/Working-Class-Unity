@@ -109,6 +109,14 @@ async function run() {
     solidarityImporterHelp.stdout.includes('Usage: node .output/server/import-solidarity-events.mjs'),
     'Production image is missing the packaged Solidarity event importer'
   )
+  const solidarityConverterHelp = await docker(
+    ['run', '--rm', '--entrypoint', 'node', image, '.output/server/normalize-solidarity-events.mjs', '--help'],
+    20_000
+  )
+  assert(
+    solidarityConverterHelp.stdout.includes('Usage: node .output/server/normalize-solidarity-events.mjs'),
+    'Production image is missing the packaged Solidarity report converter'
+  )
 
   await docker(
     [
@@ -127,7 +135,7 @@ async function run() {
   )
 
   console.log(
-    'Container build proof passed: configured Sentry upload failures stop the build, BuildKit keeps the token out of diagnostics and the runtime image, deployable output contains no source maps, the build context excludes private state, the Stripe membership and Solidarity event importers are packaged, and the image defaults to node:node.'
+    'Container build proof passed: configured Sentry upload failures stop the build, BuildKit keeps the token out of diagnostics and the runtime image, deployable output contains no source maps, the build context excludes private state, the Stripe membership importer and Solidarity event converter/importer are packaged, and the image defaults to node:node.'
   )
 }
 

@@ -89,6 +89,10 @@ export type SolidarityEventImportReport = Readonly<{
   snapshots: Readonly<{ changed: number; unchanged: number }>
 }>
 
+export function assertSolidarityEventImportDataset(input: SolidarityEventImportDataset): void {
+  normalizeDataset(input)
+}
+
 type NormalizedEvent = Omit<SolidarityEventRecord, 'id' | 'primaryEventId'> & {
   id: string
   primaryEventId: string | null
@@ -328,6 +332,9 @@ function normalizeDataset(input: SolidarityEventImportDataset): NormalizedDatase
   assertUniqueIds(attendance, 'attendance')
   assertUniqueActivitySubjects(rsvps, 'RSVP')
   assertUniqueActivitySubjects(attendance, 'attendance')
+  const canonicalSessionByExternalId = canonicalSessionIds(sessions)
+  assertUniqueCanonicalActivitySubjects(rsvps, 'RSVP', canonicalSessionByExternalId)
+  assertUniqueCanonicalActivitySubjects(attendance, 'attendance', canonicalSessionByExternalId)
   return Object.freeze({ attendance, events, people, rsvps, sessions })
 }
 
@@ -457,30 +464,8 @@ function prepareSessions(
      where provider = 'solidarity'
        and (external_id = ? or primary_external_id = ? or paired_external_id = ?)`
   )
-  const canonicalByExternal = new Map(sessions.map((session) => [session.id, session.primarySessionId ?? session.id]))
-  const parent = new Map<string, string>()
-  const find = (value: string): string => {
-    const current = parent.get(value) ?? value
-    if (current === value) return value
-    const root = find(current)
-    parent.set(value, root)
-    return root
-  }
-  const union = (left: string, right: string) => {
-    const leftRoot = find(left)
-    const rightRoot = find(right)
-    if (leftRoot === rightRoot) return
-    const [first, second] = [leftRoot, rightRoot].sort()
-    parent.set(second!, first!)
-  }
-  for (const session of sessions) {
-    const canonical = session.primarySessionId ?? session.id
-    parent.set(canonical, parent.get(canonical) ?? canonical)
-    if (session.pairedSessionId) {
-      union(canonical, canonicalByExternal.get(session.pairedSessionId) ?? session.pairedSessionId)
-    }
-  }
-  const groups = groupBy(sessions, (session) => find(session.primarySessionId ?? session.id))
+  const canonicalByExternal = canonicalSessionIds(sessions)
+  const groups = groupBy(sessions, (session) => canonicalByExternal.get(session.id)!)
   const plans = [...groups.entries()]
     .sort(([left], [right]) => left.localeCompare(right))
     .map(([canonicalExternalId, externalSessions]) => {
@@ -520,6 +505,33 @@ function prepareSessions(
     for (const session of plan.externalSessions) sessionByExternalId.set(session.id, plan)
   }
   return Object.freeze({ sessionByExternalId, sessionPlans: Object.freeze(plans) })
+}
+
+function canonicalSessionIds(sessions: readonly NormalizedSession[]): ReadonlyMap<string, string> {
+  const declaredCanonical = new Map(sessions.map((session) => [session.id, session.primarySessionId ?? session.id]))
+  const parent = new Map<string, string>()
+  const find = (value: string): string => {
+    const current = parent.get(value) ?? value
+    if (current === value) return value
+    const root = find(current)
+    parent.set(value, root)
+    return root
+  }
+  const union = (left: string, right: string) => {
+    const leftRoot = find(left)
+    const rightRoot = find(right)
+    if (leftRoot === rightRoot) return
+    const [first, second] = [leftRoot, rightRoot].sort()
+    parent.set(second!, first!)
+  }
+  for (const session of sessions) {
+    const canonical = session.primarySessionId ?? session.id
+    parent.set(canonical, parent.get(canonical) ?? canonical)
+    if (session.pairedSessionId) {
+      union(canonical, declaredCanonical.get(session.pairedSessionId) ?? session.pairedSessionId)
+    }
+  }
+  return new Map(sessions.map((session) => [session.id, find(session.primarySessionId ?? session.id)]))
 }
 
 function preparePeople(
@@ -1139,6 +1151,20 @@ function assertUniqueActivitySubjects(
   for (const { sessionId, userId } of values) {
     const key = `${sessionId}\0${userId}`
     if (seen.has(key)) throw new TypeError(`Solidarity event import contains duplicate ${label} person/session`)
+    seen.add(key)
+  }
+}
+
+function assertUniqueCanonicalActivitySubjects(
+  values: readonly Readonly<{ sessionId: string; userId: string }>[],
+  label: string,
+  canonicalSessionByExternalId: ReadonlyMap<string, string>
+): void {
+  const seen = new Set<string>()
+  for (const { sessionId, userId } of values) {
+    const key = `${canonicalSessionByExternalId.get(sessionId) ?? sessionId}\0${userId}`
+    if (seen.has(key))
+      throw new TypeError(`Solidarity event import contains duplicate normalized ${label} person/session`)
     seen.add(key)
   }
 }
