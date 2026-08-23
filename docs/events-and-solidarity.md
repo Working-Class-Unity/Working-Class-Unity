@@ -47,6 +47,63 @@ The category names shown to website visitors are Meeting, Action, Learning, and 
 
 ## Import operation
 
+First normalize one People JSON export and one or more aligned event-metadata/RSVP report pairs:
+
+```sh
+pnpm db:normalize:solidarity-events -- \
+  --people /private/path/people.json \
+  --event /private/path/general-meeting.json \
+  --rsvps /private/path/general-meeting-rsvps.csv \
+  --event /private/path/steering-meeting.json \
+  --rsvps /private/path/steering-meeting-rsvps.csv \
+  --bundle /private/path/solidarity-events.json \
+  --manifest /private/path/solidarity-events-manifest.json
+```
+
+Each event metadata file is an operator-reviewed, schema-versioned allowlist:
+
+```json
+{
+  "schemaVersion": 1,
+  "event": {
+    "id": "solidarity-event-id",
+    "primaryEventId": null,
+    "title": "Event title",
+    "description": null,
+    "status": "active",
+    "timezone": "America/Los_Angeles",
+    "eventPageUrl": "https://events.solidarity.tech/example",
+    "eventTags": ["audience-public", "category-social"],
+    "campaignTags": []
+  },
+  "sessions": [
+    {
+      "id": "solidarity-session-id",
+      "eventId": "solidarity-event-id",
+      "primarySessionId": null,
+      "pairedSessionId": null,
+      "title": "Dated occurrence",
+      "status": "scheduled",
+      "eventType": "in_person",
+      "startsAt": "2026-09-01T02:00:00.000Z",
+      "endsAt": "2026-09-01T03:00:00.000Z",
+      "timezone": "America/Los_Angeles",
+      "locationName": "Example Hall",
+      "locationAddress": "100 Example Street",
+      "virtualUrl": null,
+      "rsvpUrl": "https://events.solidarity.tech/example"
+    }
+  ],
+  "attendance": []
+}
+```
+
+Do not infer event type, pairing, tags, visibility, category, location, or attendance from a title or free-form dashboard text. Put those facts explicitly in the reviewed metadata. Attendance records use the normalized importer fields and canonical UTC timestamps shown in the import contract; use an empty array when no attendance was recorded.
+
+The converter reads only People ID, name, primary email, and primary phone from the People report and ignores every other field. From RSVP CSV it reads only RSVP ID, User ID, Session ID, status, and created/updated timestamps. It accepts standard quoted CSV fields, requires the current named headers, and fails closed on malformed records, unsupported values, unknown references, or duplicate normalized activity. A blank RSVP status is omitted and counted as `rsvp_status_missing`, matching the currently observed Solidarity report behavior. The event and RSVP options may be repeated for any number of events, but each event must have exactly one matching RSVP report in the same option order.
+
+The converter has no network or database access. It refuses existing outputs, limits total inputs and the normalized bundle to 25 MiB, writes both new files with mode `0600`, and prints only aggregate counts, issue-code counts, and the bundle hash. Its manifest contains source hashes and counts but no paths, filenames, external IDs, titles, names, or contact data. Keep the source reports, metadata, normalized bundle, and database backups outside Git and shared logs. Review the issue counts and retain the exact manifest and bundle hash used for staging and production.
+
 Run a dry run first:
 
 ```sh
@@ -59,12 +116,12 @@ After reviewing the count-only receipt and issue-code counts, apply the same fil
 pnpm db:import:solidarity-events -- --input=/private/path/solidarity-events.json --apply
 ```
 
-The input is a normalized bundle assembled from one or more Solidarity reports, not an untouched dashboard export. It is limited to 25 MiB and has five arrays: `events`, `sessions`, `people`, `rsvps`, and `attendance`. IDs may be numbers or strings. Dates must be canonical UTC timestamps. Events carry Event Tags and Campaign Tags; sessions carry the parent event ID, `in_person` or `virtual` type, optional primary/paired IDs, location, and RSVP URL. A paired/hybrid local session may have only one RSVP and one attendance record per person in a normalized bundle. The importer rejects conflicting mirror records instead of choosing one by input order. It is transactional and idempotent, never matches a person by name, considers only verified local email/phone contacts for automatic matching, quarantines ambiguous matches, and does not infer deletion from a record missing from one report bundle.
+The input is the normalized converter output, not an untouched dashboard export. It is limited to 25 MiB and has five arrays: `events`, `sessions`, `people`, `rsvps`, and `attendance`. IDs may be numbers or strings. Dates must be canonical UTC timestamps. Events carry Event Tags and Campaign Tags; sessions carry the parent event ID, `in_person` or `virtual` type, optional primary/paired IDs, location, and RSVP URL. A paired/hybrid local session may have only one RSVP and one attendance record per person in a normalized bundle. The importer rejects conflicting mirror records instead of choosing one by input order. It is transactional and idempotent, never matches a person by name, considers only verified local email/phone contacts for automatic matching, quarantines ambiguous matches, and does not infer deletion from a record missing from one report bundle.
 
 The command logs only aggregate counts, the local batch ID, and issue-code counts. Do not put raw exports in Git, fixtures, command output, or public logs.
 
 ## Current synchronization boundary
 
-The paid Solidarity API is not used. Manually assembled and validated report bundles are the supported import boundary in this commit. Solidarity's official calendar subscription is promising for automatic event updates, but it includes only future events marked for web calendars and does not document a complete event/session/tag payload. Do not schedule it as the authoritative importer until WCU generates one feed, inspects its stable identifiers and fields, and proves the tag-filter behavior on representative public, member, recurring, and hybrid events.
+The paid Solidarity API is not used. Dashboard People and RSVP exports plus operator-reviewed event metadata are the supported import boundary. Solidarity's official calendar subscription is promising for automatic event updates, but it includes only future events marked for web calendars and does not document a complete event/session/tag payload. Do not schedule it as the authoritative importer until WCU generates one feed, inspects its stable identifiers and fields, and proves the tag-filter behavior on representative public, member, recurring, and hybrid events.
 
 Native WCU RSVP forms are a later change. They must store a local receipt and reliably create the corresponding Solidarity action so Solidarity confirmations and engagement ladders remain deterministic. Until that contract is available, RSVP links go to Solidarity.
