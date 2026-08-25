@@ -1,0 +1,89 @@
+:root {
+  color-scheme: light;
+
+  /* Semantic color roles: components do not consume the generated primitive scale directly. */
+  --color-brand-primary: var(--primitive-brand-navy);
+  --color-brand-accent: var(--primitive-brand-red);
+  --color-brand-highlight: var(--primitive-brand-orange);
+  --color-highlight-contrast: var(--primitive-brand-ink);
+  --color-canvas: var(--primitive-brand-canvas);
+  --color-surface: var(--primitive-white);
+  --color-surface-subtle: var(--primitive-navy-100);
+  --color-text: var(--primitive-brand-ink);
+  --color-text-muted: var(--primitive-ink-800);
+  --color-border: var(--primitive-ink-200);
+  --color-control-border: var(--primitive-ink-500);
+  --color-action: var(--primitive-brand-navy);
+  --color-action-contrast: var(--primitive-white);
+  --color-action-soft: var(--primitive-navy-100);
+  --color-neutral-tag-surface: var(--primitive-ink-100);
+  --color-neutral-tag-text: var(--primitive-ink-800);
+  --color-accent-action: var(--primitive-red-700);
+  --color-accent-action-hover: var(--primitive-red-800);
+  --color-accent-action-contrast: var(--primitive-white);
+  --color-divider: rgb(4 51 79 / 12%);
+  --color-divider-strong: rgb(4 51 79 / 18%);
+  --color-event-organizing-surface: var(--primitive-navy-100);
+  --color-event-organizing-text: var(--primitive-brand-navy);
+  --color-event-action-surface: var(--primitive-red-100);
+  --color-event-action-text: var(--primitive-red-800);
+  --color-event-community-surface: var(--primitive-orange-100);
+  --color-event-community-text: var(--primitive-orange-800);
+  --color-event-training-surface: var(--primitive-success-100);
+  --color-event-training-text: var(--primitive-success-800);
+  --color-overlay: rgb(4 34 51 / 62%);
+  --color-focus-ring: var(--primitive-brand-navy);
+  --color-status-success-text: var(--primitive-success-800);
+  --color-status-success-surface: var(--primitive-success-100);
+  --color-status-warning-text: var(--primitive-orange-800);
+  --color-status-warning-surface: var(--primitive-orange-100);
+  --color-status-error-text: var(--primitive-red-800);
+  --color-status-error-surface: var(--primitive-red-100);
+
+  /* Typography roles. */
+  --font-family-body: 'Inter Variable', 'Arial', ui-sans-serif, system-ui, sans-serif;
+  --font-family-display: 'Mona Sans Variable', 'Arial Black', ui-sans-serif, sans-serif;
+  --font-family-mono: ui-monospace, 'SFMono-Regular', 'Cascadia Code', 'Roboto Mono', consolas, monospace;
+  --font-size-heading-1: clamp(2.2rem, 1.6rem + 2.4vw, 3.75rem);
+  --font-size-heading-2: clamp(1.35rem, 1.1rem + 1vw, 2rem);
+  --font-size-heading-3: 1rem;
+  --font-size-small: 0.82rem;
+  --font-size-caption: 0.75rem;
+  --line-height-body: 1.5;
+  --line-height-heading: 1.08;
+  --font-weight-strong: 750;
+  --font-weight-bold: 800;
+  --font-weight-heavy: 900;
+
+  /* Spacing scale. */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.375rem;
+  --space-6: 1.75rem;
+  --space-7: 2.25rem;
+
+  /* Component and interaction roles. */
+  --border-width: 1px;
+  --border-width-accent: 4px;
+  --radius-1: 0.25rem;
+  --radius-2: 0.5rem;
+  --radius-3: 0.75rem;
+  --radius-round: 999px;
+  --shadow-panel: 0 1rem 2.625rem rgb(35 55 58 / 10%);
+  --shadow-dialog: 0 1.5rem 4rem rgb(4 20 31 / 28%);
+  --focus-outline: 3px solid var(--color-focus-ring);
+  --focus-offset: 3px;
+  --control-min-block-size: 2.75rem;
+  --control-min-inline-size: 2.75rem;
+  --content-max-width: 92rem;
+  --home-content-max-width: 100rem;
+  --home-content-inset: clamp(1rem, 3vw, 3.25rem);
+  --content-gutter: clamp(1rem, 2.5vw, 2.5rem);
+  --content-gutter-compact: 1rem;
+  --motion-duration-fast: 150ms;
+  --motion-duration-none: 0.01ms;
+  --z-menu: 20;
+  --z-skip-link: 100;
+}

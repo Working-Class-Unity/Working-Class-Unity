@@ -1,0 +1,34 @@
+# Reviewed 2026-08-04 by Working Class Unity maintainers.
+# The ancestry-free Baseline snapshot contains documentation prose describing a
+# synthetic model identifier, not a credential.
+ce833c307793ee0fbca476b2b55e906d41bef15f:docs/baseline/README.md:generic-api-key:389
+
+# Reviewed 2026-08-04 by Working Class Unity maintainers.
+# The ancestry-free Baseline snapshot contains test-only Stripe placeholders,
+# not provider credentials. The apps/web paths are historical paths in the
+# immutable import commit, not paths in the flattened application.
+ce833c307793ee0fbca476b2b55e906d41bef15f:apps/web/tests/billing-projection.test.ts:stripe-access-token:14
+ce833c307793ee0fbca476b2b55e906d41bef15f:apps/web/tests/billing-transition.test.ts:stripe-access-token:23
+ce833c307793ee0fbca476b2b55e906d41bef15f:apps/web/tests/module-states.test.ts:stripe-access-token:159
+
+# Reviewed 2026-08-22 by Working Class Unity maintainers.
+# The rebuilt baseline contains test-only restricted-key placeholders, not
+# credentials issued by Stripe or used by Working Class Unity.
+c010ede07f73b405fd522ae3f97c8057a51867f9:tests/billing/billing-service-race.test.ts:stripe-access-token:26
+c010ede07f73b405fd522ae3f97c8057a51867f9:tests/billing/transition-convergence-race.test.ts:stripe-access-token:26
+c010ede07f73b405fd522ae3f97c8057a51867f9:tests/billing/transition.test.ts:stripe-access-token:31
+
+# Reviewed 2026-08-25 by Working Class Unity maintainers.
+# The Stripe membership sync tests contain synthetic restricted-key fixtures,
+# not credentials issued by Stripe or used by Working Class Unity.
+59d23bf1d048af9cf9b94e9acb984738228bc1fe:tests/stripe-membership-sync.test.ts:stripe-access-token:35
+59d23bf1d048af9cf9b94e9acb984738228bc1fe:tests/stripe-membership-sync.test.ts:stripe-access-token:36
+
+# Reviewed 2026-08-04 by Working Class Unity maintainers.
+# Legacy WCU history contains copied public developer-documentation examples,
+# not credentials issued to or used by WCU.
+28b1fd87b8ebe3f49f923d3e513d915de1135458:knowledgebase/Formbricks/formbricks.com_docs_self-hosting_configuration_auth-sso_open-id-connect.md:generic-api-key:95
+576166187f3ffddc26d7fca297168496a5a34a88:knowledgebase/node.js Documentation 2025-11-24/nodejs.org_dist_latest_docs_api_https.html.md:generic-api-key:898
+576166187f3ffddc26d7fca297168496a5a34a88:knowledgebase/node.js Documentation 2025-11-24/nodejs.org_dist_latest_docs_api_https.html.md:generic-api-key:901
+576166187f3ffddc26d7fca297168496a5a34a88:knowledgebase/node.js Documentation 2025-11-24/nodejs.org_dist_latest_docs_api_https.html.md:generic-api-key:904
+576166187f3ffddc26d7fca297168496a5a34a88:knowledgebase/node.js Documentation 2025-11-24/nodejs.org_dist_latest_docs_api_https.html.md:generic-api-key:907

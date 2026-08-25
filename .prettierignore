@@ -1,0 +1,8 @@
+.dex/
+.nuxt/
+.output/
+coverage/
+data/
+node_modules/
+pnpm-lock.yaml
+server/db/migrations/meta/

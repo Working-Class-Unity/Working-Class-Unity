@@ -1,0 +1,355 @@
+{
+  "common": {
+    "email": "Email",
+    "emailInvalid": "Enter a valid email address.",
+    "required": "required",
+    "retry": "Try again",
+    "checkingSession": "Checking your session...",
+    "sessionVerificationFailed": "We could not verify your session right now.",
+    "working": "Working..."
+  },
+  "metadata": {
+    "defaultDescription": "Working Class Unity.",
+    "home": {
+      "title": "Working Class Unity",
+      "description": "Working people organizing together across San Joaquin County."
+    },
+    "about": {
+      "title": "About",
+      "description": "Learn why Working Class Unity is building a member-run working-class organization in San Joaquin County."
+    },
+    "bylaws": {
+      "title": "Bylaws",
+      "description": "Read the bylaws that govern Working Class Unity's membership, democratic decisions, elected leadership, campaigns, and committees."
+    },
+    "calendar": {
+      "title": "Calendar",
+      "description": "Find upcoming Working Class Unity events and meetings."
+    },
+    "forum": {
+      "title": "Forum",
+      "description": "Visit the Working Class Unity community forum."
+    },
+    "removeFlock": {
+      "overview": {
+        "title": "Remove Mass Surveillance from Stockton",
+        "description": "Working Class Unity's side-quest to remove Stockton's private mass-tracking system."
+      },
+      "whatStocktonBought": {
+        "title": "What Stockton Bought",
+        "description": "A sourced account of Stockton's Flock contracts, costs, tools, and unresolved questions."
+      },
+      "whySafeguards": {
+        "title": "Why Safeguards Are Not Enough",
+        "description": "Why immediate restrictions can reduce harm but cannot replace removal of Stockton's Flock system."
+      },
+      "faq": {
+        "title": "Stockton Flock FAQ",
+        "description": "Answers about safety, movement data, police technology, public spending, and removal."
+      }
+    },
+    "login": {
+      "title": "Log in"
+    },
+    "signup": {
+      "title": "Sign up"
+    },
+    "app": {
+      "title": "App"
+    },
+    "account": {
+      "title": "Account"
+    },
+    "observability": {
+      "title": "Observability test"
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "description": "Privacy policy template for Working Class Unity."
+    },
+    "terms": {
+      "title": "Terms",
+      "description": "Terms template for Working Class Unity."
+    },
+    "errorTitle": "{heading} {'|'} {appName}"
+  },
+  "navigation": {
+    "skipToMain": "Skip to main content",
+    "applicationLabel": "Application",
+    "brandHome": "{appName} home",
+    "primaryLabel": "Primary",
+    "sessionUnavailable": "Session check unavailable",
+    "about": "About",
+    "calendar": "Calendar",
+    "forum": "Forum",
+    "menu": "Menu",
+    "app": "App",
+    "login": "Log In",
+    "signup": "JOIN NOW"
+  },
+  "removeFlock": {
+    "campaignLabel": "Remove mass surveillance from Stockton side-quest",
+    "campaignHome": "Remove mass surveillance from Stockton overview",
+    "navigationLabel": "Side-quest",
+    "navigation": {
+      "overview": "Overview",
+      "whatStocktonBought": "What Stockton Bought",
+      "whySafeguards": "Why Removal",
+      "faq": "FAQ"
+    },
+    "petitionAction": "Sign Demand",
+    "footer": {
+      "description": "A Working Class Unity side-quest to remove Stockton's private mass-tracking system.",
+      "campaign": "Side-quest",
+      "wcu": "Working Class Unity",
+      "accountability": "Accountability",
+      "sourceNote": "Claims are tied to public records or named sources. Open questions remain marked as unknown.",
+      "privacy": "Privacy Policy",
+      "terms": "Terms"
+    }
+  },
+  "account": {
+    "eyebrow": "Personal settings",
+    "title": "Account",
+    "sessionUnavailable": {
+      "title": "Account unavailable"
+    },
+    "loginRequired": {
+      "title": "Continuing to log in",
+      "description": "A signed-in session is required to view this page."
+    },
+    "profile": {
+      "title": "Profile settings",
+      "description": "Add these details whenever you are ready. They are not required to use your account.",
+      "help": "First and last names stay in Account Settings. Only an explicit display name is used elsewhere in your WCU account.",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "displayName": "Display name",
+      "optional": "Optional",
+      "displayNameHelp": "Optional. Your email is used in your dashboard and account menu when this is blank.",
+      "save": "Save profile",
+      "saving": "Saving profile...",
+      "saved": "Profile saved.",
+      "saveError": "We could not save your profile right now. Please try again."
+    },
+    "identity": {
+      "title": "Sign-in details",
+      "avatar": "Avatar",
+      "avatarAlt": "Avatar for {identity}",
+      "noAvatar": "No avatar set"
+    },
+    "menu": {
+      "triggerLabel": "Account menu for {identity}",
+      "account": "Account",
+      "signingOut": "Signing out...",
+      "signOut": "Sign out",
+      "signOutError": "We could not confirm that you were signed out. Your session may still be active. Please try again."
+    },
+    "deletion": {
+      "title": "Delete account",
+      "description": "Deletion removes your login and private app content.",
+      "billingWarning": "If you own a Stripe subscription, deletion waits until cancellation is confirmed. Your account remains available while that result is uncertain; afterward, we may retain only minimized billing references needed for reconciliation.",
+      "confirmationLabel": "Type {confirmation} to confirm",
+      "help": "Once any required Stripe cancellation is confirmed, this action has no grace period.",
+      "deleting": "Deleting account...",
+      "submit": "Delete account",
+      "sessionTooOld": "Your session is too old for this action. Log out, sign in again, and then retry deletion.",
+      "billingPending": "Stripe cancellation is not confirmed, so your account was not deleted. Wait briefly and retry.",
+      "unknownResult": "We could not confirm whether deletion completed. Try signing in again; if this account still opens, you can retry."
+    }
+  },
+  "security": {
+    "check": {
+      "label": "Security check",
+      "complete": "Security check complete.",
+      "failure": "The security check could not be completed.",
+      "progress": "Security check in progress.",
+      "retry": "Retry security check"
+    }
+  },
+  "auth": {
+    "login": {
+      "eyebrow": "Welcome back",
+      "title": "Log in",
+      "introduction": "Enter your email address to receive a passwordless sign-in link."
+    },
+    "signup": {
+      "eyebrow": "Get started",
+      "title": "Create your account",
+      "introduction": "Enter your email address to create or return to your account."
+    },
+    "errors": {
+      "authenticationFailed": "We could not complete authentication. Request a new email link.",
+      "formInvalid": "Check the highlighted field and try again.",
+      "securityRequired": "Complete the security check before requesting an email link.",
+      "emailLink": "We could not send an email link right now. Please try again."
+    },
+    "status": {
+      "signedOut": "You are signed out.",
+      "emailLinkSent": "If you can receive email at that address, a sign-in link is on its way."
+    },
+    "sessionUnavailable": {
+      "title": "Session check unavailable",
+      "description": "We could not check your current session. You can still request a new email link."
+    },
+    "email": {
+      "required": "Email is required.",
+      "sending": "Sending...",
+      "submit": "Send email link"
+    },
+    "legal": {
+      "acknowledgment": "By continuing, you acknowledge the {terms} and {privacy}.",
+      "terms": "Terms",
+      "privacy": "Privacy Policy"
+    }
+  },
+  "errors": {
+    "notFound": {
+      "heading": "Page not found",
+      "description": "The requested page could not be found."
+    },
+    "unexpected": {
+      "heading": "Something went wrong",
+      "description": "The application could not complete this request."
+    },
+    "status": "Status {statusCode}",
+    "recoveryFailed": "We could not return home. Please reload the page and try again.",
+    "returningHome": "Returning home...",
+    "returnHome": "Return home"
+  },
+  "observability": {
+    "eyebrow": "Observability",
+    "title": "Client Event Test",
+    "preparing": "Preparing client event test.",
+    "missingToken": "Missing token hash.",
+    "validating": "Validating test token.",
+    "sent": "Client test event sent.",
+    "sentWithId": "Client test event sent: {eventId}",
+    "failed": "Client test validation failed."
+  },
+  "legal": {
+    "eyebrow": "Legal template",
+    "privacy": {
+      "title": "Privacy Policy",
+      "notice": "This text is a customization prompt, not a production privacy policy or legal advice. Replace it before launch.",
+      "information": {
+        "title": "Information and purpose",
+        "description": "Describe the information Working Class Unity collects, why it is needed, whether it is required, and how people can review or correct it."
+      },
+      "providers": {
+        "title": "Providers and sharing",
+        "description": "List every authentication, payment, infrastructure, analytics, email, and abuse-defense provider together with the information each provider receives."
+      },
+      "abuseDefense": {
+        "title": "Abuse defense",
+        "description": "The magic-link pages load Cloudflare's Turnstile challenge script and frame, which let Cloudflare process browser and network signals to distinguish people from bots. The application sends the resulting opaque token to Cloudflare Siteverify, but does not add the optional visitor IP field, enable widget failure feedback, retain the token or provider response in application data or ordinary logs, or surface provider error codes. Describe the deployment's actual retention and link to Cloudflare's {addendum}.",
+        "addendum": "Turnstile Privacy Addendum"
+      },
+      "retention": {
+        "title": "Retention and choices",
+        "description": "State the real retention periods, account-deletion behavior, billing-history exceptions, security controls, and a working contact method for privacy questions."
+      }
+    },
+    "terms": {
+      "title": "Terms",
+      "notice": "This text is a customization prompt, not production terms or legal advice. Replace it before launch.",
+      "service": {
+        "title": "The service",
+        "description": "Describe what Working Class Unity provides, who may use it, and any eligibility or account requirements."
+      },
+      "conduct": {
+        "title": "Acceptable use",
+        "description": "Document the conduct, content, automation, and abuse rules that are appropriate for the service."
+      },
+      "payments": {
+        "title": "Payments and ending access",
+        "description": "Explain the real price, renewal, cancellation, refund, account-deletion, and access behavior."
+      }
+    }
+  },
+  "publicPages": {
+    "eyebrow": "Public site",
+    "about": {
+      "eyebrow": "Our Story",
+      "title": "They Have Their Parties. We Need Our Own Organization",
+      "introduction": "The bosses and landlords have two political parties. The working class needs a fighting organization of its own.",
+      "photoAlt": "Working Class Unity members standing together at a community meeting.",
+      "photoCaption": "Working Class Unity members in San Joaquin County.",
+      "problem": {
+        "title": "The Problem",
+        "bodyOne": "Across San Joaquin, rents rise while our wages stall. Bosses demand more while giving less. Both the Democratic and Republican parties answer to their donors, not to us.",
+        "bodyTwo": "Our political and economic system is not broken; it is working exactly as designed to protect the profits of the wealthy by keeping the rest of us divided and powerless. It makes us too poor to live in and own the homes we've built, too poor to eat the food we've grown and served, too poor to benefit from the fruits of our labor."
+      },
+      "solution": {
+        "title": "Our Solution",
+        "bodyOne": "We refuse to accept this. We are organizing a mass working-class movement to build the genuine democracy we deserve – one where working people have real control over our lives, our communities, and our economy. We are not a political party. We organize collectively through mass membership. We do not have to continue relying on politicians, lobbying them, and hoping that they side with us over their donors.",
+        "bodyTwo": "Working Class Unity is just as the name suggests, an organization fighting to unite the working class, to give individuals in San Joaquin control over their lives. We demand truly affordable and safe housing, workplace autonomy, protection of our communities from police oppression, and accountability from our elected officials. Our mission is to strengthen working class power by forging alliances between labor and tenant unions and social movements through education, advocacy, and direct action.",
+        "bodyThree": "We fight for our families. For the future prosperity of our children. Whatever your race, your creed, your birthplace – don't stand by and let the wealthy tear down this country that each one of us has helped build."
+      },
+      "governance": {
+        "eyebrow": "Member-run by design",
+        "title": "How we govern ourselves",
+        "description": "Our bylaws set the rules for how members govern Working Class Unity, make collective decisions, and hold the organization accountable.",
+        "action": "Read our bylaws"
+      },
+      "cta": {
+        "eyebrow": "Build lasting power",
+        "title": "Organize with us",
+        "description": "Together, we can build a member-run movement in San Joaquin County that wins concrete victories, without the compromises and betrayals of politicians and their wealthy donors.",
+        "action": "JOIN WCU"
+      }
+    },
+    "bylaws": {
+      "eyebrow": "Member-Governed",
+      "title": "Working Class Unity Bylaws",
+      "introduction": "These bylaws describe how members govern Working Class Unity: who can participate, how decisions are made, and how our elected bodies, campaigns, and committees are accountable.",
+      "sourceAction": "View the source document",
+      "sourceUpdated": "Last updated February 12, 2026.",
+      "documentLabel": "Working Class Unity bylaws",
+      "outline": {
+        "label": "Bylaws contents",
+        "title": "On This Page",
+        "description": "Jump to an article or section.",
+        "trigger": "On this page",
+        "close": "Close bylaws contents"
+      }
+    },
+    "calendar": {
+      "title": "Calendar",
+      "description": "Our public meetings, events, and actions will appear here soon."
+    },
+    "forum": {
+      "title": "Forum",
+      "description": "The community discussion space is being prepared."
+    }
+  },
+  "home": {
+    "eyebrow": "WORKING CLASS UNITY · SAN JOAQUIN COUNTY",
+    "title": "Working People Need an Organization of Our Own",
+    "introduction": "WCU brings tenants, workers, and neighbors together to win concrete changes, develop new leaders, and build lasting power.",
+    "join": "JOIN WCU",
+    "nextEvent": "NEXT EVENT",
+    "newsletterHeading": "Stay informed about meetings and actions.",
+    "emailLabel": "Email address",
+    "emailPlaceholder": "Email address",
+    "newsletterSubmit": "STAY INFORMED",
+    "newsletterNote": "Newsletter signup is coming soon.",
+    "photoCaption": "Real WCU moments across San Joaquin County."
+  },
+  "personalApp": {
+    "eyebrow": "Working Class Unity",
+    "welcome": "Welcome back",
+    "welcomeNamed": "Welcome back, {name}",
+    "loading": {
+      "title": "Loading your account",
+      "description": "Retrieving your account session."
+    },
+    "unavailable": {
+      "title": "App unavailable",
+      "description": "We could not load your account right now."
+    },
+    "ready": "Your WCU account is ready.",
+    "signedInAs": "Signed in as {email}",
+    "manageAccount": "Manage account"
+  }
+}

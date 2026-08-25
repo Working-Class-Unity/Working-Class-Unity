@@ -1,0 +1,9 @@
+export const fileUploadTokenTtlMs = 15 * 60 * 1000
+export const pendingFileUploadLimit = 5
+export const fileUploadInitiationLimit = 25
+export const fileUploadInitiationWindowMs = fileUploadTokenTtlMs
+export const fileDownloadTokenTtlMs = 60 * 1000
+export const fileCleanupSchedulingMarginMs = 60 * 1000
+export const fileCleanupMaxAttempts = 2_147_483_647
+export const fileUploadCreateBodyLimitBytes = 4_096
+export const fileUploadCompleteBodyLimitBytes = 1_024

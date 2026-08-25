@@ -1,0 +1,31 @@
+overrides:
+  '@types/node': 24.13.3
+  # Patched same-major resolutions for advisories published against the transitive graph on 2026-08-04.
+  brace-expansion: 5.0.9
+  fast-uri: 3.1.5
+  postcss: 8.5.25
+  undici: 8.10.0
+  # Patched resolutions for advisories published against the locked graph on 2026-08-22.
+  '@nuxt/devtools': 3.3.1
+  js-yaml: 4.3.1
+  nanoid: 3.3.18
+  # Leonardo's color generator still requests mout 0.11; 1.2.4 retains the modular imports it uses.
+  'ciebase@0.1.1>mout': 1.2.4
+  'ciecam02@0.4.6>mout': 1.2.4
+  # Drop these when Nitro replaces Archiver 7; both preserve its used APIs while keeping one brace-expansion v5.
+  'archiver-utils@5.0.2>glob': 13.0.6
+  'archiver@7.0.1>readdir-glob': 3.0.0
+  # Stable Drizzle Kit ships a self-contained tsx loader; this dependency is used only by its unpublished development build.
+  'drizzle-kit@0.31.10>@esbuild-kit/esm-loader': '-'
+  vue: 3.5.40
+
+publicHoistPattern:
+  - nuxt
+
+allowBuilds:
+  '@parcel/watcher': true
+  '@sentry/cli': true
+  better-sqlite3: true
+  esbuild: true
+  unrs-resolver: true
+  vue-demi: false

@@ -1,0 +1,34 @@
+import { billingOfferingKeys, isBillingOfferingKey, type BillingOfferingKey } from '../../../../shared/billing'
+import type { BillingStripePriceConfiguration } from './configuration'
+import { configurationError } from '../../../utils/errors'
+
+export type StripeBillingCatalog = Readonly<{
+  priceIdForOffering(offering: BillingOfferingKey): string
+  offeringForPriceId(priceId: string): BillingOfferingKey | null
+}>
+
+export function createStripeBillingCatalog(prices: BillingStripePriceConfiguration): StripeBillingCatalog {
+  const priceIdByOffering = new Map<BillingOfferingKey, string>()
+  const offeringByPriceId = new Map<string, BillingOfferingKey>()
+
+  for (const offering of billingOfferingKeys) {
+    const priceId = prices[offering]
+    if (typeof priceId !== 'string' || !priceId.startsWith('price_') || offeringByPriceId.has(priceId)) {
+      throw configurationError('Stripe billing catalog is invalid')
+    }
+    priceIdByOffering.set(offering, priceId)
+    offeringByPriceId.set(priceId, offering)
+  }
+
+  return Object.freeze({
+    priceIdForOffering(offering: BillingOfferingKey) {
+      if (!isBillingOfferingKey(offering)) {
+        throw configurationError('Stripe billing catalog is invalid')
+      }
+      return priceIdByOffering.get(offering)!
+    },
+    offeringForPriceId(priceId: string) {
+      return offeringByPriceId.get(priceId) ?? null
+    }
+  })
+}
