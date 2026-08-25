@@ -18,6 +18,12 @@ c010ede07f73b405fd522ae3f97c8057a51867f9:tests/billing/billing-service-race.test
 c010ede07f73b405fd522ae3f97c8057a51867f9:tests/billing/transition-convergence-race.test.ts:stripe-access-token:26
 c010ede07f73b405fd522ae3f97c8057a51867f9:tests/billing/transition.test.ts:stripe-access-token:31
 
+# Reviewed 2026-08-25 by Working Class Unity maintainers.
+# The Stripe membership sync tests contain synthetic restricted-key fixtures,
+# not credentials issued by Stripe or used by Working Class Unity.
+59d23bf1d048af9cf9b94e9acb984738228bc1fe:tests/stripe-membership-sync.test.ts:stripe-access-token:35
+59d23bf1d048af9cf9b94e9acb984738228bc1fe:tests/stripe-membership-sync.test.ts:stripe-access-token:36
+
 # Reviewed 2026-08-04 by Working Class Unity maintainers.
 # Legacy WCU history contains copied public developer-documentation examples,
 # not credentials issued to or used by WCU.
