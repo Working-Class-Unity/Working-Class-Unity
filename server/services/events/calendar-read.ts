@@ -1,5 +1,7 @@
 import type { DatabaseConnection } from '../../db/connect'
 import type { EventCategory } from '../../db/schema/events'
+import type { BillingStripePriceConfiguration } from '../payments/stripe/configuration'
+import { readWebsiteMembershipAccess } from '../membership/member-access'
 
 export type CalendarEvent = Readonly<{
   category: EventCategory
@@ -45,7 +47,14 @@ type CalendarRow = Readonly<{
 
 export function listVisibleCalendarEvents(
   connection: DatabaseConnection,
-  input: Readonly<{ from: string; limit: number; to: string; userId: string | null }>
+  input: Readonly<{
+    from: string
+    limit: number
+    now: Date
+    prices: BillingStripePriceConfiguration
+    to: string
+    userId: string | null
+  }>
 ): Readonly<{ events: readonly CalendarEvent[] }> {
   const from = canonicalUtcTimestamp(input.from, 'Calendar from')
   const to = canonicalUtcTimestamp(input.to, 'Calendar to')
@@ -53,7 +62,9 @@ export function listVisibleCalendarEvents(
   if (!Number.isInteger(input.limit) || input.limit < 1 || input.limit > 200) {
     throw new TypeError('Calendar limit must be an integer from 1 to 200')
   }
-  const canViewMemberEvents = input.userId ? hasActiveMembership(connection, input.userId) : false
+  const canViewMemberEvents = input.userId
+    ? readWebsiteMembershipAccess(connection, input.userId, input.prices, input.now).granted
+    : false
   const rows = connection.sqlite
     .prepare(
       `select e.id as eventId, e.title as eventTitle, e.description, e.kind as category,
@@ -107,18 +118,6 @@ export function listVisibleCalendarEvents(
       [...events.values()].map((event) => Object.freeze({ ...event, sessions: Object.freeze(event.sessions) }))
     )
   })
-}
-
-function hasActiveMembership(connection: DatabaseConnection, userId: string): boolean {
-  return Boolean(
-    connection.sqlite
-      .prepare(
-        `select 1 from person_accounts pa
-         join memberships m on m.person_id = pa.person_id
-         where pa.user_id = ? and m.status = 'active' and m.ended_at is null limit 1`
-      )
-      .get(userId)
-  )
 }
 
 function canonicalUtcTimestamp(value: string, label: string): string {

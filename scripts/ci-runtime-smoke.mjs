@@ -35,11 +35,8 @@ const canonicalBuildStripeCanary = 'rk_test_canonical_build_canary_must_not_ente
 const canonicalBuildWebhookCanary = 'whsec_canonical_build_canary_must_not_enter_output'
 const canonicalBuildStripeCatalogCanaries = {
   portalConfigurationId: 'bpc_canonical_build_must_not_enter_output',
-  personalWeeklyPriceId: 'price_canonical_build_personal_weekly',
-  personalMonthlyPriceId: 'price_canonical_build_personal_monthly',
-  personalAnnualPriceId: 'price_canonical_build_personal_annual',
-  familyMonthlyPriceId: 'price_canonical_build_family_monthly',
-  familyAnnualPriceId: 'price_canonical_build_family_annual'
+  membershipDues10PriceId: 'price_canonical_build_personal_monthly',
+  solidarityDues27PriceId: 'price_canonical_build_family_monthly'
 }
 const canonicalBuildSentryCanary = 'https://build-canary@o0.ingest.invalid/0'
 const runtimeAuthSecret = 'runtime-only-auth-secret-sentinel-not-a-credential'
@@ -49,11 +46,8 @@ const runtimeStripeSecret = 'rk_test_runtime_config_boundary_not_used'
 const runtimeStripeWebhookSecret = 'whsec_runtime_config_boundary'
 const runtimeStripeCatalog = {
   portalConfigurationId: 'bpc_runtime',
-  personalWeeklyPriceId: 'price_runtime_personal_weekly',
-  personalMonthlyPriceId: 'price_runtime_personal_monthly',
-  personalAnnualPriceId: 'price_runtime_personal_annual',
-  familyMonthlyPriceId: 'price_runtime_family_monthly',
-  familyAnnualPriceId: 'price_runtime_family_annual'
+  membershipDues10PriceId: 'price_runtime_personal_monthly',
+  solidarityDues27PriceId: 'price_runtime_family_monthly'
 }
 const runtimeEmailFrom = 'baseline@example.test'
 const httpRequestTimeoutMs = 10_000
@@ -96,11 +90,8 @@ const buildEnv = {
   NUXT_STRIPE_SECRET_KEY: canonicalBuildStripeCanary,
   NUXT_STRIPE_WEBHOOK_SECRET: canonicalBuildWebhookCanary,
   NUXT_STRIPE_PORTAL_CONFIGURATION_ID: canonicalBuildStripeCatalogCanaries.portalConfigurationId,
-  NUXT_STRIPE_PERSONAL_WEEKLY_PRICE_ID: canonicalBuildStripeCatalogCanaries.personalWeeklyPriceId,
-  NUXT_STRIPE_PERSONAL_MONTHLY_PRICE_ID: canonicalBuildStripeCatalogCanaries.personalMonthlyPriceId,
-  NUXT_STRIPE_PERSONAL_ANNUAL_PRICE_ID: canonicalBuildStripeCatalogCanaries.personalAnnualPriceId,
-  NUXT_STRIPE_FAMILY_MONTHLY_PRICE_ID: canonicalBuildStripeCatalogCanaries.familyMonthlyPriceId,
-  NUXT_STRIPE_FAMILY_ANNUAL_PRICE_ID: canonicalBuildStripeCatalogCanaries.familyAnnualPriceId,
+  NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID: canonicalBuildStripeCatalogCanaries.membershipDues10PriceId,
+  NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID: canonicalBuildStripeCatalogCanaries.solidarityDues27PriceId,
   NUXT_SENTRY_DSN: canonicalBuildSentryCanary
 }
 const runtimeDatabaseEnv = {
@@ -154,6 +145,9 @@ await coordinator.run(async () => {
       NUXT_EMAIL_TRANSPORT: 'capture',
       NUXT_EMAIL_FROM: runtimeEmailFrom,
       NUXT_EMAIL_CAPTURE_DIRECTORY: runtimeEmailCaptureDirectory,
+      NUXT_TWILIO_VERIFY_API_KEY_SID: 'SK11111111111111111111111111111111',
+      NUXT_TWILIO_VERIFY_API_KEY_SECRET: 'runtime-twilio-secret-not-a-credential',
+      NUXT_TWILIO_VERIFY_SERVICE_SID: 'VA11111111111111111111111111111111',
       NUXT_READINESS_TOKEN: runtimeReadinessToken,
       NUXT_CLOUDFLARE_TURNSTILE_SECRET_KEY: 'runtime-turnstile-secret-not-a-provider-credential',
       NUXT_PUBLIC_TURNSTILE_SITE_KEY: 'runtime-turnstile-site-not-a-provider-credential',
@@ -164,11 +158,8 @@ await coordinator.run(async () => {
       NUXT_STRIPE_SECRET_KEY: runtimeStripeSecret,
       NUXT_STRIPE_WEBHOOK_SECRET: runtimeStripeWebhookSecret,
       NUXT_STRIPE_PORTAL_CONFIGURATION_ID: runtimeStripeCatalog.portalConfigurationId,
-      NUXT_STRIPE_PERSONAL_WEEKLY_PRICE_ID: runtimeStripeCatalog.personalWeeklyPriceId,
-      NUXT_STRIPE_PERSONAL_MONTHLY_PRICE_ID: runtimeStripeCatalog.personalMonthlyPriceId,
-      NUXT_STRIPE_PERSONAL_ANNUAL_PRICE_ID: runtimeStripeCatalog.personalAnnualPriceId,
-      NUXT_STRIPE_FAMILY_MONTHLY_PRICE_ID: runtimeStripeCatalog.familyMonthlyPriceId,
-      NUXT_STRIPE_FAMILY_ANNUAL_PRICE_ID: runtimeStripeCatalog.familyAnnualPriceId
+      NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID: runtimeStripeCatalog.membershipDues10PriceId,
+      NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID: runtimeStripeCatalog.solidarityDues27PriceId
     }
     await assertStartupRejected(
       { ...runtimeEnv, NUXT_DATABASE_URL: undefined },

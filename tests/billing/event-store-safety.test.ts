@@ -2,6 +2,7 @@ import type Stripe from 'stripe'
 import { afterEach, describe, expect, it } from 'vitest'
 import { createStripeBillingCatalog } from '../../server/services/payments/stripe/catalog'
 import { enqueueBillingDetachedSubscriptionCancellation } from '../../server/services/payments/stripe/detached-subscription-cancellation'
+import { billingGracePeriodMs } from '../../server/services/payments/stripe/dunning'
 import { applyStripeEventObservation } from '../../server/services/payments/stripe/event-store'
 import {
   projectStripeSubscription,
@@ -981,7 +982,7 @@ describe('Billing Stripe webhook transaction safety', () => {
       status: 'past_due',
       graceInvoiceId: invoiceId,
       graceStartedAt: new Date(901_000).toISOString(),
-      graceEndsAt: new Date(901_000 + 14 * 24 * 60 * 60 * 1_000).toISOString()
+      graceEndsAt: new Date(901_000 + billingGracePeriodMs).toISOString()
     })
 
     const paidInvoice = renewalInvoice(invoiceId, 'cus_test', 'paid')

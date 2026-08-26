@@ -24,6 +24,8 @@ import { commitBillingProjectionInTransaction } from './state-store'
 import { isBillingOfferingKey, type BillingOfferingKey } from '../../../../shared/billing'
 import type { StripeBillingClient } from './stripe-client'
 import { executeBillingTransition } from './transition'
+import { hasCurrentImportedStripeDuesSubscription } from '../../membership/imported-stripe-billing'
+import { hasOpenWebsiteAccountIdentityReview } from '../../membership/account-identity'
 
 export type BillingStripeServiceContext = Readonly<{
   connection: BillingStripeConnection
@@ -48,6 +50,9 @@ export async function createBillingStripeCheckout(
   now = new Date()
 ) {
   if (!isBillingOfferingKey(offering)) throw forbiddenError('Unsupported billing offering')
+  const assertCheckoutAllowed = (connection: BillingStripeConnection, userId: string) =>
+    assertMembershipCheckoutAllowed(connection, userId, context.config)
+  assertCheckoutAllowed(context.connection, purchaserUserId)
   const state = readBaseBillingStripePurchaserState(context.connection, purchaserUserId, now)
   const open = getOpenCheckoutAttempt(context.connection, purchaserUserId)
   const retry =
@@ -56,12 +61,30 @@ export async function createBillingStripeCheckout(
     throw conflictError('The current billing account must be managed or reconciled')
   }
   return ensureBillingCheckout(
-    context,
+    { ...context, assertCheckoutAllowed },
     purchaserUserId,
     getBillingCustomerForPurchaser(context.connection, purchaserUserId),
     offering,
     now
   )
+}
+
+function assertMembershipCheckoutAllowed(
+  connection: BillingStripeConnection,
+  purchaserUserId: string,
+  config: BillingStripeRuntimeConfiguration
+): void {
+  if (hasOpenWebsiteAccountIdentityReview(connection, purchaserUserId)) {
+    throw conflictError('Account identity must be reviewed before starting another subscription')
+  }
+  if (
+    hasCurrentImportedStripeDuesSubscription(connection, purchaserUserId, {
+      'personal.monthly': config.stripe.prices['personal.monthly'],
+      'family.monthly': config.stripe.prices['family.monthly']
+    })
+  ) {
+    throw conflictError('An existing Stripe membership must be reconciled before starting another subscription')
+  }
 }
 
 export async function changeBillingStripeOffering(

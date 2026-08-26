@@ -3,7 +3,8 @@ import { z } from 'zod'
 export const turnstileTokenSchema = z.string().min(1).max(2_048)
 
 export const turnstileActions = {
-  magicLink: 'auth_magic_link'
+  magicLink: 'auth_magic_link',
+  phoneOtp: 'auth_phone_otp'
 } as const
 
 export const turnstileHeaderName = 'x-turnstile-token'

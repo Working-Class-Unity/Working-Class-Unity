@@ -14,6 +14,7 @@ import { commitBillingProjectionInTransaction, type BillingProjectionCommit } fr
 import type { StripeBillingClient } from './stripe-client'
 import { isExactManagedSubscription, isExactRenewalInvoice } from './webhook-lifecycle'
 import { readExactStripeSubscriptionState } from './webhook-state'
+import { isMembershipDuesOfferingKey } from '../../../../shared/billing'
 
 export const billingReconciliationSafetyJobType = 'billing.reconciliation-safety' as const
 export const billingReconciliationSafetyIntervalMs = 24 * 60 * 60 * 1_000
@@ -197,7 +198,7 @@ function safetyProjection(
     failClosed('missing_authenticated_failure_invoice')
   }
 
-  if (!projection.reconciliationRequired && current.planKey === 'family') {
+  if (!projection.reconciliationRequired && isMembershipDuesOfferingKey(`${current.planKey}.${current.cadence}`)) {
     if (!current.cancelAtPeriodEnd && projection.status === 'active' && projection.cancelAtPeriodEnd) {
       effects.push({
         action: 'renewal_ending',

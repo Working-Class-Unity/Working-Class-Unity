@@ -1,4 +1,6 @@
 import { randomUUID } from 'node:crypto'
+import { isBillingOfferingKey, isMembershipDuesOfferingKey } from '../../../../shared/billing'
+import { reserveBillingEmailVerificationInTransaction } from './billing-email-verification'
 import { enqueueBillingDetachedSubscriptionCancellation } from './detached-subscription-cancellation'
 import { currentProjectionFingerprint } from './projection'
 import type {
@@ -18,7 +20,6 @@ import {
   updateCheckoutAttempt
 } from './repository'
 import { commitBillingProjectionInTransaction, type BillingProjectionCommit } from './state-store'
-import { isBillingOfferingKey } from '../../../../shared/billing'
 import { normalizedTransitionSnapshot } from './transition-store'
 import type { StripeEventObservation } from './webhook'
 import {
@@ -29,6 +30,7 @@ import {
   type BillingStripeTransitionMutation,
   type BillingStripeWebhookLifecycle
 } from './webhook-lifecycle'
+import { isExactPaidInitialInvoice } from './webhook-state'
 
 export type StripeEventApplyResult = Readonly<{
   duplicate: boolean
@@ -303,8 +305,54 @@ function applyObservationInTransaction(
     } else if (projection.status !== 'none' && observation.checkoutState !== 'failed') {
       updateCheckoutAttempt(connection, attempt.id, { state: 'completed', updatedAt: now.toISOString() })
     }
+    reserveAcceptedCheckoutBillingEmail(connection, attempt, observation, projection, now)
   }
   return 'live'
+}
+
+function reserveAcceptedCheckoutBillingEmail(
+  connection: BillingStripeConnection,
+  attempt: NonNullable<ReturnType<typeof getCheckoutAttemptById>>,
+  observation: StripeEventObservation,
+  projection: BillingProjectionCommit,
+  now: Date
+): void {
+  if (
+    observation.providerState.kind !== 'checkout' ||
+    !['checkout.session.completed', 'checkout.session.async_payment_succeeded'].includes(observation.eventType) ||
+    observation.checkoutState !== 'completed' ||
+    observation.reconciliationReason ||
+    projection.status !== 'active' ||
+    projection.reconciliationRequired
+  )
+    return
+
+  const offering = `${attempt.planKey}.${attempt.cadence}`
+  const session = observation.providerState.session
+  const subscription = observation.providerState.subscription
+  const email = session?.customer_details?.email
+  if (
+    !session ||
+    session.id !== observation.stripeSessionId ||
+    !subscription ||
+    !observation.stripeCustomerId ||
+    !isMembershipDuesOfferingKey(offering) ||
+    observation.providerState.checkoutOffering !== offering ||
+    !isExactPaidInitialInvoice(subscription, observation.stripeCustomerId) ||
+    typeof email !== 'string'
+  )
+    return
+
+  reserveBillingEmailVerificationInTransaction(
+    connection,
+    {
+      billingCheckoutAttemptId: attempt.id,
+      email,
+      purchaserUserId: attempt.purchaserUserId,
+      stripeSessionId: session.id
+    },
+    now
+  )
 }
 
 function applyCheckoutObservation(

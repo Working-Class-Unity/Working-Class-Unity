@@ -3,6 +3,7 @@ import type { JobHandler, JobPayload } from '../../jobs/job-queue'
 import type { TransactionalEmailMessage, TransactionalEmailSender } from '../../email'
 import { TransactionalEmailDeliveryError } from '../../email'
 import { z } from 'zod'
+import { isTemporaryPhoneEmail } from '../../../utils/auth/phone'
 import type { BillingStripeConnection } from './public-contract'
 
 export const billingNotificationDeliveryJobType = 'billing.notification-delivery' as const
@@ -86,9 +87,9 @@ export function createBillingNotificationDeliveryHandler(
     }
 
     const recipient = context.connection.sqlite
-      .prepare('select email from user where id = ?')
-      .get(parsed.data.purchaserUserId) as { email: string } | undefined
-    if (!recipient) return
+      .prepare('select email, email_verified as emailVerified from user where id = ?')
+      .get(parsed.data.purchaserUserId) as { email: string; emailVerified: number } | undefined
+    if (!recipient || recipient.emailVerified !== 1 || isTemporaryPhoneEmail(recipient.email)) return
 
     try {
       await context.sender.send({

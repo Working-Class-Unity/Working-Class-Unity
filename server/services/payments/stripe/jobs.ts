@@ -5,10 +5,20 @@ import { createBillingAccountDeletionCancellationJobHandlerWithClient } from './
 import { ensureBillingAccountDeletionCancellationJobs } from './account-deletion-store'
 import type { BillingStripeRuntimeConfiguration } from './configuration'
 import {
+  billingEmailVerificationJobType,
+  createBillingEmailVerificationDeliveryHandler,
+  ensureBillingEmailVerificationJobs
+} from './billing-email-verification'
+import {
   billingDetachedSubscriptionCancellationJobType,
   createBillingDetachedSubscriptionCancellationHandler,
   ensureBillingDetachedSubscriptionCancellationJobs
 } from './detached-subscription-cancellation'
+import {
+  billingGraceExpiryJobType,
+  createBillingGraceExpiryHandler,
+  ensureBillingGraceExpiryJobs
+} from './grace-expiry'
 import {
   billingNotificationDeliveryJobType,
   createBillingNotificationDeliveryHandler,
@@ -32,6 +42,8 @@ import { billingWebhookReconciliationJobType, ensureBillingWebhookReconciliation
 export const billingStripeJobTypes = Object.freeze([
   billingAccountDeletionCancellationJobType,
   billingDetachedSubscriptionCancellationJobType,
+  billingGraceExpiryJobType,
+  billingEmailVerificationJobType,
   billingWebhookReconciliationJobType,
   billingReconciliationSafetyJobType,
   billingTransitionConvergenceJobType,
@@ -44,6 +56,7 @@ export type BillingStripeJobHandlers = Readonly<Record<BillingStripeJobType, Job
 export type BillingStripeJobContext = Readonly<{
   connection: BillingStripeConnection
   configuration: BillingStripeRuntimeConfiguration
+  emailVerificationSecret: string
   sender: TransactionalEmailSender
   integration?: BillingStripeIntegration<BillingStripeConnection, unknown>
   now?: () => Date
@@ -62,6 +75,21 @@ export function createBillingStripeJobHandlers(context: BillingStripeJobContext)
       () => client,
       context.now
     ),
+    [billingGraceExpiryJobType]: createBillingGraceExpiryHandler({
+      connection: context.connection,
+      client,
+      prices: context.configuration.stripe.prices,
+      integration: context.integration,
+      now: context.now
+    }),
+    [billingEmailVerificationJobType]: createBillingEmailVerificationDeliveryHandler({
+      appName: context.configuration.appName,
+      appUrl: context.configuration.appUrl,
+      connection: context.connection,
+      secret: context.emailVerificationSecret,
+      sender: context.sender,
+      now: context.now
+    }),
     [billingWebhookReconciliationJobType]: createBillingWebhookReconciliationHandler({
       connection: context.connection,
       client,
@@ -93,6 +121,8 @@ export function createBillingStripeJobHandlers(context: BillingStripeJobContext)
 export type EnsureBillingStripeJobsResult = Readonly<{
   accountDeletionCancellation: number
   detachedSubscriptionCancellation: number
+  graceExpiry: number
+  emailVerification: number
   webhookReconciliation: number
   reconciliationSafety: 'idle' | 'scheduled' | 'covered-active' | 'covered-future'
   transitionConvergence: number
@@ -106,6 +136,8 @@ export function ensureBillingStripeJobs(
   return Object.freeze({
     accountDeletionCancellation: ensureBillingAccountDeletionCancellationJobs(connection, now),
     detachedSubscriptionCancellation: ensureBillingDetachedSubscriptionCancellationJobs(connection, now),
+    graceExpiry: ensureBillingGraceExpiryJobs(connection, now),
+    emailVerification: ensureBillingEmailVerificationJobs(connection, now),
     webhookReconciliation: ensureBillingWebhookReconciliationJobs(connection, now),
     reconciliationSafety: ensureBillingReconciliationSafetyJob(connection, now),
     transitionConvergence: ensureBillingTransitionConvergenceJobs(connection, now),

@@ -21,10 +21,11 @@ afterEach(() => {
 })
 
 describe('Billing Stripe schema contract', () => {
-  it('exports exactly seven purchaser-keyed tables with no Family or organization field', () => {
+  it('exports exactly eight Billing tables with no Family or organization field', () => {
     expect(Object.keys(billingStripeSchema)).toEqual([
       'billingCustomers',
       'billingCheckoutAttempts',
+      'billingEmailVerifications',
       'billingSubscriptions',
       'billingSubscriptionTransitions',
       'billingAccountDeletionRequests',

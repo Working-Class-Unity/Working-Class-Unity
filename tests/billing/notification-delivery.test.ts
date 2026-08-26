@@ -8,6 +8,7 @@ import {
   enqueueBillingStripeNotification,
   ensureBillingNotificationDeliveryJobs
 } from '../../server/services/payments/stripe/notification-delivery'
+import { temporaryPhoneEmail } from '../../server/utils/auth/phone'
 import { createBillingStripeRuntimeFixture, type BillingStripeRuntimeFixture } from './runtime-fixture'
 
 const fixtures: BillingStripeRuntimeFixture[] = []
@@ -128,6 +129,30 @@ describe('Billing notification delivery boundary', () => {
     })
 
     await handler(JSON.parse(notificationJobs(fixture)[0]!.payload))
+    expect(send).not.toHaveBeenCalled()
+  })
+
+  it('never sends to the hidden phone-only compatibility email', async () => {
+    const fixture = runtimeFixture('phone_only')
+    fixture.sqlite
+      .prepare('update user set email = ?, email_verified = 0 where id = ?')
+      .run(temporaryPhoneEmail('notification-test-secret', '+12095550123'), fixture.purchaserUserId)
+    expect(
+      enqueueBillingStripeNotification(fixture.connection, {
+        kind: 'payment_attention',
+        purchaserUserId: fixture.purchaserUserId,
+        episodeKey: 'phone-only-payment-attention'
+      })
+    ).toBe(true)
+    const send = vi.fn(async () => undefined)
+    const handler = createBillingNotificationDeliveryHandler({
+      appName: 'Billing Test',
+      connection: fixture.connection,
+      sender: { send }
+    })
+
+    await handler(JSON.parse(notificationJobs(fixture)[0]!.payload))
+
     expect(send).not.toHaveBeenCalled()
   })
 

@@ -20,12 +20,14 @@ const serviceMocks = vi.hoisted(() => ({
   reconcileBillingStripe: vi.fn()
 }))
 const webhookMocks = vi.hoisted(() => ({ processStripeWebhookEvent: vi.fn() }))
+const membershipMocks = vi.hoisted(() => ({ readAccountMembershipState: vi.fn() }))
 
 vi.mock('../../server/services/payments/stripe/app-composition', async () => ({
   default: (await import('./composition-fixture')).default
 }))
 vi.mock('../../server/services/payments/stripe/billing-service', () => serviceMocks)
 vi.mock('../../server/services/payments/stripe/webhook', () => webhookMocks)
+vi.mock('../../server/services/membership/member-access', () => membershipMocks)
 
 const getStripeClientSpy = vi.spyOn(stripeClientModule, 'getStripeClient')
 
@@ -35,7 +37,8 @@ let server: Server
 let baseUrl: string
 
 beforeAll(async () => {
-  const [billing, checkout, change, portal, reconcile, webhook] = await Promise.all([
+  const [membership, billing, checkout, change, portal, reconcile, webhook] = await Promise.all([
+    import('../../server/api/account/membership.get').then((module) => module.default),
     import('../../server/api/account/billing/index.get').then((module) => module.default),
     import('../../server/api/account/billing/checkout.post').then((module) => module.default),
     import('../../server/api/account/billing/change.post').then((module) => module.default),
@@ -44,6 +47,7 @@ beforeAll(async () => {
     import('../../server/api/webhooks/stripe.post').then((module) => module.default)
   ])
   const router = createRouter()
+    .get('/api/account/membership', membership as EventHandler)
     .get('/api/account/billing', billing as EventHandler)
     .post('/api/account/billing/checkout', checkout as EventHandler)
     .post('/api/account/billing/change', change as EventHandler)
@@ -73,6 +77,7 @@ beforeEach(() => {
   serviceMocks.createBillingStripePortal.mockResolvedValue({ url: 'https://billing.stripe.test/bps_safe' })
   serviceMocks.reconcileBillingStripe.mockResolvedValue(safeState())
   webhookMocks.processStripeWebhookEvent.mockResolvedValue({ duplicate: false, target: 'ignored' })
+  membershipMocks.readAccountMembershipState.mockReturnValue(safeMembershipState())
 })
 
 afterAll(async () => {
@@ -81,6 +86,29 @@ afterAll(async () => {
 })
 
 describe('Billing HTTP boundary', () => {
+  it('returns the private Supporter/member contract only after authentication', async () => {
+    const response = await fetch(`${baseUrl}/api/account/membership`)
+
+    expect(response.status).toBe(200)
+    expect(response.headers.get('cache-control')).toBe('private, no-store')
+    expect(await response.json()).toEqual(safeMembershipState())
+    expect(membershipMocks.readAccountMembershipState).toHaveBeenCalledExactlyOnceWith(
+      billingStripeCompositionFixture.connection,
+      'purchaser_http',
+      billingStripeCompositionFixture.configuration.stripe.prices
+    )
+
+    membershipMocks.readAccountMembershipState.mockClear()
+    billingStripeCompositionFixture.requireUserError = createError({
+      statusCode: 401,
+      statusMessage: 'Authentication required'
+    })
+    const anonymous = await fetch(`${baseUrl}/api/account/membership`)
+    expect(anonymous.status).toBe(401)
+    expect(anonymous.headers.get('cache-control')).toBe('private, no-store')
+    expect(membershipMocks.readAccountMembershipState).not.toHaveBeenCalled()
+  })
+
   it('authenticates Billing portal commands before bounded body parsing', async () => {
     billingStripeCompositionFixture.requireUserError = createError({
       statusCode: 401,
@@ -542,6 +570,21 @@ function safeState() {
     },
     transition: null,
     capabilities: { canCheckout: true, canChange: false, canManage: false, canReconcile: false }
+  }
+}
+
+function safeMembershipState() {
+  return {
+    level: 'supporter',
+    identityReviewPending: false,
+    access: {
+      granted: false,
+      graceDeadline: null,
+      offering: null,
+      source: 'supporter',
+      state: 'none'
+    },
+    billing: safeState()
   }
 }
 

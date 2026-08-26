@@ -7,6 +7,7 @@ import { safeErrorData } from '../server/utils/errors'
 import { createBetterAuthSecurityOptions, createRedactedBetterAuthLogger } from '../server/utils/auth/security'
 import { validateWithZod } from '../server/utils/validation'
 import {
+  createAccountEmailVerificationEmail,
   createMagicLinkEmail,
   createTransactionalEmailSender,
   getTransactionalEmailSender,
@@ -112,6 +113,22 @@ describe('server foundation utilities', () => {
     expect((failure as Error).message).not.toContain('provider-secret-sentinel')
     expect((failure as Error).message).not.toContain('person@example.test')
     expect((failure as Error).message).not.toContain('private-token')
+  })
+
+  it('renders account email verification as confirmation rather than sign-in', () => {
+    const message = createAccountEmailVerificationEmail({
+      appName: 'Working Class <Unity>',
+      to: 'person@example.test',
+      url: 'https://app.example.test/api/auth/verify-email?token=private-token'
+    })
+
+    expect(message).toMatchObject({
+      to: 'person@example.test',
+      subject: 'Confirm your email for your WCU account'
+    })
+    expect(message.text).toContain('does not sign you in')
+    expect(message.html).toContain('Working Class &lt;Unity&gt;')
+    expect(message.html).not.toContain('Working Class <Unity>')
   })
 
   it('captures a private magic-link email atomically and normalizes capture failures', async () => {
@@ -398,16 +415,17 @@ describe('server foundation utilities', () => {
   it('requires each active basic-release provider capability to be complete', () => {
     const cases = [
       [
+        'twilio verify',
+        ['NUXT_TWILIO_VERIFY_API_KEY_SID', 'NUXT_TWILIO_VERIFY_API_KEY_SECRET', 'NUXT_TWILIO_VERIFY_SERVICE_SID']
+      ],
+      [
         'billing',
         [
           'NUXT_STRIPE_SECRET_KEY',
           'NUXT_STRIPE_WEBHOOK_SECRET',
           'NUXT_STRIPE_PORTAL_CONFIGURATION_ID',
-          'NUXT_STRIPE_PERSONAL_WEEKLY_PRICE_ID',
-          'NUXT_STRIPE_PERSONAL_MONTHLY_PRICE_ID',
-          'NUXT_STRIPE_PERSONAL_ANNUAL_PRICE_ID',
-          'NUXT_STRIPE_FAMILY_MONTHLY_PRICE_ID',
-          'NUXT_STRIPE_FAMILY_ANNUAL_PRICE_ID'
+          'NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID',
+          'NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID'
         ]
       ],
       ['turnstile', ['NUXT_CLOUDFLARE_TURNSTILE_SECRET_KEY', 'NUXT_PUBLIC_TURNSTILE_SITE_KEY']],
@@ -833,20 +851,14 @@ describe('server foundation utilities', () => {
           input.stripe.secretKey = 'build-stripe-sentinel'
           input.stripe.webhookSecret = 'matching-webhook-secret'
           input.stripe.portalConfigurationId = 'bpc_matching'
-          input.stripe.personalWeeklyPriceId = 'price_matching_personal_weekly'
-          input.stripe.personalMonthlyPriceId = 'price_matching_personal_monthly'
-          input.stripe.personalAnnualPriceId = 'price_matching_personal_annual'
-          input.stripe.familyMonthlyPriceId = 'price_matching_family_monthly'
-          input.stripe.familyAnnualPriceId = 'price_matching_family_annual'
+          input.stripe.membershipDues10PriceId = 'price_matching_personal_monthly'
+          input.stripe.solidarityDues27PriceId = 'price_matching_family_monthly'
           Object.assign(environment, {
             NUXT_STRIPE_SECRET_KEY: 'runtime-stripe-sentinel',
             NUXT_STRIPE_WEBHOOK_SECRET: 'matching-webhook-secret',
             NUXT_STRIPE_PORTAL_CONFIGURATION_ID: 'bpc_matching',
-            NUXT_STRIPE_PERSONAL_WEEKLY_PRICE_ID: 'price_matching_personal_weekly',
-            NUXT_STRIPE_PERSONAL_MONTHLY_PRICE_ID: 'price_matching_personal_monthly',
-            NUXT_STRIPE_PERSONAL_ANNUAL_PRICE_ID: 'price_matching_personal_annual',
-            NUXT_STRIPE_FAMILY_MONTHLY_PRICE_ID: 'price_matching_family_monthly',
-            NUXT_STRIPE_FAMILY_ANNUAL_PRICE_ID: 'price_matching_family_annual'
+            NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID: 'price_matching_personal_monthly',
+            NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID: 'price_matching_family_monthly'
           })
         }
       },
@@ -886,16 +898,21 @@ describe('server foundation utilities', () => {
   it('fails malformed destr-resolved leaves for configured providers', () => {
     const cases = [
       {
+        key: 'NUXT_TWILIO_VERIFY_API_KEY_SID',
+        values: {
+          NUXT_TWILIO_VERIFY_API_KEY_SID: 'RK55555555555555555555555555555555',
+          NUXT_TWILIO_VERIFY_API_KEY_SECRET: 'foundation-twilio-secret-not-a-credential',
+          NUXT_TWILIO_VERIFY_SERVICE_SID: 'VA55555555555555555555555555555555'
+        }
+      },
+      {
         key: 'NUXT_STRIPE_SECRET_KEY',
         values: {
           NUXT_STRIPE_SECRET_KEY: '123',
           NUXT_STRIPE_WEBHOOK_SECRET: 'valid-webhook-secret',
           NUXT_STRIPE_PORTAL_CONFIGURATION_ID: 'bpc_test',
-          NUXT_STRIPE_PERSONAL_WEEKLY_PRICE_ID: 'price_personal_weekly',
-          NUXT_STRIPE_PERSONAL_MONTHLY_PRICE_ID: 'price_personal_monthly',
-          NUXT_STRIPE_PERSONAL_ANNUAL_PRICE_ID: 'price_personal_annual',
-          NUXT_STRIPE_FAMILY_MONTHLY_PRICE_ID: 'price_family_monthly',
-          NUXT_STRIPE_FAMILY_ANNUAL_PRICE_ID: 'price_family_annual'
+          NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID: 'price_personal_monthly',
+          NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID: 'price_family_monthly'
         }
       },
       {
@@ -1408,15 +1425,15 @@ function runtimeEnvironment(overrides: Record<string, string | undefined> = {}) 
     NUXT_EMAIL_TRANSPORT: 'capture',
     NUXT_EMAIL_FROM: 'baseline@example.test',
     NUXT_EMAIL_CAPTURE_DIRECTORY: './data/test-email-capture',
+    NUXT_TWILIO_VERIFY_API_KEY_SID: 'SK55555555555555555555555555555555',
+    NUXT_TWILIO_VERIFY_API_KEY_SECRET: 'foundation-twilio-secret-not-a-credential',
+    NUXT_TWILIO_VERIFY_SERVICE_SID: 'VA55555555555555555555555555555555',
     NUXT_PUBLIC_APP_URL: 'http://127.0.0.1:3000',
     NUXT_STRIPE_SECRET_KEY: 'rk_test_foundation_not_a_provider_credential',
     NUXT_STRIPE_WEBHOOK_SECRET: 'whsec_foundation_not_a_provider_credential',
     NUXT_STRIPE_PORTAL_CONFIGURATION_ID: 'bpc_foundation',
-    NUXT_STRIPE_PERSONAL_WEEKLY_PRICE_ID: 'price_foundation_personal_weekly',
-    NUXT_STRIPE_PERSONAL_MONTHLY_PRICE_ID: 'price_foundation_personal_monthly',
-    NUXT_STRIPE_PERSONAL_ANNUAL_PRICE_ID: 'price_foundation_personal_annual',
-    NUXT_STRIPE_FAMILY_MONTHLY_PRICE_ID: 'price_foundation_family_monthly',
-    NUXT_STRIPE_FAMILY_ANNUAL_PRICE_ID: 'price_foundation_family_annual',
+    NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID: 'price_foundation_personal_monthly',
+    NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID: 'price_foundation_family_monthly',
     NUXT_FILES_DRIVER: 'local',
     NUXT_OPENAI_API_KEY: 'foundation-openai-key-not-a-provider-credential',
     NUXT_OPENAI_PROJECT_ID: 'proj_foundation_test',
@@ -1451,15 +1468,17 @@ function completeRuntimeConfig() {
         apiKey: ''
       }
     },
+    twilioVerify: {
+      apiKeySid: 'SK55555555555555555555555555555555',
+      apiKeySecret: 'foundation-twilio-secret-not-a-credential',
+      serviceSid: 'VA55555555555555555555555555555555'
+    },
     stripe: {
       secretKey: 'rk_test_foundation_not_a_provider_credential',
       webhookSecret: 'whsec_foundation_not_a_provider_credential',
       portalConfigurationId: 'bpc_foundation',
-      personalWeeklyPriceId: 'price_foundation_personal_weekly',
-      personalMonthlyPriceId: 'price_foundation_personal_monthly',
-      personalAnnualPriceId: 'price_foundation_personal_annual',
-      familyMonthlyPriceId: 'price_foundation_family_monthly',
-      familyAnnualPriceId: 'price_foundation_family_annual'
+      membershipDues10PriceId: 'price_foundation_personal_monthly',
+      solidarityDues27PriceId: 'price_foundation_family_monthly'
     },
     files: {
       driver: 'local' as '' | 'local' | 'r2'

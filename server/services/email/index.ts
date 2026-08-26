@@ -3,7 +3,12 @@ import { chmod, mkdir, open, rename, rm } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { Resend } from 'resend'
 import { getAppRuntimeConfig, type AppRuntimeConfig } from '../../utils/runtime'
-import { renderEnglishMagicLinkEmail } from './templates/en'
+import {
+  renderEnglishAccountEmailVerificationEmail,
+  renderEnglishBillingEmailVerificationEmail,
+  renderEnglishIdentityReviewEmail,
+  renderEnglishMagicLinkEmail
+} from './templates/en'
 
 export type TransactionalEmailMessage = Readonly<{
   to: string
@@ -60,6 +65,49 @@ export function createMagicLinkEmail(input: { to: string; url: string; appName: 
   const appName = normalizeDisplayText(input.appName)
   const url = requireHttpUrl(input.url)
   return renderEnglishMagicLinkEmail({ to, url, appName })
+}
+
+export function createAccountEmailVerificationEmail(input: {
+  to: string
+  url: string
+  appName: string
+}): TransactionalEmailMessage {
+  const to = requireHeaderValue(input.to)
+  const appName = normalizeDisplayText(input.appName)
+  const url = requireHttpUrl(input.url)
+  return renderEnglishAccountEmailVerificationEmail({ to, url, appName })
+}
+
+export function createIdentityReviewEmail(input: {
+  appName: string
+  reason: string
+  reviewId: string
+  userId: string
+}): TransactionalEmailMessage {
+  const appName = normalizeDisplayText(input.appName)
+  const reason = normalizeDisplayText(input.reason)
+  const reviewId = normalizeDisplayText(input.reviewId)
+  const userId = normalizeDisplayText(input.userId)
+  return {
+    ...renderEnglishIdentityReviewEmail({ appName, reason, reviewId, userId }),
+    idempotencyKey: `identity-review-${reviewId}`
+  }
+}
+
+export function createBillingEmailVerificationEmail(input: {
+  appName: string
+  to: string
+  url: string
+  verificationId: string
+}): TransactionalEmailMessage {
+  const appName = normalizeDisplayText(input.appName)
+  const to = requireHeaderValue(input.to)
+  const url = requireHttpUrl(input.url)
+  const verificationId = normalizeDisplayText(input.verificationId)
+  return {
+    ...renderEnglishBillingEmailVerificationEmail({ appName, to, url }),
+    idempotencyKey: `billing-email-verification-${verificationId}`
+  }
 }
 
 function createCaptureEmailSender(config: AppRuntimeConfig['email']): TransactionalEmailSender {

@@ -64,11 +64,8 @@ let stripeProviderUrl
 const stripeProviderRequests = []
 const stripeCatalog = {
   portalConfigurationId: 'bpc_isolated',
-  personalWeeklyPriceId: 'price_isolated_personal_weekly',
-  personalMonthlyPriceId: 'price_isolated_personal_monthly',
-  personalAnnualPriceId: 'price_isolated_personal_annual',
-  familyMonthlyPriceId: 'price_isolated_family_monthly',
-  familyAnnualPriceId: 'price_isolated_family_annual'
+  membershipDues10PriceId: 'price_isolated_personal_monthly',
+  solidarityDues27PriceId: 'price_isolated_family_monthly'
 }
 let server
 let serverOutputMonitor
@@ -213,6 +210,9 @@ function applicationEnvironment(baseUrl, port) {
     NUXT_EMAIL_TRANSPORT: 'capture',
     NUXT_EMAIL_FROM: 'baseline@example.test',
     NUXT_EMAIL_CAPTURE_DIRECTORY: emailCaptureDirectory,
+    NUXT_TWILIO_VERIFY_API_KEY_SID: 'SK33333333333333333333333333333333',
+    NUXT_TWILIO_VERIFY_API_KEY_SECRET: 'isolated-twilio-secret-not-a-credential',
+    NUXT_TWILIO_VERIFY_SERVICE_SID: 'VA33333333333333333333333333333333',
     NUXT_CLOUDFLARE_TURNSTILE_SECRET_KEY: 'isolated-turnstile-secret-not-a-provider-credential',
     NUXT_PUBLIC_TURNSTILE_SITE_KEY: 'isolated-turnstile-site-not-a-provider-credential',
     NUXT_SENTRY_DSN: 'http://public@127.0.0.1:9/1',
@@ -225,11 +225,8 @@ function applicationEnvironment(baseUrl, port) {
     NUXT_STRIPE_SECRET_KEY: stripeSecret,
     NUXT_STRIPE_WEBHOOK_SECRET: stripeWebhookSecret,
     NUXT_STRIPE_PORTAL_CONFIGURATION_ID: stripeCatalog.portalConfigurationId,
-    NUXT_STRIPE_PERSONAL_WEEKLY_PRICE_ID: stripeCatalog.personalWeeklyPriceId,
-    NUXT_STRIPE_PERSONAL_MONTHLY_PRICE_ID: stripeCatalog.personalMonthlyPriceId,
-    NUXT_STRIPE_PERSONAL_ANNUAL_PRICE_ID: stripeCatalog.personalAnnualPriceId,
-    NUXT_STRIPE_FAMILY_MONTHLY_PRICE_ID: stripeCatalog.familyMonthlyPriceId,
-    NUXT_STRIPE_FAMILY_ANNUAL_PRICE_ID: stripeCatalog.familyAnnualPriceId,
+    NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID: stripeCatalog.membershipDues10PriceId,
+    NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID: stripeCatalog.solidarityDues27PriceId,
     SWL_ISOLATED_STRIPE_PROVIDER_URL: stripeProviderUrl,
     SWL_ISOLATED_TURNSTILE_HOSTNAME: new URL(baseUrl).hostname
   }
@@ -373,7 +370,7 @@ function handleStripeProviderRequest(request, response) {
         {
           id: `li_${sessionId.slice('cs_test_'.length)}`,
           object: 'item',
-          price: stripeCatalog.personalMonthlyPriceId,
+          price: stripeCatalog.membershipDues10PriceId,
           quantity: 1
         }
       ],

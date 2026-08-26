@@ -66,6 +66,21 @@ describe('configured passwordless HTTP behavior', () => {
     expect(sessionBody).toMatchObject({ user: { email, displayName: null } })
     expect(sessionBody.user).not.toHaveProperty('firstName')
     expect(sessionBody.user).not.toHaveProperty('lastName')
+    expect(
+      fixture.sqlite
+        .prepare(
+          `select pc.kind, pc.normalized_value as normalizedValue, pc.verified_at as verifiedAt
+           from person_accounts pa
+           join user u on u.id = pa.user_id
+           join person_contacts pc on pc.person_id = pa.person_id
+           where u.email = ?`
+        )
+        .get(email)
+    ).toEqual({
+      kind: 'email',
+      normalizedValue: email,
+      verifiedAt: expect.any(String)
+    })
 
     const forgedEmail = 'forged-signup-profile@example.test'
     const forged = await issueMagicLink(forgedEmail, {}, nextUniqueClientIp(), {
@@ -83,6 +98,32 @@ describe('configured passwordless HTTP behavior', () => {
       lastName: null,
       displayName: null
     })
+  })
+
+  it('provisions a canonical identity when an existing website account logs in', async () => {
+    const email = 'existing-account@example.test'
+    fixture.sqlite
+      .prepare(
+        `insert into user (id, name, email, email_verified, created_at, updated_at)
+         values ('existing-account', 'WCU account', ?, 1, 1, 1)`
+      )
+      .run(email)
+
+    const issued = await issueMagicLink(email)
+    const verified = await fixture.auth.handler(authRequest(issued.url))
+
+    expect(redirectOutcome(verified).error).toBeUndefined()
+    expect(
+      fixture.sqlite
+        .prepare(
+          `select pa.user_id as userId, pc.normalized_value as normalizedValue
+           from person_accounts pa
+           join person_contacts pc on pc.person_id = pa.person_id
+           where pa.user_id = 'existing-account'`
+        )
+        .get()
+    ).toEqual({ normalizedValue: email, userId: 'existing-account' })
+    expect(fixture.sqlite.prepare('select count(*) as count from people').get()).toEqual({ count: 1 })
   })
 
   it('normalizes, isolates, validates, and clears optional account profile fields', async () => {
@@ -693,6 +734,10 @@ function testRuntimeConfig(): AppRuntimeConfig {
       appName: 'Passwordless HTTP Test',
       appUrl: baseURL,
       turnstileSiteKey: '1x00000000000000000000AA'
+    },
+    stripe: {
+      membershipDues10PriceId: 'price_passwordless_membership_10',
+      solidarityDues27PriceId: 'price_passwordless_solidarity_27'
     }
   } as AppRuntimeConfig
 }

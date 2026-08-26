@@ -81,8 +81,8 @@ describe('Stripe subscription dunning', () => {
     })
   })
 
-  it('grants past-due access only before the validated 14-day deadline', () => {
-    const graceStartedAt = '2026-07-14T12:00:00.000Z'
+  it('grants past-due access only before the validated 60-day deadline', () => {
+    const graceStartedAt = '2026-05-29T12:00:00.000Z'
     const graceEndsAt = '2026-07-28T12:00:00.000Z'
     const snapshot = {
       status: 'past_due' as const,
@@ -126,7 +126,7 @@ describe('Stripe subscription dunning', () => {
         status: 'past_due' as const,
         reconciliationRequired: false,
         graceInvoiceId: 'in_renewal',
-        graceStartedAt: '2026-07-14T12:00:00.000Z',
+        graceStartedAt: '2026-05-29T12:00:00.000Z',
         graceEndsAt: '2026-07-28T12:00:00.001Z'
       }
     ]) {

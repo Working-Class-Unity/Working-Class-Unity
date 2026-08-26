@@ -5,7 +5,7 @@ import type { CurrentBillingProjection } from './projection'
 import type { BillingStripeLifecycleEffect } from './public-contract'
 import { getBillingSubscriptionForPurchaser, getCheckoutAttemptById, getOpenBillingTransition } from './repository'
 import type { BillingSubscription, BillingSubscriptionTransition } from '../../../db/schema/billing'
-import type { BillingOfferingKey } from '../../../../shared/billing'
+import { isMembershipDuesOfferingKey, type BillingOfferingKey } from '../../../../shared/billing'
 import type { StripeEventObservation } from './webhook'
 import type { StripeWebhookEventType } from './webhook-reference'
 import { isExactPaidInitialInvoice, type StripeWebhookProviderState } from './webhook-state'
@@ -91,7 +91,8 @@ export function resolveBillingStripeWebhookLifecycle(
 
   const effects: BillingStripeLifecycleEffect[] = []
   if (
-    current?.planKey === 'family' &&
+    current &&
+    isMembershipDuesOfferingKey(`${current.planKey}.${current.cadence}`) &&
     !current.cancelAtPeriodEnd &&
     providerProjection.status === 'active' &&
     providerProjection.cancelAtPeriodEnd
@@ -99,7 +100,8 @@ export function resolveBillingStripeWebhookLifecycle(
     effects.push(effect('renewal_ending', observation.eventId, providerProjection.currentPeriodEnd, null))
   }
   if (
-    current?.planKey === 'family' &&
+    current &&
+    isMembershipDuesOfferingKey(`${current.planKey}.${current.cadence}`) &&
     !isTerminalProjectionStatus(current.status) &&
     isTerminalProjectionStatus(providerProjection.status)
   ) {
@@ -131,7 +133,7 @@ function resolveOpenTransitionLifecycle(
   ) {
     return reconciliationLifecycle(projection, 'transition_subscription_identity_conflict', transition)
   }
-  return transition.kind === 'personal_to_family'
+  return transition.kind === 'personal_to_family' && transition.effectiveAt === null
     ? resolveImmediateTransitionLifecycle(current, transition, observation, projection, subscription)
     : resolveScheduledTransitionLifecycle(current, transition, observation, projection, subscription)
 }
@@ -283,10 +285,7 @@ function resolveScheduledTransitionLifecycle(
       projection,
       grace: { kind: 'clear' },
       transition: transitionMutation(transition, 'applied', null),
-      effects:
-        transition.kind === 'family_to_personal'
-          ? [effect('coverage_ended', transition.id, transition.effectiveAt, transition.id)]
-          : []
+      effects: []
     }
   }
   if (offering !== sourceOffering) {
@@ -317,7 +316,7 @@ function resolveScheduledTransitionLifecycle(
     transition: changed
       ? { transition, state: 'scheduled', reason: null, stripeSubscriptionScheduleId: expectedScheduleId }
       : null,
-    effects: changed ? [effect('renewal_ending', transition.id, transition.effectiveAt, transition.id)] : []
+    effects: []
   }
 }
 
@@ -580,7 +579,7 @@ export function transitionConvergenceEventType(
   schedule: Stripe.SubscriptionSchedule | null,
   observedAt: Date
 ): StripeWebhookEventType {
-  if (transition.kind === 'personal_to_family') {
+  if (transition.kind === 'personal_to_family' && transition.effectiveAt === null) {
     const expiresAt = Date.parse(transition.stripePendingUpdateExpiresAt ?? '')
     if (
       projectionOffering(projection) === transitionOffering(transition, 'source') &&

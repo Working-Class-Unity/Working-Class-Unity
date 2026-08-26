@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { appUserIdentity } from '~/composables/useAppSession'
+
 const { t } = useI18n()
 const { data: session, error: sessionError, status: sessionStatus, refresh: refreshSession } = await useAppSession()
 
@@ -7,6 +9,7 @@ if (!sessionError.value && !session.value?.user) {
 }
 
 const user = computed(() => session.value?.user ?? null)
+const identity = computed(() => (user.value ? appUserIdentity(user.value) : ''))
 const retryState = ref<'idle' | 'pending' | 'failed'>('idle')
 const retrying = computed(() => retryState.value === 'pending')
 const retryAnnouncement = computed<'polite' | 'assertive' | undefined>(() => {
@@ -72,9 +75,9 @@ async function retrySession() {
 
       <div v-else class="personal-app-content">
         <p>{{ t('personalApp.ready') }}</p>
-        <i18n-t keypath="personalApp.signedInAs" tag="p" class="account-email">
-          <template #email>
-            <strong>{{ user.email }}</strong>
+        <i18n-t keypath="personalApp.signedInAs" tag="p" class="account-identity">
+          <template #identity>
+            <strong>{{ identity }}</strong>
           </template>
         </i18n-t>
         <NuxtLink class="account-link" to="/account">
@@ -127,7 +130,7 @@ async function retrySession() {
     margin: 0;
   }
 
-  .account-email {
+  .account-identity {
     color: var(--color-text-muted);
   }
 

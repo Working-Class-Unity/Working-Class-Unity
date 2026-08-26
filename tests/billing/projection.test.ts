@@ -174,7 +174,7 @@ describe('Stripe billing projection', () => {
     })
   })
 
-  it('grants past-due access only inside one validated 14-day grace window', () => {
+  it('grants past-due access only inside one validated 60-day grace window', () => {
     const firstFailure = new Date('2026-07-01T12:00:00.000Z')
     const grace = graceWindowFromFirstFailure(firstFailure)
     const snapshot = {
@@ -186,12 +186,12 @@ describe('Stripe billing projection', () => {
     } as const
 
     expect(Date.parse(grace.endsAt) - Date.parse(grace.startedAt)).toBe(billingGracePeriodMs)
-    expect(evaluateStripeSubscriptionAccess(snapshot, new Date('2026-07-15T11:59:59.999Z'))).toMatchObject({
+    expect(evaluateStripeSubscriptionAccess(snapshot, new Date(Date.parse(grace.endsAt) - 1))).toMatchObject({
       state: 'grace',
       granted: true,
       graceDeadline: grace.endsAt
     })
-    expect(evaluateStripeSubscriptionAccess(snapshot, new Date('2026-07-15T12:00:00.000Z'))).toMatchObject({
+    expect(evaluateStripeSubscriptionAccess(snapshot, new Date(grace.endsAt))).toMatchObject({
       state: 'suspended',
       granted: false,
       graceDeadline: grace.endsAt

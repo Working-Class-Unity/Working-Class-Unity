@@ -35,6 +35,7 @@ export type BillingStripeStateCommitCause =
   | 'reconciliation_safety'
   | 'transition'
   | 'transition_convergence'
+  | 'grace_expiry'
   | 'renewal_stop'
 
 export type BillingStripeAuthorizationRequest =

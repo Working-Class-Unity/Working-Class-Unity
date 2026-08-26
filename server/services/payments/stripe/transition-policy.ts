@@ -25,6 +25,9 @@ export function deriveBillingTransition(
     return decision('cadence_change', targetOffering, 'period_end', 'subscription_schedule', false)
   }
   if (currentPlan === 'personal') {
+    if (currentCadence === 'monthly' && targetOffering === 'family.monthly') {
+      return decision('personal_to_family', targetOffering, 'period_end', 'subscription_schedule', false)
+    }
     return decision(
       'personal_to_family',
       targetOffering,

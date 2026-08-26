@@ -15,7 +15,10 @@ const expectedMigrationTags = [
   '0001_wcu_account_profile',
   '0002_membership_operations',
   '0003_stripe_charge_ids',
-  '0004_event_operations'
+  '0004_event_operations',
+  '0005_phone_auth',
+  '0006_identity_link_reviews',
+  '0007_billing_email_verification'
 ] as const
 const expectedRuntimeTables = [
   'account',
@@ -33,6 +36,7 @@ const expectedRuntimeTables = [
   'billing_account_deletion_requests',
   'billing_checkout_attempts',
   'billing_customers',
+  'billing_email_verifications',
   'billing_events',
   'billing_subscription_transitions',
   'billing_subscriptions',
@@ -47,6 +51,7 @@ const expectedRuntimeTables = [
   'events',
   'external_record_snapshots',
   'files',
+  'identity_link_reviews',
   'import_batches',
   'job_queue',
   'meetings',
@@ -120,22 +125,29 @@ try {
   requireCurrentRuntimeSchema('Repeat migration')
   requireMembershipSeedData('Repeat migration')
   verifySqliteIntegrityAndForeignKeys(sqlite, 'Repeat migration', fail)
-  requirePopulatedStripeChargeUpgrade()
+  requirePopulatedRuntimeUpgrade()
 
-  console.log('Fresh and repeat WCU migration check passed with 68 tables and 12 integrity triggers.')
+  console.log('Fresh and repeat WCU migration check passed with 70 tables and 12 integrity triggers.')
 } finally {
   sqlite.close()
   rmSync(tempDir, { recursive: true, force: true })
 }
 
-function requirePopulatedStripeChargeUpgrade() {
-  const upgradePath = join(tempDir, 'populated-stripe-charge-upgrade.db')
+function requirePopulatedRuntimeUpgrade() {
+  const upgradePath = join(tempDir, 'populated-runtime-upgrade.db')
   const upgrade = new Database(upgradePath)
   try {
     upgrade.pragma('foreign_keys = ON')
-    for (const tag of expectedMigrationTags.slice(0, -1)) {
+    for (const tag of expectedMigrationTags.slice(0, 4)) {
       upgrade.exec(readFileSync(join(migrationsFolder, `${tag}.sql`), 'utf8'))
     }
+    upgrade
+      .prepare(
+        `insert into user
+           (id, name, email, email_verified, role, created_at, updated_at)
+         values ('user_upgrade', 'Existing user', 'existing@example.test', 1, 'user', 1788206400, 1788206400)`
+      )
+      .run()
     upgrade
       .prepare(
         `insert into stripe_charges
@@ -170,8 +182,20 @@ function requirePopulatedStripeChargeUpgrade() {
       )
       .run()
 
-    const upgradeMigration = readFileSync(join(migrationsFolder, `${expectedMigrationTags.at(-1)}.sql`), 'utf8')
-    upgrade.transaction(() => upgrade.exec(upgradeMigration))()
+    for (const tag of expectedMigrationTags.slice(4)) {
+      const upgradeMigration = readFileSync(join(migrationsFolder, `${tag}.sql`), 'utf8')
+      upgrade.transaction(() => upgrade.exec(upgradeMigration))()
+    }
+
+    const preservedUser = upgrade
+      .prepare(
+        `select id, phone_number as phoneNumber, phone_number_verified as phoneNumberVerified
+         from user where id = 'user_upgrade'`
+      )
+      .get() as { id: string; phoneNumber: string | null; phoneNumberVerified: number } | undefined
+    if (!preservedUser || preservedUser.phoneNumber !== null || preservedUser.phoneNumberVerified !== 0) {
+      fail('Populated phone-auth migration did not preserve an existing user with safe phone defaults.')
+    }
 
     const preserved = upgrade
       .prepare(
@@ -206,7 +230,7 @@ function requirePopulatedStripeChargeUpgrade() {
          values ('py_upgrade', 'succeeded', 'dues', 100, 100, 0, 'USD', 1, 0)`
       )
       .run()
-    verifySqliteIntegrityAndForeignKeys(upgrade, 'Populated Stripe charge migration', fail)
+    verifySqliteIntegrityAndForeignKeys(upgrade, 'Populated runtime migration', fail)
   } finally {
     upgrade.close()
   }
@@ -274,6 +298,7 @@ function requireCurrentRuntimeSchema(label: string) {
     'billing_account_deletion_requests',
     'billing_checkout_attempts',
     'billing_customers',
+    'billing_email_verifications',
     'billing_subscription_transitions',
     'billing_subscriptions'
   ]) {

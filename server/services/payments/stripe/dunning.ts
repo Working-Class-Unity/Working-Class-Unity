@@ -1,6 +1,6 @@
 import type { BillingSnapshotStatus } from '../../../../shared/billing'
 
-export const billingGracePeriodMs = 14 * 24 * 60 * 60 * 1_000
+export const billingGracePeriodMs = 60 * 24 * 60 * 60 * 1_000
 
 type BillingAccessSnapshot = Readonly<{
   status: BillingSnapshotStatus

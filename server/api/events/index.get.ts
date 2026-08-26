@@ -2,6 +2,7 @@ import { getValidatedQuery, setHeader } from 'h3'
 import { z } from 'zod'
 import { useDatabase } from '../../db/client'
 import { listVisibleCalendarEvents } from '../../services/events/calendar-read'
+import { billingStripeConfiguration } from '../../services/payments/stripe/app-composition'
 import { getOptionalSession } from '../../utils/auth/require-session'
 import { validateWithZod } from '../../utils/validation'
 
@@ -23,6 +24,8 @@ export default defineEventHandler(async (event) => {
   return listVisibleCalendarEvents(useDatabase(), {
     from,
     limit: query.limit ?? 200,
+    now,
+    prices: billingStripeConfiguration().stripe.prices,
     to,
     userId: session?.user.id ?? null
   })

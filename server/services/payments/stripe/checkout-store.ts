@@ -43,15 +43,19 @@ export type CheckoutAttemptReservationResult =
       attempt: BillingCheckoutAttempt | null
     }>
 
+export type CheckoutAttemptReservationGuard = (connection: BillingStripeConnection, purchaserUserId: string) => void
+
 type CheckoutIntegration = BillingStripeIntegration<BillingStripeConnection, unknown> | undefined
 
 export function reserveCheckoutAttempt(
   connection: BillingStripeConnection,
   integration: CheckoutIntegration,
-  input: CheckoutAttemptReservationInput
+  input: CheckoutAttemptReservationInput,
+  assertAllowed?: CheckoutAttemptReservationGuard
 ): CheckoutAttemptReservationResult {
   return connection.sqlite
     .transaction(() => {
+      assertAllowed?.(connection, input.purchaserUserId)
       let existing = getOpenCheckoutAttempt(connection, input.purchaserUserId)
       if (
         isBillingDeletionPending(connection, input.purchaserUserId) ||
@@ -82,6 +86,7 @@ export function reserveCheckoutAttempt(
       }
 
       const afterAuthorization = getOpenCheckoutAttempt(connection, input.purchaserUserId)
+      assertAllowed?.(connection, input.purchaserUserId)
       if (
         isBillingDeletionPending(connection, input.purchaserUserId) ||
         getOpenBillingTransition(connection, input.purchaserUserId)

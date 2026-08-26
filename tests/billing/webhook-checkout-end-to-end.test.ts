@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { BillingStripeRuntimeConfiguration } from '../../server/services/payments/stripe/configuration'
 import type { StripeBillingClient } from '../../server/services/payments/stripe/stripe-client'
 import { processStripeWebhookEvent } from '../../server/services/payments/stripe/webhook'
+import { temporaryPhoneEmail } from '../../server/utils/auth/phone'
 import {
   createBillingStripeRuntimeFixture,
   seedBillingCustomer,
@@ -22,6 +23,10 @@ describe('Stripe Checkout webhook end-to-end projection', () => {
     'atomically associates %s and deduplicates concurrent delivery',
     async (eventType) => {
       const fixture = runtimeFixture(`checkout_success_${eventType.replaceAll('.', '_')}`)
+      const billingEmail = `member-${eventType.replaceAll('.', '-')}@example.test`
+      fixture.sqlite
+        .prepare('update user set email = ?, email_verified = 0 where id = ?')
+        .run(temporaryPhoneEmail('checkout-email-test-secret', '+12095550123'), fixture.purchaserUserId)
       const attemptId = seedCheckoutAttempt(fixture, { id: `attempt_${eventType.replaceAll('.', '_')}` })
       const subscription = providerSubscription({
         id: `sub_${eventType.replaceAll('.', '_')}`,
@@ -37,7 +42,8 @@ describe('Stripe Checkout webhook end-to-end projection', () => {
         attemptId,
         customer: subscription.customer as string,
         subscription: subscription.id,
-        paymentStatus: 'paid'
+        paymentStatus: 'paid',
+        billingEmail
       })
       const provider = currentProvider(session, subscription)
       const event = stripeEvent(`evt_${eventType.replaceAll('.', '_')}`, eventType, session.id)
@@ -61,6 +67,32 @@ describe('Stripe Checkout webhook end-to-end projection', () => {
         reconciliationRequired: 0
       })
       expect(receiptCount(fixture)).toBe(1)
+      const verification = fixture.sqlite
+        .prepare(
+          `select id, purchaser_user_id as purchaserUserId, billing_checkout_attempt_id as attemptId,
+                  stripe_session_id as stripeSessionId, email, status
+           from billing_email_verifications`
+        )
+        .get() as {
+        attemptId: string
+        email: string
+        id: string
+        purchaserUserId: string
+        status: string
+        stripeSessionId: string
+      }
+      expect(verification).toMatchObject({
+        attemptId,
+        email: billingEmail,
+        purchaserUserId: fixture.purchaserUserId,
+        status: 'pending',
+        stripeSessionId: session.id
+      })
+      const job = fixture.sqlite
+        .prepare("select payload from job_queue where type = 'billing.email-verification'")
+        .get() as { payload: string }
+      expect(JSON.parse(job.payload)).toEqual({ verificationId: verification.id })
+      expect(job.payload).not.toContain(billingEmail)
     }
   )
 
@@ -697,6 +729,7 @@ function checkoutSession(
     customer: string | null
     subscription: string | null
     paymentStatus: Stripe.Checkout.Session.PaymentStatus
+    billingEmail?: string
   }>
 ): Stripe.Checkout.Session {
   return {
@@ -708,6 +741,7 @@ function checkoutSession(
     client_reference_id: input.attemptId,
     customer: input.customer,
     subscription: input.subscription,
+    customer_details: input.billingEmail ? { email: input.billingEmail } : null,
     metadata: { billing_attempt_id: input.attemptId },
     line_items: {
       object: 'list',

@@ -37,6 +37,8 @@ describe('Billing Stripe durable jobs', () => {
     expect(ensureBillingStripeJobs(fixture.connection, now)).toEqual({
       accountDeletionCancellation: 0,
       detachedSubscriptionCancellation: 1,
+      graceExpiry: 0,
+      emailVerification: 0,
       webhookReconciliation: 0,
       reconciliationSafety: 'scheduled',
       transitionConvergence: 1,
@@ -45,6 +47,8 @@ describe('Billing Stripe durable jobs', () => {
     expect(ensureBillingStripeJobs(fixture.connection, now)).toEqual({
       accountDeletionCancellation: 0,
       detachedSubscriptionCancellation: 0,
+      graceExpiry: 0,
+      emailVerification: 0,
       webhookReconciliation: 0,
       reconciliationSafety: 'covered-future',
       transitionConvergence: 0,

@@ -12,7 +12,7 @@ import {
 } from './public-contract'
 import { getBillingCustomerForPurchaser, getBillingSubscriptionForPurchaser } from './repository'
 import type { BillingSubscription } from '../../../db/schema/billing'
-import { isBillingOfferingKey } from '../../../../shared/billing'
+import { isBillingOfferingKey, isMembershipDuesOfferingKey } from '../../../../shared/billing'
 import { enqueueBillingStripeNotification } from './notification-delivery'
 
 export type BillingProjectionCommit = CurrentBillingProjection &
@@ -223,7 +223,7 @@ function mergeLifecycleEffects(
   if (
     !after.reconciliationRequired &&
     !hasAction('renewal_ending') &&
-    before.offering?.startsWith('family.') &&
+    isMembershipDuesOfferingKey(before.offering ?? '') &&
     !before.cancelAtPeriodEnd &&
     after.status === 'active' &&
     after.cancelAtPeriodEnd
@@ -238,7 +238,7 @@ function mergeLifecycleEffects(
   if (
     !after.reconciliationRequired &&
     !hasAction('coverage_ended') &&
-    before.offering?.startsWith('family.') &&
+    isMembershipDuesOfferingKey(before.offering ?? '') &&
     !['canceled', 'incomplete_expired', 'none'].includes(before.status) &&
     ['canceled', 'incomplete_expired'].includes(after.status)
   ) {

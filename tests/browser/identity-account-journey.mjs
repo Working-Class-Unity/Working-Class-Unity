@@ -32,8 +32,16 @@ async function assertPublicEntryAndLegalRoutes(context, helpers) {
     await expect(page).toHaveURL(/\/signup$/)
     await expect(page.getByRole('heading', { name: 'Create your account' })).toBeVisible()
     await expect(page.locator('.nuxt-route-announcer [role="status"]')).toHaveText('Sign up')
-    await expect(page.getByText('Enter your email address to create or return to your account.')).toBeVisible()
+    await expect(
+      page.getByText(
+        'Create a Supporter account with email or a U.S. phone number, or return to your existing WCU account.'
+      )
+    ).toBeVisible()
     await expect(page.getByRole('textbox', { name: 'Email', exact: true })).toBeVisible()
+    await page.getByRole('button', { name: 'Use phone', exact: true }).click()
+    await expect(page.getByRole('textbox', { name: 'U.S. phone number', exact: true })).toBeVisible()
+    await expect(page.getByText(/one-time verification code/i)).toBeVisible()
+    await page.getByRole('button', { name: 'Use email', exact: true }).click()
     await expect(page.getByRole('textbox', { name: /(?:first|last|display) name/i })).toHaveCount(0)
     await expect(page.getByRole('link', { name: 'Terms', exact: true })).toHaveAttribute('href', '/legal/terms')
     await expect(page.getByRole('link', { name: 'Privacy Policy', exact: true })).toHaveAttribute(
@@ -49,7 +57,9 @@ async function assertPublicEntryAndLegalRoutes(context, helpers) {
     await page.getByRole('link', { name: 'Log In', exact: true }).click()
     await expect(page).toHaveURL(/\/login$/)
     await expect(page.getByRole('heading', { name: 'Log in' })).toBeVisible()
-    await expect(page.getByText('Enter your email address to receive a passwordless sign-in link.')).toBeVisible()
+    await expect(
+      page.getByText('Use your email address or U.S. phone number to log in without a password.')
+    ).toBeVisible()
     await expect(page.getByRole('button', { name: 'Send email link' })).toBeEnabled()
 
     await page.getByRole('link', { name: 'Privacy Policy', exact: true }).click()
