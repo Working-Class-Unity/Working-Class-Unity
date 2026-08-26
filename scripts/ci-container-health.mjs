@@ -39,8 +39,8 @@ const applicationEnvironment = {
   NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID: 'price_container_family_monthly',
   NUXT_CLOUDFLARE_TURNSTILE_SECRET_KEY: 'container-turnstile-secret-not-a-provider-credential',
   NUXT_PUBLIC_TURNSTILE_SITE_KEY: 'container-turnstile-site-not-a-provider-credential',
-  NUXT_SENTRY_DSN: 'http://public@127.0.0.1:9/1',
-  NUXT_PUBLIC_SENTRY_DSN: 'http://public@127.0.0.1:9/1',
+  NUXT_SENTRY_DSN: '',
+  NUXT_PUBLIC_SENTRY_DSN: '',
   NUXT_SENTRY_TRACES_SAMPLE_RATE: '0',
   NUXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE: '0'
 }

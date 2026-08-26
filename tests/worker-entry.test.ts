@@ -52,6 +52,35 @@ describe('worker entry', () => {
     }
   }, 40_000)
 
+  it('runs in production without the preload when Sentry is disabled', async () => {
+    const directory = mkdtempSync(join(tmpdir(), 'swl-worker-disabled-sentry-'))
+    const databasePath = join(directory, 'worker.db')
+    let sqlite: InstanceType<typeof Database> | undefined
+    let worker: RunningWorker | undefined
+    try {
+      sqlite = createMigratedDatabase(databasePath)
+      const jobId = insertJob(sqlite, billingAccountDeletionCancellationJobType, {
+        requestId: 'missing_request'
+      })
+      worker = startWorker(
+        databasePath,
+        {
+          NUXT_SENTRY_DSN: '',
+          NUXT_PUBLIC_SENTRY_DSN: ''
+        },
+        false
+      )
+
+      expect(await waitForCompletedJob(sqlite, jobId)).toEqual(completedOnce)
+      const output = await stopWorker(worker)
+      expect(output.stdout).toContain(`Worker processed job ${jobId}: succeeded`)
+    } finally {
+      await forceStopWorker(worker)
+      if (sqlite?.open) sqlite.close()
+      rmSync(directory, { recursive: true, force: true })
+    }
+  }, 40_000)
+
   it('leaves disabled Files jobs untouched while continuing to process Billing jobs', async () => {
     const directory = mkdtempSync(join(tmpdir(), 'swl-worker-disabled-files-'))
     const databasePath = join(directory, 'worker.db')
@@ -190,8 +219,13 @@ type RunningWorker = WorkerOutput & {
   exited: Promise<{ code: number | null; signal: NodeJS.Signals | null }>
 }
 
-function startWorker(databasePath: string, overrides: Record<string, string> = {}): RunningWorker {
-  const child = spawn(process.execPath, ['--import', tsxImport, '--import', workerPreload, workerEntry], {
+function startWorker(
+  databasePath: string,
+  overrides: Record<string, string> = {},
+  preloadSentry = true
+): RunningWorker {
+  const imports = preloadSentry ? ['--import', workerPreload] : []
+  const child = spawn(process.execPath, ['--import', tsxImport, ...imports, workerEntry], {
     cwd: webRoot,
     env: workerEnvironment(databasePath, overrides),
     stdio: ['ignore', 'pipe', 'pipe']
