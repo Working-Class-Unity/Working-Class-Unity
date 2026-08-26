@@ -13,7 +13,7 @@ import { getAppRuntimeConfig, readDatabaseUrl } from './utils/runtime'
 
 const config = getAppRuntimeConfig()
 
-if (process.env.NODE_ENV === 'production' && !Sentry.getClient()) {
+if (process.env.NODE_ENV === 'production' && config.sentryDsn && !Sentry.getClient()) {
   throw new Error('Sentry must be preloaded before the production worker starts')
 }
 const connection = connectDatabase(readDatabaseUrl())
