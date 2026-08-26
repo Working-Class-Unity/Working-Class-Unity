@@ -21,6 +21,7 @@ const emailCaptureDirectory = requiredEnvironment('BROWSER_EMAIL_CAPTURE_DIRECTO
 const runtimeSentryOrigin = requiredEnvironment('BROWSER_RUNTIME_SENTRY_ORIGIN')
 const turnstileOrigin = 'https://challenges.cloudflare.com'
 const turnstileScriptUrl = `${turnstileOrigin}/turnstile/v0/api.js?render=explicit`
+const forumUrl = 'https://chat.workingclassunity.com/'
 const sentryEnvelopePath = '/api/1/envelope/'
 const maxCaptureFileBytes = 65_536
 const maxCaptureFiles = 64
@@ -163,9 +164,19 @@ test('home presents the WCU foundation and preserves client navigation', async (
   await assertCleanPage(page, observations)
 })
 
-test('global public navigation exposes current routes and a route-closing mobile disclosure', async ({ page }) => {
+test('global public navigation exposes current routes and a route-closing mobile disclosure', async ({
+  page,
+  request
+}) => {
   const observations = observePage(page)
   await page.setViewportSize({ width: 1024, height: 900 })
+  await page.context().route(forumUrl, async (route) => {
+    await route.fulfill({ status: 200, contentType: 'text/html', body: '<!doctype html><title>Forum fixture</title>' })
+  })
+
+  const forumRedirect = await request.get('/forum', { maxRedirects: 0 })
+  expect(forumRedirect.status()).toBe(302)
+  expect(forumRedirect.headers().location).toBe(forumUrl)
 
   for (const destination of [
     {
@@ -174,8 +185,7 @@ test('global public navigation exposes current routes and a route-closing mobile
       heading: 'They Have Their Parties. We Need Our Own Organization',
       title: 'About'
     },
-    { path: '/calendar', label: 'Calendar', heading: 'Find your place in the work', title: 'Calendar' },
-    { path: '/forum', label: 'Forum', heading: 'Forum', title: 'Forum' }
+    { path: '/calendar', label: 'Calendar', heading: 'Find your place in the work', title: 'Calendar' }
   ]) {
     await page.goto(destination.path)
     const primaryNavigation = page.getByRole('navigation', { name: 'Primary' })
@@ -196,11 +206,16 @@ test('global public navigation exposes current routes and a route-closing mobile
 
   await expect(desktopNavigation).toHaveRole('navigation')
   await expect(desktopNavigation).toHaveAttribute('data-orientation', 'horizontal')
+  await expect(forumLink).toHaveAttribute('href', forumUrl)
+  await expect(forumLink).toHaveAttribute('target', '_blank')
+  await expect(forumLink).toHaveAttribute('rel', 'noopener noreferrer')
+  expect(await forumLink.getAttribute('aria-current')).toBeNull()
   await aboutLink.focus()
   await page.keyboard.press('ArrowRight')
   await expect(calendarLink).toBeFocused()
   await page.keyboard.press('End')
   await expect(forumLink).toBeFocused()
+  await assertForumPopup(page, () => page.keyboard.press('Enter'))
   await page.keyboard.press('Home')
   await expect(aboutLink).toBeFocused()
 
@@ -215,15 +230,32 @@ test('global public navigation exposes current routes and a route-closing mobile
   await menuToggle.click()
   await expect(menuToggle).toHaveAttribute('aria-expanded', 'true')
   await expect(navigationPanel).toBeVisible()
+  const mobileForumLink = page.getByRole('link', { name: 'Forum', exact: true })
+
   await assertMinimumTargetSize(page.getByRole('link', { name: 'About', exact: true }))
   await assertMinimumTargetSize(page.getByRole('link', { name: 'Calendar', exact: true }))
-  await assertMinimumTargetSize(page.getByRole('link', { name: 'Forum', exact: true }))
+  await assertMinimumTargetSize(mobileForumLink)
   await assertMinimumTargetSize(page.getByRole('link', { name: 'Log In', exact: true }))
   await assertMinimumTargetSize(page.getByRole('link', { name: 'JOIN NOW', exact: true }))
+  await expect(mobileForumLink).toHaveAttribute('href', forumUrl)
+  await expect(mobileForumLink).toHaveAttribute('target', '_blank')
+  await expect(mobileForumLink).toHaveAttribute('rel', 'noopener noreferrer')
+  expect(await mobileForumLink.getAttribute('aria-current')).toBeNull()
   await assertNoHorizontalOverflow(page)
 
-  await page.getByRole('link', { name: 'About', exact: true }).focus()
+  await expect(menuToggle).toBeFocused()
+  await page.keyboard.press('Shift+Tab')
+  await page.keyboard.press('Shift+Tab')
+  await page.keyboard.press('Shift+Tab')
+  await expect(mobileForumLink).toBeFocused()
+  await assertVisibleFocusIndicator(page, mobileForumLink)
   await page.keyboard.press('Escape')
+  await expect(menuToggle).toHaveAttribute('aria-expanded', 'false')
+  await expect(navigationPanel).toBeHidden()
+  await expect(menuToggle).toBeFocused()
+
+  await menuToggle.click()
+  await assertForumPopup(page, () => mobileForumLink.click())
   await expect(menuToggle).toHaveAttribute('aria-expanded', 'false')
   await expect(navigationPanel).toBeHidden()
   await expect(menuToggle).toBeFocused()
@@ -1056,6 +1088,16 @@ async function fulfillJson(route, value, status = 200) {
     contentType: 'application/json',
     body: JSON.stringify(value)
   })
+}
+
+async function assertForumPopup(page, activate) {
+  const popupPromise = page.waitForEvent('popup')
+  await activate()
+  const popup = await popupPromise
+  await popup.waitForLoadState('domcontentloaded')
+  await expect(popup).toHaveURL(forumUrl)
+  expect(await popup.evaluate(() => window.opener)).toBeNull()
+  await popup.close()
 }
 
 async function assertAccessibleWithoutOverflow(page) {
