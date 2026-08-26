@@ -1,5 +1,5 @@
 import { createAuthClient } from 'better-auth/vue'
-import { inferAdditionalFields, magicLinkClient } from 'better-auth/client/plugins'
+import { inferAdditionalFields, magicLinkClient, phoneNumberClient } from 'better-auth/client/plugins'
 import { profileUserFields } from '#shared/profile'
 
 // The app pins its auth route; separate config guards reject alternate origin
@@ -7,5 +7,5 @@ import { profileUserFields } from '#shared/profile'
 // hydration payload share one key.
 export const authClient = createAuthClient({
   basePath: '/api/auth',
-  plugins: [magicLinkClient(), inferAdditionalFields({ user: profileUserFields })]
+  plugins: [magicLinkClient(), phoneNumberClient(), inferAdditionalFields({ user: profileUserFields })]
 })

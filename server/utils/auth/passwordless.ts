@@ -4,6 +4,7 @@ import { turnstileActions, turnstileHeaderName } from '../../../shared/turnstile
 import { createMagicLinkEmail, type TransactionalEmailSender } from '../../services/email'
 import { verifyTurnstileToken } from '../../services/security/turnstile'
 import type { AppRuntimeConfig } from '../runtime'
+import { normalizeUsPhoneNumber } from './phone'
 
 const disabledPasswordAuthPaths = [
   '/sign-up/email',
@@ -24,6 +25,12 @@ export const disabledNonMagicLinkAuthPaths = [
   '/get-access-token',
   '/refresh-token',
   '/account-info'
+] as const
+
+export const disabledPhonePasswordAuthPaths = [
+  '/sign-in/phone-number',
+  '/phone-number/request-password-reset',
+  '/phone-number/reset-password'
 ] as const
 
 const callbackParameters = [
@@ -62,6 +69,18 @@ function createPasswordlessAuthBeforeHook(authUrl: string) {
   const authOrigin = new URL(authUrl).origin
 
   return createAuthMiddleware(async (context) => {
+    if (context.path === '/phone-number/send-otp' || context.path === '/phone-number/verify') {
+      const phoneNumber =
+        typeof context.body?.phoneNumber === 'string' ? normalizeUsPhoneNumber(context.body.phoneNumber) : null
+      if (!phoneNumber) {
+        throw new APIError('BAD_REQUEST', {
+          code: 'INVALID_PHONE_NUMBER',
+          message: 'Enter a valid United States phone number.'
+        })
+      }
+      if (context.body) context.body.phoneNumber = phoneNumber
+    }
+
     if (context.path === '/sign-in/magic-link') {
       // Better Auth 1.6.23 persists its core `name` during first magic-link
       // verification. Keep that compatibility field server-owned so auth
@@ -99,6 +118,20 @@ function createPasswordlessAuthBeforeHook(authUrl: string) {
       })
     }
 
+    if (context.path === '/change-email' && context.body?.callbackURL !== '/account') {
+      throw new APIError('BAD_REQUEST', {
+        code: 'INVALID_REQUEST',
+        message: 'Invalid request.'
+      })
+    }
+
+    if (context.path === '/verify-email' && context.query?.callbackURL !== '/account') {
+      throw new APIError('BAD_REQUEST', {
+        code: 'INVALID_REQUEST',
+        message: 'Invalid request.'
+      })
+    }
+
     const usesAuthCallbacks = context.path === '/sign-in/magic-link' || context.path === '/magic-link/verify'
     if (!usesAuthCallbacks) return
 
@@ -117,14 +150,20 @@ function createPasswordlessAuthBeforeHook(authUrl: string) {
   })
 }
 
-function createMagicLinkTurnstileBeforeHook(config: AppRuntimeConfig) {
+function createTurnstileBeforeHook(config: AppRuntimeConfig) {
   return createAuthMiddleware(async (context) => {
-    if (context.path !== '/sign-in/magic-link') return
+    const expectedAction =
+      context.path === '/sign-in/magic-link'
+        ? turnstileActions.magicLink
+        : context.path === '/phone-number/send-otp'
+          ? turnstileActions.phoneOtp
+          : null
+    if (!expectedAction) return
 
     try {
       await verifyTurnstileToken({
         token: context.headers?.get(turnstileHeaderName) ?? undefined,
-        expectedAction: turnstileActions.magicLink,
+        expectedAction,
         config
       })
     } catch (error) {
@@ -145,11 +184,11 @@ function createMagicLinkTurnstileBeforeHook(config: AppRuntimeConfig) {
 
 export function createAuthenticationBeforeHook(config: AppRuntimeConfig) {
   const passwordlessBeforeHook = createPasswordlessAuthBeforeHook(config.betterAuth.url)
-  const magicLinkTurnstileBeforeHook = createMagicLinkTurnstileBeforeHook(config)
+  const turnstileBeforeHook = createTurnstileBeforeHook(config)
 
   return createAuthMiddleware(async (context) => {
     await passwordlessBeforeHook(context)
-    await magicLinkTurnstileBeforeHook(context)
+    await turnstileBeforeHook(context)
   })
 }
 

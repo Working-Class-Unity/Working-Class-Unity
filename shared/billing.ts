@@ -7,6 +7,7 @@ export const billingOfferingKeys = Object.freeze([
   'family.monthly',
   'family.annual'
 ] as const)
+export const membershipDuesOfferingKeys = Object.freeze(['personal.monthly', 'family.monthly'] as const)
 
 export const stripeSubscriptionStatuses = Object.freeze([
   'active',
@@ -23,6 +24,7 @@ export const billingSnapshotStatuses = Object.freeze(['none', ...stripeSubscript
 export type BillingPlan = (typeof billingPlans)[number]
 export type BillingCadence = (typeof billingCadences)[number]
 export type BillingOfferingKey = (typeof billingOfferingKeys)[number]
+export type MembershipDuesOfferingKey = (typeof membershipDuesOfferingKeys)[number]
 export type StripeSubscriptionStatus = (typeof stripeSubscriptionStatuses)[number]
 export type BillingSnapshotStatus = (typeof billingSnapshotStatuses)[number]
 
@@ -38,7 +40,9 @@ function deriveOfferingDefinition(key: BillingOfferingKey): BillingOfferingDefin
 }
 
 export const billingOfferingDefinitions = Object.freeze(billingOfferingKeys.map(deriveOfferingDefinition))
+export const membershipDuesOfferingDefinitions = Object.freeze(membershipDuesOfferingKeys.map(deriveOfferingDefinition))
 const offeringByKey = new Map(billingOfferingDefinitions.map((offering) => [offering.key, offering] as const))
+const membershipDuesOfferingSet = new Set<BillingOfferingKey>(membershipDuesOfferingKeys)
 
 export function isBillingOfferingKey(value: string): value is BillingOfferingKey {
   return offeringByKey.has(value as BillingOfferingKey)
@@ -46,6 +50,10 @@ export function isBillingOfferingKey(value: string): value is BillingOfferingKey
 
 export function getBillingOffering(value: string): BillingOfferingDefinition | null {
   return offeringByKey.get(value as BillingOfferingKey) ?? null
+}
+
+export function isMembershipDuesOfferingKey(value: string): value is MembershipDuesOfferingKey {
+  return membershipDuesOfferingSet.has(value as BillingOfferingKey)
 }
 
 export type BillingSubscriptionState =

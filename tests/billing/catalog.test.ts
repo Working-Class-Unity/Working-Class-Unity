@@ -6,15 +6,18 @@ import {
   billingOfferingKeys,
   billingPlans,
   getBillingOffering,
-  isBillingOfferingKey
+  isBillingOfferingKey,
+  isMembershipDuesOfferingKey,
+  membershipDuesOfferingDefinitions,
+  membershipDuesOfferingKeys
 } from '../../shared/billing'
 
 const prices = {
-  'personal.weekly': 'price_personal_weekly',
+  'personal.weekly': '',
   'personal.monthly': 'price_personal_monthly',
-  'personal.annual': 'price_personal_annual',
+  'personal.annual': '',
   'family.monthly': 'price_family_monthly',
-  'family.annual': 'price_family_annual'
+  'family.annual': ''
 } as const
 
 describe('private Stripe billing catalog', () => {
@@ -42,7 +45,12 @@ describe('private Stripe billing catalog', () => {
   })
 
   it('keeps public metadata provider- and price-free', () => {
-    expect(JSON.stringify(billingOfferingDefinitions)).not.toMatch(
+    expect(membershipDuesOfferingKeys).toEqual(['personal.monthly', 'family.monthly'])
+    expect(membershipDuesOfferingDefinitions).toEqual([
+      { key: 'personal.monthly', plan: 'personal', cadence: 'monthly' },
+      { key: 'family.monthly', plan: 'family', cadence: 'monthly' }
+    ])
+    expect(JSON.stringify(membershipDuesOfferingDefinitions)).not.toMatch(
       /stripe|price|secret|portal|amount|currency|environment/i
     )
   })
@@ -56,25 +64,30 @@ describe('private Stripe billing catalog', () => {
     })
     expect(isBillingOfferingKey('family.weekly')).toBe(false)
     expect(getBillingOffering('family.weekly')).toBeNull()
+    expect(isMembershipDuesOfferingKey('personal.monthly')).toBe(true)
+    expect(isMembershipDuesOfferingKey('family.monthly')).toBe(true)
+    expect(isMembershipDuesOfferingKey('personal.weekly')).toBe(false)
   })
 
-  it('maps all five offerings bidirectionally without exposing configured values through serialization', () => {
+  it('maps only the two monthly dues offerings without exposing configured values through serialization', () => {
     const catalog = createStripeBillingCatalog(prices)
 
-    expect(catalog.priceIdForOffering('personal.weekly')).toBe('price_personal_weekly')
-    expect(catalog.priceIdForOffering('family.annual')).toBe('price_family_annual')
-    expect(catalog.offeringForPriceId('price_personal_annual')).toBe('personal.annual')
+    expect(catalog.priceIdForOffering('personal.monthly')).toBe('price_personal_monthly')
+    expect(catalog.priceIdForOffering('family.monthly')).toBe('price_family_monthly')
+    expect(catalog.offeringForPriceId('price_personal_monthly')).toBe('personal.monthly')
+    expect(catalog.offeringForPriceId('price_family_monthly')).toBe('family.monthly')
+    expect(catalog.offeringForPriceId('price_personal_annual')).toBeNull()
     expect(catalog.offeringForPriceId('price_unknown')).toBeNull()
     expect(Object.isFrozen(catalog)).toBe(true)
-    expect(JSON.stringify(catalog)).not.toContain('price_personal_weekly')
+    expect(JSON.stringify(catalog)).not.toContain('price_personal_monthly')
   })
 
   it('fails closed for duplicate, malformed, and unsupported mappings without leaking Price IDs', () => {
     const privateDuplicate = 'price_private_duplicate'
 
     for (const invalidPrices of [
-      { ...prices, 'personal.weekly': privateDuplicate, 'family.annual': privateDuplicate },
-      { ...prices, 'personal.weekly': 'product_private_invalid' }
+      { ...prices, 'personal.monthly': privateDuplicate, 'family.monthly': privateDuplicate },
+      { ...prices, 'personal.monthly': 'product_private_invalid' }
     ]) {
       try {
         createStripeBillingCatalog(invalidPrices)
@@ -89,7 +102,7 @@ describe('private Stripe billing catalog', () => {
     }
 
     const catalog = createStripeBillingCatalog(prices)
-    expect(() => catalog.priceIdForOffering('family.weekly' as never)).toThrowError(
+    expect(() => catalog.priceIdForOffering('personal.weekly')).toThrowError(
       expect.objectContaining({
         statusCode: 503,
         statusMessage: 'Stripe billing catalog is invalid'

@@ -12,6 +12,8 @@ export const user = sqliteTable(
     name: text('name').notNull(),
     email: text('email').notNull(),
     emailVerified: integer('email_verified', { mode: 'boolean' }).notNull().default(false),
+    phoneNumber: text('phone_number'),
+    phoneNumberVerified: integer('phone_number_verified', { mode: 'boolean' }).notNull().default(false),
     image: text('image'),
     firstName: text('first_name'),
     lastName: text('last_name'),
@@ -22,6 +24,7 @@ export const user = sqliteTable(
   },
   (table) => [
     uniqueIndex('user_email_idx').on(table.email),
+    uniqueIndex('user_phone_number_idx').on(table.phoneNumber),
     check('user_name_check', sql`${table.name} = trim(${table.name}) and length(${table.name}) between 1 and 100`),
     check(
       'user_first_name_check',
@@ -35,7 +38,12 @@ export const user = sqliteTable(
       'user_display_name_check',
       sql`${table.displayName} is null or (${table.displayName} = trim(${table.displayName}) and length(${table.displayName}) between 1 and 100)`
     ),
-    check('user_role_check', sql`${table.role} in ('user', 'admin')`)
+    check('user_role_check', sql`${table.role} in ('user', 'admin')`),
+    check(
+      'user_phone_number_check',
+      sql`${table.phoneNumber} is null or (${table.phoneNumber} glob '+1[2-9][0-9][0-9][2-9][0-9][0-9][0-9][0-9][0-9][0-9]' and length(${table.phoneNumber}) = 12)`
+    ),
+    check('user_phone_verification_check', sql`${table.phoneNumberVerified} = 0 or ${table.phoneNumber} is not null`)
   ]
 )
 

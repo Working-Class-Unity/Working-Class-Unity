@@ -1,4 +1,4 @@
-import { billingOfferingKeys, isBillingOfferingKey, type BillingOfferingKey } from '../../../../shared/billing'
+import { billingOfferingKeys, isMembershipDuesOfferingKey, type BillingOfferingKey } from '../../../../shared/billing'
 import type { BillingStripePriceConfiguration } from './configuration'
 import { configurationError } from '../../../utils/errors'
 
@@ -13,6 +13,7 @@ export function createStripeBillingCatalog(prices: BillingStripePriceConfigurati
 
   for (const offering of billingOfferingKeys) {
     const priceId = prices[offering]
+    if (!priceId && !isMembershipDuesOfferingKey(offering)) continue
     if (typeof priceId !== 'string' || !priceId.startsWith('price_') || offeringByPriceId.has(priceId)) {
       throw configurationError('Stripe billing catalog is invalid')
     }
@@ -22,7 +23,7 @@ export function createStripeBillingCatalog(prices: BillingStripePriceConfigurati
 
   return Object.freeze({
     priceIdForOffering(offering: BillingOfferingKey) {
-      if (!isBillingOfferingKey(offering)) {
+      if (!priceIdByOffering.has(offering)) {
         throw configurationError('Stripe billing catalog is invalid')
       }
       return priceIdByOffering.get(offering)!

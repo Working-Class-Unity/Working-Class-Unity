@@ -16,6 +16,8 @@ const session = Object.freeze({
     name: 'One Person',
     email: 'one@example.test',
     emailVerified: true,
+    phoneNumber: '+12095550100',
+    phoneNumberVerified: true,
     image: null,
     firstName: 'One',
     lastName: 'Person',
@@ -30,7 +32,11 @@ const session = Object.freeze({
     token: 'private-session-token'
   }
 })
-const profile = Object.freeze({
+const accountIdentity = Object.freeze({
+  email: 'one@example.test',
+  emailVerified: 1,
+  phoneNumber: '+12095550100',
+  phoneNumberVerified: 1,
   firstName: 'One',
   lastName: 'Person',
   displayName: 'Organizer One'
@@ -54,7 +60,7 @@ beforeEach(() => {
   vi.clearAllMocks()
   sessionMocks.requireSession.mockResolvedValue(session)
   databaseMocks.prepare.mockReturnValue({ get: databaseMocks.get })
-  databaseMocks.get.mockReturnValue(profile)
+  databaseMocks.get.mockReturnValue(accountIdentity)
 })
 
 afterAll(async () => {
@@ -71,13 +77,33 @@ describe('personal identity HTTP boundary', () => {
     expect(await response.json()).toEqual({
       user: {
         id: session.user.id,
-        email: session.user.email,
+        email: accountIdentity.email,
+        emailVerified: true,
+        phoneNumber: accountIdentity.phoneNumber,
+        phoneNumberVerified: true,
         image: session.user.image,
-        ...profile
+        firstName: accountIdentity.firstName,
+        lastName: accountIdentity.lastName,
+        displayName: accountIdentity.displayName
       }
     })
     expect(sessionMocks.requireSession).toHaveBeenCalledOnce()
     expect(databaseMocks.get).toHaveBeenCalledExactlyOnceWith(session.user.id)
+  })
+
+  it('never returns a phone-only placeholder email', async () => {
+    databaseMocks.get.mockReturnValueOnce({
+      ...accountIdentity,
+      email: `phone-${'a'.repeat(64)}@accounts.invalid`,
+      emailVerified: 0
+    })
+
+    const response = await fetch(`${baseUrl}/api/me`)
+    const body = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(body.user).toMatchObject({ email: null, emailVerified: false, phoneNumber: '+12095550100' })
+    expect(JSON.stringify(body)).not.toContain('accounts.invalid')
   })
 
   it('requires authentication', async () => {

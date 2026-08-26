@@ -68,15 +68,17 @@ export default defineNuxtConfig({
         apiKey: ''
       }
     },
+    twilioVerify: {
+      apiKeySid: '',
+      apiKeySecret: '',
+      serviceSid: ''
+    },
     stripe: {
       secretKey: '',
       webhookSecret: '',
       portalConfigurationId: '',
-      personalWeeklyPriceId: '',
-      personalMonthlyPriceId: '',
-      personalAnnualPriceId: '',
-      familyMonthlyPriceId: '',
-      familyAnnualPriceId: ''
+      membershipDues10PriceId: '',
+      solidarityDues27PriceId: ''
     },
     files: {
       driver: ''

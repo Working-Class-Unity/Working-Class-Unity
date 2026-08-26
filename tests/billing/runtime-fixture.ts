@@ -14,7 +14,54 @@ export function createBillingStripeRuntimeFixture(purchaserUserId = 'purchaser_t
   sqlite.exec(`
     create table user (
       id text primary key not null,
-      email text not null unique
+      email text not null unique,
+      email_verified integer not null default 1
+    );
+    create table people (
+      id text primary key not null
+    );
+    create table person_accounts (
+      person_id text primary key not null references people(id),
+      user_id text not null unique references user(id)
+    );
+    create table identity_link_reviews (
+      id text primary key not null,
+      user_id text not null references user(id) on delete cascade,
+      reason text not null,
+      identifier_hash text not null,
+      status text not null default 'open',
+      resolved_person_id text references people(id) on delete restrict,
+      resolved_at text,
+      created_at text not null default current_timestamp,
+      updated_at text not null default current_timestamp,
+      check(reason in ('ambiguous_verified_email', 'conflicting_verified_email',
+                       'phone_match_requires_verified_email', 'conflicting_verified_identifiers')),
+      check(identifier_hash not glob '*[^0-9a-f]*' and length(identifier_hash) = 64),
+      check((status = 'open' and resolved_person_id is null and resolved_at is null) or
+            (status = 'resolved' and resolved_person_id is not null and resolved_at is not null and
+             julianday(resolved_at) is not null))
+    );
+    create unique index identity_link_reviews_one_open_user_uidx
+      on identity_link_reviews(user_id)
+      where status = 'open';
+    create index identity_link_reviews_status_idx
+      on identity_link_reviews(status, created_at);
+    create table stripe_customers (
+      id text primary key not null,
+      person_id text references people(id)
+    );
+    create table stripe_subscriptions (
+      id text primary key not null,
+      customer_id text not null references stripe_customers(id),
+      status text not null,
+      current_period_start text,
+      current_period_end text,
+      cancel_at_period_end integer not null default 0
+    );
+    create table stripe_subscription_items (
+      id text primary key not null,
+      subscription_id text not null references stripe_subscriptions(id),
+      price_id text not null
     );
     create table billing_customers (
       id text primary key not null,
@@ -50,6 +97,22 @@ export function createBillingStripeRuntimeFixture(purchaserUserId = 'purchaser_t
     create unique index billing_checkout_attempts_one_open_uidx
       on billing_checkout_attempts(purchaser_user_id)
       where state in ('pending', 'open', 'reconciliation_required');
+    create table billing_email_verifications (
+      id text primary key not null,
+      purchaser_user_id text not null references user(id) on delete cascade,
+      billing_checkout_attempt_id text not null unique references billing_checkout_attempts(id) on delete cascade,
+      stripe_session_id text not null unique,
+      email text not null,
+      status text not null default 'pending',
+      expires_at text not null,
+      sent_at text,
+      consumed_at text,
+      created_at text not null default current_timestamp,
+      updated_at text not null default current_timestamp,
+      check(status in ('pending', 'sent', 'consumed', 'conflict', 'expired'))
+    );
+    create index billing_email_verifications_status_expiry_idx
+      on billing_email_verifications(status, expires_at);
     create table billing_subscriptions (
       id text primary key not null,
       purchaser_user_id text not null references user(id) on delete restrict,

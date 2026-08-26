@@ -127,7 +127,7 @@ describe('Billing transition convergence fences', () => {
     ).toEqual({ state: 'pending' })
   })
 
-  it('converges a missed scheduled downgrade and emits the normalized coverage episode', async () => {
+  it('converges a missed scheduled contribution change without ending membership coverage', async () => {
     const fixture = runtimeFixture('scheduled')
     const customerId = seedBillingCustomer(fixture, 'cus_convergence_scheduled')
     const subscriptionId = seedBillingSubscription(fixture, {
@@ -202,13 +202,7 @@ describe('Billing transition convergence fences', () => {
       expect.objectContaining({
         kind: 'state_committed',
         transition: expect.objectContaining({ id: transitionId, state: 'applied' }),
-        effects: [
-          expect.objectContaining({
-            action: 'coverage_ended',
-            episodeKey: expect.stringMatching(/^billing_episode_[a-f0-9]{64}$/),
-            transitionId
-          })
-        ]
+        effects: []
       })
     ])
     expect(JSON.stringify(synchronization)).not.toContain(transitionId + ':')

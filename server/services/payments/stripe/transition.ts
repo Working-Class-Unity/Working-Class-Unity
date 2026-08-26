@@ -64,7 +64,7 @@ export async function executeBillingTransition(
     throw conflictError('The current subscription must be reconciled before it can be changed')
   }
 
-  if (expected.transition.kind === 'personal_to_family') {
+  if (expected.transition.kind === 'personal_to_family' && expected.transition.effectiveAt === null) {
     await executeImmediate(context, purchaserUserId, expected, sourcePrice, targetPrice, catalog, now)
     return
   }

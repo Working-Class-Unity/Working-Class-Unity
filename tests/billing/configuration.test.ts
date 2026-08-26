@@ -33,11 +33,8 @@ function environment(overrides: Record<string, string | undefined> = {}) {
     NUXT_STRIPE_SECRET_KEY: 'rk_test_billing',
     NUXT_STRIPE_WEBHOOK_SECRET: 'whsec_billing',
     NUXT_STRIPE_PORTAL_CONFIGURATION_ID: 'bpc_billing',
-    NUXT_STRIPE_PERSONAL_WEEKLY_PRICE_ID: prices['personal.weekly'],
-    NUXT_STRIPE_PERSONAL_MONTHLY_PRICE_ID: prices['personal.monthly'],
-    NUXT_STRIPE_PERSONAL_ANNUAL_PRICE_ID: prices['personal.annual'],
-    NUXT_STRIPE_FAMILY_MONTHLY_PRICE_ID: prices['family.monthly'],
-    NUXT_STRIPE_FAMILY_ANNUAL_PRICE_ID: prices['family.annual'],
+    NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID: prices['personal.monthly'],
+    NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID: prices['family.monthly'],
     ...overrides
   }
 }
@@ -72,11 +69,8 @@ describe('Billing Stripe runtime configuration', () => {
         NUXT_STRIPE_SECRET_KEY: undefined,
         NUXT_STRIPE_WEBHOOK_SECRET: undefined,
         NUXT_STRIPE_PORTAL_CONFIGURATION_ID: undefined,
-        NUXT_STRIPE_PERSONAL_WEEKLY_PRICE_ID: undefined,
-        NUXT_STRIPE_PERSONAL_MONTHLY_PRICE_ID: undefined,
-        NUXT_STRIPE_PERSONAL_ANNUAL_PRICE_ID: undefined,
-        NUXT_STRIPE_FAMILY_MONTHLY_PRICE_ID: undefined,
-        NUXT_STRIPE_FAMILY_ANNUAL_PRICE_ID: undefined
+        NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID: undefined,
+        NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID: undefined
       })
     )
 
@@ -94,8 +88,8 @@ describe('Billing Stripe runtime configuration', () => {
           portalConfigurationId: 'portal_private',
           prices: {
             ...prices,
-            'personal.weekly': duplicate,
-            'family.annual': duplicate
+            'personal.monthly': duplicate,
+            'family.monthly': duplicate
           }
         }
       }),
@@ -104,8 +98,8 @@ describe('Billing Stripe runtime configuration', () => {
         NUXT_STRIPE_SECRET_KEY: 'sk_test_unrestricted_private',
         NUXT_STRIPE_WEBHOOK_SECRET: 'secret_private',
         NUXT_STRIPE_PORTAL_CONFIGURATION_ID: 'portal_private',
-        NUXT_STRIPE_PERSONAL_WEEKLY_PRICE_ID: duplicate,
-        NUXT_STRIPE_FAMILY_ANNUAL_PRICE_ID: duplicate
+        NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID: duplicate,
+        NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID: duplicate
       })
     )
 
@@ -115,8 +109,8 @@ describe('Billing Stripe runtime configuration', () => {
         expect.objectContaining({ code: 'invalid', key: 'NUXT_STRIPE_SECRET_KEY' }),
         expect.objectContaining({ code: 'invalid', key: 'NUXT_STRIPE_WEBHOOK_SECRET' }),
         expect.objectContaining({ code: 'invalid', key: 'NUXT_STRIPE_PORTAL_CONFIGURATION_ID' }),
-        expect.objectContaining({ code: 'invalid', key: 'NUXT_STRIPE_PERSONAL_WEEKLY_PRICE_ID' }),
-        expect.objectContaining({ code: 'invalid', key: 'NUXT_STRIPE_FAMILY_ANNUAL_PRICE_ID' })
+        expect.objectContaining({ code: 'invalid', key: 'NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID' }),
+        expect.objectContaining({ code: 'invalid', key: 'NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID' })
       ])
     )
     expect(JSON.stringify(issues)).not.toContain('private')
@@ -139,7 +133,7 @@ describe('Billing Stripe runtime configuration', () => {
       environment({
         NUXT_STRIPE_WEBHOOK_SECRET: undefined,
         NUXT_STRIPE_PORTAL_CONFIGURATION_ID: ' bpc_billing ',
-        NUXT_STRIPE_PERSONAL_MONTHLY_PRICE_ID: 'price_other_monthly'
+        NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID: 'price_other_monthly'
       })
     )
 
@@ -149,7 +143,7 @@ describe('Billing Stripe runtime configuration', () => {
         expect.objectContaining({ code: 'mismatch', key: 'NUXT_STRIPE_WEBHOOK_SECRET' }),
         expect.objectContaining({ code: 'invalid', key: 'NUXT_STRIPE_PORTAL_CONFIGURATION_ID' }),
         expect.objectContaining({ code: 'mismatch', key: 'NUXT_STRIPE_PORTAL_CONFIGURATION_ID' }),
-        expect.objectContaining({ code: 'mismatch', key: 'NUXT_STRIPE_PERSONAL_MONTHLY_PRICE_ID' })
+        expect.objectContaining({ code: 'mismatch', key: 'NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID' })
       ])
     )
   })

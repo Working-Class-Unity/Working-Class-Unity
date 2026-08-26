@@ -14,6 +14,8 @@ import { billingStripeJobTypes } from '../server/services/payments/stripe/jobs'
 const [
   billingAccountDeletionCancellationJobType,
   billingDetachedSubscriptionCancellationJobType,
+  billingGraceExpiryJobType,
+  billingEmailVerificationJobType,
   billingWebhookReconciliationJobType,
   billingReconciliationSafetyJobType,
   billingTransitionConvergenceJobType,
@@ -106,6 +108,16 @@ describe('worker entry', () => {
         insertJob(sqlite, billingDetachedSubscriptionCancellationJobType, {
           subjectId: 'missing_detached_subject'
         }),
+        insertJob(sqlite, billingGraceExpiryJobType, {
+          billingSubscriptionId: 'missing_billing_subscription',
+          stripeSubscriptionId: 'sub_missing_grace',
+          graceInvoiceId: 'in_missing_grace',
+          graceStartedAt: '2026-06-01T00:00:00.000Z',
+          graceEndsAt: '2026-07-31T00:00:00.000Z'
+        }),
+        insertJob(sqlite, billingEmailVerificationJobType, {
+          verificationId: 'missing_verification'
+        }),
         insertJob(sqlite, billingReconciliationSafetyJobType, { cursor: null, cycleStartedAt }),
         insertJob(sqlite, billingWebhookReconciliationJobType, {
           eventId: 'evt_worker_duplicate',
@@ -125,11 +137,8 @@ describe('worker entry', () => {
         NUXT_STRIPE_SECRET_KEY: 'rk_test_worker_entry',
         NUXT_STRIPE_WEBHOOK_SECRET: 'whsec_worker_entry',
         NUXT_STRIPE_PORTAL_CONFIGURATION_ID: 'bpc_worker_entry',
-        NUXT_STRIPE_PERSONAL_WEEKLY_PRICE_ID: 'price_worker_personal_weekly',
-        NUXT_STRIPE_PERSONAL_MONTHLY_PRICE_ID: 'price_worker_personal_monthly',
-        NUXT_STRIPE_PERSONAL_ANNUAL_PRICE_ID: 'price_worker_personal_annual',
-        NUXT_STRIPE_FAMILY_MONTHLY_PRICE_ID: 'price_worker_family_monthly',
-        NUXT_STRIPE_FAMILY_ANNUAL_PRICE_ID: 'price_worker_family_annual'
+        NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID: 'price_worker_personal_monthly',
+        NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID: 'price_worker_family_monthly'
       })
 
       expect(await waitForCompletedJob(sqlite, jobId)).toEqual(completedOnce)
@@ -266,15 +275,15 @@ function workerEnvironment(databasePath: string, overrides: Record<string, strin
     NUXT_EMAIL_TRANSPORT: 'capture',
     NUXT_EMAIL_FROM: 'Worker Test <worker@example.test>',
     NUXT_EMAIL_CAPTURE_DIRECTORY: join(dirname(databasePath), 'email'),
+    NUXT_TWILIO_VERIFY_API_KEY_SID: 'SK99999999999999999999999999999999',
+    NUXT_TWILIO_VERIFY_API_KEY_SECRET: 'worker-twilio-secret-not-a-credential',
+    NUXT_TWILIO_VERIFY_SERVICE_SID: 'VA99999999999999999999999999999999',
     NUXT_PUBLIC_APP_URL: 'http://127.0.0.1:3000',
     NUXT_STRIPE_SECRET_KEY: 'rk_test_worker_entry',
     NUXT_STRIPE_WEBHOOK_SECRET: 'whsec_worker_entry',
     NUXT_STRIPE_PORTAL_CONFIGURATION_ID: 'bpc_worker_entry',
-    NUXT_STRIPE_PERSONAL_WEEKLY_PRICE_ID: 'price_worker_personal_weekly',
-    NUXT_STRIPE_PERSONAL_MONTHLY_PRICE_ID: 'price_worker_personal_monthly',
-    NUXT_STRIPE_PERSONAL_ANNUAL_PRICE_ID: 'price_worker_personal_annual',
-    NUXT_STRIPE_FAMILY_MONTHLY_PRICE_ID: 'price_worker_family_monthly',
-    NUXT_STRIPE_FAMILY_ANNUAL_PRICE_ID: 'price_worker_family_annual',
+    NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID: 'price_worker_personal_monthly',
+    NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID: 'price_worker_family_monthly',
     NUXT_CLOUDFLARE_TURNSTILE_SECRET_KEY: 'worker-turnstile-secret-not-a-provider-credential',
     NUXT_PUBLIC_TURNSTILE_SITE_KEY: 'worker-turnstile-site-not-a-provider-credential',
     NUXT_SENTRY_DSN: 'https://server@example.ingest.sentry.io/1',

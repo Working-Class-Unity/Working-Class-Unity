@@ -126,7 +126,7 @@
       "lastName": "Last name",
       "displayName": "Display name",
       "optional": "Optional",
-      "displayNameHelp": "Optional. Your email is used in your dashboard and account menu when this is blank.",
+      "displayNameHelp": "Optional. Your email or phone number is used in your dashboard and account menu when this is blank.",
       "save": "Save profile",
       "saving": "Saving profile...",
       "saved": "Profile saved.",
@@ -136,7 +136,58 @@
       "title": "Sign-in details",
       "avatar": "Avatar",
       "avatarAlt": "Avatar for {identity}",
-      "noAvatar": "No avatar set"
+      "noAvatar": "No avatar set",
+      "phone": "Phone number",
+      "notAdded": "Not added"
+    },
+    "email": {
+      "title": "Email login",
+      "description": "A verified email gives you another way to log in to this same account.",
+      "current": "Email address",
+      "status": "Email status",
+      "verified": "Verified",
+      "notVerified": "Not verified",
+      "addEmail": "Add an email address",
+      "newEmail": "New email address",
+      "help": "We will send a WCU verification link. Your email becomes a login only after you click it.",
+      "required": "Email is required.",
+      "unchanged": "Enter a different email address.",
+      "sending": "Sending verification link...",
+      "send": "Send verification link",
+      "requested": "If that address can be used, a WCU verification link is on its way.",
+      "requestError": "We could not send the verification link. Try again or contact WCU."
+    },
+    "membership": {
+      "title": "WCU membership",
+      "description": "Your contribution amount does not change your membership rights.",
+      "loading": "Loading your membership status...",
+      "loadError": "We could not load your membership status right now.",
+      "accountType": "Account type",
+      "supporter": "Supporter",
+      "member": "Member",
+      "contribution": "Current contribution",
+      "amountMonthly": "${amount} per month",
+      "equalRights": "The $10 and $27 contributions have identical membership rights.",
+      "currentContribution": "Current contribution",
+      "scheduledContribution": "Scheduled contribution",
+      "identityReviewTitle": "Membership match needs review",
+      "identityReview": "We could not safely match this account to an existing membership. Contact WCU before starting another subscription.",
+      "joinContribution": "Become a member at ${amount}/month",
+      "changeContribution": "Change to ${amount}/month",
+      "changeSaved": "Your contribution change is scheduled for your next renewal.",
+      "paymentProblemTitle": "Payment needs attention",
+      "paymentProblem": "You keep all membership rights through {deadline}. Fix the payment before then to remain a member.",
+      "fixPayment": "Fix payment",
+      "managePayment": "Manage payment",
+      "cancellationTitle": "Membership cancellation scheduled",
+      "cancellation": "Your membership rights continue through {deadline}.",
+      "changePendingTitle": "Contribution change scheduled",
+      "changePending": "Your contribution changes to ${amount}/month on {deadline}. There is no proration.",
+      "checkoutCancelled": "Checkout was canceled. Your account was not charged.",
+      "refresh": "Refresh Stripe status",
+      "refreshed": "Your Stripe status is up to date.",
+      "commandError": "We could not complete that Stripe action. Try again or contact WCU.",
+      "dateUnavailable": "the date shown in Stripe"
     },
     "menu": {
       "triggerLabel": "Account menu for {identity}",
@@ -171,22 +222,32 @@
     "login": {
       "eyebrow": "Welcome back",
       "title": "Log in",
-      "introduction": "Enter your email address to receive a passwordless sign-in link."
+      "introduction": "Use your email address or U.S. phone number to log in without a password."
     },
     "signup": {
       "eyebrow": "Get started",
       "title": "Create your account",
-      "introduction": "Enter your email address to create or return to your account."
+      "introduction": "Create a Supporter account with email or a U.S. phone number, or return to your existing WCU account."
+    },
+    "method": {
+      "label": "Choose how to continue",
+      "email": "Use email",
+      "phone": "Use phone"
     },
     "errors": {
       "authenticationFailed": "We could not complete authentication. Request a new email link.",
       "formInvalid": "Check the highlighted field and try again.",
-      "securityRequired": "Complete the security check before requesting an email link.",
-      "emailLink": "We could not send an email link right now. Please try again."
+      "securityRequired": "Complete the security check before continuing.",
+      "emailLink": "We could not send an email link right now. Please try again.",
+      "phoneCode": "We could not send a verification text. Check the U.S. phone number and try again.",
+      "phoneVerification": "That verification code did not work. Check the code or request a new one.",
+      "phoneUnavailable": "Phone verification is unavailable right now. Please try again."
     },
     "status": {
       "signedOut": "You are signed out.",
-      "emailLinkSent": "If you can receive email at that address, a sign-in link is on its way."
+      "billingEmailChecked": "If this billing email could be verified, it is now ready for email login. Request a sign-in link below.",
+      "emailLinkSent": "If you can receive email at that address, a sign-in link is on its way.",
+      "phoneCodeSent": "A one-time verification code is on its way."
     },
     "sessionUnavailable": {
       "title": "Session check unavailable",
@@ -196,6 +257,21 @@
       "required": "Email is required.",
       "sending": "Sending...",
       "submit": "Send email link"
+    },
+    "phone": {
+      "label": "U.S. phone number",
+      "required": "Phone number is required.",
+      "invalid": "Enter a valid U.S. phone number.",
+      "help": "We will text this number a one-time verification code. Message and data rates may apply.",
+      "sending": "Sending code...",
+      "send": "Text me a code",
+      "codeLabel": "Verification code",
+      "codeRequired": "Verification code is required.",
+      "codeInvalid": "Enter the numeric code from the text message.",
+      "codeHelp": "Enter the code sent to {phone}.",
+      "verifying": "Verifying...",
+      "verify": "Verify and continue",
+      "change": "Use a different number"
     },
     "legal": {
       "acknowledgment": "By continuing, you acknowledge the {terms} and {privacy}.",
@@ -349,7 +425,7 @@
       "description": "We could not load your account right now."
     },
     "ready": "Your WCU account is ready.",
-    "signedInAs": "Signed in as {email}",
+    "signedInAs": "Signed in as {identity}",
     "manageAccount": "Manage account"
   }
 }

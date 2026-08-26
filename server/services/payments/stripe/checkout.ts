@@ -7,7 +7,8 @@ import {
   recordObservedCheckoutSession,
   reserveCheckoutAttempt,
   transitionCheckoutAttempt,
-  type AttemptOutcome
+  type AttemptOutcome,
+  type CheckoutAttemptReservationGuard
 } from './checkout-store'
 import { createStripeBillingCatalog } from './catalog'
 import type { BillingStripeRuntimeConfiguration } from './configuration'
@@ -27,6 +28,7 @@ export type StripeCheckoutContext = Readonly<{
   client: StripeBillingClient
   config: BillingStripeRuntimeConfiguration
   integration?: BillingStripeIntegration<BillingStripeConnection, unknown>
+  assertCheckoutAllowed?: CheckoutAttemptReservationGuard
 }>
 
 export type CheckoutAttemptSessionResolution =
@@ -60,7 +62,12 @@ export async function ensureBillingCheckout(
     now,
     reuseUntil: new Date(now.getTime() + checkoutAttemptReuseMs)
   }
-  let reservation = reserveCheckoutAttempt(context.connection, context.integration, reservationInput)
+  let reservation = reserveCheckoutAttempt(
+    context.connection,
+    context.integration,
+    reservationInput,
+    context.assertCheckoutAllowed
+  )
   if (reservation.outcome !== 'applied') {
     requireCheckoutReservation(context, purchaserUserId, reservation.outcome)
   }
@@ -79,7 +86,9 @@ export async function ensureBillingCheckout(
   }
 
   if (attempt.stripeSessionId) {
+    context.assertCheckoutAllowed?.(context.connection, purchaserUserId)
     const existing = await retrieveCheckoutSession(context.client, attempt.stripeSessionId)
+    context.assertCheckoutAllowed?.(context.connection, purchaserUserId)
     const expectedCustomer = attempt.billingCustomerId
       ? getBillingCustomerById(context.connection, attempt.billingCustomerId)
       : null
@@ -111,7 +120,12 @@ export async function ensureBillingCheckout(
         ),
         'creation'
       )
-      reservation = reserveCheckoutAttempt(context.connection, context.integration, reservationInput)
+      reservation = reserveCheckoutAttempt(
+        context.connection,
+        context.integration,
+        reservationInput,
+        context.assertCheckoutAllowed
+      )
       if (reservation.outcome !== 'applied') {
         requireCheckoutReservation(context, purchaserUserId, reservation.outcome)
       }
@@ -179,6 +193,7 @@ export async function ensureBillingCheckout(
   const attemptCustomer = attempt.billingCustomerId
     ? getBillingCustomerById(context.connection, attempt.billingCustomerId)
     : null
+  context.assertCheckoutAllowed?.(context.connection, purchaserUserId)
   let session: Stripe.Checkout.Session
   try {
     session = await context.client.checkout.sessions.create(
@@ -188,6 +203,7 @@ export async function ensureBillingCheckout(
   } catch {
     throw upstreamServiceError(502, 'Stripe Checkout is temporarily unavailable')
   }
+  context.assertCheckoutAllowed?.(context.connection, purchaserUserId)
 
   if (
     !isExpectedCheckoutSession(session, attempt, attemptCustomer?.stripeCustomerId ?? null) ||

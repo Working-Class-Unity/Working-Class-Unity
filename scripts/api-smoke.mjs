@@ -231,11 +231,24 @@ function assertMinimalMeProjection(body, expectedUser) {
   )
   assert(
     JSON.stringify(Object.keys(body.user ?? {}).sort()) ===
-      JSON.stringify(['displayName', 'email', 'firstName', 'id', 'image', 'lastName']),
+      JSON.stringify([
+        'displayName',
+        'email',
+        'emailVerified',
+        'firstName',
+        'id',
+        'image',
+        'lastName',
+        'phoneNumber',
+        'phoneNumberVerified'
+      ]),
     'expected /api/me to expose only the minimal user identity fields'
   )
   assert(body.user.id === expectedUser.id, 'expected /api/me user id to match the authenticated caller')
   assert(body.user.email === expectedUser.email, 'expected /api/me user email to match the authenticated caller')
+  assert(body.user.emailVerified === true, 'expected the magic-link email to be verified')
+  assert(body.user.phoneNumber === null, 'expected an email-only account to have no phone number')
+  assert(body.user.phoneNumberVerified === false, 'expected an email-only account to have no verified phone number')
   assert(body.user.image === expectedUser.image, 'expected /api/me user image to match the authenticated caller')
   assert(body.user.firstName === null, 'expected a new account to have no first name')
   assert(body.user.lastName === null, 'expected a new account to have no last name')

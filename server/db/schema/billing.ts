@@ -41,6 +41,13 @@ export const billingAccountDeletionRequestStates = Object.freeze([
   'reconciliation_required',
   'cancellation_confirmed'
 ] as const)
+export const billingEmailVerificationStatuses = Object.freeze([
+  'pending',
+  'sent',
+  'consumed',
+  'conflict',
+  'expired'
+] as const)
 
 const validOfferingPair = (plan: unknown, cadence: unknown) =>
   sql`((${plan} = 'personal' and ${cadence} in ('weekly', 'monthly', 'annual')) or (${plan} = 'family' and ${cadence} in ('monthly', 'annual')))`
@@ -98,6 +105,53 @@ export const billingCheckoutAttempts = sqliteTable(
     ),
     check('billing_checkout_attempts_price_check', sql`${table.stripePriceId} glob 'price_*'`),
     check('billing_checkout_attempts_reuse_check', sql`${table.reuseUntil} >= ${table.createdAt}`)
+  ]
+)
+
+export const billingEmailVerifications = sqliteTable(
+  'billing_email_verifications',
+  {
+    id: text('id').primaryKey(),
+    purchaserUserId: text('purchaser_user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    billingCheckoutAttemptId: text('billing_checkout_attempt_id')
+      .notNull()
+      .references(() => billingCheckoutAttempts.id, { onDelete: 'cascade' }),
+    stripeSessionId: text('stripe_session_id').notNull(),
+    email: text('email').notNull(),
+    status: text('status', { enum: billingEmailVerificationStatuses }).notNull().default('pending'),
+    expiresAt: text('expires_at').notNull(),
+    sentAt: text('sent_at'),
+    consumedAt: text('consumed_at'),
+    createdAt: createdAtColumn(),
+    updatedAt: updatedAtColumn()
+  },
+  (table) => [
+    uniqueIndex('billing_email_verifications_attempt_id_uidx').on(table.billingCheckoutAttemptId),
+    uniqueIndex('billing_email_verifications_stripe_session_id_uidx').on(table.stripeSessionId),
+    index('billing_email_verifications_status_expiry_idx').on(table.status, table.expiresAt),
+    check(
+      'billing_email_verifications_id_check',
+      sql`length(${table.id}) = 63 and substr(${table.id}, 1, 27) = 'billing_email_verification_'`
+    ),
+    check('billing_email_verifications_session_check', sql`${table.stripeSessionId} glob 'cs_*'`),
+    check(
+      'billing_email_verifications_email_check',
+      sql`${table.email} = lower(trim(${table.email})) and length(${table.email}) between 3 and 320 and instr(${table.email}, '@') > 1`
+    ),
+    check(
+      'billing_email_verifications_status_check',
+      sql`${table.status} in ('pending', 'sent', 'consumed', 'conflict', 'expired')`
+    ),
+    check(
+      'billing_email_verifications_lifecycle_check',
+      sql`(${table.status} = 'pending' and ${table.sentAt} is null and ${table.consumedAt} is null) or (${table.status} = 'sent' and ${table.sentAt} is not null and ${table.consumedAt} is null) or (${table.status} in ('consumed', 'conflict') and ${table.sentAt} is not null and ${table.consumedAt} is not null) or (${table.status} = 'expired' and ${table.consumedAt} is not null)`
+    ),
+    check(
+      'billing_email_verifications_timestamps_check',
+      sql`julianday(${table.expiresAt}) is not null and julianday(${table.createdAt}) is not null and julianday(${table.updatedAt}) is not null and julianday(${table.expiresAt}) > julianday(${table.createdAt}) and julianday(${table.updatedAt}) >= julianday(${table.createdAt}) and (${table.sentAt} is null or julianday(${table.sentAt}) >= julianday(${table.createdAt})) and (${table.consumedAt} is null or julianday(${table.consumedAt}) >= julianday(${table.createdAt}))`
+    )
   ]
 )
 
@@ -347,6 +401,7 @@ export const detachedBillingSubjects = sqliteTable(
 export const billingStripeSchema = Object.freeze({
   billingCustomers,
   billingCheckoutAttempts,
+  billingEmailVerifications,
   billingSubscriptions,
   billingSubscriptionTransitions,
   billingAccountDeletionRequests,
@@ -357,6 +412,7 @@ export const billingStripeSchema = Object.freeze({
 export type BillingCustomer = typeof billingCustomers.$inferSelect
 export type BillingCheckoutAttempt = typeof billingCheckoutAttempts.$inferSelect
 export type BillingSubscription = typeof billingSubscriptions.$inferSelect
+export type BillingEmailVerification = typeof billingEmailVerifications.$inferSelect
 export type BillingSubscriptionTransition = typeof billingSubscriptionTransitions.$inferSelect
 export type BillingAccountDeletionRequest = typeof billingAccountDeletionRequests.$inferSelect
 export type BillingEvent = typeof billingEvents.$inferSelect
@@ -364,6 +420,7 @@ export type DetachedBillingSubject = typeof detachedBillingSubjects.$inferSelect
 export type CheckoutAttemptState = (typeof checkoutAttemptStates)[number]
 export type BillingSubscriptionTransitionKind = (typeof billingSubscriptionTransitionKinds)[number]
 export type BillingSubscriptionTransitionState = (typeof billingSubscriptionTransitionStates)[number]
+export type BillingEmailVerificationStatus = (typeof billingEmailVerificationStatuses)[number]
 export type BillingAccountDeletionRequestState = (typeof billingAccountDeletionRequestStates)[number]
 
 export type NewBillingCustomer = typeof billingCustomers.$inferInsert

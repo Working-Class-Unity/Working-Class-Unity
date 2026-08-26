@@ -10,6 +10,13 @@ import * as schema from '../server/db/schema/index'
 import { listVisibleCalendarEvents } from '../server/services/events/calendar-read'
 
 const migrationsFolder = fileURLToPath(new URL('../server/db/migrations/', import.meta.url))
+const prices = {
+  'personal.weekly': '',
+  'personal.monthly': 'price_membership_10',
+  'personal.annual': '',
+  'family.monthly': 'price_solidarity_27',
+  'family.annual': ''
+} as const
 
 describe('calendar visibility', () => {
   it('shows member events only to website accounts linked to an active membership', () => {
@@ -68,6 +75,8 @@ describe('calendar visibility', () => {
       const input = {
         from: '2026-09-01T00:00:00.000Z',
         limit: 200,
+        now: new Date('2026-08-26T12:00:00.000Z'),
+        prices,
         to: '2026-10-01T00:00:00.000Z'
       }
       expect(

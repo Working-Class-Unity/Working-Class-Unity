@@ -68,6 +68,7 @@ export const canonicalAppRuntimePaths = [
   ['BETTER_AUTH', 'object'],
   ['EMAIL', 'object'],
   ['EMAIL_RESEND', 'object'],
+  ['TWILIO_VERIFY', 'object'],
   ['STRIPE', 'object'],
   ['FILES', 'object'],
   ['OPENAI', 'object'],
@@ -86,14 +87,14 @@ export const canonicalAppRuntimePaths = [
   ['EMAIL_FROM', 'leaf'],
   ['EMAIL_CAPTURE_DIRECTORY', 'leaf'],
   ['EMAIL_RESEND_API_KEY', 'leaf'],
+  ['TWILIO_VERIFY_API_KEY_SID', 'leaf'],
+  ['TWILIO_VERIFY_API_KEY_SECRET', 'leaf'],
+  ['TWILIO_VERIFY_SERVICE_SID', 'leaf'],
   ['STRIPE_SECRET_KEY', 'leaf'],
   ['STRIPE_WEBHOOK_SECRET', 'leaf'],
   ['STRIPE_PORTAL_CONFIGURATION_ID', 'leaf'],
-  ['STRIPE_PERSONAL_WEEKLY_PRICE_ID', 'leaf'],
-  ['STRIPE_PERSONAL_MONTHLY_PRICE_ID', 'leaf'],
-  ['STRIPE_PERSONAL_ANNUAL_PRICE_ID', 'leaf'],
-  ['STRIPE_FAMILY_MONTHLY_PRICE_ID', 'leaf'],
-  ['STRIPE_FAMILY_ANNUAL_PRICE_ID', 'leaf'],
+  ['STRIPE_MEMBERSHIP_DUES10_PRICE_ID', 'leaf'],
+  ['STRIPE_SOLIDARITY_DUES27_PRICE_ID', 'leaf'],
   ['FILES_DRIVER', 'leaf'],
   ['OPENAI_API_KEY', 'leaf'],
   ['OPENAI_PROJECT_ID', 'leaf'],
@@ -141,6 +142,22 @@ type RuntimeRequirement = Readonly<{
 }>
 
 const runtimeRequirements = [
+  {
+    environmentKey: 'NUXT_TWILIO_VERIFY_API_KEY_SID',
+    configPath: 'twilioVerify.apiKeySid',
+    kind: 'value'
+  },
+  {
+    environmentKey: 'NUXT_TWILIO_VERIFY_API_KEY_SECRET',
+    configPath: 'twilioVerify.apiKeySecret',
+    kind: 'value',
+    preserveBytes: true
+  },
+  {
+    environmentKey: 'NUXT_TWILIO_VERIFY_SERVICE_SID',
+    configPath: 'twilioVerify.serviceSid',
+    kind: 'value'
+  },
   { environmentKey: 'NUXT_STRIPE_SECRET_KEY', configPath: 'stripe.secretKey', kind: 'value', preserveBytes: true },
   {
     environmentKey: 'NUXT_STRIPE_WEBHOOK_SECRET',
@@ -154,28 +171,13 @@ const runtimeRequirements = [
     kind: 'value'
   },
   {
-    environmentKey: 'NUXT_STRIPE_PERSONAL_WEEKLY_PRICE_ID',
-    configPath: 'stripe.personalWeeklyPriceId',
+    environmentKey: 'NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID',
+    configPath: 'stripe.membershipDues10PriceId',
     kind: 'value'
   },
   {
-    environmentKey: 'NUXT_STRIPE_PERSONAL_MONTHLY_PRICE_ID',
-    configPath: 'stripe.personalMonthlyPriceId',
-    kind: 'value'
-  },
-  {
-    environmentKey: 'NUXT_STRIPE_PERSONAL_ANNUAL_PRICE_ID',
-    configPath: 'stripe.personalAnnualPriceId',
-    kind: 'value'
-  },
-  {
-    environmentKey: 'NUXT_STRIPE_FAMILY_MONTHLY_PRICE_ID',
-    configPath: 'stripe.familyMonthlyPriceId',
-    kind: 'value'
-  },
-  {
-    environmentKey: 'NUXT_STRIPE_FAMILY_ANNUAL_PRICE_ID',
-    configPath: 'stripe.familyAnnualPriceId',
+    environmentKey: 'NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID',
+    configPath: 'stripe.solidarityDues27PriceId',
     kind: 'value'
   },
   {
@@ -271,6 +273,7 @@ const runtimeConfigSchema = z.object({
       apiKey: z.unknown()
     })
   }),
+  twilioVerify: z.unknown(),
   stripe: z.unknown(),
   files: z.unknown(),
   openai: z.unknown(),
@@ -308,6 +311,11 @@ type NormalizedRuntimeConfig = {
       apiKey: string
     }
   }
+  twilioVerify: {
+    apiKeySid: string
+    apiKeySecret: string
+    serviceSid: string
+  }
   files: {
     driver: '' | 'local' | 'r2'
   }
@@ -326,11 +334,8 @@ type NormalizedRuntimeConfig = {
     secretKey: string
     webhookSecret: string
     portalConfigurationId: string
-    personalWeeklyPriceId: string
-    personalMonthlyPriceId: string
-    personalAnnualPriceId: string
-    familyMonthlyPriceId: string
-    familyAnnualPriceId: string
+    membershipDues10PriceId: string
+    solidarityDues27PriceId: string
   }
   sentryDsn: string
   sentryEnvironment: string
@@ -516,15 +521,17 @@ export function runtimeConfigFromEnvironment(environment: RuntimeEnvironment): u
         apiKey: nitroEnvironmentValue(environment, 'NUXT_EMAIL_RESEND_API_KEY')
       }
     },
+    twilioVerify: {
+      apiKeySid: nitroEnvironmentValue(environment, 'NUXT_TWILIO_VERIFY_API_KEY_SID'),
+      apiKeySecret: nitroEnvironmentValue(environment, 'NUXT_TWILIO_VERIFY_API_KEY_SECRET'),
+      serviceSid: nitroEnvironmentValue(environment, 'NUXT_TWILIO_VERIFY_SERVICE_SID')
+    },
     stripe: {
       secretKey: nitroEnvironmentValue(environment, 'NUXT_STRIPE_SECRET_KEY'),
       webhookSecret: nitroEnvironmentValue(environment, 'NUXT_STRIPE_WEBHOOK_SECRET'),
       portalConfigurationId: nitroEnvironmentValue(environment, 'NUXT_STRIPE_PORTAL_CONFIGURATION_ID'),
-      personalWeeklyPriceId: nitroEnvironmentValue(environment, 'NUXT_STRIPE_PERSONAL_WEEKLY_PRICE_ID'),
-      personalMonthlyPriceId: nitroEnvironmentValue(environment, 'NUXT_STRIPE_PERSONAL_MONTHLY_PRICE_ID'),
-      personalAnnualPriceId: nitroEnvironmentValue(environment, 'NUXT_STRIPE_PERSONAL_ANNUAL_PRICE_ID'),
-      familyMonthlyPriceId: nitroEnvironmentValue(environment, 'NUXT_STRIPE_FAMILY_MONTHLY_PRICE_ID'),
-      familyAnnualPriceId: nitroEnvironmentValue(environment, 'NUXT_STRIPE_FAMILY_ANNUAL_PRICE_ID')
+      membershipDues10PriceId: nitroEnvironmentValue(environment, 'NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID'),
+      solidarityDues27PriceId: nitroEnvironmentValue(environment, 'NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID')
     },
     files: {
       driver: nitroEnvironmentValue(environment, 'NUXT_FILES_DRIVER')
@@ -606,6 +613,7 @@ export function formatRuntimeConfigIssues(issues: readonly RuntimeConfigIssue[])
 function normalizeRuntimeConfig(config: ParsedRuntimeConfig): NormalizedRuntimeConfig {
   const email = recordValue(config.email)
   const emailResend = recordValue(email.resend)
+  const twilioVerify = recordValue(config.twilioVerify)
   const stripe = recordValue(config.stripe)
   const files = recordValue(config.files)
   const openai = recordValue(config.openai)
@@ -631,15 +639,17 @@ function normalizeRuntimeConfig(config: ParsedRuntimeConfig): NormalizedRuntimeC
         apiKey: stringValue(emailResend.apiKey)
       }
     },
+    twilioVerify: {
+      apiKeySid: trimmedStringValue(twilioVerify.apiKeySid),
+      apiKeySecret: stringValue(twilioVerify.apiKeySecret),
+      serviceSid: trimmedStringValue(twilioVerify.serviceSid)
+    },
     stripe: {
       secretKey: stringValue(stripe.secretKey),
       webhookSecret: stringValue(stripe.webhookSecret),
       portalConfigurationId: trimmedStringValue(stripe.portalConfigurationId),
-      personalWeeklyPriceId: trimmedStringValue(stripe.personalWeeklyPriceId),
-      personalMonthlyPriceId: trimmedStringValue(stripe.personalMonthlyPriceId),
-      personalAnnualPriceId: trimmedStringValue(stripe.personalAnnualPriceId),
-      familyMonthlyPriceId: trimmedStringValue(stripe.familyMonthlyPriceId),
-      familyAnnualPriceId: trimmedStringValue(stripe.familyAnnualPriceId)
+      membershipDues10PriceId: trimmedStringValue(stripe.membershipDues10PriceId),
+      solidarityDues27PriceId: trimmedStringValue(stripe.solidarityDues27PriceId)
     },
     files: {
       driver: normalizeFilesDriver(files.driver)
@@ -918,10 +928,38 @@ function validateCapabilities(
   }
 
   validateStripeConfiguration(config, environment, issues)
+  validateTwilioVerifyConfiguration(config, environment, issues)
   validateFilesConfiguration(config, environment, issues)
   validateOpenAIConfiguration(config, environment, issues)
   validateTurnstileTestKeyContainment(config, environment, issues)
   validateSentryConfiguration(config, environment, issues)
+}
+
+function validateTwilioVerifyConfiguration(
+  config: NormalizedRuntimeConfig,
+  environment: RuntimeEnvironment,
+  issues: RuntimeConfigIssue[]
+) {
+  const apiKeySidKey = 'NUXT_TWILIO_VERIFY_API_KEY_SID'
+  const apiKeySid = environment[apiKeySidKey] ?? ''
+  requireAlreadyTrimmed(apiKeySid, apiKeySidKey, issues)
+  if (config.twilioVerify.apiKeySid && !/^SK[0-9a-fA-F]{32}$/.test(config.twilioVerify.apiKeySid)) {
+    issues.push(configIssue('invalid', apiKeySidKey, 'must be a Twilio API key SID'))
+  }
+
+  const apiKeySecretKey = 'NUXT_TWILIO_VERIFY_API_KEY_SECRET'
+  const apiKeySecret = environment[apiKeySecretKey] ?? ''
+  requireAlreadyTrimmed(apiKeySecret, apiKeySecretKey, issues)
+  if (config.twilioVerify.apiKeySecret && config.twilioVerify.apiKeySecret.length < 32) {
+    issues.push(configIssue('invalid', apiKeySecretKey, 'must contain at least 32 characters'))
+  }
+
+  const serviceSidKey = 'NUXT_TWILIO_VERIFY_SERVICE_SID'
+  const serviceSid = environment[serviceSidKey] ?? ''
+  requireAlreadyTrimmed(serviceSid, serviceSidKey, issues)
+  if (config.twilioVerify.serviceSid && !/^VA[0-9a-fA-F]{32}$/.test(config.twilioVerify.serviceSid)) {
+    issues.push(configIssue('invalid', serviceSidKey, 'must be a Twilio Verify Service SID'))
+  }
 }
 
 function validateFilesConfiguration(

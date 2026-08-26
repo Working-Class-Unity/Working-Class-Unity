@@ -1,5 +1,5 @@
 import { isIP } from 'node:net'
-import { billingOfferingKeys, type BillingOfferingKey } from '../../../../shared/billing'
+import { membershipDuesOfferingKeys, type BillingOfferingKey } from '../../../../shared/billing'
 
 export type BillingStripePriceConfiguration = Readonly<Record<BillingOfferingKey, string>>
 
@@ -29,12 +29,9 @@ const secretKeyEnvironmentKey = 'NUXT_STRIPE_SECRET_KEY'
 const webhookSecretEnvironmentKey = 'NUXT_STRIPE_WEBHOOK_SECRET'
 const portalConfigurationEnvironmentKey = 'NUXT_STRIPE_PORTAL_CONFIGURATION_ID'
 const priceEnvironmentKeys = {
-  'personal.weekly': 'NUXT_STRIPE_PERSONAL_WEEKLY_PRICE_ID',
-  'personal.monthly': 'NUXT_STRIPE_PERSONAL_MONTHLY_PRICE_ID',
-  'personal.annual': 'NUXT_STRIPE_PERSONAL_ANNUAL_PRICE_ID',
-  'family.monthly': 'NUXT_STRIPE_FAMILY_MONTHLY_PRICE_ID',
-  'family.annual': 'NUXT_STRIPE_FAMILY_ANNUAL_PRICE_ID'
-} as const satisfies Record<BillingOfferingKey, string>
+  'personal.monthly': 'NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID',
+  'family.monthly': 'NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID'
+} as const satisfies Record<(typeof membershipDuesOfferingKeys)[number], string>
 
 export function evaluateBillingStripeRuntimeConfiguration(
   input: BillingStripeRuntimeConfigurationInput,
@@ -78,7 +75,7 @@ export function evaluateBillingStripeRuntimeConfiguration(
   }
 
   const environmentKeysByPriceId = new Map<string, string[]>()
-  for (const offering of billingOfferingKeys) {
+  for (const offering of membershipDuesOfferingKeys) {
     const environmentKey = priceEnvironmentKeys[offering]
     const priceId = validateRequiredValue(input.stripe.prices[offering], environmentKey, environment, issues)
     if (priceId && !priceId.startsWith('price_')) {

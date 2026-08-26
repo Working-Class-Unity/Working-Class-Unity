@@ -114,6 +114,8 @@ async function retrySession() {
       <div v-else class="account-content">
         <AccountProfileForm :user="user" @updated="profileUpdated" />
 
+        <AccountMembershipSection />
+
         <section aria-labelledby="identity-title">
           <h2 id="identity-title">{{ t('account.identity.title') }}</h2>
           <dl class="identity-list grid">
@@ -133,10 +135,16 @@ async function retrySession() {
             </div>
             <div>
               <dt>{{ t('common.email') }}</dt>
-              <dd>{{ user.email }}</dd>
+              <dd>{{ user.email ?? t('account.identity.notAdded') }}</dd>
+            </div>
+            <div>
+              <dt>{{ t('account.identity.phone') }}</dt>
+              <dd>{{ user.phoneNumber ?? t('account.identity.notAdded') }}</dd>
             </div>
           </dl>
         </section>
+
+        <AccountEmailSection :email="user.email" :email-verified="user.emailVerified" />
 
         <AccountDeletionSection @deleted="accountDeleted" />
       </div>

@@ -26,6 +26,10 @@ const open = ref(false)
 const isSigningOut = ref(false)
 const signOutError = ref('')
 const identity = computed(() => appUserIdentity(props.user))
+const secondaryIdentity = computed(() => {
+  if (!props.user.displayName) return null
+  return props.user.email ?? props.user.phoneNumber
+})
 const triggerLabel = computed(() => t('account.menu.triggerLabel', { identity: identity.value }))
 const nuxtUseId = () => useId()
 
@@ -82,7 +86,7 @@ async function signOut(event: Event) {
         >
           <DropdownMenuLabel class="account-menu-identity">
             <strong>{{ identity }}</strong>
-            <span v-if="props.user.displayName">{{ props.user.email }}</span>
+            <span v-if="secondaryIdentity">{{ secondaryIdentity }}</span>
           </DropdownMenuLabel>
 
           <DropdownMenuSeparator class="account-menu-separator" />

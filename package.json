@@ -26,6 +26,7 @@
     "db:studio": "node --env-file-if-exists=.env scripts/run-pnpm.mjs exec drizzle-kit studio",
     "db:backup": "node --env-file-if-exists=.env server/db/backup.mjs",
     "db:import:stripe": "node --env-file-if-exists=.env scripts/run-pnpm.mjs exec tsx scripts/import-stripe-membership.ts",
+    "db:identity-review:resolve": "node --env-file-if-exists=.env scripts/run-pnpm.mjs exec tsx scripts/resolve-identity-review.ts",
     "db:import:solidarity-events": "node --env-file-if-exists=.env scripts/run-pnpm.mjs exec tsx scripts/import-solidarity-events.ts",
     "db:normalize:solidarity-events": "node scripts/run-pnpm.mjs exec tsx scripts/normalize-solidarity-events.ts",
     "db:migrate:check": "node --env-file-if-exists=.env scripts/run-pnpm.mjs exec tsx server/db/migration-check.ts",

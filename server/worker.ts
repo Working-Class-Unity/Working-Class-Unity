@@ -3,6 +3,10 @@ import { connectDatabase } from './db/connect'
 import { getTransactionalEmailSender } from './services/email'
 import { runNextJobForConnection, type JobHandler } from './services/jobs/job-queue'
 import { runWorkerLoop } from './services/jobs/worker-loop'
+import {
+  createIdentityReviewNotificationHandler,
+  identityReviewNotificationJobType
+} from './services/membership/identity-review-notification'
 import { billingStripeConfiguration } from './services/payments/stripe/app-composition'
 import { createBillingStripeJobHandlers, ensureBillingStripeJobs } from './services/payments/stripe/jobs'
 import { getAppRuntimeConfig, readDatabaseUrl } from './utils/runtime'
@@ -23,8 +27,14 @@ const onSigterm = () => requestShutdown('SIGTERM')
 const onSigint = () => requestShutdown('SIGINT')
 let nextBillingSafetyCheckAt = 0
 const handlers: Record<string, JobHandler> = {
+  [identityReviewNotificationJobType]: createIdentityReviewNotificationHandler({
+    appName: config.public.appName,
+    connection,
+    sender: getTransactionalEmailSender()
+  }),
   ...createBillingStripeJobHandlers({
     configuration: billingStripeConfiguration(config),
+    emailVerificationSecret: config.betterAuth.secret,
     integration: undefined,
     sender: getTransactionalEmailSender(),
     connection

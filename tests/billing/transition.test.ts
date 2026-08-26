@@ -139,33 +139,16 @@ describe('Stripe billing transitions', () => {
         run_after: source.currentPeriodEnd
       })
     ])
-    expect(fixture.synchronizationRequests).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          kind: 'state_committed',
-          cause: 'transition',
-          transition: {
-            id: transition.id,
-            kind: 'family_to_personal',
-            sourceOffering: 'family.annual',
-            targetOffering: 'personal.monthly',
-            state: 'scheduled',
-            effectiveAt: source.currentPeriodEnd
-          },
-          effects: [
-            {
-              action: 'renewal_ending',
-              episodeKey: expect.stringMatching(/^billing_episode_[a-f0-9]{64}$/),
-              effectiveAt: source.currentPeriodEnd,
-              transitionId: transition.id
-            }
-          ]
-        })
-      ])
-    )
+    expect(fixture.synchronizationRequests).toEqual([
+      expect.objectContaining({
+        kind: 'transition_reserved',
+        sourceOffering: 'family.annual',
+        targetOffering: 'personal.monthly'
+      })
+    ])
   })
 
-  it('applies a paid same-cadence Personal-to-Family update to the existing item', async () => {
+  it('schedules the public $10-to-$27 change for the next renewal without proration', async () => {
     const fixture = createTransitionFixture('upgrade')
     const source = seedActiveSubscription(fixture, 'personal', 'monthly')
     let transitionWasReserved = false
@@ -184,37 +167,50 @@ describe('Stripe billing transitions', () => {
 
     const transition = transitionRow(fixture)!
     expect(transitionWasReserved).toBe(true)
-    expect(provider.subscriptionUpdate).toHaveBeenCalledWith(
-      source.stripeSubscriptionId,
-      {
-        items: [
-          {
-            id: source.stripeSubscriptionItemId,
-            price: priceByOffering['family.monthly'],
-            quantity: 1
-          }
-        ],
-        payment_behavior: 'pending_if_incomplete',
-        proration_behavior: 'always_invoice',
-        expand: ['latest_invoice']
-      },
-      { idempotencyKey: transition.idempotency_key }
+    expect(provider.subscriptionUpdate).not.toHaveBeenCalled()
+    expect(provider.scheduleCreate).toHaveBeenCalledWith(
+      { from_subscription: source.stripeSubscriptionId },
+      { idempotencyKey: `${transition.idempotency_key}_schedule_create` }
     )
-    expect(provider.subscriptionRetrieve.mock.calls).toEqual([
-      [source.stripeSubscriptionId, { expand: ['latest_invoice'] }],
-      [source.stripeSubscriptionId, { expand: ['latest_invoice'] }],
-      [source.stripeSubscriptionId]
-    ])
-    expect(transition).toMatchObject({ state: 'applied' })
+    expect(provider.scheduleUpdate).toHaveBeenCalledWith(
+      'sub_sched_transition',
+      {
+        end_behavior: 'release',
+        proration_behavior: 'none',
+        phases: [
+          {
+            start_date: epoch(source.currentPeriodStart),
+            end_date: epoch(source.currentPeriodEnd),
+            items: [{ price: priceByOffering['personal.monthly'], quantity: 1 }],
+            proration_behavior: 'none'
+          },
+          {
+            start_date: epoch(source.currentPeriodEnd),
+            duration: { interval: 'month', interval_count: 1 },
+            items: [{ price: priceByOffering['family.monthly'], quantity: 1 }],
+            proration_behavior: 'none'
+          }
+        ]
+      },
+      { idempotencyKey: `${transition.idempotency_key}_schedule_configure` }
+    )
+    expect(transition).toMatchObject({ state: 'scheduled', effective_at: source.currentPeriodEnd })
     expect(subscriptionRow(fixture)).toMatchObject({
       purchaser_user_id: fixture.purchaserUserId,
       stripe_subscription_id: source.stripeSubscriptionId,
       stripe_subscription_item_id: source.stripeSubscriptionItemId,
-      plan_key: 'family',
+      plan_key: 'personal',
       cadence: 'monthly',
-      stripe_price_id: priceByOffering['family.monthly'],
+      stripe_price_id: priceByOffering['personal.monthly'],
       status: 'active'
     })
+    expect(fixture.synchronizationRequests).toEqual([
+      expect.objectContaining({
+        kind: 'transition_reserved',
+        sourceOffering: 'personal.monthly',
+        targetOffering: 'family.monthly'
+      })
+    ])
   })
 
   it('resets the billing anchor only when an immediate upgrade changes cadence', async () => {
@@ -245,13 +241,13 @@ describe('Stripe billing transitions', () => {
 
   it('stores only private correlation when payment needs action', async () => {
     const fixture = createTransitionFixture('action')
-    const source = seedActiveSubscription(fixture, 'personal', 'monthly')
+    const source = seedActiveSubscription(fixture, 'personal', 'annual')
     const provider = transitionProvider(source, { updateOutcome: 'pending' })
 
     await executeBillingTransition(
       billingContext(fixture, provider.client),
       fixture.purchaserUserId,
-      'family.monthly',
+      'family.annual',
       commandNow
     )
 
@@ -264,8 +260,8 @@ describe('Stripe billing transitions', () => {
     })
     expect(subscriptionRow(fixture)).toMatchObject({
       plan_key: 'personal',
-      cadence: 'monthly',
-      stripe_price_id: priceByOffering['personal.monthly']
+      cadence: 'annual',
+      stripe_price_id: priceByOffering['personal.annual']
     })
     expect(provider.subscriptionList).not.toHaveBeenCalled()
     expect(jobRows(fixture)).toEqual([
@@ -282,8 +278,8 @@ describe('Stripe billing transitions', () => {
           transition: {
             id: transition.id,
             kind: 'personal_to_family',
-            sourceOffering: 'personal.monthly',
-            targetOffering: 'family.monthly',
+            sourceOffering: 'personal.annual',
+            targetOffering: 'family.annual',
             state: 'action_required',
             effectiveAt: null
           },
@@ -384,21 +380,21 @@ describe('Stripe billing transitions', () => {
 
   it('does not apply the target when the independent current read still shows the source', async () => {
     const fixture = createTransitionFixture('stale-current')
-    const source = seedActiveSubscription(fixture, 'personal', 'monthly')
+    const source = seedActiveSubscription(fixture, 'personal', 'annual')
     const provider = transitionProvider(source, { postUpdateRetrieveKeepsSource: true })
 
     await expect(
       executeBillingTransition(
         billingContext(fixture, provider.client),
         fixture.purchaserUserId,
-        'family.monthly',
+        'family.annual',
         commandNow
       )
     ).rejects.toMatchObject({ statusCode: 409 })
     expect(subscriptionRow(fixture)).toMatchObject({
       plan_key: 'personal',
-      cadence: 'monthly',
-      stripe_price_id: priceByOffering['personal.monthly']
+      cadence: 'annual',
+      stripe_price_id: priceByOffering['personal.annual']
     })
     expect(transitionRow(fixture)).toMatchObject({
       state: 'reconciliation_required',
@@ -408,14 +404,14 @@ describe('Stripe billing transitions', () => {
 
   it('does not apply the target when a second nonterminal subscription is discovered', async () => {
     const fixture = createTransitionFixture('ambiguous-live')
-    const source = seedActiveSubscription(fixture, 'personal', 'monthly')
+    const source = seedActiveSubscription(fixture, 'personal', 'annual')
     const provider = transitionProvider(source, { additionalLiveStatuses: ['trialing'] })
 
     await expect(
       executeBillingTransition(
         billingContext(fixture, provider.client),
         fixture.purchaserUserId,
-        'family.monthly',
+        'family.annual',
         commandNow
       )
     ).rejects.toMatchObject({ statusCode: 409 })
@@ -425,7 +421,7 @@ describe('Stripe billing transitions', () => {
     })
     expect(subscriptionRow(fixture)).toMatchObject({
       plan_key: 'personal',
-      cadence: 'monthly'
+      cadence: 'annual'
     })
   })
 

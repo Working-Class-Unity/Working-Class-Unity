@@ -245,6 +245,108 @@ describe('Checkout service extraction parity', () => {
     expect(attemptRows(fixture)).toEqual([])
   })
 
+  it('rejects Checkout before provider I/O when an imported Stripe dues subscription is not yet projected', async () => {
+    const fixture = runtimeFixture('imported_entitled')
+    const provider = checkoutProvider()
+    seedImportedMembership(fixture, 'entitled')
+
+    await expect(
+      createBillingStripeCheckout(
+        serviceContext(fixture, provider.client),
+        fixture.purchaserUserId,
+        'family.monthly',
+        now
+      )
+    ).rejects.toMatchObject({
+      statusCode: 409,
+      statusMessage: 'An existing Stripe membership must be reconciled before starting another subscription'
+    })
+    expect(provider.create).not.toHaveBeenCalled()
+    expect(provider.retrieve).not.toHaveBeenCalled()
+    expect(attemptRows(fixture)).toEqual([])
+  })
+
+  it.each(['none', 'canceled', 'active'] as const)(
+    'rejects Checkout with a local %s projection when imported Stripe dues remain active',
+    async (status) => {
+      const fixture = runtimeFixture(`imported_with_local_${status}`)
+      const customerId = seedBillingCustomer(fixture, `cus_local_${status}`)
+      seedBillingSubscription(
+        fixture,
+        status === 'none'
+          ? {
+              customerId,
+              stripeSubscriptionId: null,
+              stripeSubscriptionItemId: null,
+              status,
+              planKey: null,
+              cadence: null,
+              stripePriceId: null,
+              currentPeriodStart: null,
+              currentPeriodEnd: null
+            }
+          : {
+              customerId,
+              stripeSubscriptionId: `sub_local_${status}`,
+              stripeSubscriptionItemId: `si_local_${status}`,
+              status,
+              planKey: 'personal',
+              cadence: 'monthly',
+              stripePriceId: 'price_personal_monthly',
+              currentPeriodStart: '2026-06-01T00:00:00.000Z',
+              currentPeriodEnd: status === 'active' ? '2026-08-01T00:00:00.000Z' : '2026-07-01T00:00:00.000Z'
+            }
+      )
+      seedImportedMembership(fixture, `with_local_${status}`)
+      const provider = checkoutProvider()
+
+      await expect(
+        createBillingStripeCheckout(
+          serviceContext(fixture, provider.client),
+          fixture.purchaserUserId,
+          'family.monthly',
+          now
+        )
+      ).rejects.toMatchObject({
+        statusCode: 409,
+        statusMessage: 'An existing Stripe membership must be reconciled before starting another subscription'
+      })
+      expect(provider.create).not.toHaveBeenCalled()
+      expect(provider.retrieve).not.toHaveBeenCalled()
+      expect(attemptRows(fixture)).toEqual([])
+    }
+  )
+
+  it('rejects Checkout before provider I/O while canonical identity review is pending', async () => {
+    const fixture = runtimeFixture('identity_review_pending')
+    const provider = checkoutProvider()
+    fixture.sqlite
+      .prepare(
+        `insert into identity_link_reviews
+           (id, user_id, reason, identifier_hash, status)
+         values (
+           'identity_review_22222222-2222-4222-8222-222222222222',
+           ?, 'ambiguous_verified_email', ?, 'open'
+         )`
+      )
+      .run(fixture.purchaserUserId, 'b'.repeat(64))
+
+    await expect(
+      createBillingStripeCheckout(
+        serviceContext(fixture, provider.client),
+        fixture.purchaserUserId,
+        'personal.monthly',
+        now
+      )
+    ).rejects.toMatchObject({
+      statusCode: 409,
+      statusMessage: 'Account identity must be reviewed before starting another subscription'
+    })
+    expect(provider.create).not.toHaveBeenCalled()
+    expect(provider.retrieve).not.toHaveBeenCalled()
+    expect(attemptRows(fixture)).toEqual([])
+  })
+
   it('reuses an established Customer only after an unambiguous empty provider projection', async () => {
     const fixture = runtimeFixture('empty_projection_customer')
     const customerId = seedBillingCustomer(fixture, 'cus_empty_projection')
@@ -274,6 +376,48 @@ describe('Checkout service extraction parity', () => {
       line_items: [{ price: 'price_personal_monthly', quantity: 1 }]
     })
     expect(attemptRows(fixture)).toEqual([expect.objectContaining({ billingCustomerId: customerId, state: 'open' })])
+  })
+
+  it('rechecks eligibility after reservation and before provider I/O', async () => {
+    const fixture = runtimeFixture('eligibility_changed_after_reservation')
+    const provider = checkoutProvider()
+    let eligibilityChecks = 0
+    const context = {
+      ...checkoutContext(fixture, provider.client),
+      assertCheckoutAllowed() {
+        eligibilityChecks += 1
+        if (eligibilityChecks === 3) throw new Error('Checkout identity review became pending')
+      }
+    }
+
+    await expect(ensureBillingCheckout(context, fixture.purchaserUserId, null, 'family.monthly', now)).rejects.toThrow(
+      'Checkout identity review became pending'
+    )
+    expect(eligibilityChecks).toBe(3)
+    expect(provider.create).not.toHaveBeenCalled()
+    expect(provider.retrieve).not.toHaveBeenCalled()
+    expect(attemptRows(fixture)).toEqual([expect.objectContaining({ state: 'pending' })])
+  })
+
+  it('does not return Checkout when eligibility changes during provider I/O', async () => {
+    const fixture = runtimeFixture('eligibility_changed_during_provider')
+    const provider = checkoutProvider({ deferCreates: true })
+    let blocked = false
+    const context = {
+      ...checkoutContext(fixture, provider.client),
+      assertCheckoutAllowed() {
+        if (blocked) throw new Error('Checkout identity review became pending during provider I/O')
+      }
+    }
+
+    const checkout = ensureBillingCheckout(context, fixture.purchaserUserId, null, 'family.monthly', now)
+    await vi.waitFor(() => expect(provider.create).toHaveBeenCalledOnce())
+    blocked = true
+    provider.releaseCreates()
+
+    await expect(checkout).rejects.toThrow('Checkout identity review became pending during provider I/O')
+    expect(provider.create).toHaveBeenCalledOnce()
+    expect(attemptRows(fixture)).toEqual([expect.objectContaining({ state: 'pending', stripeSessionId: null })])
   })
 
   it('rejects an asynchronous authorization callback and rolls back the Checkout reservation', async () => {
@@ -513,6 +657,24 @@ async function openCheckoutScenario(suffix: string) {
   const context = checkoutContext(fixture, provider.client)
   await ensureBillingCheckout(context, fixture.purchaserUserId, null, 'family.monthly', now)
   return { fixture, provider, context }
+}
+
+function seedImportedMembership(fixture: BillingStripeRuntimeFixture, suffix: string): void {
+  fixture.sqlite.exec(`
+    insert into people (id) values ('person_imported_${suffix}');
+    insert into person_accounts (person_id, user_id)
+      values ('person_imported_${suffix}', '${fixture.purchaserUserId}');
+    insert into stripe_customers (id, person_id)
+      values ('cus_imported_${suffix}', 'person_imported_${suffix}');
+    insert into stripe_subscriptions (
+      id, customer_id, status, current_period_start, current_period_end
+    ) values (
+      'sub_imported_${suffix}', 'cus_imported_${suffix}', 'active',
+      '2026-07-01T00:00:00.000Z', '2026-08-01T00:00:00.000Z'
+    );
+    insert into stripe_subscription_items (id, subscription_id, price_id)
+      values ('si_imported_${suffix}', 'sub_imported_${suffix}', 'price_personal_monthly');
+  `)
 }
 
 function runtimeFixture(suffix: string): BillingStripeRuntimeFixture {

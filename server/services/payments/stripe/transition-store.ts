@@ -239,17 +239,7 @@ export function applyAuthorizedBillingTransitionProjection(
         if (transitionUpdate.changes !== 1) return false
         const committedTransition = getBillingTransitionById(connection, authority.reservation.transition.id)
         if (!committedTransition) throw new Error('Applied Billing transition disappeared')
-        const effects: BillingStripeLifecycleEffect[] =
-          authority.reservation.transition.kind === 'family_to_personal'
-            ? [
-                {
-                  action: 'coverage_ended',
-                  episodeKey: authority.reservation.transition.id,
-                  effectiveAt: authority.reservation.transition.effectiveAt,
-                  transitionId: authority.reservation.transition.id
-                }
-              ]
-            : []
+        const effects: BillingStripeLifecycleEffect[] = []
         const committed = commitBillingProjectionInTransaction(connection, integration, {
           purchaserUserId,
           stripeCustomerId: authority.reservation.customer.stripeCustomerId,
@@ -441,14 +431,6 @@ function transitionLifecycleEffect(transition: BillingSubscriptionTransition): B
       action: 'payment_attention',
       episodeKey: transition.id,
       effectiveAt: transition.stripePendingUpdateExpiresAt,
-      transitionId: transition.id
-    })
-  }
-  if (transition.kind === 'family_to_personal' && transition.state === 'scheduled') {
-    return Object.freeze({
-      action: 'renewal_ending',
-      episodeKey: transition.id,
-      effectiveAt: transition.effectiveAt,
       transitionId: transition.id
     })
   }

@@ -16,6 +16,10 @@ export function createAuthenticationUserOptions(connection: DatabaseConnection) 
 
   return {
     ...accountDeletionOptions,
+    changeEmail: {
+      enabled: true,
+      updateEmailWithoutVerification: false
+    },
     additionalFields: {
       ...accountDeletionOptions.additionalFields,
       firstName: {

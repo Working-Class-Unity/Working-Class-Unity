@@ -8,7 +8,8 @@ import {
   getOpenCheckoutAttempt
 } from './repository'
 import {
-  billingOfferingDefinitions,
+  isMembershipDuesOfferingKey,
+  membershipDuesOfferingDefinitions,
   getBillingOffering,
   isBillingOfferingKey,
   type BillingStripePurchaserState,
@@ -37,7 +38,7 @@ function readBaseBillingStripePurchaserStateInTransaction(
   const deletionPending = getBillingAccountDeletionRequest(connection, purchaserUserId) !== null
   const offeringKey =
     subscription?.planKey && subscription.cadence ? `${subscription.planKey}.${subscription.cadence}` : null
-  const offering = offeringKey && isBillingOfferingKey(offeringKey) ? getBillingOffering(offeringKey) : null
+  const offering = offeringKey && isMembershipDuesOfferingKey(offeringKey) ? getBillingOffering(offeringKey) : null
   const periodStart = Date.parse(subscription?.currentPeriodStart ?? '')
   const periodEnd = Date.parse(subscription?.currentPeriodEnd ?? '')
   const malformed = Boolean(
@@ -70,7 +71,7 @@ function readBaseBillingStripePurchaserStateInTransaction(
   const transitionState = openTransition && isBillingTransitionState(openTransition.state) ? openTransition.state : null
 
   return Object.freeze({
-    catalog: billingOfferingDefinitions,
+    catalog: membershipDuesOfferingDefinitions,
     deletionPending,
     subscription: Object.freeze({
       provider: 'Stripe' as const,

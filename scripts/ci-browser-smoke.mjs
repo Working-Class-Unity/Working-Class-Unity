@@ -36,11 +36,8 @@ const runtimeStripeSecret = 'rk_test_ci_only_runtime_browser_stripe_secret'
 const runtimeStripeWebhookSecret = 'whsec_ci_only_runtime_browser_webhook_secret'
 const runtimeStripeCatalog = {
   portalConfigurationId: 'bpc_ci_runtime',
-  personalWeeklyPriceId: 'price_ci_runtime_personal_weekly',
-  personalMonthlyPriceId: 'price_ci_runtime_personal_monthly',
-  personalAnnualPriceId: 'price_ci_runtime_personal_annual',
-  familyMonthlyPriceId: 'price_ci_runtime_family_monthly',
-  familyAnnualPriceId: 'price_ci_runtime_family_annual'
+  membershipDues10PriceId: 'price_ci_runtime_personal_monthly',
+  solidarityDues27PriceId: 'price_ci_runtime_family_monthly'
 }
 const browserAuthEmailMarker = 'ci-only-browser-auth-recipient'
 const bearerEmailSubjects = new Set(['Your sign-in link'])
@@ -205,6 +202,9 @@ function applicationEnvironment({ appName, appUrl, databasePath: selectedDatabas
     NUXT_EMAIL_CAPTURE_DIRECTORY: emailCaptureDirectory,
     NUXT_EMAIL_FROM: 'baseline@example.test',
     NUXT_EMAIL_TRANSPORT: 'capture',
+    NUXT_TWILIO_VERIFY_API_KEY_SID: 'SK22222222222222222222222222222222',
+    NUXT_TWILIO_VERIFY_API_KEY_SECRET: 'browser-twilio-secret-not-a-credential',
+    NUXT_TWILIO_VERIFY_SERVICE_SID: 'VA22222222222222222222222222222222',
     NUXT_READINESS_TOKEN: runtimeReadinessToken,
     NUXT_CLOUDFLARE_TURNSTILE_SECRET_KEY: 'isolated-turnstile-browser-secret-not-a-provider-credential',
     NUXT_PUBLIC_TURNSTILE_SITE_KEY: 'isolated-turnstile-browser-site-not-a-provider-credential',
@@ -218,11 +218,8 @@ function applicationEnvironment({ appName, appUrl, databasePath: selectedDatabas
     NUXT_STRIPE_SECRET_KEY: runtimeStripeSecret,
     NUXT_STRIPE_WEBHOOK_SECRET: runtimeStripeWebhookSecret,
     NUXT_STRIPE_PORTAL_CONFIGURATION_ID: runtimeStripeCatalog.portalConfigurationId,
-    NUXT_STRIPE_PERSONAL_WEEKLY_PRICE_ID: runtimeStripeCatalog.personalWeeklyPriceId,
-    NUXT_STRIPE_PERSONAL_MONTHLY_PRICE_ID: runtimeStripeCatalog.personalMonthlyPriceId,
-    NUXT_STRIPE_PERSONAL_ANNUAL_PRICE_ID: runtimeStripeCatalog.personalAnnualPriceId,
-    NUXT_STRIPE_FAMILY_MONTHLY_PRICE_ID: runtimeStripeCatalog.familyMonthlyPriceId,
-    NUXT_STRIPE_FAMILY_ANNUAL_PRICE_ID: runtimeStripeCatalog.familyAnnualPriceId
+    NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID: runtimeStripeCatalog.membershipDues10PriceId,
+    NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID: runtimeStripeCatalog.solidarityDues27PriceId
   }
 }
 

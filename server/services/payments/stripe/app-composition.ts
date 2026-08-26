@@ -15,11 +15,11 @@ export function billingStripeConfiguration(
       webhookSecret: config.stripe.webhookSecret,
       portalConfigurationId: config.stripe.portalConfigurationId,
       prices: Object.freeze({
-        'personal.weekly': config.stripe.personalWeeklyPriceId,
-        'personal.monthly': config.stripe.personalMonthlyPriceId,
-        'personal.annual': config.stripe.personalAnnualPriceId,
-        'family.monthly': config.stripe.familyMonthlyPriceId,
-        'family.annual': config.stripe.familyAnnualPriceId
+        'personal.weekly': '',
+        'personal.monthly': config.stripe.membershipDues10PriceId,
+        'personal.annual': '',
+        'family.monthly': config.stripe.solidarityDues27PriceId,
+        'family.annual': ''
       })
     })
   })
