@@ -1062,13 +1062,11 @@ function validateSentryConfiguration(
     ['NUXT_SENTRY_DSN', config.sentryDsn],
     ['NUXT_PUBLIC_SENTRY_DSN', config.public.sentryDsn]
   ] as const
-  const production = environment.NODE_ENV === 'production'
+  const enabled = values.some(([key, resolvedValue]) => Boolean(environment[key] || resolvedValue))
 
   for (const [key, resolvedValue] of values) {
     const rawValue = environment[key] ?? ''
-    if (production) {
-      requireRuntimeHttpUrl(environment, key, resolvedValue, issues, true)
-    } else if (rawValue) {
+    if (enabled) {
       requireRuntimeHttpUrl(environment, key, resolvedValue, issues, true)
     } else {
       requireMatch(resolvedValue, rawValue, key, issues)

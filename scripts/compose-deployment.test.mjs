@@ -83,9 +83,7 @@ const requiredEnvironmentNames = [
   'NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID',
   'NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID',
   'NUXT_CLOUDFLARE_TURNSTILE_SECRET_KEY',
-  'NUXT_PUBLIC_TURNSTILE_SITE_KEY',
-  'NUXT_SENTRY_DSN',
-  'NUXT_PUBLIC_SENTRY_DSN'
+  'NUXT_PUBLIC_TURNSTILE_SITE_KEY'
 ]
 
 test('Coolify builds one commit-qualified image for every application role', () => {
@@ -112,6 +110,8 @@ test('required Coolify variables have no placeholder defaults', () => {
   for (const [name, value] of requiredEntries) {
     assert.equal(value, '${' + name + ':?}')
   }
+  assert.equal(services.web.environment.NUXT_SENTRY_DSN, '${NUXT_SENTRY_DSN-}')
+  assert.equal(services.web.environment.NUXT_PUBLIC_SENTRY_DSN, '${NUXT_PUBLIC_SENTRY_DSN-}')
 })
 
 test('backup is unconditional with fail-closed runtime configuration', () => {

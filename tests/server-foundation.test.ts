@@ -428,8 +428,7 @@ describe('server foundation utilities', () => {
           'NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID'
         ]
       ],
-      ['turnstile', ['NUXT_CLOUDFLARE_TURNSTILE_SECRET_KEY', 'NUXT_PUBLIC_TURNSTILE_SITE_KEY']],
-      ['observability', ['NUXT_SENTRY_DSN', 'NUXT_PUBLIC_SENTRY_DSN']]
+      ['turnstile', ['NUXT_CLOUDFLARE_TURNSTILE_SECRET_KEY', 'NUXT_PUBLIC_TURNSTILE_SITE_KEY']]
     ] as const
 
     for (const [capabilityId, expectedKeys] of cases) {
@@ -445,6 +444,34 @@ describe('server foundation utilities', () => {
         expect(evaluation.issues, capabilityId).toContainEqual(expect.objectContaining({ key }))
       }
     }
+  })
+
+  it('starts in production with Sentry disabled and rejects a one-sided Sentry configuration', () => {
+    const production = {
+      NODE_ENV: 'production',
+      NUXT_DATABASE_URL: 'file:/tmp/foundation-sentry-optional.db'
+    } as const
+    const disabled = evaluateRuntimeEnvironment(
+      runtimeEnvironment({
+        ...production,
+        NUXT_SENTRY_DSN: undefined,
+        NUXT_PUBLIC_SENTRY_DSN: undefined
+      })
+    )
+
+    expect(disabled.issues).toEqual([])
+    expect(disabled.config?.sentryDsn).toBe('')
+    expect(disabled.config?.public.sentryDsn).toBe('')
+
+    const incomplete = evaluateRuntimeEnvironment(
+      runtimeEnvironment({
+        ...production,
+        NUXT_PUBLIC_SENTRY_DSN: undefined
+      })
+    )
+    expect(incomplete.issues).toContainEqual(
+      expect.objectContaining({ code: 'missing', key: 'NUXT_PUBLIC_SENTRY_DSN' })
+    )
   })
 
   it('starts without excluded Files, R2, or OpenAI provider configuration', () => {
