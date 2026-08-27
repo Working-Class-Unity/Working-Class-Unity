@@ -130,6 +130,108 @@ describe('Stripe membership import', () => {
     })
   })
 
+  it('leaves duplicate Stripe customer emails unlinked from a verified website account', () => {
+    withMigratedDatabase('duplicate-stripe-email', (sqlite, connection) => {
+      sqlite
+        .prepare(
+          `insert into user (id, name, email, email_verified, created_at, updated_at)
+           values ('website-user', 'Website Member', 'shared@example.test', 1, 1, 1)`
+        )
+        .run()
+      const memberDataset = membershipDataset({
+        chargeAmount: 1000,
+        coverageEnd: '2026-09-01T00:00:00.000Z',
+        customerId: 'cus_active_shared',
+        email: 'SHARED@example.test',
+        refundAmount: 0,
+        subscriptionId: 'sub_active_shared',
+        subscriptionStartedAt: '2025-08-01T00:00:00.000Z'
+      })
+      const dataset = withDuplicateStripeCustomer(memberDataset, 'cus_duplicate_shared', 'shared@example.test')
+      const options = {
+        apply: false,
+        grandfatheredBefore: new Date('2026-08-22T00:00:00.000Z'),
+        observedAt: new Date('2026-08-22T12:00:00.000Z')
+      }
+
+      const beforeDryRun = operationalCounts(sqlite)
+      const dryRun = importStripeMembershipDataset(connection, dataset, options)
+      expect(dryRun.identities).toEqual({ ambiguous: 2, created: 0, existing: 0 })
+      expect(dryRun.issues.filter((value) => value.code === 'ambiguous_verified_email')).toHaveLength(2)
+      expect(operationalCounts(sqlite)).toEqual(beforeDryRun)
+
+      const first = importStripeMembershipDataset(connection, dataset, { ...options, apply: true })
+      expect(first.memberships).toEqual({ blocked: 1, createdActive: 0, createdPending: 0, existing: 0 })
+      expect(sqlite.prepare('select id, person_id as personId from stripe_customers order by id').all()).toEqual([
+        { id: 'cus_active_shared', personId: null },
+        { id: 'cus_duplicate_shared', personId: null }
+      ])
+      expect(
+        sqlite
+          .prepare(
+            "select external_id as externalId, person_id as personId, state from provider_identities where provider = 'stripe' order by external_id"
+          )
+          .all()
+      ).toEqual([
+        { externalId: 'cus_active_shared', personId: null, state: 'unlinked' },
+        { externalId: 'cus_duplicate_shared', personId: null, state: 'unlinked' }
+      ])
+      expect(count(sqlite, 'people')).toBe(0)
+      expect(count(sqlite, 'person_accounts')).toBe(0)
+      expect(count(sqlite, 'memberships')).toBe(0)
+
+      const normalizedCounts = operationalCounts(sqlite)
+      const second = importStripeMembershipDataset(connection, dataset, { ...options, apply: true })
+      expect(second.identities).toEqual({ ambiguous: 2, created: 0, existing: 0 })
+      expect(operationalCounts(sqlite)).toEqual(normalizedCounts)
+    })
+  })
+
+  it('preserves immutable Stripe identity when another customer shares its email', () => {
+    withMigratedDatabase('duplicate-email-bound-identity', (sqlite, connection) => {
+      sqlite.prepare("insert into people (id, display_name) values ('person-bound', 'Bound Member')").run()
+      sqlite
+        .prepare(
+          `insert into provider_identities
+             (id, person_id, provider, external_id, state, linked_at, last_synced_at)
+           values ('identity-bound', 'person-bound', 'stripe', 'cus_bound', 'active',
+             '2025-01-01T00:00:00.000Z', '2025-01-01T00:00:00.000Z')`
+        )
+        .run()
+      const memberDataset = membershipDataset({
+        chargeAmount: 1000,
+        coverageEnd: '2026-09-01T00:00:00.000Z',
+        customerId: 'cus_bound',
+        email: 'shared@example.test',
+        refundAmount: 0,
+        subscriptionId: 'sub_bound',
+        subscriptionStartedAt: '2025-08-01T00:00:00.000Z'
+      })
+      const dataset = withDuplicateStripeCustomer(memberDataset, 'cus_duplicate_bound', 'SHARED@example.test')
+      const options = {
+        apply: true,
+        grandfatheredBefore: new Date('2026-08-22T00:00:00.000Z'),
+        observedAt: new Date('2026-08-22T12:00:00.000Z')
+      }
+
+      const first = importStripeMembershipDataset(connection, dataset, options)
+      expect(first.identities).toEqual({ ambiguous: 1, created: 0, existing: 1 })
+      expect(first.memberships).toEqual({ blocked: 0, createdActive: 1, createdPending: 0, existing: 0 })
+      expect(sqlite.prepare('select id, person_id as personId from stripe_customers order by id').all()).toEqual([
+        { id: 'cus_bound', personId: 'person-bound' },
+        { id: 'cus_duplicate_bound', personId: null }
+      ])
+      expect(count(sqlite, 'people')).toBe(1)
+      expect(count(sqlite, 'memberships')).toBe(1)
+
+      const normalizedCounts = operationalCounts(sqlite)
+      const second = importStripeMembershipDataset(connection, dataset, options)
+      expect(second.identities).toEqual({ ambiguous: 1, created: 0, existing: 1 })
+      expect(second.memberships).toEqual({ blocked: 0, createdActive: 0, createdPending: 0, existing: 1 })
+      expect(operationalCounts(sqlite)).toEqual(normalizedCounts)
+    })
+  })
+
   it('moves an imported member through the sixty-day dues grace without ending membership', () => {
     withMigratedDatabase('grace', (sqlite, connection) => {
       const dataset = membershipDataset({
@@ -714,6 +816,26 @@ function membershipDataset(input: {
     refunds: Object.freeze(refunds),
     subscriptionItems: new Map([[input.subscriptionId, Object.freeze([subscriptionItem])]]),
     subscriptions: Object.freeze([subscription])
+  })
+}
+
+function withDuplicateStripeCustomer(
+  dataset: StripeMembershipImportDataset,
+  customerId: string,
+  email: string
+): StripeMembershipImportDataset {
+  return Object.freeze({
+    ...dataset,
+    customers: Object.freeze([
+      ...dataset.customers,
+      stripe<Stripe.Customer>({
+        created: dataset.customers[0]?.created ?? 0,
+        email,
+        id: customerId,
+        name: 'Another Stripe Customer',
+        object: 'customer'
+      })
+    ])
   })
 }
 

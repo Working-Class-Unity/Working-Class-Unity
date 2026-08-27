@@ -346,6 +346,14 @@ function planCustomerResolutions(
 ): readonly CustomerResolution[] {
   const plannedAccounts = new Map<string, string>()
   const resolutions: CustomerResolution[] = []
+  const customerIdsByEmail = new Map<string, Set<string>>()
+  for (const customer of customers) {
+    const email = normalizeEmail(customer.email)
+    if (!email) continue
+    const customerIds = customerIdsByEmail.get(email) ?? new Set<string>()
+    customerIds.add(customer.id)
+    customerIdsByEmail.set(email, customerIds)
+  }
 
   for (const customer of [...customers].sort((left, right) => left.id.localeCompare(right.id))) {
     const strongPeople = new Set<string>()
@@ -395,6 +403,11 @@ function planCustomerResolutions(
     }
 
     const normalizedEmail = normalizeEmail(customer.email)
+    if (normalizedEmail && (customerIdsByEmail.get(normalizedEmail)?.size ?? 0) > 1) {
+      issue(issues, 'ambiguous_verified_email', 'stripe.customer', customer.id)
+      resolutions.push({ accountUserId: null, action: 'ambiguous', customer, personId: null })
+      continue
+    }
     const candidatePeople = new Set<string>()
     const candidateUsers = new Set<string>()
     if (normalizedEmail) {
