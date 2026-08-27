@@ -10,6 +10,10 @@ document a current WCU contract.
   user-file capabilities and distinguishes user-file R2 from database-backup R2.
 - [`wcu-rebuild-provenance.md`](wcu-rebuild-provenance.md) records the approved product direction,
   history boundary, and selective-port ledger.
+- [`solidarity-taxonomy.md`](solidarity-taxonomy.md) records the current Solidarity properties,
+  controlled values, forms, automations, and organizer/developer governance contract.
+- [`events-and-solidarity.md`](events-and-solidarity.md) records the supported Solidarity event
+  authoring, normalization, and import operation.
 - The root [`README.md`](../README.md) describes the current application foundation and local entry
   points.
 - The root [`AGENTS.md`](../AGENTS.md) governs future implementation and verification work.

@@ -192,6 +192,55 @@ describe('Solidarity report converter', () => {
     }
   })
 
+  it('rejects noncanonical event and campaign tags before creating outputs', () => {
+    const root = mkdtempSync(join(tmpdir(), 'wcu-solidarity-converter-taxonomy-'))
+    try {
+      for (const invalid of [
+        { kind: 'event', tag: 'KYR' },
+        { kind: 'campaign', tag: 'sq_2026-03_finishflock' }
+      ] as const) {
+        const inputs = syntheticInputs()
+        const firstReport = inputs.reports[0]!
+        const metadata = JSON.parse(new TextDecoder().decode(firstReport.event)) as {
+          event: { campaignTags: string[]; eventTags: string[] }
+        }
+        if (invalid.kind === 'event') metadata.event.eventTags.push(invalid.tag)
+        else metadata.event.campaignTags = [invalid.tag]
+        const { arguments_: inputArguments, privateValues } = writeInputs(root, {
+          ...inputs,
+          reports: [{ ...firstReport, event: bytes(JSON.stringify(metadata)) }, ...inputs.reports.slice(1)]
+        })
+        const bundlePath = join(root, `${invalid.kind}-bundle.json`)
+        const manifestPath = join(root, `${invalid.kind}-manifest.json`)
+        const result = spawnSync(
+          process.execPath,
+          [
+            '--import',
+            'tsx',
+            'scripts/normalize-solidarity-events.ts',
+            ...inputArguments,
+            '--bundle',
+            bundlePath,
+            '--manifest',
+            manifestPath
+          ],
+          { cwd: repositoryRoot, encoding: 'utf8' }
+        )
+
+        expect(result.status).toBe(1)
+        expect(result.stderr).toBe('Solidarity report normalization failed (converter_failed).\n')
+        expect(() => statSync(bundlePath)).toThrow()
+        expect(() => statSync(manifestPath)).toThrow()
+        for (const privateValue of privateValues) {
+          expect(result.stdout).not.toContain(privateValue)
+          expect(result.stderr).not.toContain(privateValue)
+        }
+      }
+    } finally {
+      rmSync(root, { force: true, recursive: true })
+    }
+  })
+
   it('rejects malformed cross-references without leaving either output behind', () => {
     const root = mkdtempSync(join(tmpdir(), 'wcu-solidarity-converter-invalid-'))
     try {
@@ -339,6 +388,7 @@ function syntheticInputs() {
       }
     ])
   )
+  const campaignTags = ['focus-tenant-union', 'sidequest-2025-06-kyr', 'sidequest-2026-03-deflock-stockton'] as const
   const reports = Array.from({ length: 5 }, (_, index) => {
     const ordinal = index + 1
     const eventId = `event-${ordinal}`
@@ -388,7 +438,7 @@ function syntheticInputs() {
         JSON.stringify({
           attendance,
           event: {
-            campaignTags: [`campaign-${ordinal}`],
+            campaignTags: [campaignTags[index % campaignTags.length]],
             description: null,
             eventPageUrl: `https://events.example.test/${ordinal}`,
             eventTags,

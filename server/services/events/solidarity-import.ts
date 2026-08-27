@@ -3,6 +3,12 @@ import type Database from 'better-sqlite3'
 import type { DatabaseConnection } from '../../db/connect'
 import type { AttendanceStatus, EventCategory, EventVisibility, RsvpStatus } from '../../db/schema/events'
 import { recalculateMembershipStandingInTransaction } from '../membership/membership-standing'
+import {
+  normalizeSolidarityTaxonomyTags,
+  solidarityAudienceTags,
+  solidarityCategoryTags,
+  solidarityMeetingTags
+} from './solidarity-taxonomy'
 
 type Sqlite = InstanceType<typeof Database>
 
@@ -166,9 +172,7 @@ type PreparedImport = Readonly<{
   snapshots: readonly PreparedSnapshot[]
 }>
 
-const audienceTags = ['audience-members', 'audience-public'] as const
-const categoryTags = ['category-action', 'category-learning', 'category-meeting', 'category-social'] as const
-const categoryByTag: Readonly<Record<(typeof categoryTags)[number], EventCategory>> = Object.freeze({
+const categoryByTag: Readonly<Record<(typeof solidarityCategoryTags)[number], EventCategory>> = Object.freeze({
   'category-action': 'action',
   'category-learning': 'learning',
   'category-meeting': 'meeting',
@@ -256,8 +260,10 @@ function normalizeDataset(input: SolidarityEventImportDataset): NormalizedDatase
     assertTags(event.eventTags, 'Solidarity event tags')
     assertTags(event.campaignTags, 'Solidarity campaign tags')
     assertOptionalHttpsUrl(event.eventPageUrl, 'Solidarity event page URL')
+    const taxonomyTags = normalizeSolidarityTaxonomyTags(event.eventTags, event.campaignTags)
     return {
       ...event,
+      ...taxonomyTags,
       id: externalId(event.id, 'Solidarity event ID'),
       primaryEventId:
         event.primaryEventId === null || event.primaryEventId === undefined
@@ -427,8 +433,8 @@ function classifyEvent(
   issues: SolidarityEventImportIssue[]
 ): Readonly<{ category: EventCategory; meetingKind: 'general' | 'steering' | null; visibility: EventVisibility }> {
   const tags = new Set(event.eventTags)
-  const audiences = audienceTags.filter((tag) => tags.has(tag))
-  const categories = categoryTags.filter((tag) => tags.has(tag))
+  const audiences = solidarityAudienceTags.filter((tag) => tags.has(tag))
+  const categories = solidarityCategoryTags.filter((tag) => tags.has(tag))
   let visibility: EventVisibility = audiences[0] === 'audience-public' ? 'public' : 'members'
   if (audiences.length !== 1) {
     visibility = 'hidden'
@@ -439,7 +445,7 @@ function classifyEvent(
     visibility = 'hidden'
     issue(issues, 'invalid_category_tags', 'solidarity.event', event.id)
   }
-  const meetingTags = ['meeting-general', 'meeting-steering'].filter((tag) => tags.has(tag))
+  const meetingTags = solidarityMeetingTags.filter((tag) => tags.has(tag))
   let meetingKind: 'general' | 'steering' | null = null
   if (category === 'meeting' && meetingTags.length === 1) {
     meetingKind = meetingTags[0] === 'meeting-general' ? 'general' : 'steering'
