@@ -35,6 +35,9 @@ describe('Cloudflare R2 endpoint and managed-key boundary', () => {
     expect(normalizeCloudflareR2Endpoint(`https://${accountId}.eu.r2.cloudflarestorage.com`, accountId)).toBe(
       `https://${accountId}.eu.r2.cloudflarestorage.com`
     )
+    expect(normalizeCloudflareR2Endpoint(`https://${accountId}.us.r2.cloudflarestorage.com`, accountId)).toBe(
+      `https://${accountId}.us.r2.cloudflarestorage.com`
+    )
     expect(normalizeCloudflareR2Endpoint(`https://${accountId}.fedramp.r2.cloudflarestorage.com`, accountId)).toBe(
       `https://${accountId}.fedramp.r2.cloudflarestorage.com`
     )
@@ -42,16 +45,19 @@ describe('Cloudflare R2 endpoint and managed-key boundary', () => {
       r2BrowserRequestOrigin({
         accountId,
         bucket: 'private-files',
-        endpoint: `https://${accountId}.eu.r2.cloudflarestorage.com`
+        endpoint: `https://${accountId}.us.r2.cloudflarestorage.com`
       })
-    ).toBe(`https://private-files.${accountId}.eu.r2.cloudflarestorage.com`)
+    ).toBe(`https://private-files.${accountId}.us.r2.cloudflarestorage.com`)
 
     for (const endpoint of [
       `http://${accountId}.r2.cloudflarestorage.com`,
+      `http://${accountId}.us.r2.cloudflarestorage.com`,
       `https://${foreignAccountId}.r2.cloudflarestorage.com`,
+      `https://${foreignAccountId}.us.r2.cloudflarestorage.com`,
       `https://private-files.${accountId}.r2.cloudflarestorage.com`,
       `https://${accountId}.apac.r2.cloudflarestorage.com`,
       `https://${accountId}.r2.cloudflarestorage.com/bucket`,
+      `https://${accountId}.us.r2.cloudflarestorage.com/bucket`,
       `https://${accountId}.r2.cloudflarestorage.com?redirect=elsewhere`,
       'https://example.com'
     ]) {
