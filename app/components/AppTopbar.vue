@@ -58,7 +58,7 @@ function toggleMobileMenu() {
   mobileMenuOpen.value = !mobileMenuOpen.value
 }
 
-async function closeMobileMenuOnEscape() {
+async function closeMobileMenu() {
   if (!mobileMenuOpen.value) return
 
   mobileMenuOpen.value = false
@@ -103,7 +103,7 @@ function currentPage(path: string) {
         id="primary-navigation-panel"
         class="topbar-panel"
         :class="{ 'topbar-panel--open': mobileMenuOpen }"
-        @keydown.esc.prevent.stop="closeMobileMenuOnEscape"
+        @keydown.esc.prevent.stop="closeMobileMenu"
       >
         <ConfigProvider :use-id="nuxtUseId">
           <NavigationMenuRoot class="desktop-navigation" :aria-label="t('navigation.primaryLabel')">
@@ -123,10 +123,15 @@ function currentPage(path: string) {
                 </NavigationMenuLink>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <NavigationMenuLink as-child :active="route.path === '/forum'">
-                  <NuxtLink class="topbar-link topbar-link--public" to="/forum">
+                <NavigationMenuLink as-child>
+                  <a
+                    class="topbar-link topbar-link--public"
+                    href="https://chat.workingclassunity.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     {{ t('navigation.forum') }}
-                  </NuxtLink>
+                  </a>
                 </NavigationMenuLink>
               </NavigationMenuItem>
             </NavigationMenuList>
@@ -146,9 +151,15 @@ function currentPage(path: string) {
               </NuxtLink>
             </li>
             <li>
-              <NuxtLink class="topbar-link topbar-link--public" to="/forum" :aria-current="currentPage('/forum')">
+              <a
+                class="topbar-link topbar-link--public"
+                href="https://chat.workingclassunity.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                @click="closeMobileMenu"
+              >
                 {{ t('navigation.forum') }}
-              </NuxtLink>
+              </a>
             </li>
           </ul>
         </nav>
