@@ -24,6 +24,7 @@ const turnstileScriptUrl = `${turnstileOrigin}/turnstile/v0/api.js?render=explic
 const forumUrl = 'https://chat.workingclassunity.com/'
 const updatesDisclaimer =
   'Choose email, text messages, or both. By signing up, you agree to receive WCU updates through the options you select. Message frequency varies; message and data rates may apply. Unsubscribe from email or reply STOP to stop texts.'
+const campaignUpdatesDisclaimer = 'Sign up for updates about this campaign and other WCU updates.'
 const sentryEnvelopePath = '/api/1/envelope/'
 const maxCaptureFileBytes = 65_536
 const maxCaptureFiles = 64
@@ -278,7 +279,7 @@ test('global public navigation exposes current routes and a route-closing mobile
   await assertCleanPage(page, observations)
 })
 
-test('campaign update prompts use the hosted WCU form without collecting contact details', async ({ page }) => {
+test('campaign update prompts use the hosted Deflock form without collecting contact details', async ({ page }) => {
   const observations = observePage(page)
   await page.setViewportSize({ width: 1280, height: 900 })
   await page.goto('/campaigns/remove-flock-stockton')
@@ -292,14 +293,14 @@ test('campaign update prompts use the hosted WCU form without collecting contact
 
   for (let index = 0; index < 2; index += 1) {
     const updatesLink = updatesLinks.nth(index)
-    await expect(updatesLink).toHaveAttribute('href', 'https://tech.workingclassunity.com/wcu-updates')
+    await expect(updatesLink).toHaveAttribute('href', 'https://tech.workingclassunity.com/deflock-stockton-updates')
     await assertMinimumTargetSize(updatesLink)
     const colors = await updatesLink.evaluate((element) => {
       const style = getComputedStyle(element)
       return { background: style.backgroundColor, text: style.color }
     })
     expect(contrastRatio(colors.text, colors.background), 'signup link text contrast').toBeGreaterThanOrEqual(4.5)
-    await expect(updatesNotes.nth(index)).toHaveText(updatesDisclaimer)
+    await expect(updatesNotes.nth(index)).toHaveText(campaignUpdatesDisclaimer)
   }
   await assertAccessibleWithoutOverflow(page, '.campaign-newsletter')
 

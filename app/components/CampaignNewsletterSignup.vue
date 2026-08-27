@@ -12,19 +12,15 @@ const noteId = computed(() => `${props.idPrefix}-note`)
 
 <template>
   <div class="campaign-newsletter" :data-tone="props.tone">
-    <h2>Get WCU updates by email or text.</h2>
+    <h2>Get Deflock Stockton updates by email or text.</h2>
     <a
       class="campaign-newsletter-action"
-      href="https://tech.workingclassunity.com/wcu-updates"
+      href="https://tech.workingclassunity.com/deflock-stockton-updates"
       :aria-describedby="noteId"
     >
       Stay informed
     </a>
-    <p :id="noteId">
-      Choose email, text messages, or both. By signing up, you agree to receive WCU updates through the options you
-      select. Message frequency varies; message and data rates may apply. Unsubscribe from email or reply STOP to stop
-      texts.
-    </p>
+    <p :id="noteId">Sign up for updates about this campaign and other WCU updates.</p>
   </div>
 </template>
 
