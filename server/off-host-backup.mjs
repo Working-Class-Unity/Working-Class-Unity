@@ -808,6 +808,7 @@ function normalizeCloudflareEndpoint(endpoint, accountId) {
   const validHostname =
     url.hostname === `${accountId}.r2.cloudflarestorage.com` ||
     url.hostname === `${accountId}.eu.r2.cloudflarestorage.com` ||
+    url.hostname === `${accountId}.us.r2.cloudflarestorage.com` ||
     url.hostname === `${accountId}.fedramp.r2.cloudflarestorage.com`
   if (
     url.protocol !== 'https:' ||

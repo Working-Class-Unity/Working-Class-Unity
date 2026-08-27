@@ -464,6 +464,7 @@ function validateR2Endpoint(config: NormalizedRuntimeConfig, issues: RuntimeConf
     const allowedHosts = new Set([
       `${accountId}.r2.cloudflarestorage.com`,
       `${accountId}.eu.r2.cloudflarestorage.com`,
+      `${accountId}.us.r2.cloudflarestorage.com`,
       `${accountId}.fedramp.r2.cloudflarestorage.com`
     ])
     if (

@@ -42,11 +42,21 @@ test('backup configuration is explicit, private, and restricted to Cloudflare ac
   assert.throws(() => readBackupConfiguration({}), /BACKUP_R2_ACCOUNT_ID is required/)
   const configuration = readBackupConfiguration(backupEnvironment('/tmp/app.db'))
   assert.equal(configuration.bucket, 'private-database-backups')
+  assert.equal(
+    readBackupConfiguration({
+      ...backupEnvironment('/tmp/app.db'),
+      BACKUP_R2_ENDPOINT: `https://${accountId}.us.r2.cloudflarestorage.com`
+    }).endpoint,
+    `https://${accountId}.us.r2.cloudflarestorage.com`
+  )
 
   for (const endpoint of [
     `http://${accountId}.r2.cloudflarestorage.com`,
+    `http://${accountId}.us.r2.cloudflarestorage.com`,
     `https://bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb.r2.cloudflarestorage.com`,
+    'https://bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb.us.r2.cloudflarestorage.com',
     `https://${accountId}.r2.cloudflarestorage.com/public`,
+    `https://${accountId}.us.r2.cloudflarestorage.com/public`,
     'https://example.com'
   ]) {
     assert.throws(

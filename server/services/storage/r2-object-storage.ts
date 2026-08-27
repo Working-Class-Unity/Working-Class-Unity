@@ -351,6 +351,7 @@ function isCloudflareAccountEndpointHostname(hostname: string, accountId: string
   return (
     hostname === `${accountId}.r2.cloudflarestorage.com` ||
     hostname === `${accountId}.eu.r2.cloudflarestorage.com` ||
+    hostname === `${accountId}.us.r2.cloudflarestorage.com` ||
     hostname === `${accountId}.fedramp.r2.cloudflarestorage.com`
   )
 }

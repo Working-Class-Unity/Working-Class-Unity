@@ -551,6 +551,7 @@ describe('server foundation utilities', () => {
     for (const endpoint of [
       `https://${r2AccountId}.r2.cloudflarestorage.com`,
       `https://${r2AccountId}.eu.r2.cloudflarestorage.com`,
+      `https://${r2AccountId}.us.r2.cloudflarestorage.com`,
       `https://${r2AccountId}.fedramp.r2.cloudflarestorage.com`
     ]) {
       const evaluation = evaluateRuntimeEnvironment(
@@ -561,9 +562,12 @@ describe('server foundation utilities', () => {
 
     for (const endpoint of [
       `http://${r2AccountId}.r2.cloudflarestorage.com`,
+      `http://${r2AccountId}.us.r2.cloudflarestorage.com`,
       'https://other.r2.cloudflarestorage.com',
+      'https://other.us.r2.cloudflarestorage.com',
       `https://${r2AccountId}.r2.cloudflarestorage.com.attacker.invalid`,
       `https://${r2AccountId}.r2.cloudflarestorage.com/bucket`,
+      `https://${r2AccountId}.us.r2.cloudflarestorage.com/bucket`,
       `https://${r2AccountId}.r2.cloudflarestorage.com?credential=leak`
     ]) {
       const evaluation = evaluateRuntimeEnvironment(
