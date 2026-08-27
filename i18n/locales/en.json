@@ -406,10 +406,8 @@
     "join": "JOIN WCU",
     "nextEvent": "NEXT EVENT",
     "newsletterHeading": "Stay informed about meetings and actions.",
-    "emailLabel": "Email address",
-    "emailPlaceholder": "Email address",
     "newsletterSubmit": "STAY INFORMED",
-    "newsletterNote": "Newsletter signup is coming soon.",
+    "newsletterNote": "Choose email, text messages, or both. By signing up, you agree to receive WCU updates through the options you select. Message frequency varies; message and data rates may apply. Unsubscribe from email or reply STOP to stop texts.",
     "photoCaption": "Real WCU moments across San Joaquin County."
   },
   "personalApp": {

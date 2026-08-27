@@ -79,25 +79,17 @@ useHead(() => ({
           </NuxtLink>
         </div>
 
-        <form class="newsletter" aria-labelledby="newsletter-heading" @submit.prevent>
-          <fieldset disabled>
-            <legend id="newsletter-heading">{{ t('home.newsletterHeading') }}</legend>
-            <div class="newsletter-controls">
-              <label class="visually-hidden" for="newsletter-email">{{ t('home.emailLabel') }}</label>
-              <AppInput
-                id="newsletter-email"
-                type="email"
-                name="newsletter-email"
-                autocomplete="email"
-                inputmode="email"
-                :placeholder="t('home.emailPlaceholder')"
-                aria-describedby="newsletter-note"
-              />
-              <AppButton type="submit">{{ t('home.newsletterSubmit') }}</AppButton>
-            </div>
-          </fieldset>
+        <section class="newsletter" aria-labelledby="newsletter-heading">
+          <h2 id="newsletter-heading" class="newsletter-heading">{{ t('home.newsletterHeading') }}</h2>
+          <a
+            class="newsletter-action"
+            href="https://tech.workingclassunity.com/wcu-updates"
+            aria-describedby="newsletter-note"
+          >
+            {{ t('home.newsletterSubmit') }}
+          </a>
           <p id="newsletter-note" class="newsletter-note">{{ t('home.newsletterNote') }}</p>
-        </form>
+        </section>
       </div>
 
       <HeroPhotoWall class="hero-photos" />
@@ -259,48 +251,38 @@ useHead(() => ({
     margin-block-start: var(--space-7);
   }
 
-  .newsletter fieldset {
-    min-width: 0;
-    border: 0;
-    padding: 0;
-    margin: 0;
-  }
-
-  .newsletter legend {
-    padding: 0;
+  .newsletter-heading {
     margin-block-end: var(--space-4);
     color: var(--color-text);
     font-size: 1rem;
     font-weight: 600;
   }
 
-  .newsletter-controls {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: var(--space-3);
-  }
+  .newsletter-action {
+    --anchor-color: var(--color-brand-primary);
 
-  .newsletter input,
-  .newsletter button {
+    display: inline-flex;
     min-block-size: 3.25rem;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--color-brand-primary);
     border-radius: var(--radius-2);
-    font-size: 1rem;
-  }
-
-  .newsletter input {
-    padding-block: 0;
-    background: rgb(255 255 255 / 82%);
-    line-height: 1;
-  }
-
-  .newsletter button {
-    min-inline-size: 8.5rem;
-    border: 0;
     padding-inline: var(--space-4);
+    color: var(--color-brand-primary);
+    background: rgb(247 249 252 / 72%);
+    font-family: var(--font-family-body);
+    font-size: 1rem;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+  }
+
+  .newsletter-action:hover,
+  .newsletter-action:focus-visible {
+    --anchor-color: var(--color-action-contrast);
+
     color: var(--color-action-contrast);
     background: var(--color-brand-primary);
-    font-family: var(--font-family-body);
-    font-weight: 700;
   }
 
   .newsletter-note {
@@ -377,12 +359,13 @@ useHead(() => ({
       font-size: 0.875rem;
     }
 
-    .newsletter-controls {
-      grid-template-columns: minmax(0, 1fr);
+    .newsletter-action {
+      inline-size: 100%;
+      min-block-size: 3rem;
     }
 
-    .newsletter button {
-      min-block-size: 3rem;
+    .newsletter-note {
+      font-size: 1rem;
     }
 
     .hero-photos {

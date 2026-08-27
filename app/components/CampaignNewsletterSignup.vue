@@ -7,32 +7,25 @@ const props = withDefaults(
   { tone: 'inverse' }
 )
 
-const headingId = computed(() => `${props.idPrefix}-heading`)
-const inputId = computed(() => `${props.idPrefix}-email`)
 const noteId = computed(() => `${props.idPrefix}-note`)
 </script>
 
 <template>
-  <form class="campaign-newsletter" :data-tone="props.tone" :aria-labelledby="headingId" @submit.prevent>
-    <fieldset disabled>
-      <legend :id="headingId">Get updates by email.</legend>
-      <div class="campaign-newsletter-controls">
-        <label class="visually-hidden" :for="inputId">Email address</label>
-        <AppInput
-          :id="inputId"
-          class="campaign-newsletter-input"
-          type="email"
-          :name="inputId"
-          autocomplete="email"
-          inputmode="email"
-          placeholder="Email address"
-          :aria-describedby="noteId"
-        />
-        <AppButton class="campaign-newsletter-button" type="submit" disabled>Stay informed</AppButton>
-      </div>
-    </fieldset>
-    <p :id="noteId">Newsletter signup is coming soon.</p>
-  </form>
+  <div class="campaign-newsletter" :data-tone="props.tone">
+    <h2>Get WCU updates by email or text.</h2>
+    <a
+      class="campaign-newsletter-action"
+      href="https://tech.workingclassunity.com/wcu-updates"
+      :aria-describedby="noteId"
+    >
+      Stay informed
+    </a>
+    <p :id="noteId">
+      Choose email, text messages, or both. By signing up, you agree to receive WCU updates through the options you
+      select. Message frequency varies; message and data rates may apply. Unsubscribe from email or reply STOP to stop
+      texts.
+    </p>
+  </div>
 </template>
 
 <style scoped>
@@ -46,44 +39,38 @@ const noteId = computed(() => `${props.idPrefix}-note`)
     padding-block-start: var(--space-5);
   }
 
-  .campaign-newsletter fieldset {
-    min-width: 0;
-    border: 0;
-    padding: 0;
+  .campaign-newsletter h2 {
     margin: 0;
-  }
-
-  .campaign-newsletter legend {
-    padding: 0;
-    margin-block-end: var(--space-4);
     color: var(--color-action-contrast);
+    font-size: 1rem;
     font-weight: var(--font-weight-strong);
   }
 
-  .campaign-newsletter-controls {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: var(--space-3);
-  }
+  .campaign-newsletter-action {
+    --anchor-color: var(--color-highlight-contrast);
 
-  .campaign-newsletter-input,
-  .campaign-newsletter-button {
+    display: inline-flex;
     min-block-size: 3.25rem;
+    align-items: center;
+    justify-content: center;
+    justify-self: start;
+    border: 0;
     border-radius: var(--radius-2);
-    font-size: 1rem;
-  }
-
-  .campaign-newsletter-input {
-    border: 0;
-    padding-inline: var(--space-3);
-    color: var(--color-text);
-    background: var(--color-surface);
-  }
-
-  .campaign-newsletter-button {
-    border: 0;
+    padding-inline: var(--space-4);
     color: var(--color-highlight-contrast);
     background: var(--color-brand-highlight);
+    font-size: 1rem;
+    font-weight: var(--font-weight-bold);
+    text-align: center;
+    text-decoration: none;
+  }
+
+  .campaign-newsletter-action:hover,
+  .campaign-newsletter-action:focus-visible {
+    --anchor-color: var(--color-brand-primary);
+
+    color: var(--color-brand-primary);
+    background: var(--color-action-contrast);
   }
 
   .campaign-newsletter > p {
@@ -97,17 +84,25 @@ const noteId = computed(() => `${props.idPrefix}-note`)
     border-block-start-color: var(--color-divider-strong);
   }
 
-  .campaign-newsletter[data-tone='light'] legend {
+  .campaign-newsletter[data-tone='light'] h2 {
     color: var(--color-brand-primary);
   }
 
-  .campaign-newsletter[data-tone='light'] .campaign-newsletter-input {
-    border: var(--border-width) solid rgb(4 51 79 / 38%);
-  }
+  .campaign-newsletter[data-tone='light'] .campaign-newsletter-action {
+    --anchor-color: var(--color-action-contrast);
 
-  .campaign-newsletter[data-tone='light'] .campaign-newsletter-button {
+    border: 2px solid var(--color-brand-primary);
     color: var(--color-action-contrast);
     background: var(--color-brand-primary);
+  }
+
+  .campaign-newsletter[data-tone='light'] .campaign-newsletter-action:hover,
+  .campaign-newsletter[data-tone='light'] .campaign-newsletter-action:focus-visible {
+    --anchor-color: var(--color-accent-action-contrast);
+
+    border-color: var(--color-accent-action);
+    color: var(--color-accent-action-contrast);
+    background: var(--color-accent-action);
   }
 
   .campaign-newsletter[data-tone='light'] > p {
@@ -115,8 +110,12 @@ const noteId = computed(() => `${props.idPrefix}-note`)
   }
 
   @media (width <= 46rem) {
-    .campaign-newsletter-controls {
-      grid-template-columns: minmax(0, 1fr);
+    .campaign-newsletter-action {
+      inline-size: 100%;
+    }
+
+    .campaign-newsletter > p {
+      font-size: 1rem;
     }
   }
 }
