@@ -39,7 +39,7 @@ describe('event operations schema', () => {
            values ('event-steering', 'event', 'audience-members'),
                   ('event-steering', 'event', 'category-meeting'),
                   ('event-steering', 'event', 'meeting-steering'),
-                  ('event-steering', 'campaign', 'sq_2026_member_governance')`
+                  ('event-steering', 'campaign', 'focus-tenant-union')`
         )
         .run()
       sqlite
