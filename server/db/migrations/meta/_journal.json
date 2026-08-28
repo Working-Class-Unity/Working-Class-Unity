@@ -64,6 +64,13 @@
       "when": 1787903457414,
       "tag": "0008_simple_stripe_membership",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1787931573843,
+      "tag": "0009_stripe-membership-deletion",
+      "breakpoints": true
     }
   ]
 }

@@ -327,6 +327,9 @@ export const billingAccountDeletionRequests = sqliteTable(
       onDelete: 'restrict'
     }),
     billingCustomerId: text('billing_customer_id').references(() => billingCustomers.id, { onDelete: 'restrict' }),
+    stripeMembershipUserId: text('stripe_membership_user_id').references(() => accountStripeMemberships.userId, {
+      onDelete: 'restrict'
+    }),
     expectedStripeSubscriptionId: text('expected_stripe_subscription_id'),
     expectedStripeCustomerId: text('expected_stripe_customer_id'),
     capturedBillingRevision: integer('captured_billing_revision').notNull().default(0),
@@ -434,6 +437,7 @@ export const billingStripeSchema = Object.freeze({
 })
 
 export type BillingCustomer = typeof billingCustomers.$inferSelect
+export type AccountStripeMembership = typeof accountStripeMemberships.$inferSelect
 export type BillingCheckoutAttempt = typeof billingCheckoutAttempts.$inferSelect
 export type BillingSubscription = typeof billingSubscriptions.$inferSelect
 export type BillingEmailVerification = typeof billingEmailVerifications.$inferSelect

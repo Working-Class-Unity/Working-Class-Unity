@@ -150,4 +150,65 @@ when
 begin
   select raise(abort, 'billing deletion reference mismatch');
 end;
+--> statement-breakpoint
+
+create trigger if not exists billing_deletion_membership_reference_insert
+before insert on billing_account_deletion_requests
+when new.stripe_membership_user_id is not null and (
+  new.stripe_membership_user_id <> new.purchaser_user_id
+  or not exists (
+    select 1 from account_stripe_memberships membership
+    where membership.user_id = new.stripe_membership_user_id
+  )
+)
+begin
+  select raise(abort, 'billing deletion membership reference mismatch');
+end;
+--> statement-breakpoint
+
+create trigger if not exists billing_deletion_membership_reference_update
+before update of purchaser_user_id, stripe_membership_user_id on billing_account_deletion_requests
+when new.stripe_membership_user_id is not null and (
+  new.stripe_membership_user_id <> new.purchaser_user_id
+  or not exists (
+    select 1 from account_stripe_memberships membership
+    where membership.user_id = new.stripe_membership_user_id
+  )
+)
+begin
+  select raise(abort, 'billing deletion membership reference mismatch');
+end;
+--> statement-breakpoint
+
+create trigger if not exists account_stripe_membership_deletion_insert
+before insert on account_stripe_memberships
+when exists (
+  select 1 from billing_account_deletion_requests request
+  where request.purchaser_user_id = new.user_id
+)
+begin
+  select raise(abort, 'account Stripe membership is fenced for deletion');
+end;
+--> statement-breakpoint
+
+create trigger if not exists account_stripe_membership_deletion_update
+before update of user_id, stripe_customer_id, stripe_subscription_id on account_stripe_memberships
+when exists (
+  select 1 from billing_account_deletion_requests request
+  where request.purchaser_user_id in (old.user_id, new.user_id)
+)
+begin
+  select raise(abort, 'account Stripe membership is fenced for deletion');
+end;
+--> statement-breakpoint
+
+create trigger if not exists account_stripe_membership_deletion_delete
+before delete on account_stripe_memberships
+when exists (
+  select 1 from billing_account_deletion_requests request
+  where request.purchaser_user_id = old.user_id
+)
+begin
+  select raise(abort, 'account Stripe membership is fenced for deletion');
+end;
 `

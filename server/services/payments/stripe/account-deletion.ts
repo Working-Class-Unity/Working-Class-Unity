@@ -11,6 +11,7 @@ import { checkoutSessionCreateParams, isExpectedCheckoutSession, resolveCheckout
 import { readCurrentStripeProjection, stripeId } from './projection'
 import type { BillingStripeConnection } from './public-contract'
 import {
+  getAccountStripeMembershipForUser,
   getBillingAccountDeletionRequest,
   getBillingCustomerById,
   getBillingCustomerByStripeId,
@@ -42,6 +43,9 @@ type BillingStripeAccountDeletionProofRecord = Readonly<{
   purchaserUserId: string
   requestRevision: number
   capturedBillingRevision: number
+  stripeMembershipUserId: string | null
+  stripeMembershipCustomerId: string | null
+  stripeMembershipSubscriptionId: string | null
   cancellationConfirmedAt: string
   expiresAt: number
 }>
@@ -108,10 +112,41 @@ async function prepareBillingStripeAccountDeletionCore(
     capture = captureBillingStripeAccountDeletion(connection, purchaserUserId, now)
     if (capture.hasOpenCheckout) throw accountDeletionPending()
   }
+  const stripeMembership = getAccountStripeMembershipForUser(connection, purchaserUserId)
+  if (capture.request.stripeMembershipUserId) {
+    if (!stripeMembership || hasStripeMembershipReferenceConflict(capture.request, stripeMembership)) {
+      markBillingStripeAccountDeletionReconciliation(
+        connection,
+        capture.request,
+        'stripe_membership_billing_reference_conflict',
+        now
+      )
+      throw accountDeletionPending()
+    }
+    if (capture.request.state === 'cancellation_confirmed') return issueProof(connection, capture.request)
+
+    let client: BillingAccountDeletionStripeClient
+    try {
+      client = getClient()
+    } catch {
+      throw accountDeletionPending()
+    }
+    await cancelAndVerifySubscription(
+      client,
+      capture.request,
+      stripeMembership.stripeSubscriptionId,
+      stripeMembership.stripeCustomerId,
+      connection,
+      now
+    )
+    const confirmed = confirmBillingStripeAccountDeletion(connection, capture.request, now)
+    if (!confirmed?.cancellationConfirmedAt) throw accountDeletionPending()
+    return issueProof(connection, confirmed)
+  }
   if (!capture.request.expectedStripeCustomerId) {
     const confirmed = confirmBillingStripeAccountDeletion(connection, capture.request, now)
     if (!confirmed?.cancellationConfirmedAt) throw accountDeletionPending()
-    return issueProof(confirmed)
+    return issueProof(connection, confirmed)
   }
 
   let client: BillingAccountDeletionStripeClient
@@ -157,7 +192,14 @@ async function prepareBillingStripeAccountDeletionCore(
       )
     }
   } else if (capture.request.state !== 'cancellation_confirmed') {
-    await cancelAndVerifySubscription(client, capture.request, connection, now)
+    await cancelAndVerifySubscription(
+      client,
+      capture.request,
+      capture.request.expectedStripeSubscriptionId!,
+      capture.request.expectedStripeCustomerId,
+      connection,
+      now
+    )
   }
 
   let live
@@ -187,7 +229,7 @@ async function prepareBillingStripeAccountDeletionCore(
   // provider I/O and incorrectly bless it without ever verifying its Stripe state.
   const confirmed = confirmBillingStripeAccountDeletion(connection, capture.request, now)
   if (!confirmed?.cancellationConfirmedAt) throw accountDeletionPending()
-  return issueProof(confirmed)
+  return issueProof(connection, confirmed)
 }
 
 export async function withBillingStripeAccountDeletionProof<T>(
@@ -220,6 +262,7 @@ export function deleteBillingStripeAccountData(
   const request = getBillingAccountDeletionRequest(connection, purchaserUserId)
   const customer = getBillingCustomerForPurchaser(connection, purchaserUserId)
   const subscription = getBillingSubscriptionForPurchaser(connection, purchaserUserId)
+  const stripeMembership = getAccountStripeMembershipForUser(connection, purchaserUserId)
   if (
     !scope ||
     scope.purchaserUserId !== purchaserUserId ||
@@ -231,6 +274,11 @@ export function deleteBillingStripeAccountData(
     request.state !== 'cancellation_confirmed' ||
     request.revision !== proof.requestRevision ||
     request.capturedBillingRevision !== proof.capturedBillingRevision ||
+    request.stripeMembershipUserId !== proof.stripeMembershipUserId ||
+    request.stripeMembershipUserId !== (stripeMembership?.userId ?? null) ||
+    proof.stripeMembershipCustomerId !== (stripeMembership?.stripeCustomerId ?? null) ||
+    proof.stripeMembershipSubscriptionId !== (stripeMembership?.stripeSubscriptionId ?? null) ||
+    hasStripeMembershipReferenceConflict(request, stripeMembership) ||
     request.cancellationConfirmedAt !== proof.cancellationConfirmedAt ||
     request.billingCustomerId !== (customer?.id ?? null) ||
     request.expectedStripeCustomerId !== (customer?.stripeCustomerId ?? null) ||
@@ -242,11 +290,13 @@ export function deleteBillingStripeAccountData(
   }
   proofRecords.delete(scope.proof)
 
-  if (request.expectedStripeCustomerId) {
+  const stripeCustomerId = stripeMembership?.stripeCustomerId ?? request.expectedStripeCustomerId
+  const stripeSubscriptionId = stripeMembership?.stripeSubscriptionId ?? request.expectedStripeSubscriptionId
+  if (stripeCustomerId) {
     preserveDetachedDeletionReference(connection, {
-      providerReference: request.expectedStripeSubscriptionId ?? `customer:${request.expectedStripeCustomerId}`,
-      providerCustomerReference: request.expectedStripeCustomerId,
-      providerStatus: request.expectedStripeSubscriptionId ? 'canceled' : 'verified_no_live_subscriptions',
+      providerReference: stripeSubscriptionId ?? `customer:${stripeCustomerId}`,
+      providerCustomerReference: stripeCustomerId,
+      providerStatus: stripeSubscriptionId ? 'canceled' : 'verified_no_live_subscriptions',
       deletedAt: now.toISOString()
     })
   }
@@ -275,6 +325,7 @@ export function deleteBillingStripeAccountData(
   connection.sqlite
     .prepare('delete from billing_account_deletion_requests where purchaser_user_id = ?')
     .run(purchaserUserId)
+  connection.sqlite.prepare('delete from account_stripe_memberships where user_id = ?').run(purchaserUserId)
   connection.sqlite.prepare('delete from billing_subscriptions where purchaser_user_id = ?').run(purchaserUserId)
   connection.sqlite.prepare('delete from billing_customers where purchaser_user_id = ?').run(purchaserUserId)
 
@@ -285,19 +336,23 @@ export function deleteBillingStripeAccountData(
          (select count(*) from billing_checkout_attempts where purchaser_user_id = ?) +
          (select count(*) from billing_subscriptions where purchaser_user_id = ?) +
          (select count(*) from billing_subscription_transitions where purchaser_user_id = ?) +
-         (select count(*) from billing_account_deletion_requests where purchaser_user_id = ?) as count`
+         (select count(*) from billing_account_deletion_requests where purchaser_user_id = ?) +
+         (select count(*) from account_stripe_memberships where user_id = ?) as count`
     )
-    .get(purchaserUserId, purchaserUserId, purchaserUserId, purchaserUserId, purchaserUserId) as { count: number }
+    .get(purchaserUserId, purchaserUserId, purchaserUserId, purchaserUserId, purchaserUserId, purchaserUserId) as {
+    count: number
+  }
   if (residue.count !== 0) throw new Error('Billing account deletion left purchaser-owned rows')
 }
 
 async function cancelAndVerifySubscription(
   client: BillingAccountDeletionStripeClient,
   request: NonNullable<ReturnType<typeof getBillingAccountDeletionRequest>>,
+  subscriptionId: string,
+  customerId: string,
   connection: BillingStripeConnection,
   now: Date
 ): Promise<void> {
-  const subscriptionId = request.expectedStripeSubscriptionId!
   try {
     await client.subscriptions.cancel(
       subscriptionId,
@@ -316,7 +371,7 @@ async function cancelAndVerifySubscription(
   if (
     retrieved.id !== subscriptionId ||
     retrieved.status !== 'canceled' ||
-    stripeId(retrieved.customer) !== request.expectedStripeCustomerId
+    stripeId(retrieved.customer) !== customerId
   ) {
     markBillingStripeAccountDeletionReconciliation(connection, request, 'stripe_cancellation_unconfirmed', now)
     throw accountDeletionPending()
@@ -610,20 +665,45 @@ function getCheckoutAttemptForDeletion(
 }
 
 function issueProof(
+  connection: BillingStripeConnection,
   request: NonNullable<ReturnType<typeof getBillingAccountDeletionRequest>>
 ): BillingStripeAccountDeletionProof {
   if (!request.cancellationConfirmedAt) throw new Error('Billing cancellation is not confirmed')
+  const stripeMembership = getAccountStripeMembershipForUser(connection, request.purchaserUserId)
+  if (
+    request.stripeMembershipUserId !== (stripeMembership?.userId ?? null) ||
+    hasStripeMembershipReferenceConflict(request, stripeMembership)
+  ) {
+    throw new Error('Billing cancellation confirmation is stale')
+  }
   const proof = Object.freeze({}) as BillingStripeAccountDeletionProof
   const record: BillingStripeAccountDeletionProofRecord = Object.freeze({
     requestId: request.id,
     purchaserUserId: request.purchaserUserId,
     requestRevision: request.revision,
     capturedBillingRevision: request.capturedBillingRevision,
+    stripeMembershipUserId: stripeMembership?.userId ?? null,
+    stripeMembershipCustomerId: stripeMembership?.stripeCustomerId ?? null,
+    stripeMembershipSubscriptionId: stripeMembership?.stripeSubscriptionId ?? null,
     cancellationConfirmedAt: request.cancellationConfirmedAt,
     expiresAt: Date.now() + accountDeletionBillingProofTtlMs
   })
   proofRecords.set(proof, record)
   return proof
+}
+
+function hasStripeMembershipReferenceConflict(
+  request: NonNullable<ReturnType<typeof getBillingAccountDeletionRequest>>,
+  stripeMembership: ReturnType<typeof getAccountStripeMembershipForUser>
+): boolean {
+  if (!request.stripeMembershipUserId) return stripeMembership !== null
+  return (
+    !stripeMembership ||
+    (request.expectedStripeCustomerId !== null &&
+      request.expectedStripeCustomerId !== stripeMembership.stripeCustomerId) ||
+    (request.expectedStripeSubscriptionId !== null &&
+      request.expectedStripeSubscriptionId !== stripeMembership.stripeSubscriptionId)
+  )
 }
 
 function preserveDetachedDeletionReference(
