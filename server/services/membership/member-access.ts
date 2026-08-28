@@ -10,6 +10,8 @@ import {
 import type { AccountMembershipState, WebsiteMembershipAccess } from '../../../shared/membership'
 import { hasOpenWebsiteAccountIdentityReview } from './account-identity'
 import { hasCurrentImportedStripeDuesSubscription } from './imported-stripe-billing'
+import { hasAccountStripeMembership, type StripeMembershipTier } from './stripe-first'
+import type { AccountStripeMembershipStatus } from '../../db/schema/billing'
 
 export type { WebsiteMembershipAccess }
 
@@ -22,12 +24,14 @@ export function readAccountMembershipState(
   const access = readWebsiteMembershipAccess(connection, userId, prices, now)
   const baseBilling = readBaseBillingStripePurchaserState(connection, userId, now)
   const identityReviewPending = hasOpenWebsiteAccountIdentityReview(connection, userId)
+  const stripeMembershipLinked = hasAccountStripeMembership(connection, userId)
   const currentImportedSubscription = hasCurrentImportedStripeDuesSubscription(connection, userId, {
     'personal.monthly': prices['personal.monthly'],
     'family.monthly': prices['family.monthly']
   })
   const billing =
-    (currentImportedSubscription || identityReviewPending) && baseBilling.capabilities.canCheckout
+    (stripeMembershipLinked || currentImportedSubscription || identityReviewPending) &&
+    baseBilling.capabilities.canCheckout
       ? Object.freeze({
           ...baseBilling,
           capabilities: Object.freeze({ ...baseBilling.capabilities, canCheckout: false })
@@ -42,6 +46,18 @@ export function readWebsiteMembershipAccess(
   prices: BillingStripePriceConfiguration,
   now = new Date()
 ): WebsiteMembershipAccess {
+  const linkedTier = connection.sqlite
+    .prepare('select tier, stripe_status as stripeStatus from account_stripe_memberships where user_id = ?')
+    .get(userId) as { stripeStatus: AccountStripeMembershipStatus | null; tier: StripeMembershipTier } | undefined
+  if (linkedTier) {
+    if (linkedTier.tier === 'supporter') return result('supporter', 'none', false)
+    if (linkedTier.stripeStatus === 'active') return result('stripe_membership', 'active', true)
+    if (linkedTier.stripeStatus === null) return result('stripe_membership', 'reconciliation_required', false)
+    if (linkedTier.stripeStatus === 'canceled' || linkedTier.stripeStatus === 'incomplete_expired') {
+      return result('stripe_membership', 'terminal', false)
+    }
+    return result('stripe_membership', 'suspended', false)
+  }
   if (!personForUser(connection, userId)) return result('supporter', 'none', false)
 
   const subscription = connection.sqlite

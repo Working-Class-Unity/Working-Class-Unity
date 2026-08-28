@@ -48,9 +48,47 @@ export const billingEmailVerificationStatuses = Object.freeze([
   'conflict',
   'expired'
 ] as const)
+export const accountStripeMembershipTiers = Object.freeze(['supporter', 'member', 'solidarity'] as const)
+export const accountStripeMembershipStatuses = Object.freeze([
+  'active',
+  'canceled',
+  'incomplete',
+  'incomplete_expired',
+  'past_due',
+  'paused',
+  'trialing',
+  'unpaid'
+] as const)
 
 const validOfferingPair = (plan: unknown, cadence: unknown) =>
   sql`((${plan} = 'personal' and ${cadence} in ('weekly', 'monthly', 'annual')) or (${plan} = 'family' and ${cadence} in ('monthly', 'annual')))`
+
+export const accountStripeMemberships = sqliteTable(
+  'account_stripe_memberships',
+  {
+    userId: text('user_id')
+      .primaryKey()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    stripeCustomerId: text('stripe_customer_id').notNull(),
+    stripeSubscriptionId: text('stripe_subscription_id').notNull(),
+    stripePriceId: text('stripe_price_id').notNull(),
+    tier: text('tier', { enum: accountStripeMembershipTiers }).notNull(),
+    stripeStatus: text('stripe_status', { enum: accountStripeMembershipStatuses }),
+    lastVerifiedAt: text('last_verified_at'),
+    projectionOrderMs: integer('projection_order_ms').notNull().default(0),
+    projectionEventId: text('projection_event_id'),
+    createdAt: createdAtColumn(),
+    updatedAt: updatedAtColumn()
+  },
+  (table) => [
+    uniqueIndex('account_stripe_memberships_customer_uidx').on(table.stripeCustomerId),
+    uniqueIndex('account_stripe_memberships_subscription_uidx').on(table.stripeSubscriptionId),
+    check('account_stripe_memberships_customer_check', sql`${table.stripeCustomerId} glob 'cus_*'`),
+    check('account_stripe_memberships_subscription_check', sql`${table.stripeSubscriptionId} glob 'sub_*'`),
+    check('account_stripe_memberships_price_check', sql`length(${table.stripePriceId}) between 1 and 255`),
+    check('account_stripe_memberships_tier_check', sql`${table.tier} in ('supporter', 'member', 'solidarity')`)
+  ]
+)
 
 export const billingCustomers = sqliteTable(
   'billing_customers',
@@ -303,6 +341,9 @@ export const billingAccountDeletionRequests = sqliteTable(
       onDelete: 'restrict'
     }),
     billingCustomerId: text('billing_customer_id').references(() => billingCustomers.id, { onDelete: 'restrict' }),
+    stripeMembershipUserId: text('stripe_membership_user_id').references(() => accountStripeMemberships.userId, {
+      onDelete: 'restrict'
+    }),
     expectedStripeSubscriptionId: text('expected_stripe_subscription_id'),
     expectedStripeCustomerId: text('expected_stripe_customer_id'),
     capturedBillingRevision: integer('captured_billing_revision').notNull().default(0),
@@ -410,6 +451,7 @@ export const billingStripeSchema = Object.freeze({
 })
 
 export type BillingCustomer = typeof billingCustomers.$inferSelect
+export type AccountStripeMembership = typeof accountStripeMemberships.$inferSelect
 export type BillingCheckoutAttempt = typeof billingCheckoutAttempts.$inferSelect
 export type BillingSubscription = typeof billingSubscriptions.$inferSelect
 export type BillingEmailVerification = typeof billingEmailVerifications.$inferSelect
@@ -422,6 +464,7 @@ export type BillingSubscriptionTransitionKind = (typeof billingSubscriptionTrans
 export type BillingSubscriptionTransitionState = (typeof billingSubscriptionTransitionStates)[number]
 export type BillingEmailVerificationStatus = (typeof billingEmailVerificationStatuses)[number]
 export type BillingAccountDeletionRequestState = (typeof billingAccountDeletionRequestStates)[number]
+export type AccountStripeMembershipStatus = (typeof accountStripeMembershipStatuses)[number]
 
 export type NewBillingCustomer = typeof billingCustomers.$inferInsert
 export type NewBillingCheckoutAttempt = typeof billingCheckoutAttempts.$inferInsert

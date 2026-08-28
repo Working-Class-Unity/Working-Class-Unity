@@ -57,6 +57,34 @@
       "when": 1787744243257,
       "tag": "0007_billing_email_verification",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1787903457414,
+      "tag": "0008_simple_stripe_membership",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1787931573843,
+      "tag": "0009_stripe-membership-deletion",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1787932399538,
+      "tag": "0010_stripe-membership-status",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "6",
+      "when": 1787933587787,
+      "tag": "0011_stripe-membership-legacy-price",
+      "breakpoints": true
     }
   ]
 }

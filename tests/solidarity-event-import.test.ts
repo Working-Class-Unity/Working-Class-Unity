@@ -9,11 +9,29 @@ import { spawnSync } from 'node:child_process'
 import { describe, expect, it } from 'vitest'
 import * as schema from '../server/db/schema/index'
 import { importSolidarityEventDataset } from '../server/services/events/solidarity-import'
+import {
+  solidarityAudienceTags,
+  solidarityCategoryTags,
+  solidarityMeetingTags
+} from '../server/services/events/solidarity-taxonomy'
 
 const migrationsFolder = fileURLToPath(new URL('../server/db/migrations/', import.meta.url))
 const observedAt = new Date('2026-08-23T20:00:00.000Z')
 
 describe('Solidarity event import', () => {
+  it('defines the exact website-interpreted Event Tags', () => {
+    expect([...solidarityAudienceTags, ...solidarityCategoryTags, ...solidarityMeetingTags]).toEqual([
+      'audience-members',
+      'audience-public',
+      'category-action',
+      'category-learning',
+      'category-meeting',
+      'category-social',
+      'meeting-general',
+      'meeting-steering'
+    ])
+  })
+
   it('projects tagged events, paired hybrid sessions, people, RSVPs, and attendance idempotently', () => {
     withMigratedDatabase((sqlite, connection) => {
       const dataset = {
@@ -26,7 +44,7 @@ describe('Solidarity event import', () => {
             timezone: 'America/Los_Angeles',
             eventPageUrl: 'https://events.example.test/general',
             eventTags: ['audience-public', 'category-meeting', 'meeting-general'],
-            campaignTags: ['sq_2026_membership']
+            campaignTags: ['focus-tenant-union']
           },
           {
             id: 'event-steering',
@@ -205,6 +223,80 @@ describe('Solidarity event import', () => {
           )
           .get()
       ).toEqual({ category: 'social', meetingKind: null })
+    })
+  })
+
+  it('accepts governed taxonomy and rejects noncanonical tags without writing', () => {
+    withMigratedDatabase((sqlite, connection) => {
+      const event = {
+        campaignTags: [
+          'sidequest-2025-06-kyr',
+          'sidequest-2026-03-deflock-stockton',
+          'focus-worker-organizing',
+          'sidequest-2026-09-mutual-aid',
+          'sidequest-mutual-aid'
+        ],
+        eventTags: ['audience-public', 'category-action'],
+        id: 'event-taxonomy',
+        status: 'active',
+        timezone: 'America/Los_Angeles',
+        title: 'Governed campaign action'
+      } as const
+      const dataset = { attendance: [], events: [event], people: [], rsvps: [], sessions: [] } as const
+
+      expect(importSolidarityEventDataset(connection, dataset, { apply: true, observedAt }).issues).toEqual([])
+      expect(
+        sqlite
+          .prepare(
+            `select kind, value from event_tags where event_id =
+               (select event_id from event_provider_links where external_id = 'event-taxonomy')
+             order by kind, value`
+          )
+          .all()
+      ).toEqual([
+        { kind: 'campaign', value: 'focus-worker-organizing' },
+        { kind: 'campaign', value: 'sidequest-2025-06-kyr' },
+        { kind: 'campaign', value: 'sidequest-2026-03-deflock-stockton' },
+        { kind: 'campaign', value: 'sidequest-2026-09-mutual-aid' },
+        { kind: 'campaign', value: 'sidequest-mutual-aid' },
+        { kind: 'event', value: 'audience-public' },
+        { kind: 'event', value: 'category-action' }
+      ])
+
+      const persistedCounts = {
+        events: count(sqlite, 'events'),
+        eventTags: count(sqlite, 'event_tags'),
+        importBatches: count(sqlite, 'import_batches'),
+        snapshots: count(sqlite, 'external_record_snapshots')
+      }
+
+      expect(() =>
+        importSolidarityEventDataset(
+          connection,
+          { ...dataset, events: [{ ...event, eventTags: [...event.eventTags, 'KYR'] }] },
+          { apply: true, observedAt }
+        )
+      ).toThrow('Solidarity event tag is not governed: KYR')
+      expect(() =>
+        importSolidarityEventDataset(
+          connection,
+          { ...dataset, events: [{ ...event, campaignTags: ['sq_2026-03_finishflock'] }] },
+          { apply: true, observedAt }
+        )
+      ).toThrow('Solidarity campaign tag does not follow the governed naming convention: sq_2026-03_finishflock')
+      expect(() =>
+        importSolidarityEventDataset(
+          connection,
+          { ...dataset, events: [{ ...event, campaignTags: ['campaign-misc'] }] },
+          { apply: true, observedAt }
+        )
+      ).toThrow('Solidarity campaign tag does not follow the governed naming convention: campaign-misc')
+      expect({
+        events: count(sqlite, 'events'),
+        eventTags: count(sqlite, 'event_tags'),
+        importBatches: count(sqlite, 'import_batches'),
+        snapshots: count(sqlite, 'external_record_snapshots')
+      }).toEqual(persistedCounts)
     })
   })
 

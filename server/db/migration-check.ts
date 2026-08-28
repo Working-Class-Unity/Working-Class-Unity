@@ -18,10 +18,15 @@ const expectedMigrationTags = [
   '0004_event_operations',
   '0005_phone_auth',
   '0006_identity_link_reviews',
-  '0007_billing_email_verification'
+  '0007_billing_email_verification',
+  '0008_simple_stripe_membership',
+  '0009_stripe-membership-deletion',
+  '0010_stripe-membership-status',
+  '0011_stripe-membership-legacy-price'
 ] as const
 const expectedRuntimeTables = [
   'account',
+  'account_stripe_memberships',
   'agenda_items',
   'ai_conversations',
   'ai_generation_attempts',
@@ -93,10 +98,15 @@ const expectedRuntimeTables = [
   'votes'
 ] as const
 const expectedBillingTriggers = [
+  'account_stripe_membership_deletion_delete',
+  'account_stripe_membership_deletion_insert',
+  'account_stripe_membership_deletion_update',
   'billing_checkout_customer_purchaser_insert',
   'billing_checkout_customer_purchaser_update',
   'billing_deletion_references_insert',
   'billing_deletion_references_update',
+  'billing_deletion_membership_reference_insert',
+  'billing_deletion_membership_reference_update',
   'billing_subscription_customer_purchaser_insert',
   'billing_subscription_customer_purchaser_update',
   'billing_subscription_offering_reconciliation_insert',
@@ -127,7 +137,7 @@ try {
   verifySqliteIntegrityAndForeignKeys(sqlite, 'Repeat migration', fail)
   requirePopulatedRuntimeUpgrade()
 
-  console.log('Fresh and repeat WCU migration check passed with 70 tables and 12 integrity triggers.')
+  console.log('Fresh and repeat WCU migration check passed with 70 tables and 17 integrity triggers.')
 } finally {
   sqlite.close()
   rmSync(tempDir, { recursive: true, force: true })
@@ -182,9 +192,51 @@ function requirePopulatedRuntimeUpgrade() {
       )
       .run()
 
-    for (const tag of expectedMigrationTags.slice(4)) {
+    for (const tag of expectedMigrationTags.slice(4, -1)) {
       const upgradeMigration = readFileSync(join(migrationsFolder, `${tag}.sql`), 'utf8')
       upgrade.transaction(() => upgrade.exec(upgradeMigration))()
+    }
+    upgrade.exec(`
+      insert into account_stripe_memberships
+        (user_id, stripe_customer_id, stripe_subscription_id, stripe_price_id, tier,
+         stripe_status, last_verified_at)
+      values ('user_upgrade', 'cus_upgrade', 'sub_upgrade', 'price_upgrade', 'member',
+        'active', '2026-08-28T00:00:00.000Z');
+      insert into billing_account_deletion_requests
+        (id, purchaser_user_id, stripe_membership_user_id)
+      values ('deletion_upgrade', 'user_upgrade', 'user_upgrade');
+    `)
+    const finalMigration = readFileSync(join(migrationsFolder, `${expectedMigrationTags.at(-1)}.sql`), 'utf8')
+    upgrade.transaction(() => upgrade.exec(finalMigration))()
+    upgrade
+      .prepare(
+        "update account_stripe_memberships set stripe_price_id = 'membership-10-1month' where user_id = 'user_upgrade'"
+      )
+      .run()
+    if (
+      !upgrade
+        .prepare(
+          `select 1 from account_stripe_memberships membership
+           join billing_account_deletion_requests request
+             on request.stripe_membership_user_id = membership.user_id
+           where membership.user_id = 'user_upgrade'
+             and membership.stripe_price_id = 'membership-10-1month'`
+        )
+        .get()
+    ) {
+      fail(
+        'Stripe membership Price-check migration did not preserve its deletion reference or accept a legacy Price ID.'
+      )
+    }
+    try {
+      upgrade
+        .prepare(
+          "update account_stripe_memberships set stripe_customer_id = 'cus_changed' where user_id = 'user_upgrade'"
+        )
+        .run()
+      fail('Stripe membership Price-check migration did not restore the account-deletion update fence.')
+    } catch (error) {
+      if (!(error instanceof Error) || !error.message.includes('fenced for deletion')) throw error
     }
 
     const preservedUser = upgrade
@@ -305,6 +357,20 @@ function requireCurrentRuntimeSchema(label: string) {
     const columns = sqlite.prepare(`pragma table_info('${table}')`).all() as Array<{ name: string }>
     if (!columns.some(({ name }) => name === 'purchaser_user_id')) {
       fail(`${label} did not create ${table}.purchaser_user_id.`)
+    }
+  }
+  const deletionColumns = sqlite.prepare("pragma table_info('billing_account_deletion_requests')").all() as Array<{
+    name: string
+  }>
+  if (!deletionColumns.some(({ name }) => name === 'stripe_membership_user_id')) {
+    fail(`${label} did not create billing_account_deletion_requests.stripe_membership_user_id.`)
+  }
+  const stripeMembershipColumns = sqlite.prepare("pragma table_info('account_stripe_memberships')").all() as Array<{
+    name: string
+  }>
+  for (const name of ['stripe_status', 'last_verified_at', 'projection_order_ms', 'projection_event_id']) {
+    if (!stripeMembershipColumns.some((column) => column.name === name)) {
+      fail(`${label} did not create account_stripe_memberships.${name}.`)
     }
   }
   const temporaryTables = sqlite

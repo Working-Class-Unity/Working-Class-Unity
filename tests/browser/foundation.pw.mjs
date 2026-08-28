@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
+import Database from 'better-sqlite3'
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { assertIdentityAccountJourney } from './identity-account-journey.mjs'
@@ -154,15 +155,14 @@ test('home presents the WCU foundation and preserves client navigation', async (
 
   const timeOrigin = await page.evaluate(() => performance.timeOrigin)
   await page.getByRole('link', { name: 'JOIN WCU', exact: true }).click()
-  await expect(page).toHaveURL(/\/signup$/)
-  await expect(page.getByRole('heading', { name: 'Create your account' })).toBeVisible()
-  await expect(page.getByRole('textbox', { name: 'Email', exact: true })).toBeVisible()
-  await expect(page.getByRole('textbox', { name: /(?:first|last|display) name/i })).toHaveCount(0)
+  await expect(page).toHaveURL(/\/join$/)
+  await expect(page.getByRole('heading', { name: 'Join Working Class Unity' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Continue to Stripe' })).toBeVisible()
+  await expect(page.getByText(/connected to .*County/i)).toHaveCount(0)
+  await expect(page.getByRole('link', { name: /Code of Conduct/i })).toBeVisible()
   await expect(page.getByRole('link', { name: 'JOIN NOW', exact: true })).toHaveAttribute('aria-current', 'page')
-  await expect(page).toHaveTitle('Sign up')
-  await expect(page.getByLabel('Security check')).toBeVisible()
-  await expect(page.locator(`script[src="${turnstileScriptUrl}"]`)).toHaveCount(1)
-  await expect(page.getByText('Security check complete.', { exact: true })).toBeVisible()
+  await expect(page).toHaveTitle('Join Working Class Unity')
+  await expect(page.locator(`script[src="${turnstileScriptUrl}"]`)).toHaveCount(0)
   expect(await page.evaluate(() => performance.timeOrigin)).toBe(timeOrigin)
   await page.setViewportSize({ width: 320, height: 800 })
   await assertNoHorizontalOverflow(page)
@@ -623,7 +623,7 @@ test('signed-out private routes reach login before private data is requested', a
 const privateBrowserTest = test.extend({ screenshot: 'off', trace: 'off', video: 'off' })
 
 privateBrowserTest(
-  'real email-only signup keeps account profile fields optional and editable later',
+  'real existing-account login keeps profile fields optional and editable later',
   async ({ page }, testInfo) => {
     testInfo.setTimeout(60_000)
     const observations = observePage(page)
@@ -633,10 +633,15 @@ privateBrowserTest(
     const lastName = `Surname ${project}`
     const displayName = `Browser ${testInfo.project.name} member`
     const clientAddress = testInfo.project.name === 'desktop-chromium' ? '192.0.2.10' : '192.0.2.11'
+    const sqlite = new Database(runtimeDatabase)
+    sqlite
+      .prepare('insert into user (id, name, email, email_verified, created_at, updated_at) values (?, ?, ?, 1, 1, 1)')
+      .run(`browser-user-${project}`, 'WCU account', email)
+    sqlite.close()
 
     await page.setExtraHTTPHeaders({ 'cf-connecting-ip': clientAddress })
 
-    await page.goto('/signup')
+    await page.goto('/login')
     await page.waitForLoadState('networkidle')
     const manifestUrl = await nuxtManifestUrl(page)
     await expect(page.getByRole('textbox', { name: /(?:first|last|display) name/i })).toHaveCount(0)
@@ -653,9 +658,9 @@ privateBrowserTest(
       email,
       callbackURL: '/app',
       newUserCallbackURL: '/app',
-      errorCallbackURL: '/signup'
+      errorCallbackURL: '/login'
     })
-    await expect(page.locator('#signup-form-status[role="status"]')).toBeVisible()
+    await expect(page.locator('#login-form-status[role="status"]')).toBeVisible()
     await expect(page.getByText('Security check complete.', { exact: true })).toBeVisible()
 
     let magicLink
@@ -704,7 +709,7 @@ privateBrowserTest(
       await page.waitForLoadState('networkidle')
     }
 
-    for (const signedInEntry of ['/login', '/signup']) {
+    for (const signedInEntry of ['/login']) {
       const entryResponse = await gotoForInitialResponse(page, signedInEntry, manifestUrl)
       if (!entryResponse) throw new Error(`Signed-in ${signedInEntry} navigation did not return a document response`)
       expect(entryResponse.status()).toBe(200)

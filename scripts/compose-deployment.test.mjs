@@ -41,7 +41,8 @@ const excludedProviderEnvironmentNames = [
 const stripeSyncEnvironmentNames = [
   'WCU_STRIPE_MEMBERSHIP_SYNC_KEY',
   'WCU_STRIPE_MEMBERSHIP_SYNC_MODE',
-  'WCU_MEMBERSHIP_GRANDFATHERED_BEFORE'
+  'WCU_STRIPE_LEGACY_DUES10_PRICE_IDS',
+  'WCU_STRIPE_LEGACY_DUES27_PRICE_IDS'
 ]
 const clearedApplicationEnvironmentNames = [
   ...applicationSecretNames,
@@ -65,7 +66,8 @@ const validBackupEnvironment = {
 const validStripeSyncEnvironment = {
   WCU_STRIPE_MEMBERSHIP_SYNC_KEY: 'rk_test_sync_restricted',
   WCU_STRIPE_MEMBERSHIP_SYNC_MODE: 'test',
-  WCU_MEMBERSHIP_GRANDFATHERED_BEFORE: '2026-08-01T00:00:00.000Z'
+  WCU_STRIPE_LEGACY_DUES10_PRICE_IDS: 'membership-10-1month',
+  WCU_STRIPE_LEGACY_DUES27_PRICE_IDS: 'solidarity-27-1month'
 }
 const requiredEnvironmentNames = [
   'NUXT_PUBLIC_APP_URL',
@@ -142,7 +144,7 @@ test('Stripe membership synchronization is an inert, fail-closed, isolated runne
     }
   }
   assert.deepEqual(stripeRunner.command.slice(0, 2), ['sh', '-ec'])
-  assert.match(stripeRunner.command[2], /node \.output\/server\/import-stripe-membership\.mjs --validate-config/)
+  assert.match(stripeRunner.command[2], /node \.output\/server\/sync-stripe-membership-links\.mjs --validate-config/)
   assert.match(stripeRunner.command[2], /exec sleep infinity/)
 })
 
@@ -153,7 +155,7 @@ test('rendered Compose requires both private runners and always includes them', 
   )
   assert.throws(
     () => renderedCompose(validBackupEnvironment),
-    /WCU_(?:STRIPE_MEMBERSHIP_SYNC_(?:KEY|MODE)|MEMBERSHIP_GRANDFATHERED_BEFORE).*required variable.*missing a value/i
+    /WCU_STRIPE_(?:MEMBERSHIP_SYNC_(?:KEY|MODE)|LEGACY_DUES(?:10|27)_PRICE_IDS).*required variable.*missing a value/i
   )
   const configuredCompose = renderedCompose({ ...validBackupEnvironment, ...validStripeSyncEnvironment })
 

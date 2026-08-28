@@ -1,4 +1,5 @@
 import type {
+  AccountStripeMembership,
   BillingAccountDeletionRequest,
   BillingCheckoutAttempt,
   BillingCustomer,
@@ -10,6 +11,21 @@ import type { BillingStripeConnection } from './public-contract'
 
 const openCheckoutStates = "'pending', 'open', 'reconciliation_required'"
 const openTransitionStates = "'pending', 'action_required', 'scheduled', 'reconciliation_required'"
+
+export function getAccountStripeMembershipForUser(
+  connection: BillingStripeConnection,
+  userId: string
+): AccountStripeMembership | null {
+  const row = connection.sqlite
+    .prepare(
+      `select user_id, stripe_customer_id, stripe_subscription_id, stripe_price_id, tier,
+              stripe_status, last_verified_at, projection_order_ms, projection_event_id,
+              created_at, updated_at
+       from account_stripe_memberships where user_id = ?`
+    )
+    .get(userId)
+  return row ? (mapRow(row) as AccountStripeMembership) : null
+}
 
 export function getBillingCustomerForPurchaser(
   connection: BillingStripeConnection,
@@ -122,6 +138,7 @@ export function getBillingAccountDeletionRequest(
     connection.sqlite
       .prepare(
         `select id, purchaser_user_id, billing_subscription_id, billing_customer_id,
+                stripe_membership_user_id,
                 expected_stripe_subscription_id, expected_stripe_customer_id,
                 captured_billing_revision, state, reason, cancellation_confirmed_at,
                 revision, created_at, updated_at

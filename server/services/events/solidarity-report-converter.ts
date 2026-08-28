@@ -8,6 +8,7 @@ import {
   type SolidarityRsvpRecord,
   type SolidaritySessionRecord
 } from './solidarity-import'
+import { normalizeSolidarityTaxonomyTags } from './solidarity-taxonomy'
 
 const requiredRsvpHeaders = ['RSVP ID', 'User ID', 'Session ID', 'RSVP Status', 'Created At', 'Updated At'] as const
 const sessionMetadataHeaders = ['Session Title', 'Session Start', 'Session End', 'Session Location'] as const
@@ -191,6 +192,7 @@ function parseEventMetadata(text: string): EventMetadata {
     throw new TypeError('Solidarity event metadata sessions and attendance must be arrays')
   }
   const event = record(source.event, 'event metadata event')
+  const taxonomyTags = normalizeSolidarityTaxonomyTags(stringArray(event.eventTags), stringArray(event.campaignTags))
   return Object.freeze({
     attendance: Object.freeze(
       source.attendance.map((candidate) => {
@@ -207,10 +209,10 @@ function parseEventMetadata(text: string): EventMetadata {
       })
     ),
     event: Object.freeze({
-      campaignTags: stringArray(event.campaignTags),
+      campaignTags: taxonomyTags.campaignTags,
       description: optionalText(event.description, 20_000),
       eventPageUrl: optionalText(event.eventPageUrl, 2_000),
-      eventTags: stringArray(event.eventTags),
+      eventTags: taxonomyTags.eventTags,
       id: externalId(event.id),
       primaryEventId: optionalExternalId(event.primaryEventId),
       status: requiredText(event.status, 20) as SolidarityEventRecord['status'],

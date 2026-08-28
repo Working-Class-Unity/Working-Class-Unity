@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import { isBillingOfferingKey, isMembershipDuesOfferingKey } from '../../../../shared/billing'
+import { applyAccountStripeMembershipObservation } from '../../membership/stripe-projection'
 import { reserveBillingEmailVerificationInTransaction } from './billing-email-verification'
 import { enqueueBillingDetachedSubscriptionCancellation } from './detached-subscription-cancellation'
 import { currentProjectionFingerprint } from './projection'
@@ -135,6 +136,8 @@ function applyObservationInTransaction(
   observation: StripeEventObservation,
   now: Date
 ): StripeEventApplyResult['target'] {
+  if (applyAccountStripeMembershipObservation(connection, observation, now)) return 'live'
+
   const attempt = observation.attemptId ? getCheckoutAttemptById(connection, observation.attemptId) : null
   const customerByProvider = observation.stripeCustomerId
     ? getBillingCustomerByStripeId(connection, observation.stripeCustomerId)

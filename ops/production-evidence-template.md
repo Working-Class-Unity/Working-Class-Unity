@@ -147,7 +147,7 @@ The event destination must use Stripe API v1 snapshot events at the account scop
 - Migration, web, worker, and every enabled backup runner use the same local same-host `/app/data` volume:
 - Effective runtime UID/GID:
 - Production environment variables configured, including the exact eight private `NUXT_STRIPE_*` values when Billing is enabled:
-- Separate Stripe synchronization key/mode/fixed cutoff configured only on its runner; mode/key match and billing-key isolation proved:
+- Separate Stripe synchronization key/mode/exact legacy Price lists configured only on its runner; mode/key match and billing-key isolation proved:
 - Runtime-only variables Build disabled; enabled Observability build/runtime controls and Docker Build Secret recorded:
 - Preview Deployments disabled; approved-merge `master` auto-deploy enabled through Coolify; no-overlap maintenance ordering and temporary incident suspension confirmed:
 - Staging pause probe proved old long-lived containers absent and dependents stopped while migration ran:

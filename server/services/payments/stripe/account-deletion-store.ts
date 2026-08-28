@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import type { BillingStripeConnection } from './public-contract'
 import {
+  getAccountStripeMembershipForUser,
   getBillingAccountDeletionRequest,
   getBillingCustomerForPurchaser,
   getBillingSubscriptionForPurchaser,
@@ -27,18 +28,21 @@ export function captureBillingStripeAccountDeletion(
     .transaction(() => {
       const customer = getBillingCustomerForPurchaser(connection, purchaserUserId)
       const subscription = getBillingSubscriptionForPurchaser(connection, purchaserUserId)
+      const stripeMembership = getAccountStripeMembershipForUser(connection, purchaserUserId)
       const existing = getBillingAccountDeletionRequest(connection, purchaserUserId)
       const timestamp = now.toISOString()
       const expectedSubscriptionId = subscription?.stripeSubscriptionId ?? null
       const expectedCustomerId = customer?.stripeCustomerId ?? null
       const billingSubscriptionId = subscription?.id ?? null
       const billingCustomerId = customer?.id ?? null
+      const stripeMembershipUserId = stripeMembership?.userId ?? null
       const capturedRevision = subscription?.revision ?? 0
 
       if (existing) {
         const sameCapture =
           existing.billingSubscriptionId === billingSubscriptionId &&
           existing.billingCustomerId === billingCustomerId &&
+          existing.stripeMembershipUserId === stripeMembershipUserId &&
           existing.expectedStripeSubscriptionId === expectedSubscriptionId &&
           existing.expectedStripeCustomerId === expectedCustomerId &&
           existing.capturedBillingRevision === capturedRevision
@@ -46,7 +50,8 @@ export function captureBillingStripeAccountDeletion(
           connection.sqlite
             .prepare(
               `update billing_account_deletion_requests set
-               billing_subscription_id = ?, billing_customer_id = ?, expected_stripe_subscription_id = ?,
+               billing_subscription_id = ?, billing_customer_id = ?, stripe_membership_user_id = ?,
+               expected_stripe_subscription_id = ?,
                expected_stripe_customer_id = ?, captured_billing_revision = ?, state = 'pending', reason = null,
                cancellation_confirmed_at = null, revision = revision + 1, updated_at = ?
              where id = ? and purchaser_user_id = ?`
@@ -54,6 +59,7 @@ export function captureBillingStripeAccountDeletion(
             .run(
               billingSubscriptionId,
               billingCustomerId,
+              stripeMembershipUserId,
               expectedSubscriptionId,
               expectedCustomerId,
               capturedRevision,
@@ -66,16 +72,17 @@ export function captureBillingStripeAccountDeletion(
         connection.sqlite
           .prepare(
             `insert into billing_account_deletion_requests (
-             id, purchaser_user_id, billing_subscription_id, billing_customer_id,
+             id, purchaser_user_id, billing_subscription_id, billing_customer_id, stripe_membership_user_id,
              expected_stripe_subscription_id, expected_stripe_customer_id, captured_billing_revision,
              state, reason, cancellation_confirmed_at, revision, created_at, updated_at
-           ) values (?, ?, ?, ?, ?, ?, ?, 'pending', null, null, 0, ?, ?)`
+           ) values (?, ?, ?, ?, ?, ?, ?, ?, 'pending', null, null, 0, ?, ?)`
           )
           .run(
             `billing_deletion_${randomUUID()}`,
             purchaserUserId,
             billingSubscriptionId,
             billingCustomerId,
+            stripeMembershipUserId,
             expectedSubscriptionId,
             expectedCustomerId,
             capturedRevision,
@@ -109,6 +116,7 @@ export function markBillingStripeAccountDeletionReconciliation(
              revision = revision + 1, updated_at = ?
          where id = ? and purchaser_user_id = ? and revision = ?
            and billing_customer_id is ? and billing_subscription_id is ?
+           and stripe_membership_user_id is ?
            and expected_stripe_customer_id is ? and expected_stripe_subscription_id is ?
            and captured_billing_revision = ?`
         )
@@ -120,6 +128,7 @@ export function markBillingStripeAccountDeletionReconciliation(
           expected.revision,
           expected.billingCustomerId,
           expected.billingSubscriptionId,
+          expected.stripeMembershipUserId,
           expected.expectedStripeCustomerId,
           expected.expectedStripeSubscriptionId,
           expected.capturedBillingRevision
@@ -151,11 +160,13 @@ export function confirmBillingStripeAccountDeletion(
       const live = getBillingAccountDeletionRequest(connection, expected.purchaserUserId)
       const customer = getBillingCustomerForPurchaser(connection, expected.purchaserUserId)
       const subscription = getBillingSubscriptionForPurchaser(connection, expected.purchaserUserId)
+      const stripeMembership = getAccountStripeMembershipForUser(connection, expected.purchaserUserId)
       if (
         !live ||
         live.id !== expected.id ||
         live.revision !== expected.revision ||
         live.billingCustomerId !== (customer?.id ?? null) ||
+        live.stripeMembershipUserId !== (stripeMembership?.userId ?? null) ||
         live.expectedStripeCustomerId !== (customer?.stripeCustomerId ?? null) ||
         live.billingSubscriptionId !== (subscription?.id ?? null) ||
         live.expectedStripeSubscriptionId !== (subscription?.stripeSubscriptionId ?? null) ||

@@ -38,19 +38,20 @@ describe('Billing Stripe schema contract', () => {
     }
     expect(Object.keys(getTableColumns(billingSubscriptions))).toContain('purchaserUserId')
     expect(Object.keys(getTableColumns(billingAccountDeletionRequests))).toContain('purchaserUserId')
+    expect(Object.keys(getTableColumns(billingAccountDeletionRequests))).toContain('stripeMembershipUserId')
     expect(Object.keys(getTableColumns(detachedBillingSubjects))).not.toContain('purchaserUserId')
   })
 
-  it('ships one migration-ready canonical invariant input containing exactly ten triggers', () => {
+  it('ships one migration-ready canonical invariant input containing exactly fifteen triggers', () => {
     const fixture = createBillingStripeRuntimeFixture('purchaser_schema_trigger_count')
     fixtures.push(fixture)
-    expect(billingStripeInvariantSql.match(/^create trigger /gm) ?? []).toHaveLength(10)
-    expect(billingStripeInvariantSql.match(/^--> statement-breakpoint$/gm) ?? []).toHaveLength(9)
+    expect(billingStripeInvariantSql.match(/^create trigger /gm) ?? []).toHaveLength(15)
+    expect(billingStripeInvariantSql.match(/^--> statement-breakpoint$/gm) ?? []).toHaveLength(14)
     expect(
       fixture.sqlite
         .prepare(`select name from sqlite_master where type = 'trigger' and name like 'billing_%' order by name`)
         .all()
-    ).toHaveLength(10)
+    ).toHaveLength(12)
   })
 
   it('rejects none-state residue and partial grace tuples in real SQLite', () => {

@@ -2,6 +2,8 @@
 
 Solidarity is the event-authoring system for WCU. SQLite is the durable WCU record and the website reads only from SQLite. The website does not create or edit Solidarity events, and its RSVP buttons currently open the applicable Solidarity event page.
 
+The complete property, form, automation, event, and campaign registry is in [`solidarity-taxonomy.md`](solidarity-taxonomy.md).
+
 ## Organizer convention
 
 Every Solidarity event must have exactly one audience tag and one category tag:
@@ -20,7 +22,7 @@ Meetings also require exactly one subtype tag:
 - `meeting-general` for WCU General Meetings;
 - `meeting-steering` for Steering Committee meetings.
 
-Keep other existing event and campaign tags. They are imported unchanged for provenance and reporting, but they do not determine website visibility or category.
+The Campaign Tags currently configured in Solidarity are `focus-tenant-union`, `sidequest-2025-06-kyr`, and `sidequest-2026-03-deflock-stockton`. Future approved campaigns use the `focus-*` or `sidequest-*` convention and do not require an importer code change. The normalizer rejects other Event Tags and campaign names outside the convention. Keep the reviewed source metadata and manifest hash privately for provenance.
 
 Before publishing or updating an event:
 
@@ -28,17 +30,18 @@ Before publishing or updating an event:
 2. Add one `audience-*` tag.
 3. Add one `category-*` tag.
 4. For a meeting, add one `meeting-*` tag.
-5. Make the Event Page the RSVP destination and enable the desired Solidarity confirmations and automations.
-6. If one occurrence needs a different audience or category, create a separate Solidarity event rather than putting conflicting tags on a session.
+5. Add a governed Campaign Tag when applicable.
+6. Make the Event Page the RSVP destination and enable the desired Solidarity confirmations and automations.
+7. If one occurrence needs a different audience or category, create a separate Solidarity event rather than putting conflicting tags on a session.
 
-Missing, duplicated, or conflicting classification tags make the local event `hidden` and create an import issue. The audience tag controls only the WCU website. Solidarity has no true private-event setting, so anyone who already knows a member event's direct Solidarity URL may still open it.
+Missing or conflicting classification tags make the local event `hidden` and create an import issue. An unregistered Event Tag or nonconforming Campaign Tag rejects the normalized input before a database write. The audience tag controls only the WCU website. Solidarity has no true private-event setting, so anyone who already knows a member event's direct Solidarity URL may still open it.
 
 ## Local model
 
 - `events` is the stable series or program, such as “WCU General Meeting.”
 - `event_sessions` is a dated occurrence. A one-time event has one session; a recurring event has several.
 - A Solidarity hybrid pair becomes one local session with two provider links.
-- `event_tags` retains both Event Tags and Campaign Tags.
+- `event_tags` retains canonical Event Tags and Campaign Tags. Private source metadata and hashes retain source provenance.
 - `event_provider_links` and `event_session_provider_links` retain Solidarity IDs, primary IDs, mirror IDs, and hybrid-pair IDs.
 - RSVPs and attendance attach to a person and an existing Solidarity-linked session. Attendance recording cannot create or reclassify events. General- and steering-meeting meaning is stored separately in `meetings`.
 - Raw imported records are retained through `import_batches` and `external_record_snapshots`; application and API responses never expose those payloads.
@@ -74,7 +77,7 @@ Each event metadata file is an operator-reviewed, schema-versioned allowlist:
     "timezone": "America/Los_Angeles",
     "eventPageUrl": "https://events.solidarity.tech/example",
     "eventTags": ["audience-public", "category-social"],
-    "campaignTags": []
+    "campaignTags": ["focus-tenant-union"]
   },
   "sessions": [
     {
@@ -100,7 +103,7 @@ Each event metadata file is an operator-reviewed, schema-versioned allowlist:
 
 The converter quarantines blank RSVP statuses and Solidarity's known `recurring_auto_rsvp` rows that have no occurrence metadata. Sessionless rows from any other source fail closed because they cannot be attached safely to an event session.
 
-Do not infer event type, pairing, tags, visibility, category, location, or attendance from a title or free-form dashboard text. Put those facts explicitly in the reviewed metadata. Attendance records use the normalized importer fields and canonical UTC timestamps shown in the import contract; use an empty array when no attendance was recorded.
+Do not infer event type, pairing, tags, visibility, category, location, or attendance from a title or free-form dashboard text. Put those facts explicitly in the reviewed metadata. The converter rejects noncanonical taxonomy before writing either output. Attendance records use the normalized importer fields and canonical UTC timestamps shown in the import contract; use an empty array when no attendance was recorded.
 
 The converter reads only People ID, name, primary email, and primary phone from the People report and ignores every other field. From RSVP CSV it reads RSVP ID, User ID, Session ID, status, and created/updated timestamps; Source and occurrence metadata are consulted only to recognize a completely sessionless `recurring_auto_rsvp` row. It accepts standard quoted CSV fields, requires the current named headers, and fails closed on malformed records, unsupported values, unknown references, or duplicate normalized activity. A blank RSVP status is omitted and counted as `rsvp_status_missing`, matching the currently observed Solidarity report behavior. The event and RSVP options may be repeated for any number of events, but each event must have exactly one matching RSVP report in the same option order.
 

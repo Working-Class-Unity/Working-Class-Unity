@@ -1,5 +1,9 @@
 import { isIP } from 'node:net'
-import { membershipDuesOfferingKeys, type BillingOfferingKey } from '../../../../shared/billing'
+import {
+  isMembershipDuesOfferingKey,
+  membershipDuesOfferingKeys,
+  type BillingOfferingKey
+} from '../../../../shared/billing'
 
 export type BillingStripePriceConfiguration = Readonly<Record<BillingOfferingKey, string>>
 
@@ -32,6 +36,14 @@ const priceEnvironmentKeys = {
   'personal.monthly': 'NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID',
   'family.monthly': 'NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID'
 } as const satisfies Record<(typeof membershipDuesOfferingKeys)[number], string>
+const legacyPriceIds = {
+  'personal.monthly': 'membership-10-1month',
+  'family.monthly': 'solidarity-27-1month'
+} as const satisfies Record<(typeof membershipDuesOfferingKeys)[number], string>
+
+export function isStripePriceIdForOffering(offering: BillingOfferingKey, priceId: string): boolean {
+  return priceId.startsWith('price_') || (isMembershipDuesOfferingKey(offering) && priceId === legacyPriceIds[offering])
+}
 
 export function evaluateBillingStripeRuntimeConfiguration(
   input: BillingStripeRuntimeConfigurationInput,
@@ -78,7 +90,7 @@ export function evaluateBillingStripeRuntimeConfiguration(
   for (const offering of membershipDuesOfferingKeys) {
     const environmentKey = priceEnvironmentKeys[offering]
     const priceId = validateRequiredValue(input.stripe.prices[offering], environmentKey, environment, issues)
-    if (priceId && !priceId.startsWith('price_')) {
+    if (priceId && !isStripePriceIdForOffering(offering, priceId)) {
       issues.push(configurationIssue('invalid', environmentKey, 'must be a Stripe Price ID'))
     }
     if (priceId) {

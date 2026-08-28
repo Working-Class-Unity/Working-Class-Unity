@@ -2,7 +2,7 @@ import Database from 'better-sqlite3'
 import { drizzle } from 'drizzle-orm/better-sqlite3'
 import { migrate } from 'drizzle-orm/better-sqlite3/migrator'
 import { spawnSync } from 'node:child_process'
-import { existsSync, mkdtempSync, rmSync } from 'node:fs'
+import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
@@ -29,8 +29,28 @@ const migrationsFolder = resolve('server/db/migrations')
 const cutoff = '2026-08-01T00:00:00.000Z'
 const startedAt = '2026-08-22T10:00:00.000Z'
 const completedAt = '2026-08-22T10:05:00.000Z'
+const validLinkSyncEnvironment = {
+  WCU_STRIPE_LEGACY_DUES10_PRICE_IDS: 'membership-10-1month',
+  WCU_STRIPE_LEGACY_DUES27_PRICE_IDS: 'solidarity-27-1month',
+  WCU_STRIPE_MEMBERSHIP_SYNC_KEY: 'rk_test_private_cli_value',
+  WCU_STRIPE_MEMBERSHIP_SYNC_MODE: 'test'
+} as const
 
 describe('Stripe membership synchronization state', () => {
+  it('keeps the historical importer and account-link synchronizer as separate commands', () => {
+    const scripts = (JSON.parse(readFileSync(resolve('package.json'), 'utf8')) as { scripts: Record<string, string> })
+      .scripts
+    expect(scripts['db:import:stripe']).toContain('scripts/import-stripe-membership.ts')
+    expect(scripts['db:sync:stripe-membership-links']).toContain('scripts/sync-stripe-membership-links.ts')
+
+    const legacyHelp = runCliHelp('scripts/import-stripe-membership.ts')
+    expect(legacyHelp.status).toBe(0)
+    expect(legacyHelp.stdout).toContain('--grandfathered-before <ISO>')
+    const linkHelp = runCliHelp('scripts/sync-stripe-membership-links.ts')
+    expect(linkHelp.status).toBe(0)
+    expect(linkHelp.stdout).toContain('exact account membership links')
+  })
+
   it('rejects a restricted key from the wrong Stripe mode', () => {
     expect(() => assertStripeMembershipSyncKey('test', 'rk_test_restricted')).not.toThrow()
     expect(() => assertStripeMembershipSyncKey('live', 'rk_test_restricted')).toThrowError(
@@ -195,65 +215,27 @@ describe('Stripe membership synchronization state', () => {
     }
   })
 
-  it('rejects a changed binding before provider work or database writes and redacts CLI output', () => {
-    withMigratedDatabase('cli-binding', (connection) => {
-      recordStripeMembershipSyncStarted(connection, { grandfatheredBefore: cutoff, mode: 'test', startedAt })
+  it('rejects an ambiguous legacy Price map before provider work or database writes and redacts CLI output', () => {
+    withMigratedDatabase('cli-price-map', (connection) => {
       const settingsBefore = readAllSettings(connection)
       const secretKey = 'rk_test_private_cli_value'
-      const changedCutoff = '2026-08-02T00:00:00.000Z'
 
       const result = runSyncCli(connection.databasePath, ['--apply'], {
-        WCU_MEMBERSHIP_GRANDFATHERED_BEFORE: changedCutoff,
-        WCU_STRIPE_MEMBERSHIP_SYNC_KEY: secretKey,
-        WCU_STRIPE_MEMBERSHIP_SYNC_MODE: 'test'
+        ...validLinkSyncEnvironment,
+        WCU_STRIPE_LEGACY_DUES27_PRICE_IDS: validLinkSyncEnvironment.WCU_STRIPE_LEGACY_DUES10_PRICE_IDS
       })
 
       expect(result.status).toBe(1)
       expect(result.signal).toBeNull()
       expect(result.stdout).toBe('')
-      expect(result.stderr).toBe('Stripe membership synchronization failed: binding_changed.\n')
+      expect(result.stderr).toBe('Stripe membership synchronization failed: configuration_invalid.\n')
       expect(`${result.stdout}${result.stderr}`).not.toContain(secretKey)
-      expect(`${result.stdout}${result.stderr}`).not.toContain(changedCutoff)
       expect(readAllSettings(connection)).toEqual(settingsBefore)
       expect(existsSync(join(dirname(connection.databasePath), '.stripe-membership-sync.lock'))).toBe(false)
-    })
-  })
 
-  it('rejects local CLI overrides in the production runner boundary', () => {
-    withMigratedDatabase('cli-production', (connection) => {
-      const secretKey = 'rk_test_private_cli_value'
-      const result = runSyncCli(
-        connection.databasePath,
-        ['--apply', '--grandfathered-before', '2026-08-02T00:00:00.000Z'],
-        {
-          WCU_MEMBERSHIP_GRANDFATHERED_BEFORE: cutoff,
-          WCU_STRIPE_MEMBERSHIP_SYNC_KEY: secretKey,
-          WCU_STRIPE_MEMBERSHIP_SYNC_MODE: 'test'
-        }
-      )
-
-      expect(result.status).toBe(1)
-      expect(result.stdout).toBe('')
-      expect(result.stderr).toBe('Stripe membership synchronization failed: configuration_invalid.\n')
-      expect(`${result.stdout}${result.stderr}`).not.toContain(secretKey)
-      expect(readAllSettings(connection)).toEqual([])
-    })
-  })
-
-  it('rejects a normalized-but-invalid calendar timestamp during CLI validation', () => {
-    withMigratedDatabase('cli-invalid-date', (connection) => {
-      const secretKey = 'rk_test_private_cli_value'
-      const result = runSyncCli(connection.databasePath, ['--validate-config'], {
-        WCU_MEMBERSHIP_GRANDFATHERED_BEFORE: '2026-02-31T00:00:00.000Z',
-        WCU_STRIPE_MEMBERSHIP_SYNC_KEY: secretKey,
-        WCU_STRIPE_MEMBERSHIP_SYNC_MODE: 'test'
-      })
-
-      expect(result.status).toBe(1)
-      expect(result.stdout).toBe('')
-      expect(result.stderr).toBe('Stripe membership synchronization failed: configuration_invalid.\n')
-      expect(`${result.stdout}${result.stderr}`).not.toContain(secretKey)
-      expect(readAllSettings(connection)).toEqual([])
+      const validated = runSyncCli(connection.databasePath, ['--validate-config'], validLinkSyncEnvironment)
+      expect(validated.status).toBe(0)
+      expect(validated.stdout).toBe('Stripe account membership synchronization configuration passed.\n')
     })
   })
 })
@@ -302,7 +284,7 @@ function runSyncCli(
 ) {
   return spawnSync(
     process.execPath,
-    [resolve('node_modules/tsx/dist/cli.mjs'), resolve('scripts/import-stripe-membership.ts'), ...arguments_],
+    [resolve('node_modules/tsx/dist/cli.mjs'), resolve('scripts/sync-stripe-membership-links.ts'), ...arguments_],
     {
       cwd: resolve('.'),
       encoding: 'utf8',
@@ -315,4 +297,12 @@ function runSyncCli(
       timeout: 5_000
     }
   )
+}
+
+function runCliHelp(script: string) {
+  return spawnSync(process.execPath, [resolve('node_modules/tsx/dist/cli.mjs'), resolve(script), '--help'], {
+    cwd: resolve('.'),
+    encoding: 'utf8',
+    timeout: 5_000
+  })
 }

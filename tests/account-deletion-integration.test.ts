@@ -61,7 +61,7 @@ afterEach(async () => {
 })
 
 describe('production-wired account deletion', () => {
-  it('registers by magic link and deletes all purchaser-owned state through the account route', async () => {
+  it('logs in by magic link and deletes all purchaser-owned state through the account route', async () => {
     temporaryDirectory = mkdtempSync(join(tmpdir(), 'wcu-account-deletion-integration-'))
     const databasePath = join(temporaryDirectory, 'app.db')
     configureRuntime(databasePath)
@@ -82,6 +82,9 @@ describe('production-wired account deletion', () => {
     const accountEndpoint = `http://127.0.0.1:${address.port}/api/account`
 
     const email = 'delete-integration@example.test'
+    database
+      .prepare('insert into user (id, name, email, email_verified, created_at, updated_at) values (?, ?, ?, 1, 1, 1)')
+      .run('delete-integration-user', 'WCU account', email)
     const issued = await auth.handler(
       authRequest('/api/auth/sign-in/magic-link', {
         method: 'POST',
@@ -104,7 +107,7 @@ describe('production-wired account deletion', () => {
     expect(authenticated.status).toBe(302)
     const sessionHeaders = convertSetCookieToCookie(new Headers(authenticated.headers))
     const user = database.prepare('select id from user where email = ?').get(email) as { id: string } | undefined
-    if (!user) throw new Error('Expected open magic-link registration to persist a user')
+    if (!user) throw new Error('Expected the existing account to remain available')
 
     seedPrivatePurchaserState(database, user.id, email)
 
