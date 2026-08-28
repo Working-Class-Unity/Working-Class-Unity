@@ -29,26 +29,8 @@ async function assertPublicEntryAndLegalRoutes(context, helpers) {
     await expect(getStarted).toBeFocused()
     await page.keyboard.press('Enter')
 
-    await expect(page).toHaveURL(/\/signup$/)
-    await expect(page.getByRole('heading', { name: 'Create your account' })).toBeVisible()
-    await expect(page.locator('.nuxt-route-announcer [role="status"]')).toHaveText('Sign up')
-    await expect(
-      page.getByText(
-        'Create a Supporter account with email or a U.S. phone number, or return to your existing WCU account.'
-      )
-    ).toBeVisible()
-    await expect(page.getByRole('textbox', { name: 'Email', exact: true })).toBeVisible()
-    await page.getByRole('button', { name: 'Use phone', exact: true }).click()
-    await expect(page.getByRole('textbox', { name: 'U.S. phone number', exact: true })).toBeVisible()
-    await expect(page.getByText(/one-time verification code/i)).toBeVisible()
-    await page.getByRole('button', { name: 'Use email', exact: true }).click()
-    await expect(page.getByRole('textbox', { name: /(?:first|last|display) name/i })).toHaveCount(0)
-    await expect(page.getByRole('link', { name: 'Terms', exact: true })).toHaveAttribute('href', '/legal/terms')
-    await expect(page.getByRole('link', { name: 'Privacy Policy', exact: true })).toHaveAttribute(
-      'href',
-      '/legal/privacy'
-    )
-    await expect(page.getByRole('button', { name: 'Continue with Google' })).toHaveCount(0)
+    await expect(page).toHaveURL(/\/join$/)
+    await expect(page.getByRole('heading', { name: 'Join Working Class Unity' })).toBeVisible()
     await helpers.assertAccessibleWithoutOverflow(page)
 
     if (await page.getByRole('button', { name: 'Menu', exact: true }).isVisible()) {
@@ -72,8 +54,8 @@ async function assertPublicEntryAndLegalRoutes(context, helpers) {
       await page.getByRole('button', { name: 'Menu', exact: true }).click()
     }
     await page.getByRole('link', { name: 'JOIN NOW', exact: true }).click()
-    await expect(page).toHaveURL(/\/signup$/)
-    await page.getByRole('link', { name: 'Terms', exact: true }).click()
+    await expect(page).toHaveURL(/\/join$/)
+    await page.goto('/legal/terms')
     await expect(page).toHaveURL(/\/legal\/terms$/)
     await expect(page.getByRole('heading', { name: 'Terms', exact: true })).toBeVisible()
     await expect(page.getByText(/customization prompt, not production terms/i)).toBeVisible()

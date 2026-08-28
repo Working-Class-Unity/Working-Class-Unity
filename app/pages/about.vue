@@ -106,7 +106,7 @@ useHead(() => ({
         <h2 id="about-cta-title">{{ t('publicPages.about.cta.title') }}</h2>
         <p>{{ t('publicPages.about.cta.description') }}</p>
       </div>
-      <NuxtLink class="about-cta-action" to="/signup">{{ t('publicPages.about.cta.action') }}</NuxtLink>
+      <NuxtLink class="about-cta-action" to="/join">{{ t('publicPages.about.cta.action') }}</NuxtLink>
     </section>
   </article>
 </template>

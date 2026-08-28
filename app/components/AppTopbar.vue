@@ -189,7 +189,7 @@ function currentPage(path: string) {
             <NuxtLink class="topbar-link topbar-link--login" to="/login" :aria-current="currentPage('/login')">
               {{ t('navigation.login') }}
             </NuxtLink>
-            <NuxtLink class="topbar-link topbar-link--join" to="/signup" :aria-current="currentPage('/signup')">
+            <NuxtLink class="topbar-link topbar-link--join" to="/join" :aria-current="currentPage('/join')">
               {{ t('navigation.signup') }}
             </NuxtLink>
           </template>
