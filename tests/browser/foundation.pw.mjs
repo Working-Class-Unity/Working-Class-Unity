@@ -128,6 +128,7 @@ test('home presents the WCU foundation and preserves client navigation', async (
   const updatesLink = page.getByRole('link', { name: 'STAY INFORMED', exact: true })
   await expect(updatesLink).toHaveAttribute('href', 'https://tech.workingclassunity.com/wcu-updates')
   await expect(updatesLink).toHaveAttribute('aria-describedby', 'newsletter-note')
+  await expect(page.locator('.newsletter form')).toHaveCount(0)
   await expect(page.locator('.newsletter input')).toHaveCount(0)
   await expect(page.locator('.newsletter iframe')).toHaveCount(0)
   await expect(page.locator('#newsletter-note')).toHaveText(updatesDisclaimer)
@@ -288,6 +289,7 @@ test('campaign update prompts use the hosted Deflock form without collecting con
   const updatesNotes = page.locator('.campaign-newsletter > p')
   await expect(updatesLinks).toHaveCount(2)
   await expect(updatesNotes).toHaveCount(2)
+  await expect(page.locator('.campaign-newsletter form')).toHaveCount(0)
   await expect(page.locator('.campaign-newsletter input')).toHaveCount(0)
   await expect(page.locator('.campaign-newsletter iframe')).toHaveCount(0)
 
