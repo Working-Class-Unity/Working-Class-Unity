@@ -69,25 +69,50 @@ export function applyAccountStripeMembershipObservation(
 }
 
 function validStatus(
-  link: Readonly<{ stripeCustomerId: string; stripePriceId: string; tier: string }>,
+  link: Readonly<{
+    stripeCustomerId: string
+    stripePriceId: string
+    stripeSubscriptionId: string
+    tier: string
+  }>,
   observation: StripeEventObservation,
   subscription: Stripe.Subscription | null
 ): AccountStripeMembershipStatus | null {
   if (
     !subscription ||
-    subscription.object !== 'subscription' ||
     (subscription.id !== observation.objectId && observation.eventType.startsWith('customer.subscription.')) ||
-    stripeId(subscription.customer) !== link.stripeCustomerId ||
-    observation.stripeCustomerId !== link.stripeCustomerId ||
-    subscription.metadata.wcu_membership_tier !== link.tier ||
-    !knownStatuses.has(subscription.status) ||
-    subscription.items.has_more ||
-    subscription.items.data.length !== 1
+    observation.stripeCustomerId !== link.stripeCustomerId
   ) {
     return null
   }
-  const item = subscription.items.data[0]
-  return item?.price.id === link.stripePriceId && item.quantity === 1 ? subscription.status : null
+  return exactStripeMembershipStatus(subscription, link)
+}
+
+export function exactStripeMembershipStatus(
+  subscription: Stripe.Subscription,
+  expected: Readonly<{
+    stripeCustomerId: string
+    stripePriceId: string
+    stripeSubscriptionId?: string
+    tier: string
+  }>
+): AccountStripeMembershipStatus | null {
+  const item = subscription.items.data.length === 1 ? subscription.items.data[0] : undefined
+  const metadataTier = subscription.metadata.wcu_membership_tier
+  if (
+    subscription.object !== 'subscription' ||
+    (expected.stripeSubscriptionId !== undefined && subscription.id !== expected.stripeSubscriptionId) ||
+    stripeId(subscription.customer) !== expected.stripeCustomerId ||
+    !knownStatuses.has(subscription.status) ||
+    subscription.items.has_more ||
+    !item ||
+    item.price.id !== expected.stripePriceId ||
+    item.quantity !== 1 ||
+    (metadataTier !== undefined && metadataTier !== expected.tier)
+  ) {
+    return null
+  }
+  return subscription.status
 }
 
 function providerSubscription(state: StripeEventObservation['providerState']): Stripe.Subscription | null {

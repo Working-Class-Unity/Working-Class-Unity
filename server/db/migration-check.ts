@@ -21,7 +21,8 @@ const expectedMigrationTags = [
   '0007_billing_email_verification',
   '0008_simple_stripe_membership',
   '0009_stripe-membership-deletion',
-  '0010_stripe-membership-status'
+  '0010_stripe-membership-status',
+  '0011_stripe-membership-legacy-price'
 ] as const
 const expectedRuntimeTables = [
   'account',
@@ -191,9 +192,51 @@ function requirePopulatedRuntimeUpgrade() {
       )
       .run()
 
-    for (const tag of expectedMigrationTags.slice(4)) {
+    for (const tag of expectedMigrationTags.slice(4, -1)) {
       const upgradeMigration = readFileSync(join(migrationsFolder, `${tag}.sql`), 'utf8')
       upgrade.transaction(() => upgrade.exec(upgradeMigration))()
+    }
+    upgrade.exec(`
+      insert into account_stripe_memberships
+        (user_id, stripe_customer_id, stripe_subscription_id, stripe_price_id, tier,
+         stripe_status, last_verified_at)
+      values ('user_upgrade', 'cus_upgrade', 'sub_upgrade', 'price_upgrade', 'member',
+        'active', '2026-08-28T00:00:00.000Z');
+      insert into billing_account_deletion_requests
+        (id, purchaser_user_id, stripe_membership_user_id)
+      values ('deletion_upgrade', 'user_upgrade', 'user_upgrade');
+    `)
+    const finalMigration = readFileSync(join(migrationsFolder, `${expectedMigrationTags.at(-1)}.sql`), 'utf8')
+    upgrade.transaction(() => upgrade.exec(finalMigration))()
+    upgrade
+      .prepare(
+        "update account_stripe_memberships set stripe_price_id = 'membership-10-1month' where user_id = 'user_upgrade'"
+      )
+      .run()
+    if (
+      !upgrade
+        .prepare(
+          `select 1 from account_stripe_memberships membership
+           join billing_account_deletion_requests request
+             on request.stripe_membership_user_id = membership.user_id
+           where membership.user_id = 'user_upgrade'
+             and membership.stripe_price_id = 'membership-10-1month'`
+        )
+        .get()
+    ) {
+      fail(
+        'Stripe membership Price-check migration did not preserve its deletion reference or accept a legacy Price ID.'
+      )
+    }
+    try {
+      upgrade
+        .prepare(
+          "update account_stripe_memberships set stripe_customer_id = 'cus_changed' where user_id = 'user_upgrade'"
+        )
+        .run()
+      fail('Stripe membership Price-check migration did not restore the account-deletion update fence.')
+    } catch (error) {
+      if (!(error instanceof Error) || !error.message.includes('fenced for deletion')) throw error
     }
 
     const preservedUser = upgrade

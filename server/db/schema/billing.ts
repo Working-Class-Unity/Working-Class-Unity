@@ -85,7 +85,7 @@ export const accountStripeMemberships = sqliteTable(
     uniqueIndex('account_stripe_memberships_subscription_uidx').on(table.stripeSubscriptionId),
     check('account_stripe_memberships_customer_check', sql`${table.stripeCustomerId} glob 'cus_*'`),
     check('account_stripe_memberships_subscription_check', sql`${table.stripeSubscriptionId} glob 'sub_*'`),
-    check('account_stripe_memberships_price_check', sql`${table.stripePriceId} glob 'price_*'`),
+    check('account_stripe_memberships_price_check', sql`length(${table.stripePriceId}) between 1 and 255`),
     check('account_stripe_memberships_tier_check', sql`${table.tier} in ('supporter', 'member', 'solidarity')`)
   ]
 )
