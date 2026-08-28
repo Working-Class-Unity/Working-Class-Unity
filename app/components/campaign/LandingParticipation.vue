@@ -22,7 +22,7 @@ defineProps<{
         <li v-for="point in section.points" :key="citedTextPlainText(point)">{{ citedTextPlainText(point) }}</li>
       </ol>
 
-      <NuxtLink class="campaign-participate-action" to="/signup">Join Working Class Unity</NuxtLink>
+      <NuxtLink class="campaign-participate-action" to="/join">Join Working Class Unity</NuxtLink>
 
       <CampaignNewsletterSignup id-prefix="campaign-newsletter" />
     </div>

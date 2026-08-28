@@ -7,6 +7,7 @@ import AppButton from '../../app/components/AppButton.vue'
 import AppField from '../../app/components/AppField.vue'
 import AppInput from '../../app/components/AppInput.vue'
 import AppNotice from '../../app/components/AppNotice.vue'
+import JoinOptionGroup from '../../app/components/JoinOptionGroup.vue'
 
 describe('the shared UI foundation', () => {
   it('keeps AppButton native and prevents duplicate pending actions', async () => {
@@ -129,5 +130,31 @@ describe('the shared UI foundation', () => {
     expect(politeNotice.attributes('aria-live')).toBe('polite')
     expect(assertiveNotice.attributes('role')).toBe('alert')
     expect(assertiveNotice.attributes('aria-live')).toBe('assertive')
+  })
+
+  it('gives the join choices one radio-group selection contract', async () => {
+    const updates: string[] = []
+    const wrapper = mount(JoinOptionGroup, {
+      props: {
+        label: 'Join options',
+        modelValue: 'supporter',
+        'onUpdate:modelValue': (value: string) => updates.push(value),
+        options: [
+          { value: 'supporter', title: 'Supporter', description: 'Support WCU.', price: 'Free' },
+          { value: 'personal.monthly', title: 'Membership Dues', description: 'Become a member.', price: '$10' },
+          { value: 'family.monthly', title: 'Solidarity Dues', description: 'Contribute more.', price: '$27' }
+        ]
+      }
+    })
+
+    const group = wrapper.get('[role="radiogroup"]')
+    const radios = wrapper.findAll('[role="radio"]')
+    expect(group.attributes('aria-label')).toBe('Join options')
+    expect(radios).toHaveLength(3)
+    expect(radios[0]!.attributes('aria-checked')).toBe('true')
+    expect(radios[0]!.attributes('aria-label')).toBe('Supporter, Free')
+
+    await radios[1]!.trigger('click')
+    expect(updates).toContain('personal.monthly')
   })
 })

@@ -3,6 +3,7 @@ import {
   authenticatedAppPath,
   authEntryPaths,
   isAllowedAuthCallback,
+  isAllowedAuthReturnPath,
   resolveAuthCallbacks,
   type AuthCallbackParameter
 } from '../shared/auth-routes'
@@ -21,6 +22,11 @@ describe('app-owned authentication routes', () => {
     })
     expect(authenticatedAppPath).toBe('/app')
     expect(authEntryPaths).toEqual({ login: '/login', signup: '/signup' })
+    expect(resolveAuthCallbacks('login', '/join')).toEqual({
+      callbackURL: '/join',
+      newUserCallbackURL: '/join',
+      errorCallbackURL: '/login'
+    })
   })
 
   it('applies distinct allowlists to success and error callback parameters', () => {
@@ -28,10 +34,19 @@ describe('app-owned authentication routes', () => {
 
     for (const parameter of successParameters) {
       expect(isAllowedAuthCallback(parameter, '/app')).toBe(true)
+      expect(isAllowedAuthCallback(parameter, '/join')).toBe(true)
       expect(isAllowedAuthCallback(parameter, '/invite/Abc_123-xyz')).toBe(false)
       expect(isAllowedAuthCallback(parameter, '/login')).toBe(false)
       expect(isAllowedAuthCallback(parameter, '/signup')).toBe(false)
     }
+
+    const completion = '/join/complete?id=join_checkout_00000000-0000-4000-8000-000000000000'
+    expect(isAllowedAuthReturnPath(completion)).toBe(true)
+    expect(isAllowedAuthCallback('callbackURL', completion)).toBe(true)
+    expect(isAllowedAuthReturnPath(`${completion}&next=https://hostile.example.test`)).toBe(false)
+    expect(isAllowedAuthReturnPath('/join?offering=personal.monthly')).toBe(true)
+    expect(isAllowedAuthReturnPath('/join?offering=family.monthly')).toBe(true)
+    expect(isAllowedAuthReturnPath('/join?offering=personal.annual')).toBe(false)
 
     expect(isAllowedAuthCallback('errorCallbackURL', '/login')).toBe(true)
     expect(isAllowedAuthCallback('errorCallbackURL', '/signup')).toBe(true)

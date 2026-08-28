@@ -42,6 +42,7 @@ export default withNuxt(
       'app/components/AccountMenu.vue',
       'app/components/AppTopbar.vue',
       'app/components/CampaignCitation.vue',
+      'app/components/JoinOptionGroup.vue',
       'app/components/PageOutline.vue',
       'app/components/calendar/CalendarDatePicker.vue',
       'app/components/calendar/EventDirectionsMenu.vue',

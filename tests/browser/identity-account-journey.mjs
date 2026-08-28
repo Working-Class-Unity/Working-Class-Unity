@@ -29,6 +29,9 @@ async function assertPublicEntryAndLegalRoutes(context, helpers) {
     await expect(getStarted).toBeFocused()
     await page.keyboard.press('Enter')
 
+    await expect(page).toHaveURL(/\/join$/)
+    await expect(page.getByRole('heading', { name: 'Join WCU', exact: true })).toBeVisible()
+    await page.getByRole('button', { name: 'Join as a Supporter', exact: true }).click()
     await expect(page).toHaveURL(/\/signup$/)
     await expect(page.getByRole('heading', { name: 'Create your account' })).toBeVisible()
     await expect(page.locator('.nuxt-route-announcer [role="status"]')).toHaveText('Sign up')
@@ -72,6 +75,8 @@ async function assertPublicEntryAndLegalRoutes(context, helpers) {
       await page.getByRole('button', { name: 'Menu', exact: true }).click()
     }
     await page.getByRole('link', { name: 'JOIN NOW', exact: true }).click()
+    await expect(page).toHaveURL(/\/join$/)
+    await page.getByRole('button', { name: 'Join as a Supporter', exact: true }).click()
     await expect(page).toHaveURL(/\/signup$/)
     await page.getByRole('link', { name: 'Terms', exact: true }).click()
     await expect(page).toHaveURL(/\/legal\/terms$/)

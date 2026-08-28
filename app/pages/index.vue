@@ -73,7 +73,7 @@ useHead(() => ({
         </div>
 
         <div class="hero-actions">
-          <NuxtLink class="hero-action hero-action--primary" to="/signup">{{ t('home.join') }}</NuxtLink>
+          <NuxtLink class="hero-action hero-action--primary" to="/join">{{ t('home.join') }}</NuxtLink>
           <NuxtLink class="hero-action hero-action--secondary" to="/calendar">
             {{ t('home.nextEvent') }}
           </NuxtLink>

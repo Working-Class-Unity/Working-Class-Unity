@@ -10,6 +10,7 @@ import {
 import type { AccountMembershipState, WebsiteMembershipAccess } from '../../../shared/membership'
 import { hasOpenWebsiteAccountIdentityReview } from './account-identity'
 import { hasCurrentImportedStripeDuesSubscription } from './imported-stripe-billing'
+import { publicJoinRequiresAttestation } from './public-join'
 
 export type { WebsiteMembershipAccess }
 
@@ -45,8 +46,11 @@ export function readWebsiteMembershipAccess(
   if (!personForUser(connection, userId)) return result('supporter', 'none', false)
 
   const subscription = connection.sqlite
-    .prepare('select stripe_price_id as stripePriceId from billing_subscriptions where purchaser_user_id = ?')
-    .get(userId) as { stripePriceId: string | null } | undefined
+    .prepare(
+      `select stripe_price_id as stripePriceId, stripe_subscription_id as stripeSubscriptionId
+       from billing_subscriptions where purchaser_user_id = ?`
+    )
+    .get(userId) as { stripePriceId: string | null; stripeSubscriptionId: string | null } | undefined
   const hasBillingCustomer = Boolean(
     connection.sqlite.prepare('select 1 from billing_customers where purchaser_user_id = ?').get(userId)
   )
@@ -59,10 +63,11 @@ export function readWebsiteMembershipAccess(
     if (!offering || !isMembershipDuesOfferingKey(offering) || state.subscription.offering !== offering) {
       return result('stripe', 'reconciliation_required', false)
     }
+    const needsAttestation = publicJoinRequiresAttestation(connection, userId, subscription.stripeSubscriptionId)
     return result(
       'stripe',
       state.subscription.state,
-      state.subscription.state === 'active' || state.subscription.state === 'grace',
+      !needsAttestation && (state.subscription.state === 'active' || state.subscription.state === 'grace'),
       state.subscription.graceDeadline,
       offering
     )

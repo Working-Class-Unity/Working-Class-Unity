@@ -57,6 +57,13 @@
       "when": 1787744243257,
       "tag": "0007_billing_email_verification",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1787877864140,
+      "tag": "0008_public_join",
+      "breakpoints": true
     }
   ]
 }

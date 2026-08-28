@@ -31,6 +31,7 @@ import {
   type BillingStripeWebhookLifecycle
 } from './webhook-lifecycle'
 import { isExactPaidInitialInvoice } from './webhook-state'
+import { applyPublicJoinObservationInTransaction } from '../../membership/public-join-observation'
 
 export type StripeEventApplyResult = Readonly<{
   duplicate: boolean
@@ -135,6 +136,8 @@ function applyObservationInTransaction(
   observation: StripeEventObservation,
   now: Date
 ): StripeEventApplyResult['target'] {
+  if (applyPublicJoinObservationInTransaction(connection, observation, now)) return 'live'
+
   const attempt = observation.attemptId ? getCheckoutAttemptById(connection, observation.attemptId) : null
   const customerByProvider = observation.stripeCustomerId
     ? getBillingCustomerByStripeId(connection, observation.stripeCustomerId)

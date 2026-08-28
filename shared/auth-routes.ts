@@ -1,4 +1,17 @@
+import { isPublicJoinClaimErrorCallback, isPublicJoinCompletionCallback, parsePublicJoinClaimCallback } from './join'
+import type { MembershipDuesOfferingKey } from './billing'
+
 export const authenticatedAppPath = '/app' as const
+export const joinReturnPath = '/join' as const
+export const membershipJoinReturnPaths = Object.freeze({
+  'personal.monthly': '/join?offering=personal.monthly',
+  'family.monthly': '/join?offering=family.monthly'
+} as const)
+export type AuthReturnPath =
+  | typeof authenticatedAppPath
+  | typeof joinReturnPath
+  | (typeof membershipJoinReturnPaths)[MembershipDuesOfferingKey]
+  | `/join/complete?id=${string}`
 
 export const authEntryPaths = {
   login: '/login',
@@ -8,10 +21,23 @@ export const authEntryPaths = {
 export type AuthEntryIntent = keyof typeof authEntryPaths
 export type AuthCallbackParameter = 'callbackURL' | 'newUserCallbackURL' | 'errorCallbackURL'
 
-export function resolveAuthCallbacks(intent: AuthEntryIntent) {
+export function isAllowedAuthReturnPath(value: unknown): value is AuthReturnPath {
+  return (
+    value === authenticatedAppPath ||
+    value === joinReturnPath ||
+    Object.values(membershipJoinReturnPaths).some((path) => path === value) ||
+    isPublicJoinCompletionCallback(value)
+  )
+}
+
+export function membershipJoinReturnPath(offering: MembershipDuesOfferingKey): AuthReturnPath {
+  return membershipJoinReturnPaths[offering]
+}
+
+export function resolveAuthCallbacks(intent: AuthEntryIntent, returnTo: AuthReturnPath = authenticatedAppPath) {
   return {
-    callbackURL: authenticatedAppPath,
-    newUserCallbackURL: authenticatedAppPath,
+    callbackURL: returnTo,
+    newUserCallbackURL: returnTo,
     errorCallbackURL: authEntryPaths[intent]
   } as const
 }
@@ -20,8 +46,8 @@ export function isAllowedAuthCallback(parameter: AuthCallbackParameter, value: u
   if (typeof value !== 'string') return false
 
   if (parameter === 'errorCallbackURL') {
-    return value === authEntryPaths.login || value === authEntryPaths.signup
+    return value === authEntryPaths.login || value === authEntryPaths.signup || isPublicJoinClaimErrorCallback(value)
   }
 
-  return value === authenticatedAppPath
+  return isAllowedAuthReturnPath(value) || parsePublicJoinClaimCallback(value) !== null
 }

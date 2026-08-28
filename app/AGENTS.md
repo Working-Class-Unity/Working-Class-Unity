@@ -31,6 +31,7 @@ The root [`AGENTS.md`](../AGENTS.md) governs all work. The normative interface a
 - `AppNotice`: persistent visual feedback with explicit, opt-in announcement behavior.
 - `AppTopbar`: application-shell header, Reka desktop primary navigation, and native mobile disclosure.
 - `AccountMenu`: feature-owned Reka dropdown for identity, account navigation, and sign-out.
+- `JoinOptionGroup`: join-owned Reka radio group for membership and eligibility choices.
 - `calendar/CalendarDatePicker`: feature-owned Reka calendar and popover for agenda date navigation.
 - `calendar/EventDirectionsMenu`: feature-owned Reka dropdown for map and address actions.
 - `calendar/CalendarAgendaView`, `calendar/CalendarMonthView`, `calendar/CalendarEventActions`, and
@@ -45,7 +46,7 @@ The root [`AGENTS.md`](../AGENTS.md) governs all work. The normative interface a
 - `AuthEntryForm`, `TurnstileChallenge`, `AccountProfileForm`, and `AccountDeletionSection`: feature components, not shared primitives.
 
 Direct `reka-ui` imports are allowed only in `components/AccountMenu.vue`, `components/AppTopbar.vue`,
-`components/CampaignCitation.vue`, `components/PageOutline.vue`, and the three documented
+`components/CampaignCitation.vue`, `components/JoinOptionGroup.vue`, `components/PageOutline.vue`, and the three documented
 `components/calendar/` integrations.
 Pages and unrelated components consume app-owned contracts. Do not add another Reka primitive or a
 generic wrapper without a documented product journey.

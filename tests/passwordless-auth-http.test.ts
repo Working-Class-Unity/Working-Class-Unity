@@ -11,6 +11,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { turnstileHeaderName } from '../shared/turnstile'
 import * as schema from '../server/db/schema'
 import type { TransactionalEmailMessage } from '../server/services/email'
+import { readPublicJoinAttempt } from '../server/services/membership/public-join'
+import { publicJoinMagicLinkBody } from '../server/services/membership/public-join-auth'
 import { createAuthentication } from '../server/utils/auth/create'
 import type { AppRuntimeConfig } from '../server/utils/runtime'
 
@@ -97,6 +99,86 @@ describe('configured passwordless HTTP behavior', () => {
       firstName: null,
       lastName: null,
       displayName: null
+    })
+  })
+
+  it('creates and claims a new same-email account from an authorized paid-join magic link without public Turnstile input', async () => {
+    const email = 'paid-join-registration@example.test'
+    const attemptId = seedPaidPublicJoin(email)
+    const attempt = readPublicJoinAttempt(
+      { sqlite: fixture.sqlite, db: undefined as never, databasePath: ':memory:' },
+      attemptId
+    )!
+    const siteverify = vi.fn(successfulSiteverify)
+    vi.stubGlobal('fetch', siteverify)
+
+    const issued = await fixture.auth.handler(
+      authRequest('/api/auth/sign-in/magic-link', {
+        method: 'POST',
+        body: JSON.stringify(publicJoinMagicLinkBody(attempt, testRuntimeConfig().betterAuth.secret))
+      })
+    )
+    expect(issued.status).toBe(200)
+    expect(siteverify).not.toHaveBeenCalled()
+    expect(fixture.deliveries).toHaveLength(1)
+
+    const magicLink = fixture.deliveries[0]?.text.match(/https?:\/\/\S+/)?.[0]
+    if (!magicLink) throw new Error('Expected the public join email to contain one magic link')
+    const verified = await fixture.auth.handler(authRequest(magicLink))
+    expect(verified.status).toBe(302)
+    const redirect = new URL(verified.headers.get('location') ?? '', baseURL)
+    expect(redirect.origin).toBe(baseURL)
+    expect(redirect.pathname).toBe('/join/claim')
+    expect(redirect.searchParams.get('error')).toBeNull()
+    expect(
+      fixture.sqlite
+        .prepare(
+          `select attempt.state, attempt.email, user.email as accountEmail
+           from public_join_attempts attempt join user on user.id = attempt.claimed_user_id
+           where attempt.id = ?`
+        )
+        .get(attemptId)
+    ).toEqual({ state: 'claimed', email, accountEmail: email })
+  })
+
+  it('recovers an unclaimed paid join with a fresh public magic link after the original link expires', async () => {
+    const email = 'paid-join-recovery@example.test'
+    const attemptId = seedPaidPublicJoin(email)
+    const connection = { sqlite: fixture.sqlite, db: undefined as never, databasePath: ':memory:' }
+    const attempt = readPublicJoinAttempt(connection, attemptId)!
+    const siteverify = vi.fn(successfulSiteverify)
+    vi.stubGlobal('fetch', siteverify)
+    const original = await issueMagicLink(
+      email,
+      {},
+      nextUniqueClientIp(),
+      publicJoinMagicLinkBody(attempt, testRuntimeConfig().betterAuth.secret)
+    )
+    expect(siteverify).not.toHaveBeenCalled()
+    fixture.sqlite
+      .prepare('update verification set expires_at = ? where identifier = ?')
+      .run(Math.floor(Date.now() / 1_000) - 1, original.verification.identifier)
+
+    const expired = await fixture.auth.handler(authRequest(original.url))
+    expect(expired.status).toBe(302)
+    expect(new URL(expired.headers.get('location') ?? '', baseURL).searchParams.get('status')).toBe('link-error')
+    expect(readPublicJoinAttempt(connection, attemptId)?.state).toBe('paid')
+
+    const completionPath = `/join/complete?id=${attemptId}`
+    const recovery = await issueMagicLink(email, {}, nextUniqueClientIp(), {
+      email,
+      callbackURL: completionPath,
+      newUserCallbackURL: completionPath,
+      errorCallbackURL: '/login'
+    })
+    expect(siteverify).toHaveBeenCalledTimes(1)
+    const recovered = await fixture.auth.handler(authRequest(recovery.url))
+    expect(recovered.status).toBe(302)
+    const recoveredLocation = new URL(recovered.headers.get('location') ?? '', baseURL)
+    expect(`${recoveredLocation.pathname}${recoveredLocation.search}`).toBe(completionPath)
+    expect(readPublicJoinAttempt(connection, attemptId)).toMatchObject({
+      claimedUserId: expect.any(String),
+      state: 'claimed'
     })
   })
 
@@ -802,6 +884,37 @@ function magicLinkBody(email: string) {
     newUserCallbackURL: '/app',
     errorCallbackURL: '/login'
   }
+}
+
+function seedPaidPublicJoin(email: string): string {
+  const id = `join_checkout_${randomUUID()}`
+  const timestamp = new Date()
+  fixture.sqlite
+    .prepare(
+      `insert into public_join_attempts (
+         id, plan_key, cadence, stripe_price_id, stripe_session_id, idempotency_key, state,
+         success_url, cancel_url, stripe_customer_id, stripe_subscription_id,
+         stripe_subscription_item_id, subscription_status, current_period_start,
+         current_period_end, projection_event_id, email, claim_expires_at
+       ) values (?, 'personal', 'monthly', 'price_passwordless_membership_10', ?, ?, 'paid',
+         ?, ?, ?, ?, ?, 'active', ?, ?, ?, ?, ?)`
+    )
+    .run(
+      id,
+      `cs_${randomUUID()}`,
+      `public-join-auth-${randomUUID()}`,
+      `${baseURL}/join/complete?id=${id}`,
+      `${baseURL}/join`,
+      `cus_${randomUUID()}`,
+      `sub_${randomUUID()}`,
+      `si_${randomUUID()}`,
+      new Date(timestamp.getTime() - 60_000).toISOString(),
+      new Date(timestamp.getTime() + 30 * 24 * 60 * 60 * 1_000).toISOString(),
+      `evt_${randomUUID()}`,
+      email,
+      new Date(timestamp.getTime() + 60 * 60 * 1_000).toISOString()
+    )
+  return id
 }
 
 function profileRow(email: string) {

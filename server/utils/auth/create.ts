@@ -6,6 +6,8 @@ import type { DatabaseConnection } from '../../db/connect'
 import * as schema from '../../db/schema'
 import { createAccountEmailVerificationEmail, type TransactionalEmailSender } from '../../services/email'
 import { ensureWebsiteAccountIdentity, type WebsiteAccountIdentity } from '../../services/membership/account-identity'
+import { claimUniquePublicJoinForAccount } from '../../services/membership/public-join'
+import { captureException } from '../../services/observability/capture'
 import { checkTwilioVerification, sendTwilioVerification } from '../../services/security/twilio-verify'
 import type { AppRuntimeConfig } from '../runtime'
 import { disabledAccountDeletionAuthPaths } from './account-deletion'
@@ -90,12 +92,29 @@ export function createAuthentication(
                  from user where id = ?`
               )
               .get(session.userId) as
-              (Omit<WebsiteAccountIdentity, 'phoneNumberVerified'> & { phoneNumberVerified: number }) | undefined
+              | (Omit<WebsiteAccountIdentity, 'emailVerified' | 'phoneNumberVerified'> & {
+                  emailVerified: number
+                  phoneNumberVerified: number
+                })
+              | undefined
             if (user) {
               synchronizeIdentity({
                 ...user,
+                emailVerified: user.emailVerified === 1,
                 phoneNumberVerified: user.phoneNumberVerified === 1
               })
+              try {
+                claimUniquePublicJoinForAccount(
+                  database,
+                  { id: user.id, email: user.email, emailVerified: user.emailVerified === 1 },
+                  config.betterAuth.secret
+                )
+              } catch (error) {
+                await captureException(
+                  error instanceof Error ? error : new Error('Public join auto-claim failed'),
+                  'billing-operation-failed'
+                )
+              }
             }
           }
         }

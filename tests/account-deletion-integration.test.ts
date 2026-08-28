@@ -152,7 +152,8 @@ describe('production-wired account deletion', () => {
       ['billing_customers', 'purchaser_user_id'],
       ['billing_subscriptions', 'purchaser_user_id'],
       ['billing_subscription_transitions', 'purchaser_user_id'],
-      ['billing_account_deletion_requests', 'purchaser_user_id']
+      ['billing_account_deletion_requests', 'purchaser_user_id'],
+      ['public_join_attempts', 'claimed_user_id']
     ] as const) {
       expect(rowCount(database, table, `${column} = ?`, user.id), `${table} purchaser residue`).toBe(0)
     }
@@ -242,6 +243,23 @@ function seedPrivatePurchaserState(sqlite: InstanceType<typeof Database>, userId
       `checkout-deletion-${randomUUID()}`,
       `${authBaseUrl}/account`,
       `${authBaseUrl}/account`
+    )
+  sqlite
+    .prepare(
+      `insert into public_join_attempts (
+         id, plan_key, cadence, stripe_price_id, idempotency_key, state,
+         success_url, cancel_url, email, claimed_user_id, claimed_at
+       ) values (?, 'personal', 'monthly', 'price_account_deletion_personal_monthly', ?,
+         'review', ?, ?, ?, ?, ?)`
+    )
+    .run(
+      `join_checkout_${randomUUID()}`,
+      `public-join-deletion-${randomUUID()}`,
+      `${authBaseUrl}/join/complete`,
+      `${authBaseUrl}/join`,
+      email,
+      userId,
+      new Date().toISOString()
     )
   sqlite.prepare("insert into job_queue (type, payload) values ('billing.notification-delivery', ?)").run(
     JSON.stringify({

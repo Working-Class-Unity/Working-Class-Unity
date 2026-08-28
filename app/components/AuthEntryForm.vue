@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { resolveAuthCallbacks, type AuthEntryIntent } from '#shared/auth-routes'
+import { resolveAuthCallbacks, type AuthEntryIntent, type AuthReturnPath } from '#shared/auth-routes'
 import { turnstileActions, turnstileHeaderName } from '#shared/turnstile'
 import { authClient } from '~/lib/auth-client'
 
@@ -16,7 +16,9 @@ type AuthMethod = 'email' | 'phone'
 type PhoneStep = 'number' | 'code'
 
 const props = defineProps<{
+  emailOnly?: boolean
   intent: AuthEntryIntent
+  returnTo?: AuthReturnPath
   sessionError?: string
 }>()
 
@@ -49,7 +51,7 @@ const copy = computed(() =>
     ? {
         eyebrow: t('auth.login.eyebrow'),
         title: t('auth.login.title'),
-        intro: t('auth.login.introduction')
+        intro: t(props.emailOnly ? 'auth.login.joinIntroduction' : 'auth.login.introduction')
       }
     : {
         eyebrow: t('auth.signup.eyebrow'),
@@ -57,7 +59,7 @@ const copy = computed(() =>
         intro: t('auth.signup.introduction')
       }
 )
-const callbacks = computed(() => resolveAuthCallbacks(props.intent))
+const callbacks = computed(() => resolveAuthCallbacks(props.intent, props.returnTo))
 const inputId = computed(() =>
   method.value === 'email' ? `${props.intent}-email` : `${props.intent}-phone-${phoneStep.value}`
 )
@@ -174,7 +176,7 @@ async function verifyPhoneCode() {
     formError.value = t('auth.errors.phoneVerification')
     return
   }
-  await navigateTo('/app')
+  await navigateTo(props.returnTo ?? '/app')
 }
 
 async function focusFirstInvalidControl() {
@@ -211,7 +213,7 @@ function validateAuthForm() {
       <p class="auth-intro">{{ copy.intro }}</p>
     </div>
 
-    <div class="auth-methods" role="group" :aria-label="t('auth.method.label')">
+    <div v-if="!emailOnly" class="auth-methods" role="group" :aria-label="t('auth.method.label')">
       <AppButton
         variant="secondary"
         :aria-pressed="method === 'email' ? 'true' : 'false'"

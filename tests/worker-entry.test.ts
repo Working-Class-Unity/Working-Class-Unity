@@ -10,6 +10,7 @@ import { promisify } from 'node:util'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import { billingStripeJobTypes } from '../server/services/payments/stripe/jobs'
+import { publicJoinClaimJobType } from '../server/services/membership/public-join-job'
 
 const [
   billingAccountDeletionCancellationJobType,
@@ -134,6 +135,7 @@ describe('worker entry', () => {
         )
         .run('evt_worker_duplicate', 'customer.subscription.updated', 1, cycleStartedAt)
       const supportingJobs = [
+        insertJob(sqlite, publicJoinClaimJobType, { attemptId: 'missing_public_join_attempt' }),
         insertJob(sqlite, billingDetachedSubscriptionCancellationJobType, {
           subjectId: 'missing_detached_subject'
         }),

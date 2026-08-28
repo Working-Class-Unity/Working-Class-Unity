@@ -54,6 +54,10 @@
     "signup": {
       "title": "Sign up"
     },
+    "join": {
+      "title": "Join WCU",
+      "description": "Join Working Class Unity as a Supporter or become a dues-paying member."
+    },
     "app": {
       "title": "App"
     },
@@ -86,6 +90,107 @@
     "app": "App",
     "login": "Log In",
     "signup": "JOIN NOW"
+  },
+  "join": {
+    "eyebrow": "Build working-class power",
+    "title": "Join WCU",
+    "introduction": "Choose the way you want to take part. You can support WCU for free or become a dues-paying member.",
+    "optionsTitle": "How would you like to join?",
+    "optionsLabel": "Join options",
+    "options": {
+      "supporter": {
+        "title": "Supporter",
+        "description": "Join the website and support WCU. We’re glad you’re here.",
+        "price": "Free"
+      },
+      "membership": {
+        "title": "Membership Dues",
+        "description": "Become a WCU Member and help sustain our work together.",
+        "price": "$10 / month"
+      },
+      "solidarity": {
+        "title": "Solidarity Dues",
+        "description": "Become a WCU Member and contribute at a higher level.",
+        "price": "$27 / month"
+      }
+    },
+    "next": {
+      "title": "What happens next",
+      "selected": "You’ve selected",
+      "checkoutTitle": "Secure Stripe checkout",
+      "checkoutDescription": "Enter your email and payment details directly in Stripe’s secure checkout.",
+      "finishTitle": "Check your email and finish joining",
+      "finishDescription": "Use the WCU link we send, then confirm your county connection and Code of Conduct agreement.",
+      "supporterTitle": "Create your free account",
+      "supporterDescription": "Continue with email or a U.S. phone number. No payment details are needed."
+    },
+    "actions": {
+      "supporter": "Join as a Supporter",
+      "paid": "Continue with ${amount} membership",
+      "account": "Go to your account",
+      "manage": "View your membership"
+    },
+    "signInPrompt": "Already have an account?",
+    "signIn": "Sign in first",
+    "rights": {
+      "label": "Membership rights",
+      "title": "Both dues amounts provide the same membership and rights.",
+      "description": "Choose the contribution that works for you."
+    },
+    "cancelledTitle": "Checkout canceled",
+    "cancelled": "You weren’t charged. Your selection is saved so you can try again when you’re ready.",
+    "existingMembershipTitle": "You already have a membership in progress",
+    "existingMembership": "Use your account to finish or manage it. We won’t start another subscription here.",
+    "checkoutError": "We couldn’t open Stripe Checkout. Try again or contact WCU.",
+    "complete": {
+      "pageTitle": "Finish joining WCU",
+      "eyebrow": "Membership checkout",
+      "title": "Finish joining WCU",
+      "description": "We’ll verify the payment with Stripe, connect it to your WCU account, and help you complete membership.",
+      "processingTitle": "We’re confirming your payment",
+      "processing": "Stripe may take a moment to notify WCU. This page will check again automatically, and it won’t grant membership from the return link alone.",
+      "checkAgain": "Check again",
+      "emailTitle": "Check your email",
+      "email": "Your ${amount} monthly payment is confirmed. Use the secure WCU link sent to the email you entered in Stripe.",
+      "emailSafety": "The link connects this exact payment to your account. You do not need to pay again.",
+      "expiredLink": "If that link has expired, request a fresh WCU sign-in link using the same email you entered in Stripe.",
+      "freshLink": "Request a fresh link",
+      "reviewTitle": "We need to review the account match",
+      "review": "Your payment is recorded, but WCU could not safely connect it automatically. Contact us and do not start another subscription.",
+      "attestationTitle": "One last membership step",
+      "attestationDescription": "Your dues are recorded. Confirm your connection to San Joaquin County and your agreement with WCU’s Code of Conduct to activate membership.",
+      "connection": {
+        "legend": "How are you connected to San Joaquin County?",
+        "resides": "I live here",
+        "residesDescription": "My home is in San Joaquin County.",
+        "works": "I work here",
+        "worksDescription": "My workplace is in San Joaquin County.",
+        "studies": "I study here",
+        "studiesDescription": "My school or program is in San Joaquin County.",
+        "worships": "I worship here",
+        "worshipsDescription": "My place of worship is in San Joaquin County."
+      },
+      "conductPrefix": "I agree to follow the",
+      "conductLink": "WCU Code of Conduct",
+      "attestationRequired": "Choose your county connection and accept the Code of Conduct.",
+      "activationError": "We couldn’t activate your membership right now. Try again or contact WCU.",
+      "activate": "Activate my membership",
+      "activeTitle": "Welcome to WCU membership",
+      "active": "Your membership is active and your account has member access.",
+      "account": "Go to your account",
+      "failedTitle": "We couldn’t find a completed checkout",
+      "failed": "No membership was activated from this link. Return to the join page or contact WCU if you were charged.",
+      "tryAgain": "Return to Join WCU",
+      "statusErrorTitle": "We couldn’t check the payment",
+      "statusError": "Try again. If the problem continues and you were charged, contact WCU before starting another subscription.",
+      "linkErrorTitle": "That account link did not work",
+      "linkError": "Request a fresh sign-in link or contact WCU. Your payment record is not changed."
+    },
+    "claim": {
+      "pageTitle": "Connecting your WCU membership",
+      "title": "Connecting your membership",
+      "description": "Keep this page open while WCU securely connects your payment and account."
+    }
   },
   "removeFlock": {
     "campaignLabel": "Remove mass surveillance from Stockton side-quest",
@@ -172,6 +277,9 @@
       "scheduledContribution": "Scheduled contribution",
       "identityReviewTitle": "Membership match needs review",
       "identityReview": "We could not safely match this account to an existing membership. Contact WCU before starting another subscription.",
+      "finishTitle": "Finish activating your membership",
+      "finish": "Your dues are recorded. Confirm your San Joaquin County connection and Code of Conduct agreement to receive member access.",
+      "finishAction": "Finish joining WCU",
       "joinContribution": "Become a member at ${amount}/month",
       "changeContribution": "Change to ${amount}/month",
       "changeSaved": "Your contribution change is scheduled for your next renewal.",
@@ -222,7 +330,8 @@
     "login": {
       "eyebrow": "Welcome back",
       "title": "Log in",
-      "introduction": "Use your email address or U.S. phone number to log in without a password."
+      "introduction": "Use your email address or U.S. phone number to log in without a password.",
+      "joinIntroduction": "Use the same email address you entered in Stripe. We’ll send a fresh link that returns to your membership."
     },
     "signup": {
       "eyebrow": "Get started",

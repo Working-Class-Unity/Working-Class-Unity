@@ -1,5 +1,8 @@
 export function useWideSurfaceRoute() {
   const route = useRoute()
 
-  return computed(() => route.path === '/' || route.path.startsWith('/campaigns/remove-flock-stockton'))
+  return computed(
+    () =>
+      route.path === '/' || route.path.startsWith('/join') || route.path.startsWith('/campaigns/remove-flock-stockton')
+  )
 }

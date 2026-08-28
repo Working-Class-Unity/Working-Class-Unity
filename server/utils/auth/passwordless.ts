@@ -5,6 +5,7 @@ import { createMagicLinkEmail, type TransactionalEmailSender } from '../../servi
 import { verifyTurnstileToken } from '../../services/security/turnstile'
 import type { AppRuntimeConfig } from '../runtime'
 import { normalizeUsPhoneNumber } from './phone'
+import { isAuthorizedPublicJoinMagicLinkRequest } from '../../services/membership/public-join-auth'
 
 const disabledPasswordAuthPaths = [
   '/sign-up/email',
@@ -152,6 +153,12 @@ function createPasswordlessAuthBeforeHook(authUrl: string) {
 
 function createTurnstileBeforeHook(config: AppRuntimeConfig) {
   return createAuthMiddleware(async (context) => {
+    if (
+      context.path === '/sign-in/magic-link' &&
+      isAuthorizedPublicJoinMagicLinkRequest(context.body, config.betterAuth.secret)
+    )
+      return
+
     const expectedAction =
       context.path === '/sign-in/magic-link'
         ? turnstileActions.magicLink

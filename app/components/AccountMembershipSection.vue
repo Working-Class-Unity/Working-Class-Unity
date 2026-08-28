@@ -23,6 +23,12 @@ const offerings = [
 
 const contributionAmount = computed(() => amountFor(state.value?.access.offering ?? null))
 const isGrace = computed(() => state.value?.access.state === 'grace')
+const needsAttestation = computed(
+  () =>
+    state.value?.access.source === 'stripe' &&
+    !state.value.access.granted &&
+    (state.value.access.state === 'active' || state.value.access.state === 'grace')
+)
 const isNonrenewing = computed(() => Boolean(state.value && isStripeMembershipCancellationScheduled(state.value)))
 const hasOfferingAction = computed(() => offerings.some(({ key }) => actionFor(key) !== null))
 
@@ -151,6 +157,13 @@ function clearCommandStatus() {
       <AppNotice v-if="state.identityReviewPending" tone="warning" :title="t('account.membership.identityReviewTitle')">
         <p>{{ t('account.membership.identityReview') }}</p>
         <p><a href="mailto:info@workingclassunity.com">info@workingclassunity.com</a></p>
+      </AppNotice>
+
+      <AppNotice v-if="needsAttestation" tone="info" :title="t('account.membership.finishTitle')">
+        <p>{{ t('account.membership.finish') }}</p>
+        <p>
+          <NuxtLink to="/join/complete">{{ t('account.membership.finishAction') }}</NuxtLink>
+        </p>
       </AppNotice>
 
       <AppNotice v-if="isGrace" tone="warning" :title="t('account.membership.paymentProblemTitle')">

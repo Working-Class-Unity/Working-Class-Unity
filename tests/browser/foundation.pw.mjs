@@ -144,11 +144,16 @@ test('home presents the WCU foundation and preserves client navigation', async (
 
   const timeOrigin = await page.evaluate(() => performance.timeOrigin)
   await page.getByRole('link', { name: 'JOIN WCU', exact: true }).click()
+  await expect(page).toHaveURL(/\/join$/)
+  await expect(page.getByRole('heading', { name: 'Join WCU', exact: true })).toBeVisible()
+  await expect(page.getByRole('radio', { name: 'Supporter, Free' })).toBeChecked()
+  await expect(page.getByRole('link', { name: 'JOIN NOW', exact: true })).toHaveAttribute('aria-current', 'page')
+  await page.getByRole('button', { name: 'Join as a Supporter', exact: true }).click()
   await expect(page).toHaveURL(/\/signup$/)
   await expect(page.getByRole('heading', { name: 'Create your account' })).toBeVisible()
   await expect(page.getByRole('textbox', { name: 'Email', exact: true })).toBeVisible()
   await expect(page.getByRole('textbox', { name: /(?:first|last|display) name/i })).toHaveCount(0)
-  await expect(page.getByRole('link', { name: 'JOIN NOW', exact: true })).toHaveAttribute('aria-current', 'page')
+  await expect(page.getByRole('link', { name: 'JOIN NOW', exact: true })).not.toHaveAttribute('aria-current', 'page')
   await expect(page).toHaveTitle('Sign up')
   await expect(page.getByLabel('Security check')).toBeVisible()
   await expect(page.locator(`script[src="${turnstileScriptUrl}"]`)).toHaveCount(1)
@@ -162,6 +167,62 @@ test('home presents the WCU foundation and preserves client navigation', async (
   })
   await assertNoHorizontalOverflow(page)
   await assertCleanPage(page, observations)
+})
+
+test('join presents a responsive keyboard choice and starts only the selected paid offering', async ({ page }) => {
+  const observations = observePage(page)
+  let checkoutBody
+  await page.route('**/api/join/checkout', async (route) => {
+    checkoutBody = route.request().postDataJSON()
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ url: 'https://checkout.stripe.test/public-join' })
+    })
+  })
+  await page.route('https://checkout.stripe.test/**', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'text/html',
+      body: '<!doctype html><title>Stripe Checkout</title>'
+    })
+  })
+
+  const response = await page.goto('/join?offering=family.monthly&checkout=cancelled')
+  expect(response?.headers()['cache-control']).toBe('private, no-store')
+  await expect(page.getByRole('heading', { name: 'Join WCU', exact: true })).toBeVisible()
+  await expect(page.getByText('You weren’t charged.', { exact: false })).toBeVisible()
+  const supporter = page.getByRole('radio', { name: 'Supporter, Free' })
+  const membership = page.getByRole('radio', { name: 'Membership Dues, $10 / month' })
+  const solidarity = page.getByRole('radio', { name: 'Solidarity Dues, $27 / month' })
+  await expect(solidarity).toBeChecked()
+  await solidarity.focus()
+  await page.keyboard.press('ArrowUp')
+  await expect(membership).toBeFocused()
+  await page.keyboard.press('Space')
+  await expect(membership).toBeChecked()
+  await expect(page.getByRole('button', { name: 'Continue with $10 membership' })).toBeVisible()
+  await expect(page.getByText('Secure Stripe checkout', { exact: true })).toBeVisible()
+  await expect(page.getByText('Check your email and finish joining', { exact: true })).toBeVisible()
+  await expect(page.getByText(/email and a password/i)).toHaveCount(0)
+  await expect(page.getByText(/same membership and rights/i)).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Sign in first' })).toHaveAttribute(
+    'href',
+    '/login?returnTo=/join?offering=personal.monthly'
+  )
+  await assertAccessibleWithoutOverflow(page)
+  await assertMinimumTargetSize(supporter)
+  await assertMinimumTargetSize(membership)
+  await assertMinimumTargetSize(solidarity)
+  await assertCleanPage(page, observations)
+
+  await page.getByRole('button', { name: 'Continue with $10 membership' }).click()
+  await expect.poll(() => checkoutBody).toEqual({ offering: 'personal.monthly' })
+  await expect(page).toHaveURL('https://checkout.stripe.test/public-join')
+  expect(observations.externalRequests, 'Stripe Checkout navigation').toEqual([
+    'GET https://checkout.stripe.test/public-join'
+  ])
+  expect(observations.failedRequests, 'failed browser requests').toEqual([])
 })
 
 test('global public navigation exposes current routes and a route-closing mobile disclosure', async ({

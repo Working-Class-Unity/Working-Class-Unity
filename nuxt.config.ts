@@ -171,6 +171,16 @@ export default defineNuxtConfig({
         'cache-control': 'private, no-store'
       }
     },
+    '/join': {
+      headers: {
+        'cache-control': 'private, no-store'
+      }
+    },
+    '/join/**': {
+      headers: {
+        'cache-control': 'private, no-store'
+      }
+    },
     '/api/**': { cache: false },
     '/api/live': { cache: false },
     '/api/ready': { cache: false },

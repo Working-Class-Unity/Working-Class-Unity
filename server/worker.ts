@@ -10,6 +10,12 @@ import {
 import { billingStripeConfiguration } from './services/payments/stripe/app-composition'
 import { createBillingStripeJobHandlers, ensureBillingStripeJobs } from './services/payments/stripe/jobs'
 import { getAppRuntimeConfig, readDatabaseUrl } from './utils/runtime'
+import { createAuthentication } from './utils/auth/create'
+import {
+  createPublicJoinClaimJobHandler,
+  ensurePublicJoinClaimJobs,
+  publicJoinClaimJobType
+} from './services/membership/public-join-job'
 
 const config = getAppRuntimeConfig()
 
@@ -17,6 +23,8 @@ if (process.env.NODE_ENV === 'production' && config.sentryDsn && !Sentry.getClie
   throw new Error('Sentry must be preloaded before the production worker starts')
 }
 const connection = connectDatabase(readDatabaseUrl())
+const emailSender = getTransactionalEmailSender()
+const workerAuthentication = createAuthentication(config, connection, () => emailSender)
 const shutdown = new AbortController()
 const requestShutdown = (signal: NodeJS.Signals) => {
   if (shutdown.signal.aborted) return
@@ -30,13 +38,24 @@ const handlers: Record<string, JobHandler> = {
   [identityReviewNotificationJobType]: createIdentityReviewNotificationHandler({
     appName: config.public.appName,
     connection,
-    sender: getTransactionalEmailSender()
+    sender: emailSender
+  }),
+  [publicJoinClaimJobType]: createPublicJoinClaimJobHandler({
+    connection,
+    secret: config.betterAuth.secret,
+    issueMagicLink: async (body) => {
+      const result = await workerAuthentication.api.signInMagicLink({
+        body,
+        headers: new Headers({ origin: new URL(config.betterAuth.url).origin })
+      })
+      if (!result.status) throw new Error('Public join magic-link issuance failed')
+    }
   }),
   ...createBillingStripeJobHandlers({
     configuration: billingStripeConfiguration(config),
     emailVerificationSecret: config.betterAuth.secret,
     integration: undefined,
-    sender: getTransactionalEmailSender(),
+    sender: emailSender,
     connection
   })
 }
@@ -53,6 +72,7 @@ try {
       const now = new Date()
       if (now.getTime() >= nextBillingSafetyCheckAt) {
         ensureBillingStripeJobs(connection, now)
+        ensurePublicJoinClaimJobs(connection, now)
         nextBillingSafetyCheckAt = now.getTime() + 60_000
       }
     }

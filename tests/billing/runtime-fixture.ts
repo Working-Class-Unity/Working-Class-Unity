@@ -73,6 +73,14 @@ export function createBillingStripeRuntimeFixture(purchaserUserId = 'purchaser_t
       check(length(trim(id)) between 1 and 128),
       check(stripe_customer_id glob 'cus_*')
     );
+    create table public_join_attempts (
+      id text primary key not null,
+      stripe_customer_id text,
+      stripe_subscription_id text,
+      claimed_user_id text,
+      state text not null default 'open',
+      created_at text not null default current_timestamp
+    );
     create table billing_checkout_attempts (
       id text primary key not null,
       purchaser_user_id text not null references user(id) on delete restrict,

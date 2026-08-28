@@ -1,9 +1,15 @@
 <script setup lang="ts">
-const { t } = useI18n()
-const { data: session, error: sessionError } = await useAppSession()
+import { isAllowedAuthReturnPath } from '#shared/auth-routes'
+import { isPublicJoinCompletionCallback } from '#shared/join'
 
-if (!sessionError.value && session.value?.user) {
-  await navigateTo('/app', { redirectCode: 302 })
+const { t } = useI18n()
+const route = useRoute()
+const { data: session, error: sessionError } = await useAppSession()
+const returnTo = isAllowedAuthReturnPath(route.query.returnTo) ? route.query.returnTo : '/app'
+const isJoinRecovery = isPublicJoinCompletionCallback(returnTo)
+
+if (!sessionError.value && session.value?.user && !isJoinRecovery) {
+  await navigateTo(returnTo, { redirectCode: 302 })
 }
 
 useHead(() => ({
@@ -13,7 +19,12 @@ useHead(() => ({
 
 <template>
   <div class="auth-entry-page">
-    <AuthEntryForm intent="login" :session-error="sessionError?.message" />
+    <AuthEntryForm
+      intent="login"
+      :return-to="returnTo"
+      :email-only="isJoinRecovery"
+      :session-error="sessionError?.message"
+    />
   </div>
 </template>
 

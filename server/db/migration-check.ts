@@ -18,7 +18,8 @@ const expectedMigrationTags = [
   '0004_event_operations',
   '0005_phone_auth',
   '0006_identity_link_reviews',
-  '0007_billing_email_verification'
+  '0007_billing_email_verification',
+  '0008_public_join'
 ] as const
 const expectedRuntimeTables = [
   'account',
@@ -68,6 +69,7 @@ const expectedRuntimeTables = [
   'person_accounts',
   'person_contacts',
   'provider_identities',
+  'public_join_attempts',
   'quorum_snapshots',
   'recurring_expenses',
   'rsvps',
@@ -127,7 +129,7 @@ try {
   verifySqliteIntegrityAndForeignKeys(sqlite, 'Repeat migration', fail)
   requirePopulatedRuntimeUpgrade()
 
-  console.log('Fresh and repeat WCU migration check passed with 70 tables and 12 integrity triggers.')
+  console.log('Fresh and repeat WCU migration check passed with 71 tables and 12 integrity triggers.')
 } finally {
   sqlite.close()
   rmSync(tempDir, { recursive: true, force: true })
