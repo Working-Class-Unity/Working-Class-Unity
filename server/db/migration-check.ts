@@ -18,10 +18,12 @@ const expectedMigrationTags = [
   '0004_event_operations',
   '0005_phone_auth',
   '0006_identity_link_reviews',
-  '0007_billing_email_verification'
+  '0007_billing_email_verification',
+  '0008_simple_stripe_membership'
 ] as const
 const expectedRuntimeTables = [
   'account',
+  'account_stripe_memberships',
   'agenda_items',
   'ai_conversations',
   'ai_generation_attempts',

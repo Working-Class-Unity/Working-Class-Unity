@@ -35,7 +35,7 @@ afterEach(() => {
 })
 
 describe('configured passwordless HTTP behavior', () => {
-  it('registers a new user from an email-only magic-link request', async () => {
+  it('does not create an account for an unknown email', async () => {
     const email = 'email-only-registration@example.test'
     const issued = await issueMagicLink(email)
 
@@ -44,60 +44,10 @@ describe('configured passwordless HTTP behavior', () => {
     expect(JSON.parse(issued.verification.value)).toMatchObject({ email })
 
     const verified = await fixture.auth.handler(authRequest(issued.url))
-    expect(redirectOutcome(verified).error).toBeUndefined()
-    const sessionHeaders = convertSetCookieToCookie(new Headers(verified.headers))
-
-    expect(
-      fixture.sqlite
-        .prepare(
-          'select email, name, first_name as firstName, last_name as lastName, display_name as displayName from user where email = ?'
-        )
-        .get(email)
-    ).toEqual({
-      email,
-      name: 'WCU account',
-      firstName: null,
-      lastName: null,
-      displayName: null
-    })
-
-    const session = await fixture.auth.handler(authRequest('/api/auth/get-session', { headers: sessionHeaders }))
-    const sessionBody = await session.json()
-    expect(sessionBody).toMatchObject({ user: { email, displayName: null } })
-    expect(sessionBody.user).not.toHaveProperty('firstName')
-    expect(sessionBody.user).not.toHaveProperty('lastName')
-    expect(
-      fixture.sqlite
-        .prepare(
-          `select pc.kind, pc.normalized_value as normalizedValue, pc.verified_at as verifiedAt
-           from person_accounts pa
-           join user u on u.id = pa.user_id
-           join person_contacts pc on pc.person_id = pa.person_id
-           where u.email = ?`
-        )
-        .get(email)
-    ).toEqual({
-      kind: 'email',
-      normalizedValue: email,
-      verifiedAt: expect.any(String)
-    })
-
-    const forgedEmail = 'forged-signup-profile@example.test'
-    const forged = await issueMagicLink(forgedEmail, {}, nextUniqueClientIp(), {
-      ...magicLinkBody(forgedEmail),
-      name: 'Forged auth name',
-      firstName: 'Forged first name',
-      lastName: 'Forged last name',
-      displayName: 'Forged display name'
-    })
-    const forgedVerified = await fixture.auth.handler(authRequest(forged.url))
-    expect(forgedVerified.status).toBe(302)
-    expect(profileRow(forgedEmail)).toEqual({
-      name: 'WCU account',
-      firstName: null,
-      lastName: null,
-      displayName: null
-    })
+    expect(redirectOutcome(verified).error).toBe('new_user_signup_disabled')
+    expect(countWhere('user', 'email', email)).toBe(0)
+    expect(count('session')).toBe(0)
+    expect(fixture.sqlite.prepare('select count(*) as count from people').get()).toEqual({ count: 0 })
   })
 
   it('provisions a canonical identity when an existing website account logs in', async () => {
@@ -129,6 +79,8 @@ describe('configured passwordless HTTP behavior', () => {
   it('normalizes, isolates, validates, and clears optional account profile fields', async () => {
     const ownerEmail = 'profile-owner@example.test'
     const otherEmail = 'profile-other@example.test'
+    insertExistingIdentity(ownerEmail)
+    insertExistingIdentity(otherEmail)
     const ownerIssued = await issueMagicLink(ownerEmail)
     const otherIssued = await issueMagicLink(otherEmail)
     const ownerVerified = await fixture.auth.handler(authRequest(ownerIssued.url))
@@ -487,6 +439,7 @@ describe('configured passwordless HTTP behavior', () => {
 
   it('consumes a token atomically, rejects replay and expiry, and preserves session cookie policy', async () => {
     const email = 'session-owner@example.test'
+    insertExistingIdentity(email)
     const issued = await issueMagicLink(email)
     const [left, right] = await Promise.all([
       fixture.auth.handler(authRequest(issued.url, {}, '198.51.100.20')),
@@ -649,7 +602,9 @@ describe('configured passwordless HTTP behavior', () => {
     )
     expect(separateClient.status).toBe(200)
 
-    const valid = await issueMagicLink('verification-rate@example.test', {}, '198.51.100.50')
+    const verificationRateEmail = 'verification-rate@example.test'
+    insertExistingIdentity(verificationRateEmail)
+    const valid = await issueMagicLink(verificationRateEmail, {}, '198.51.100.50')
     for (let index = 0; index < 5; index += 1) {
       const invalid = new URL('/api/auth/magic-link/verify', baseURL)
       invalid.searchParams.set('token', `invalid-rate-token-${index}`)
@@ -875,7 +830,7 @@ function insertExistingIdentity(email: string) {
   const now = Math.floor(Date.now() / 1_000)
   fixture.sqlite
     .prepare('insert into user (id, name, email, email_verified, created_at, updated_at) values (?, ?, ?, 1, ?, ?)')
-    .run(userId, 'Existing User', email, now, now)
+    .run(userId, 'WCU account', email, now, now)
 }
 
 function count(table: 'session' | 'verification') {

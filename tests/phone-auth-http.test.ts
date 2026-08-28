@@ -10,7 +10,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { turnstileActions, turnstileHeaderName } from '../shared/turnstile'
 import * as schema from '../server/db/schema'
 import { createAuthentication } from '../server/utils/auth/create'
-import { isTemporaryPhoneEmail } from '../server/utils/auth/phone'
 import type { AppRuntimeConfig } from '../server/utils/runtime'
 
 const baseURL = 'https://phone-auth.example.test'
@@ -27,9 +26,10 @@ afterEach(() => {
 })
 
 describe('phone-number passwordless HTTP behavior', () => {
-  it('normalizes a U.S. number, verifies through Twilio, and repeats without another user', async () => {
+  it('normalizes and verifies an existing account phone without another user', async () => {
     const provider = fakeProvider()
     vi.stubGlobal('fetch', provider.fetch)
+    insertExistingPhoneAccount('+12095550123')
 
     const firstSend = await sendCode('(209) 555-0123', 'challenge-first')
     expect(firstSend.status).toBe(200)
@@ -58,21 +58,21 @@ describe('phone-number passwordless HTTP behavior', () => {
       phoneNumberVerified: number
     }
     expect(firstUser).toMatchObject({
-      emailVerified: 0,
+      email: 'existing-phone@example.test',
+      emailVerified: 1,
       phoneNumber: '+12095550123',
       phoneNumberVerified: 1
     })
-    expect(isTemporaryPhoneEmail(firstUser.email)).toBe(true)
-    expect(firstUser.email).not.toContain('12095550123')
     expect(count('verification')).toBe(0)
     expect(count('people')).toBe(1)
     expect(count('person_accounts')).toBe(1)
-    expect(count('person_contacts')).toBe(1)
+    expect(count('person_contacts')).toBe(2)
     expect(
       fixture.sqlite
         .prepare(
           `select pc.kind, pc.normalized_value as normalizedValue, pa.user_id as userId
-           from person_contacts pc join person_accounts pa on pa.person_id = pc.person_id`
+           from person_contacts pc join person_accounts pa on pa.person_id = pc.person_id
+           where pc.kind = 'phone'`
         )
         .get()
     ).toEqual({ kind: 'phone', normalizedValue: '+12095550123', userId: expect.any(String) })
@@ -85,7 +85,7 @@ describe('phone-number passwordless HTTP behavior', () => {
     expect(count('session')).toBe(2)
     expect(count('people')).toBe(1)
     expect(count('person_accounts')).toBe(1)
-    expect(count('person_contacts')).toBe(1)
+    expect(count('person_contacts')).toBe(2)
   })
 
   it('requires Turnstile before SMS and rejects non-U.S. or malformed numbers', async () => {
@@ -115,11 +115,12 @@ describe('phone-number passwordless HTTP behavior', () => {
   it('fails closed for rejected and replayed provider codes', async () => {
     const provider = fakeProvider()
     vi.stubGlobal('fetch', provider.fetch)
+    insertExistingPhoneAccount('+12095550123')
 
     expect((await sendCode('2095550123', 'challenge-code')).status).toBe(200)
     const rejected = await verifyCode('2095550123', '000000')
     expect(rejected.status).toBe(400)
-    expect(count('user')).toBe(0)
+    expect(count('user')).toBe(1)
     expect(count('session')).toBe(0)
 
     const accepted = await verifyCode('2095550123', '123456')
@@ -246,6 +247,16 @@ function authRequest(url: string, init: RequestInit = {}) {
     headers.set('origin', baseURL)
   }
   return new Request(new URL(url, baseURL), { ...init, headers, redirect: 'manual' })
+}
+
+function insertExistingPhoneAccount(phoneNumber: string) {
+  fixture.sqlite
+    .prepare(
+      `insert into user
+         (id, name, email, email_verified, phone_number, phone_number_verified, created_at, updated_at)
+       values ('existing-phone', 'Existing Phone User', 'existing-phone@example.test', 1, ?, 0, 1, 1)`
+    )
+    .run(phoneNumber)
 }
 
 function count(table: 'people' | 'person_accounts' | 'person_contacts' | 'session' | 'user' | 'verification') {

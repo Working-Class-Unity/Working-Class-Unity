@@ -48,9 +48,33 @@ export const billingEmailVerificationStatuses = Object.freeze([
   'conflict',
   'expired'
 ] as const)
+export const accountStripeMembershipTiers = Object.freeze(['supporter', 'member', 'solidarity'] as const)
 
 const validOfferingPair = (plan: unknown, cadence: unknown) =>
   sql`((${plan} = 'personal' and ${cadence} in ('weekly', 'monthly', 'annual')) or (${plan} = 'family' and ${cadence} in ('monthly', 'annual')))`
+
+export const accountStripeMemberships = sqliteTable(
+  'account_stripe_memberships',
+  {
+    userId: text('user_id')
+      .primaryKey()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    stripeCustomerId: text('stripe_customer_id').notNull(),
+    stripeSubscriptionId: text('stripe_subscription_id').notNull(),
+    stripePriceId: text('stripe_price_id').notNull(),
+    tier: text('tier', { enum: accountStripeMembershipTiers }).notNull(),
+    createdAt: createdAtColumn(),
+    updatedAt: updatedAtColumn()
+  },
+  (table) => [
+    uniqueIndex('account_stripe_memberships_customer_uidx').on(table.stripeCustomerId),
+    uniqueIndex('account_stripe_memberships_subscription_uidx').on(table.stripeSubscriptionId),
+    check('account_stripe_memberships_customer_check', sql`${table.stripeCustomerId} glob 'cus_*'`),
+    check('account_stripe_memberships_subscription_check', sql`${table.stripeSubscriptionId} glob 'sub_*'`),
+    check('account_stripe_memberships_price_check', sql`${table.stripePriceId} glob 'price_*'`),
+    check('account_stripe_memberships_tier_check', sql`${table.tier} in ('supporter', 'member', 'solidarity')`)
+  ]
+)
 
 export const billingCustomers = sqliteTable(
   'billing_customers',

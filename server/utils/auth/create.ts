@@ -6,6 +6,9 @@ import type { DatabaseConnection } from '../../db/connect'
 import * as schema from '../../db/schema'
 import { createAccountEmailVerificationEmail, type TransactionalEmailSender } from '../../services/email'
 import { ensureWebsiteAccountIdentity, type WebsiteAccountIdentity } from '../../services/membership/account-identity'
+import { hasAccountStripeMembership, stripeMembershipConfiguration } from '../../services/membership/stripe-first'
+import { billingStripeConfiguration } from '../../services/payments/stripe/app-composition'
+import { getStripeClient } from '../../services/payments/stripe/stripe-client'
 import { checkTwilioVerification, sendTwilioVerification } from '../../services/security/twilio-verify'
 import type { AppRuntimeConfig } from '../runtime'
 import { disabledAccountDeletionAuthPaths } from './account-deletion'
@@ -15,8 +18,9 @@ import {
   disabledNonMagicLinkAuthPaths,
   disabledPhonePasswordAuthPaths
 } from './passwordless'
-import { normalizeUsPhoneNumber, temporaryPhoneEmail } from './phone'
+import { normalizeUsPhoneNumber } from './phone'
 import { createBetterAuthSecurityOptions } from './security'
+import { stripeMembershipAuth } from './stripe-membership'
 import { createAuthenticationUserOptions } from './user-options'
 
 export function createAuthentication(
@@ -25,7 +29,10 @@ export function createAuthentication(
   getEmailSender: () => TransactionalEmailSender
 ) {
   const deliverMagicLink = createMagicLinkDelivery(config.public.appName, getEmailSender)
+  const billingConfig = billingStripeConfiguration(config)
+  const membershipConfig = stripeMembershipConfiguration(billingConfig)
   const synchronizeIdentity = (user: WebsiteAccountIdentity) => {
+    if (hasAccountStripeMembership(database, user.id)) return
     ensureWebsiteAccountIdentity(database, user, {
       reviewHashKey: config.betterAuth.secret,
       stripePrices: {
@@ -107,6 +114,7 @@ export function createAuthentication(
     plugins: [
       magicLink({
         expiresIn: 300,
+        disableSignUp: true,
         storeToken: 'hashed',
         rateLimit: {
           window: 60,
@@ -136,11 +144,12 @@ export function createAuthentication(
               message: 'Phone verification is temporarily unavailable.'
             })
           }
-        },
-        signUpOnVerification: {
-          getTempEmail: (value) => temporaryPhoneEmail(config.betterAuth.secret, value),
-          getTempName: () => 'WCU account'
         }
+      }),
+      stripeMembershipAuth({
+        client: () => getStripeClient(billingConfig),
+        config: membershipConfig,
+        connection: database
       })
     ]
   })

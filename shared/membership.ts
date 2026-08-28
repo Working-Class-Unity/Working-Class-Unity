@@ -4,7 +4,7 @@ export type WebsiteMembershipAccess = Readonly<{
   granted: boolean
   graceDeadline: string | null
   offering: MembershipDuesOfferingKey | null
-  source: 'canonical' | 'stripe' | 'supporter'
+  source: 'canonical' | 'stripe' | 'stripe_membership' | 'supporter'
   state: BillingSubscriptionState
 }>
 

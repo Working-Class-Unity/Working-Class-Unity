@@ -17,6 +17,13 @@ export function createBillingStripeRuntimeFixture(purchaserUserId = 'purchaser_t
       email text not null unique,
       email_verified integer not null default 1
     );
+    create table account_stripe_memberships (
+      user_id text primary key not null references user(id) on delete cascade,
+      stripe_customer_id text not null unique,
+      stripe_subscription_id text not null unique,
+      stripe_price_id text not null,
+      tier text not null
+    );
     create table people (
       id text primary key not null
     );
