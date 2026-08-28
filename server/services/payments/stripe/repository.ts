@@ -18,7 +18,9 @@ export function getAccountStripeMembershipForUser(
 ): AccountStripeMembership | null {
   const row = connection.sqlite
     .prepare(
-      `select user_id, stripe_customer_id, stripe_subscription_id, stripe_price_id, tier, created_at, updated_at
+      `select user_id, stripe_customer_id, stripe_subscription_id, stripe_price_id, tier,
+              stripe_status, last_verified_at, projection_order_ms, projection_event_id,
+              created_at, updated_at
        from account_stripe_memberships where user_id = ?`
     )
     .get(userId)

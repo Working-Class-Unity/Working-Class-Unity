@@ -20,7 +20,8 @@ const expectedMigrationTags = [
   '0006_identity_link_reviews',
   '0007_billing_email_verification',
   '0008_simple_stripe_membership',
-  '0009_stripe-membership-deletion'
+  '0009_stripe-membership-deletion',
+  '0010_stripe-membership-status'
 ] as const
 const expectedRuntimeTables = [
   'account',
@@ -320,6 +321,14 @@ function requireCurrentRuntimeSchema(label: string) {
   }>
   if (!deletionColumns.some(({ name }) => name === 'stripe_membership_user_id')) {
     fail(`${label} did not create billing_account_deletion_requests.stripe_membership_user_id.`)
+  }
+  const stripeMembershipColumns = sqlite.prepare("pragma table_info('account_stripe_memberships')").all() as Array<{
+    name: string
+  }>
+  for (const name of ['stripe_status', 'last_verified_at', 'projection_order_ms', 'projection_event_id']) {
+    if (!stripeMembershipColumns.some((column) => column.name === name)) {
+      fail(`${label} did not create account_stripe_memberships.${name}.`)
+    }
   }
   const temporaryTables = sqlite
     .prepare("select name from sqlite_master where type = 'table' and name like '\\_\\_new\\_%' escape '\\'")
