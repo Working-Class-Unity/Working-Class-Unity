@@ -18,6 +18,7 @@ import {
 } from '../../server/services/payments/stripe/account-deletion-store'
 import {
   createBillingStripeRuntimeFixture,
+  seedAccountStripeMembership,
   seedBillingCustomer,
   seedCheckoutAttempt,
   seedBillingSubscription,
@@ -84,6 +85,173 @@ describe('Billing Stripe account-deletion proof contract', () => {
     await expect(
       withBillingStripeAccountDeletionProof(fixture.purchaserUserId, proof, async () => undefined)
     ).rejects.toThrow('Billing account deletion proof is stale or invalid')
+  })
+
+  it.each([
+    ['supporter', 'price_supporter'],
+    ['member', 'price_member'],
+    ['solidarity', 'price_solidarity']
+  ] as const)('cancels the exact %s membership before deleting its link', async (tier, priceId) => {
+    const fixture = runtimeFixture(`stripe_membership_${tier}`)
+    const stripeCustomerId = `cus_membership_${tier}`
+    const stripeSubscriptionId = `sub_membership_${tier}`
+    seedAccountStripeMembership(fixture, { stripeCustomerId, stripeSubscriptionId, stripePriceId: priceId, tier })
+    const cancel = vi.fn(async () => providerSubscription('canceled', stripeSubscriptionId, stripeCustomerId))
+    const retrieve = vi.fn(async () => providerSubscription('canceled', stripeSubscriptionId, stripeCustomerId))
+    const list = vi.fn(async () => {
+      throw new Error('membership deletion must not discover a replacement subscription')
+    })
+
+    const proof = await prepareBillingStripeAccountDeletionWithClient(
+      fixture.connection,
+      fixture.purchaserUserId,
+      () => ({ checkout: {}, subscriptions: { cancel, retrieve, list } }) as never,
+      catalog,
+      now
+    )
+
+    const request = deletionRequest(fixture)
+    expect(request.stripeMembershipUserId).toBe(fixture.purchaserUserId)
+    expect(cancel).toHaveBeenCalledWith(
+      stripeSubscriptionId,
+      { invoice_now: false, prorate: false },
+      { idempotencyKey: `billing-account-deletion:${request.id}` }
+    )
+    expect(retrieve).toHaveBeenCalledWith(stripeSubscriptionId)
+    expect(list).not.toHaveBeenCalled()
+
+    await consumeProofAndDelete(fixture, proof)
+    expect(fixture.sqlite.prepare('select count(*) as count from account_stripe_memberships').get()).toEqual({
+      count: 0
+    })
+    expect(
+      fixture.sqlite
+        .prepare(
+          `select provider_reference as providerReference,
+                  provider_customer_reference as customerReference,
+                  provider_status as status
+           from detached_billing_subjects`
+        )
+        .get()
+    ).toEqual({
+      providerReference: stripeSubscriptionId,
+      customerReference: stripeCustomerId,
+      status: 'canceled'
+    })
+  })
+
+  it('retains a Stripe membership on provider uncertainty and requires a fresh user proof after worker convergence', async () => {
+    const fixture = runtimeFixture('stripe_membership_worker')
+    seedAccountStripeMembership(fixture, {
+      stripeCustomerId: 'cus_membership_worker',
+      stripeSubscriptionId: 'sub_membership_worker'
+    })
+    await expect(
+      prepareBillingStripeAccountDeletionWithClient(
+        fixture.connection,
+        fixture.purchaserUserId,
+        () =>
+          ({
+            checkout: {},
+            subscriptions: {
+              cancel: vi.fn(async () => {
+                throw new Error('private cancellation failure')
+              }),
+              retrieve: vi.fn(async () => {
+                throw new Error('private retrieval failure')
+              })
+            }
+          }) as never,
+        catalog,
+        now
+      )
+    ).rejects.toBeInstanceOf(BillingStripeAccountDeletionPendingError)
+    expect(fixture.sqlite.prepare('select count(*) as count from user').get()).toEqual({ count: 1 })
+    expect(fixture.sqlite.prepare('select count(*) as count from account_stripe_memberships').get()).toEqual({
+      count: 1
+    })
+
+    const workerClient = {
+      checkout: {},
+      subscriptions: {
+        cancel: vi.fn(),
+        retrieve: vi.fn(async () => providerSubscription('canceled', 'sub_membership_worker', 'cus_membership_worker'))
+      }
+    } as never
+    const handler = createBillingAccountDeletionCancellationJobHandlerWithClient(
+      fixture.connection,
+      () => workerClient,
+      configuration
+    )
+    await handler({ requestId: deletionRequest(fixture).id })
+    expect(deletionRequest(fixture)).toMatchObject({ state: 'cancellation_confirmed' })
+    expect(fixture.sqlite.prepare('select count(*) as count from user').get()).toEqual({ count: 1 })
+
+    const getClient = vi.fn(() => {
+      throw new Error('confirmed membership cancellation must not repeat provider I/O')
+    })
+    const proof = await prepareBillingStripeAccountDeletionWithClient(
+      fixture.connection,
+      fixture.purchaserUserId,
+      getClient,
+      catalog,
+      now
+    )
+    expect(getClient).not.toHaveBeenCalled()
+    await consumeProofAndDelete(fixture, proof)
+  })
+
+  it('fails closed when Stripe returns the linked subscription for another customer', async () => {
+    const fixture = runtimeFixture('stripe_membership_mismatch')
+    seedAccountStripeMembership(fixture, {
+      stripeCustomerId: 'cus_membership_expected',
+      stripeSubscriptionId: 'sub_membership_mismatch'
+    })
+
+    await expect(
+      prepareBillingStripeAccountDeletionWithClient(
+        fixture.connection,
+        fixture.purchaserUserId,
+        () =>
+          ({
+            checkout: {},
+            subscriptions: {
+              cancel: vi.fn(),
+              retrieve: vi.fn(async () =>
+                providerSubscription('canceled', 'sub_membership_mismatch', 'cus_membership_other')
+              )
+            }
+          }) as never,
+        catalog,
+        now
+      )
+    ).rejects.toBeInstanceOf(BillingStripeAccountDeletionPendingError)
+    expect(deletionRequest(fixture)).toMatchObject({
+      state: 'reconciliation_required',
+      reason: 'stripe_cancellation_unconfirmed'
+    })
+    expect(fixture.sqlite.prepare('select count(*) as count from user').get()).toEqual({ count: 1 })
+    expect(fixture.sqlite.prepare('select count(*) as count from account_stripe_memberships').get()).toEqual({
+      count: 1
+    })
+  })
+
+  it('freezes the linked Stripe authority and blocks a late membership claim behind the deletion fence', () => {
+    const linked = runtimeFixture('stripe_membership_frozen')
+    seedAccountStripeMembership(linked)
+    captureBillingStripeAccountDeletion(linked.connection, linked.purchaserUserId, now)
+    expect(() =>
+      linked.sqlite
+        .prepare('update account_stripe_memberships set stripe_subscription_id = ? where user_id = ?')
+        .run('sub_membership_replacement', linked.purchaserUserId)
+    ).toThrow('account Stripe membership is fenced for deletion')
+    expect(() =>
+      linked.sqlite.prepare('delete from account_stripe_memberships where user_id = ?').run(linked.purchaserUserId)
+    ).toThrow('account Stripe membership is fenced for deletion')
+
+    const unlinked = runtimeFixture('stripe_membership_late_claim')
+    captureBillingStripeAccountDeletion(unlinked.connection, unlinked.purchaserUserId, now)
+    expect(() => seedAccountStripeMembership(unlinked)).toThrow('account Stripe membership is fenced for deletion')
   })
 
   it('atomically removes purchaser-owned Billing jobs while preserving foreign and provider work', async () => {
@@ -1011,9 +1179,11 @@ function purchaserBillingRowCount(fixture: BillingStripeRuntimeFixture): number 
        (select count(*) from billing_checkout_attempts where purchaser_user_id = ?) +
        (select count(*) from billing_subscriptions where purchaser_user_id = ?) +
        (select count(*) from billing_subscription_transitions where purchaser_user_id = ?) +
-       (select count(*) from billing_account_deletion_requests where purchaser_user_id = ?) as count`
+       (select count(*) from billing_account_deletion_requests where purchaser_user_id = ?) +
+       (select count(*) from account_stripe_memberships where user_id = ?) as count`
       )
       .get(
+        fixture.purchaserUserId,
         fixture.purchaserUserId,
         fixture.purchaserUserId,
         fixture.purchaserUserId,
@@ -1040,6 +1210,7 @@ function deletionRequest(fixture: BillingStripeRuntimeFixture) {
   return fixture.sqlite
     .prepare(
       `select id, state, reason,
+            stripe_membership_user_id as stripeMembershipUserId,
             expected_stripe_customer_id as expectedStripeCustomerId,
             expected_stripe_subscription_id as expectedStripeSubscriptionId,
             captured_billing_revision as capturedBillingRevision,
@@ -1051,6 +1222,7 @@ function deletionRequest(fixture: BillingStripeRuntimeFixture) {
     id: string
     state: string
     reason: string | null
+    stripeMembershipUserId: string | null
     expectedStripeCustomerId: string | null
     expectedStripeSubscriptionId: string | null
     capturedBillingRevision: number

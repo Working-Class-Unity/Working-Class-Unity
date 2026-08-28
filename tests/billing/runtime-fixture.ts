@@ -22,7 +22,9 @@ export function createBillingStripeRuntimeFixture(purchaserUserId = 'purchaser_t
       stripe_customer_id text not null unique,
       stripe_subscription_id text not null unique,
       stripe_price_id text not null,
-      tier text not null
+      tier text not null,
+      created_at text not null default current_timestamp,
+      updated_at text not null default current_timestamp
     );
     create table people (
       id text primary key not null
@@ -207,6 +209,7 @@ export function createBillingStripeRuntimeFixture(purchaserUserId = 'purchaser_t
       purchaser_user_id text not null references user(id) on delete restrict,
       billing_subscription_id text references billing_subscriptions(id) on delete restrict,
       billing_customer_id text references billing_customers(id) on delete restrict,
+      stripe_membership_user_id text references account_stripe_memberships(user_id) on delete restrict,
       expected_stripe_subscription_id text,
       expected_stripe_customer_id text,
       captured_billing_revision integer not null default 0,
@@ -291,6 +294,30 @@ export function seedBillingCustomer(fixture: BillingStripeRuntimeFixture, stripe
     )
     .run(id, fixture.purchaserUserId, stripeCustomerId)
   return id
+}
+
+export function seedAccountStripeMembership(
+  fixture: BillingStripeRuntimeFixture,
+  input: Readonly<{
+    stripeCustomerId?: string
+    stripeSubscriptionId?: string
+    stripePriceId?: string
+    tier?: 'supporter' | 'member' | 'solidarity'
+  }> = {}
+): void {
+  fixture.sqlite
+    .prepare(
+      `insert into account_stripe_memberships
+         (user_id, stripe_customer_id, stripe_subscription_id, stripe_price_id, tier)
+       values (?, ?, ?, ?, ?)`
+    )
+    .run(
+      fixture.purchaserUserId,
+      input.stripeCustomerId ?? 'cus_membership_test',
+      input.stripeSubscriptionId ?? 'sub_membership_test',
+      input.stripePriceId ?? 'price_membership_test',
+      input.tier ?? 'member'
+    )
 }
 
 export function seedBillingSubscription(

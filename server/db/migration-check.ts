@@ -19,7 +19,8 @@ const expectedMigrationTags = [
   '0005_phone_auth',
   '0006_identity_link_reviews',
   '0007_billing_email_verification',
-  '0008_simple_stripe_membership'
+  '0008_simple_stripe_membership',
+  '0009_stripe-membership-deletion'
 ] as const
 const expectedRuntimeTables = [
   'account',
@@ -95,10 +96,15 @@ const expectedRuntimeTables = [
   'votes'
 ] as const
 const expectedBillingTriggers = [
+  'account_stripe_membership_deletion_delete',
+  'account_stripe_membership_deletion_insert',
+  'account_stripe_membership_deletion_update',
   'billing_checkout_customer_purchaser_insert',
   'billing_checkout_customer_purchaser_update',
   'billing_deletion_references_insert',
   'billing_deletion_references_update',
+  'billing_deletion_membership_reference_insert',
+  'billing_deletion_membership_reference_update',
   'billing_subscription_customer_purchaser_insert',
   'billing_subscription_customer_purchaser_update',
   'billing_subscription_offering_reconciliation_insert',
@@ -129,7 +135,7 @@ try {
   verifySqliteIntegrityAndForeignKeys(sqlite, 'Repeat migration', fail)
   requirePopulatedRuntimeUpgrade()
 
-  console.log('Fresh and repeat WCU migration check passed with 70 tables and 12 integrity triggers.')
+  console.log('Fresh and repeat WCU migration check passed with 70 tables and 17 integrity triggers.')
 } finally {
   sqlite.close()
   rmSync(tempDir, { recursive: true, force: true })
@@ -308,6 +314,12 @@ function requireCurrentRuntimeSchema(label: string) {
     if (!columns.some(({ name }) => name === 'purchaser_user_id')) {
       fail(`${label} did not create ${table}.purchaser_user_id.`)
     }
+  }
+  const deletionColumns = sqlite.prepare("pragma table_info('billing_account_deletion_requests')").all() as Array<{
+    name: string
+  }>
+  if (!deletionColumns.some(({ name }) => name === 'stripe_membership_user_id')) {
+    fail(`${label} did not create billing_account_deletion_requests.stripe_membership_user_id.`)
   }
   const temporaryTables = sqlite
     .prepare("select name from sqlite_master where type = 'table' and name like '\\_\\_new\\_%' escape '\\'")

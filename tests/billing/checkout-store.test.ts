@@ -437,6 +437,7 @@ function checkoutStoreFixture(): Readonly<{ sqlite: Database.Database; connectio
       purchaser_user_id text not null unique,
       billing_subscription_id text,
       billing_customer_id text,
+      stripe_membership_user_id text,
       expected_stripe_subscription_id text,
       expected_stripe_customer_id text,
       captured_billing_revision integer not null,
