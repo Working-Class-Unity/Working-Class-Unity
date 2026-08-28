@@ -114,6 +114,7 @@ describe('Stripe-first membership status projection', () => {
     const fixture = runtimeFixture('fresh_webhook')
     seedMembership(fixture, 'solidarity')
     const current = subscription(fixture, 'solidarity', 'past_due')
+    current.metadata = {}
     const retrieve = vi.fn(async () => current)
     const list = vi.fn(async (parameters: Stripe.SubscriptionListParams) =>
       stripePage(parameters.status === 'past_due' ? [current] : [])

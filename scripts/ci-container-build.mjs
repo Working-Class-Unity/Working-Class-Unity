@@ -101,6 +101,14 @@ async function run() {
     stripeImporterHelp.stdout.includes('Usage: node .output/server/import-stripe-membership.mjs'),
     'Production image is missing the packaged Stripe membership importer'
   )
+  const stripeLinkSyncHelp = await docker(
+    ['run', '--rm', '--entrypoint', 'node', image, '.output/server/sync-stripe-membership-links.mjs', '--help'],
+    20_000
+  )
+  assert(
+    stripeLinkSyncHelp.stdout.includes('Usage: node .output/server/sync-stripe-membership-links.mjs'),
+    'Production image is missing the packaged Stripe account-membership synchronizer'
+  )
   const solidarityImporterHelp = await docker(
     ['run', '--rm', '--entrypoint', 'node', image, '.output/server/import-solidarity-events.mjs', '--help'],
     20_000
@@ -135,7 +143,7 @@ async function run() {
   )
 
   console.log(
-    'Container build proof passed: configured Sentry upload failures stop the build, BuildKit keeps the token out of diagnostics and the runtime image, deployable output contains no source maps, the build context excludes private state, the Stripe membership importer and Solidarity event converter/importer are packaged, and the image defaults to node:node.'
+    'Container build proof passed: configured Sentry upload failures stop the build, BuildKit keeps the token out of diagnostics and the runtime image, deployable output contains no source maps, the build context excludes private state, both Stripe membership operators and the Solidarity event converter/importer are packaged, and the image defaults to node:node.'
   )
 }
 
