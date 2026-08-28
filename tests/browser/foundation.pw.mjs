@@ -23,6 +23,9 @@ const runtimeSentryOrigin = requiredEnvironment('BROWSER_RUNTIME_SENTRY_ORIGIN')
 const turnstileOrigin = 'https://challenges.cloudflare.com'
 const turnstileScriptUrl = `${turnstileOrigin}/turnstile/v0/api.js?render=explicit`
 const forumUrl = 'https://chat.workingclassunity.com/'
+const updatesDisclaimer =
+  'Choose email, text messages, or both. By signing up, you agree to receive WCU updates through the options you select. Message frequency varies; message and data rates may apply. Unsubscribe from email or reply STOP to stop texts.'
+const campaignUpdatesDisclaimer = 'Sign up for updates about this campaign and other WCU updates.'
 const sentryEnvelopePath = '/api/1/envelope/'
 const maxCaptureFileBytes = 65_536
 const maxCaptureFiles = 64
@@ -122,6 +125,13 @@ test('home presents the WCU foundation and preserves client navigation', async (
   await expect(page.locator('.brand')).toHaveAccessibleName(`${runtimeName} home`)
   await expect(page.locator('.brand')).toHaveAttribute('aria-current', 'page')
   await expect(page).toHaveTitle('Working Class Unity')
+  const updatesLink = page.getByRole('link', { name: 'STAY INFORMED', exact: true })
+  await expect(updatesLink).toHaveAttribute('href', 'https://tech.workingclassunity.com/wcu-updates')
+  await expect(updatesLink).toHaveAttribute('aria-describedby', 'newsletter-note')
+  await expect(page.locator('.newsletter form')).toHaveCount(0)
+  await expect(page.locator('.newsletter input')).toHaveCount(0)
+  await expect(page.locator('.newsletter iframe')).toHaveCount(0)
+  await expect(page.locator('#newsletter-note')).toHaveText(updatesDisclaimer)
   await expect(page.locator('script[src*="challenges.cloudflare.com/turnstile"]')).toHaveCount(0)
   await assertRuntimePublicConfig(page)
   await assertAccessibleWithoutOverflow(page)
@@ -132,6 +142,7 @@ test('home presents the WCU foundation and preserves client navigation', async (
   await assertMinimumTargetSize(topbar.getByRole('link', { name: 'Log In', exact: true }))
   await assertMinimumTargetSize(topbar.getByRole('link', { name: 'JOIN NOW', exact: true }))
   await assertMinimumTargetSize(page.getByRole('link', { name: 'JOIN WCU', exact: true }))
+  await assertMinimumTargetSize(updatesLink)
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.keyboard.press('Tab')
   await expect(skipLink).toBeFocused()
@@ -266,6 +277,37 @@ test('global public navigation exposes current routes and a route-closing mobile
   await expect(menuToggle).toHaveAttribute('aria-expanded', 'false')
   await expect(navigationPanel).toBeHidden()
   await assertAccessibleWithoutOverflow(page)
+  await assertCleanPage(page, observations)
+})
+
+test('campaign update prompts use the hosted Deflock form without collecting contact details', async ({ page }) => {
+  const observations = observePage(page)
+  await page.setViewportSize({ width: 1280, height: 900 })
+  await page.goto('/campaigns/remove-flock-stockton')
+
+  const updatesLinks = page.getByRole('link', { name: 'Stay informed', exact: true })
+  const updatesNotes = page.locator('.campaign-newsletter > p')
+  await expect(updatesLinks).toHaveCount(2)
+  await expect(updatesNotes).toHaveCount(2)
+  await expect(page.locator('.campaign-newsletter form')).toHaveCount(0)
+  await expect(page.locator('.campaign-newsletter input')).toHaveCount(0)
+  await expect(page.locator('.campaign-newsletter iframe')).toHaveCount(0)
+
+  for (let index = 0; index < 2; index += 1) {
+    const updatesLink = updatesLinks.nth(index)
+    await expect(updatesLink).toHaveAttribute('href', 'https://tech.workingclassunity.com/deflock-stockton-updates')
+    await assertMinimumTargetSize(updatesLink)
+    const colors = await updatesLink.evaluate((element) => {
+      const style = getComputedStyle(element)
+      return { background: style.backgroundColor, text: style.color }
+    })
+    expect(contrastRatio(colors.text, colors.background), 'signup link text contrast').toBeGreaterThanOrEqual(4.5)
+    await expect(updatesNotes.nth(index)).toHaveText(campaignUpdatesDisclaimer)
+  }
+  await assertAccessibleWithoutOverflow(page, '.campaign-newsletter')
+
+  await page.setViewportSize({ width: 390, height: 844 })
+  await assertAccessibleWithoutOverflow(page, '.campaign-newsletter')
   await assertCleanPage(page, observations)
 })
 
@@ -1114,8 +1156,12 @@ async function assertForumPopup(page, activate) {
   await popup.close()
 }
 
-async function assertAccessibleWithoutOverflow(page) {
-  const results = await new AxeBuilder({ page }).analyze()
+async function assertAccessibleWithoutOverflow(page, includeSelector) {
+  const builder = new AxeBuilder({ page })
+  if (includeSelector) {
+    builder.include(includeSelector)
+  }
+  const results = await builder.analyze()
   expect(results.violations, JSON.stringify(results.violations, null, 2)).toEqual([])
 
   await assertNoHorizontalOverflow(page)
