@@ -696,6 +696,34 @@ describe('server foundation utilities', () => {
     expect(Object.isFrozen(evaluation.issues)).toBe(true)
   })
 
+  it('accepts only the reviewed legacy membership Price IDs', () => {
+    const accepted = evaluateRuntimeEnvironment(
+      runtimeEnvironment({
+        NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID: 'membership-10-1month',
+        NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID: 'solidarity-27-1month'
+      })
+    )
+    expect(accepted.issues).toEqual([])
+
+    for (const [memberPriceId, solidarityPriceId] of [
+      ['membership-other', 'solidarity-other'],
+      ['solidarity-27-1month', 'membership-10-1month']
+    ] as const) {
+      const rejected = evaluateRuntimeEnvironment(
+        runtimeEnvironment({
+          NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID: memberPriceId,
+          NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID: solidarityPriceId
+        })
+      )
+      expect(rejected.issues).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ code: 'invalid', key: 'NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID' }),
+          expect.objectContaining({ code: 'invalid', key: 'NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID' })
+        ])
+      )
+    }
+  })
+
   it('requires every R2 field independently when files use r2', () => {
     const complete = completeRuntimeConfig()
     complete.files.driver = 'r2'

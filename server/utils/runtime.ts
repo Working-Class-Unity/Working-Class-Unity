@@ -1019,7 +1019,7 @@ function validateStripeConfiguration(
     const rawPriceId = environment[requirement.environmentKey] ?? ''
     const priceId = scalarStringValue(configValueAtPath(config, requirement.configPath))
     requireAlreadyTrimmed(rawPriceId, requirement.environmentKey, issues)
-    if (priceId && !priceId.startsWith('price_')) {
+    if (priceId && !isMembershipPriceId(requirement.environmentKey, priceId)) {
       issues.push(configIssue('invalid', requirement.environmentKey, 'must be a Stripe Price ID'))
     }
     if (priceId) {
@@ -1035,6 +1035,14 @@ function validateStripeConfiguration(
       issues.push(configIssue('invalid', key, 'must be distinct from every other configured Stripe Price ID'))
     }
   }
+}
+
+function isMembershipPriceId(environmentKey: string, priceId: string): boolean {
+  if (priceId.startsWith('price_')) return true
+  return (
+    (environmentKey === 'NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID' && priceId === 'membership-10-1month') ||
+    (environmentKey === 'NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID' && priceId === 'solidarity-27-1month')
+  )
 }
 
 function validateOpenAIConfiguration(
