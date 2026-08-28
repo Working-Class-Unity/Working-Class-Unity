@@ -11,6 +11,7 @@ import type { AccountMembershipState, WebsiteMembershipAccess } from '../../../s
 import { hasOpenWebsiteAccountIdentityReview } from './account-identity'
 import { hasCurrentImportedStripeDuesSubscription } from './imported-stripe-billing'
 import { hasAccountStripeMembership, type StripeMembershipTier } from './stripe-first'
+import type { AccountStripeMembershipStatus } from '../../db/schema/billing'
 
 export type { WebsiteMembershipAccess }
 
@@ -46,12 +47,16 @@ export function readWebsiteMembershipAccess(
   now = new Date()
 ): WebsiteMembershipAccess {
   const linkedTier = connection.sqlite
-    .prepare('select tier from account_stripe_memberships where user_id = ?')
-    .get(userId) as { tier: StripeMembershipTier } | undefined
+    .prepare('select tier, stripe_status as stripeStatus from account_stripe_memberships where user_id = ?')
+    .get(userId) as { stripeStatus: AccountStripeMembershipStatus | null; tier: StripeMembershipTier } | undefined
   if (linkedTier) {
-    return linkedTier.tier === 'supporter'
-      ? result('supporter', 'none', false)
-      : result('stripe_membership', 'active', true)
+    if (linkedTier.tier === 'supporter') return result('supporter', 'none', false)
+    if (linkedTier.stripeStatus === 'active') return result('stripe_membership', 'active', true)
+    if (linkedTier.stripeStatus === null) return result('stripe_membership', 'reconciliation_required', false)
+    if (linkedTier.stripeStatus === 'canceled' || linkedTier.stripeStatus === 'incomplete_expired') {
+      return result('stripe_membership', 'terminal', false)
+    }
+    return result('stripe_membership', 'suspended', false)
   }
   if (!personForUser(connection, userId)) return result('supporter', 'none', false)
 

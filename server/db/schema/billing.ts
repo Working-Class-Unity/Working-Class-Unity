@@ -49,6 +49,16 @@ export const billingEmailVerificationStatuses = Object.freeze([
   'expired'
 ] as const)
 export const accountStripeMembershipTiers = Object.freeze(['supporter', 'member', 'solidarity'] as const)
+export const accountStripeMembershipStatuses = Object.freeze([
+  'active',
+  'canceled',
+  'incomplete',
+  'incomplete_expired',
+  'past_due',
+  'paused',
+  'trialing',
+  'unpaid'
+] as const)
 
 const validOfferingPair = (plan: unknown, cadence: unknown) =>
   sql`((${plan} = 'personal' and ${cadence} in ('weekly', 'monthly', 'annual')) or (${plan} = 'family' and ${cadence} in ('monthly', 'annual')))`
@@ -63,6 +73,10 @@ export const accountStripeMemberships = sqliteTable(
     stripeSubscriptionId: text('stripe_subscription_id').notNull(),
     stripePriceId: text('stripe_price_id').notNull(),
     tier: text('tier', { enum: accountStripeMembershipTiers }).notNull(),
+    stripeStatus: text('stripe_status', { enum: accountStripeMembershipStatuses }),
+    lastVerifiedAt: text('last_verified_at'),
+    projectionOrderMs: integer('projection_order_ms').notNull().default(0),
+    projectionEventId: text('projection_event_id'),
     createdAt: createdAtColumn(),
     updatedAt: updatedAtColumn()
   },
@@ -450,6 +464,7 @@ export type BillingSubscriptionTransitionKind = (typeof billingSubscriptionTrans
 export type BillingSubscriptionTransitionState = (typeof billingSubscriptionTransitionStates)[number]
 export type BillingEmailVerificationStatus = (typeof billingEmailVerificationStatuses)[number]
 export type BillingAccountDeletionRequestState = (typeof billingAccountDeletionRequestStates)[number]
+export type AccountStripeMembershipStatus = (typeof accountStripeMembershipStatuses)[number]
 
 export type NewBillingCustomer = typeof billingCustomers.$inferInsert
 export type NewBillingCheckoutAttempt = typeof billingCheckoutAttempts.$inferInsert

@@ -70,7 +70,10 @@ describe('Stripe-first membership', () => {
   it('gives Supporter account-only access and identical rights to both paid tiers', async () => {
     await withDatabase(async (connection) => {
       const insertMembership = connection.sqlite.prepare(
-        'insert into account_stripe_memberships (user_id, stripe_customer_id, stripe_subscription_id, stripe_price_id, tier) values (?, ?, ?, ?, ?)'
+        `insert into account_stripe_memberships
+           (user_id, stripe_customer_id, stripe_subscription_id, stripe_price_id, tier,
+            stripe_status, last_verified_at)
+         values (?, ?, ?, ?, ?, 'active', '2026-08-28T00:00:00.000Z')`
       )
       for (const tier of ['supporter', 'member', 'solidarity'] as const) {
         connection.sqlite
@@ -164,6 +167,15 @@ describe('Stripe-first membership', () => {
       expect(connection.sqlite.prepare('select count(*) as count from account_stripe_memberships').get()).toEqual({
         count: 1
       })
+      expect(
+        connection.sqlite
+          .prepare(
+            `select stripe_status as stripeStatus,
+                    last_verified_at is not null as hasFreshProjection
+             from account_stripe_memberships`
+          )
+          .get()
+      ).toEqual({ stripeStatus: 'active', hasFreshProjection: 1 })
       expect(connection.sqlite.prepare('select count(*) as count from people').get()).toEqual({ count: 0 })
     })
   })

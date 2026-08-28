@@ -181,10 +181,18 @@ export async function claimStripeMembership(input: {
     input.connection.sqlite
       .prepare(
         `insert into account_stripe_memberships
-           (user_id, stripe_customer_id, stripe_subscription_id, stripe_price_id, tier)
-         values (?, ?, ?, ?, ?)`
+           (user_id, stripe_customer_id, stripe_subscription_id, stripe_price_id, tier,
+            stripe_status, last_verified_at)
+         values (?, ?, ?, ?, ?, 'active', ?)`
       )
-      .run(userId, membership.customerId, membership.subscriptionId, membership.priceId, membership.tier)
+      .run(
+        userId,
+        membership.customerId,
+        membership.subscriptionId,
+        membership.priceId,
+        membership.tier,
+        new Date(now * 1_000).toISOString()
+      )
     return Object.freeze({ userId })
   })()
 }

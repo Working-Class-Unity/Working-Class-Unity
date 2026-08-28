@@ -23,6 +23,10 @@ export function createBillingStripeRuntimeFixture(purchaserUserId = 'purchaser_t
       stripe_subscription_id text not null unique,
       stripe_price_id text not null,
       tier text not null,
+      stripe_status text,
+      last_verified_at text,
+      projection_order_ms integer not null default 0,
+      projection_event_id text,
       created_at text not null default current_timestamp,
       updated_at text not null default current_timestamp
     );
