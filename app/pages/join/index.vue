@@ -7,16 +7,8 @@ const tiers = [
   { id: 'solidarity', name: 'Solidarity Member', price: '$27/month' }
 ] as const satisfies ReadonlyArray<{ id: Tier; name: string; price: string }>
 
-const connections = [
-  ['resides', 'I live in Santa Cruz County'],
-  ['works', 'I work in Santa Cruz County'],
-  ['studies', 'I study in Santa Cruz County'],
-  ['worships', 'I worship in Santa Cruz County']
-] as const
-
 const route = useRoute()
 const tier = ref<Tier>('member')
-const connection = ref('')
 const pending = ref(false)
 const error = ref(route.query.error ? 'That membership link is invalid or no longer available.' : '')
 
@@ -24,11 +16,6 @@ useHead({ title: 'Join Working Class Unity' })
 
 async function startCheckout() {
   error.value = ''
-  if (!connection.value) {
-    error.value = 'Choose your connection to Santa Cruz County.'
-    return
-  }
-
   pending.value = true
   try {
     const result = await $fetch<{ url: string }>('/api/join/checkout', {
@@ -61,14 +48,6 @@ async function startCheckout() {
         </label>
       </fieldset>
       <p>Supporter is account-only. Both paid tiers include the same member rights.</p>
-
-      <fieldset class="grid">
-        <legend>How are you connected to Santa Cruz County?</legend>
-        <label v-for="option in connections" :key="option[0]" class="cluster">
-          <input v-model="connection" type="radio" name="county-connection" :value="option[0]" />
-          {{ option[1] }}
-        </label>
-      </fieldset>
 
       <AppNotice v-if="error" tone="error" announce="assertive">{{ error }}</AppNotice>
       <div class="flow">

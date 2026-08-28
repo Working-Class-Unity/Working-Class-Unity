@@ -47,6 +47,51 @@ describe('Billing Stripe runtime configuration', () => {
     expect(Object.isFrozen(issues)).toBe(true)
   })
 
+  it('accepts the reviewed live legacy membership Price IDs', () => {
+    const legacyPrices = {
+      ...prices,
+      'personal.monthly': 'membership-10-1month',
+      'family.monthly': 'solidarity-27-1month'
+    }
+
+    expect(
+      evaluateBillingStripeRuntimeConfiguration(
+        configuration({ stripe: { ...configuration().stripe, prices: legacyPrices } }),
+        environment({
+          NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID: legacyPrices['personal.monthly'],
+          NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID: legacyPrices['family.monthly']
+        })
+      )
+    ).toEqual([])
+  })
+
+  it('rejects unreviewed or tier-swapped custom membership Price IDs', () => {
+    for (const [memberPriceId, solidarityPriceId] of [
+      ['membership-other', 'solidarity-other'],
+      ['solidarity-27-1month', 'membership-10-1month']
+    ] as const) {
+      const candidatePrices = {
+        ...prices,
+        'personal.monthly': memberPriceId,
+        'family.monthly': solidarityPriceId
+      }
+      const issues = evaluateBillingStripeRuntimeConfiguration(
+        configuration({ stripe: { ...configuration().stripe, prices: candidatePrices } }),
+        environment({
+          NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID: memberPriceId,
+          NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID: solidarityPriceId
+        })
+      )
+
+      expect(issues).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ code: 'invalid', key: 'NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID' }),
+          expect.objectContaining({ code: 'invalid', key: 'NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID' })
+        ])
+      )
+    }
+  })
+
   it('requires provider configuration', () => {
     const issues = evaluateBillingStripeRuntimeConfiguration(
       configuration({

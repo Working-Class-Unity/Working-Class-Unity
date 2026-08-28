@@ -148,6 +148,8 @@ test('home presents the WCU foundation and preserves client navigation', async (
   await expect(page).toHaveURL(/\/join$/)
   await expect(page.getByRole('heading', { name: 'Join Working Class Unity' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Continue to Stripe' })).toBeVisible()
+  await expect(page.getByText(/connected to .*County/i)).toHaveCount(0)
+  await expect(page.getByRole('link', { name: /Code of Conduct/i })).toBeVisible()
   await expect(page.getByRole('link', { name: 'JOIN NOW', exact: true })).toHaveAttribute('aria-current', 'page')
   await expect(page).toHaveTitle('Join Working Class Unity')
   await expect(page.locator(`script[src="${turnstileScriptUrl}"]`)).toHaveCount(0)

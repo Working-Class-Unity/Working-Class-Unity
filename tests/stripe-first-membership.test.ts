@@ -29,9 +29,9 @@ const runtimeConfig: BillingStripeRuntimeConfiguration = {
     portalConfigurationId: 'bpc_membership',
     prices: {
       'personal.weekly': '',
-      'personal.monthly': 'price_member_10',
+      'personal.monthly': 'membership-10-1month',
       'personal.annual': '',
-      'family.monthly': 'price_solidarity_27',
+      'family.monthly': 'solidarity-27-1month',
       'family.annual': ''
     }
   }
@@ -42,8 +42,8 @@ const accessPrices = runtimeConfig.stripe.prices
 describe('Stripe-first membership', () => {
   it.each([
     ['supporter', 'price_1U9I17GqgHVbR26t3GDDF3Jg'],
-    ['member', 'price_member_10'],
-    ['solidarity', 'price_solidarity_27']
+    ['member', 'membership-10-1month'],
+    ['solidarity', 'solidarity-27-1month']
   ] as const)('creates %s through subscription Checkout with the server-owned Price', async (tier, priceId) => {
     const provider = createProvider()
 
@@ -110,6 +110,18 @@ describe('Stripe-first membership', () => {
           connection,
           sender: { send: vi.fn() },
           sessionId: 'cs_mismatch'
+        })
+      ).rejects.toMatchObject({ statusCode: 409 })
+      expect(connection.sqlite.prepare('select count(*) as count from verification').get()).toEqual({ count: 0 })
+
+      provider.add('member', 'price@example.test', { priceId: config.prices.solidarity })
+      await expect(
+        issueStripeMembershipMagicLink({
+          client: provider.client,
+          config,
+          connection,
+          sender: { send: vi.fn() },
+          sessionId: 'cs_wrong_price'
         })
       ).rejects.toMatchObject({ statusCode: 409 })
       expect(connection.sqlite.prepare('select count(*) as count from verification').get()).toEqual({ count: 0 })
@@ -230,7 +242,7 @@ function createProvider() {
     add(
       tier: StripeMembershipTier,
       email: string,
-      overrides: { customerEmail?: string; customerId?: string; subscriptionId?: string } = {}
+      overrides: { customerEmail?: string; customerId?: string; priceId?: string; subscriptionId?: string } = {}
     ) {
       record = membershipRecord(tier, email, overrides)
     },
@@ -242,7 +254,7 @@ function createProvider() {
 function membershipRecord(
   tier: StripeMembershipTier,
   email: string,
-  overrides: { customerEmail?: string; customerId?: string; subscriptionId?: string } = {}
+  overrides: { customerEmail?: string; customerId?: string; priceId?: string; subscriptionId?: string } = {}
 ) {
   const customerId = overrides.customerId ?? `cus_${tier}`
   const subscriptionId = overrides.subscriptionId ?? `sub_${tier}`
@@ -261,7 +273,7 @@ function membershipRecord(
       status: 'active',
       customer: customerId,
       metadata: { wcu_membership_tier: tier },
-      items: { data: [{ price: { id: config.prices[tier] }, quantity: 1 }] }
+      items: { data: [{ price: { id: overrides.priceId ?? config.prices[tier] }, quantity: 1 }] }
     }
   }
 }
