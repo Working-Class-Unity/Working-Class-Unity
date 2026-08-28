@@ -7,6 +7,12 @@ import { test } from 'node:test'
 const entry = resolve('scripts/ci-container-build.mjs')
 const canaryPath = resolve('.env.container-canary')
 
+test('Docker context packages the Stripe membership synchronizer', () => {
+  const dockerignore = readFileSync(resolve('.dockerignore'), 'utf8')
+
+  assert.match(dockerignore, /^!scripts\/sync-stripe-membership-links\.ts$/m)
+})
+
 test('Docker build stage trusts public TLS certificates before Sentry upload', () => {
   const dockerfile = readFileSync(resolve('Dockerfile'), 'utf8')
   const buildStage = dockerfile.slice(
