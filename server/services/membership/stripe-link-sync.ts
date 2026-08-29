@@ -47,6 +47,17 @@ export function assertStripeMembershipAdoptionPrices(prices: StripeMembershipAdo
   adoptionPriceTiers(prices)
 }
 
+export function readStripeMembershipAdoptionPrices(
+  environment: Readonly<Record<string, string | undefined>>
+): StripeMembershipAdoptionPrices {
+  const prices = {
+    member: priceList(environment.WCU_STRIPE_LEGACY_DUES10_PRICE_IDS),
+    solidarity: priceList(environment.WCU_STRIPE_LEGACY_DUES27_PRICE_IDS)
+  }
+  assertStripeMembershipAdoptionPrices(prices)
+  return Object.freeze(prices)
+}
+
 export async function synchronizeStripeMembershipLinks(input: {
   apply: boolean
   client: Stripe
@@ -231,6 +242,15 @@ function adoptionPriceTiers(prices: StripeMembershipAdoptionPrices): ReadonlyMap
     }
   }
   return values
+}
+
+function priceList(value: string | undefined): readonly string[] {
+  if (!value || value !== value.trim()) throw new TypeError('Stripe adoption Price lists are required')
+  const prices = value.split(',')
+  if (prices.some((price) => !price || price !== price.trim())) {
+    throw new TypeError('Stripe adoption Price lists must contain trimmed values')
+  }
+  return Object.freeze(prices)
 }
 
 function readLink(

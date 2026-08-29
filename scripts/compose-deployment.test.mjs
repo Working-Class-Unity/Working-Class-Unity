@@ -15,6 +15,7 @@ const sourceCommit = '0123456789abcdef0123456789abcdef01234567'
 const composeProjectName = 'baseline-compose-test'
 const clearedEnvironmentName = 'WCU_CLEARED_ENVIRONMENT'
 const clearedEnvironmentExpression = '${WCU_CLEARED_ENVIRONMENT:-}'
+const stripeAdoptionEmailSecretName = 'NUXT_EMAIL_RESEND_API_KEY'
 const applicationSecretNames = [
   'NUXT_READINESS_TOKEN',
   'NUXT_BETTER_AUTH_SECRET',
@@ -131,7 +132,7 @@ test('backup is unconditional with fail-closed runtime configuration', () => {
   assert.match(backupRunner.command[2], /exec sleep infinity/)
 })
 
-test('Stripe membership synchronization is an inert, fail-closed, isolated runner', () => {
+test('Stripe membership synchronization and account adoption share one inert private runner', () => {
   const stripeRunner = services['stripe-sync-runner']
   assert(!Object.hasOwn(stripeRunner, 'profiles'))
   assert.equal(stripeRunner.init, true)
@@ -143,8 +144,13 @@ test('Stripe membership synchronization is an inert, fail-closed, isolated runne
       assert.equal(services[serviceName].environment[name], clearedEnvironmentExpression)
     }
   }
+  assert.equal(stripeRunner.environment.NUXT_PUBLIC_APP_URL, '${NUXT_PUBLIC_APP_URL:?}')
+  assert.equal(stripeRunner.environment.NUXT_EMAIL_TRANSPORT, '${NUXT_EMAIL_TRANSPORT:?}')
+  assert.equal(stripeRunner.environment.NUXT_EMAIL_FROM, '${NUXT_EMAIL_FROM:?}')
+  assert.equal(stripeRunner.environment[stripeAdoptionEmailSecretName], '${NUXT_EMAIL_RESEND_API_KEY:?}')
   assert.deepEqual(stripeRunner.command.slice(0, 2), ['sh', '-ec'])
   assert.match(stripeRunner.command[2], /node \.output\/server\/sync-stripe-membership-links\.mjs --validate-config/)
+  assert.match(stripeRunner.command[2], /node \.output\/server\/adopt-stripe-membership-account\.mjs --validate-config/)
   assert.match(stripeRunner.command[2], /exec sleep infinity/)
 })
 
@@ -223,7 +229,10 @@ test('service environment overrides Coolify shared env-file backup credentials',
     for (const name of applicationSecretNames) {
       assert.equal(rendered.services.migrate.environment[name], '')
       assert.equal(rendered.services['backup-runner'].environment[name], '')
-      assert.equal(rendered.services['stripe-sync-runner'].environment[name], '')
+      assert.equal(
+        rendered.services['stripe-sync-runner'].environment[name],
+        name === stripeAdoptionEmailSecretName ? runtimeEnvironment[name] : ''
+      )
       assert.equal(rendered.services.web.environment[name], runtimeEnvironment[name])
       assert.equal(rendered.services.worker.environment[name], runtimeEnvironment[name])
     }
@@ -265,7 +274,7 @@ test('one-shot migration gates every long-lived database service', () => {
   }
 })
 
-test('one-shot operators do not receive application provider credentials', () => {
+test('private operators receive only the provider credentials their commands require', () => {
   for (const name of clearedApplicationEnvironmentNames) {
     assert.equal(services.migrate.environment[name], clearedEnvironmentExpression)
     assert.equal(services['backup-runner'].environment[name], clearedEnvironmentExpression)
@@ -274,7 +283,10 @@ test('one-shot operators do not receive application provider credentials', () =>
   assert.equal(services['backup-runner'].environment.NUXT_DATABASE_URL, 'file:/app/data/app.db')
   assert.equal(services['stripe-sync-runner'].environment.NUXT_DATABASE_URL, 'file:/app/data/app.db')
   for (const name of [...applicationSecretNames, ...excludedProviderEnvironmentNames]) {
-    assert.equal(services['stripe-sync-runner'].environment[name], clearedEnvironmentExpression)
+    assert.equal(
+      services['stripe-sync-runner'].environment[name],
+      name === stripeAdoptionEmailSecretName ? '${NUXT_EMAIL_RESEND_API_KEY:?}' : clearedEnvironmentExpression
+    )
   }
 })
 
@@ -298,7 +310,7 @@ test('Coolify-cleared values use only the reserved unset indirection', () => {
   for (const name of clearedApplicationEnvironmentNames) {
     assert.equal(rendered.services.migrate.environment[name], reservedValue)
     assert.equal(rendered.services['backup-runner'].environment[name], reservedValue)
-    if (!stripeSyncEnvironmentNames.includes(name)) {
+    if (!stripeSyncEnvironmentNames.includes(name) && name !== stripeAdoptionEmailSecretName) {
       assert.equal(rendered.services['stripe-sync-runner'].environment[name], reservedValue)
     }
   }
@@ -341,6 +353,7 @@ function renderedCompose(overrides = {}) {
     ...Object.fromEntries(requiredEnvironmentNames.map((name) => [name, `test-${name.toLowerCase()}`])),
     ...Object.fromEntries(backupEnvironmentNames.map((name) => [name, ''])),
     ...Object.fromEntries(stripeSyncEnvironmentNames.map((name) => [name, ''])),
+    [stripeAdoptionEmailSecretName]: 're_compose_test_key',
     SOURCE_COMMIT: sourceCommit,
     ...overrides
   }

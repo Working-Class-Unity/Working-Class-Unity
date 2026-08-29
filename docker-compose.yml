@@ -171,6 +171,7 @@ services:
       - -ec
       - |
         node .output/server/sync-stripe-membership-links.mjs --validate-config
+        node .output/server/adopt-stripe-membership-account.mjs --validate-config
         exec sleep infinity
     restart: unless-stopped
     init: true
@@ -179,7 +180,12 @@ services:
     environment:
       <<: *cleared-application-secrets
       NODE_ENV: production
+      NUXT_PUBLIC_APP_NAME: '${NUXT_PUBLIC_APP_NAME:-Working Class Unity}'
+      NUXT_PUBLIC_APP_URL: '${NUXT_PUBLIC_APP_URL:?}'
       NUXT_DATABASE_URL: file:/app/data/app.db
+      NUXT_EMAIL_TRANSPORT: '${NUXT_EMAIL_TRANSPORT:?}'
+      NUXT_EMAIL_FROM: '${NUXT_EMAIL_FROM:?}'
+      NUXT_EMAIL_RESEND_API_KEY: '${NUXT_EMAIL_RESEND_API_KEY:?}'
       WCU_STRIPE_MEMBERSHIP_SYNC_KEY: '${WCU_STRIPE_MEMBERSHIP_SYNC_KEY:?}'
       WCU_STRIPE_MEMBERSHIP_SYNC_MODE: '${WCU_STRIPE_MEMBERSHIP_SYNC_MODE:?}'
       WCU_STRIPE_LEGACY_DUES10_PRICE_IDS: '${WCU_STRIPE_LEGACY_DUES10_PRICE_IDS:?}'

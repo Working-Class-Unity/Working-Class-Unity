@@ -109,6 +109,14 @@ async function run() {
     stripeLinkSyncHelp.stdout.includes('Usage: node .output/server/sync-stripe-membership-links.mjs'),
     'Production image is missing the packaged Stripe account-membership synchronizer'
   )
+  const stripeAccountAdoptionHelp = await docker(
+    ['run', '--rm', '--entrypoint', 'node', image, '.output/server/adopt-stripe-membership-account.mjs', '--help'],
+    20_000
+  )
+  assert(
+    stripeAccountAdoptionHelp.stdout.includes('Usage: node .output/server/adopt-stripe-membership-account.mjs'),
+    'Production image is missing the packaged Stripe account-adoption operator'
+  )
   const solidarityImporterHelp = await docker(
     ['run', '--rm', '--entrypoint', 'node', image, '.output/server/import-solidarity-events.mjs', '--help'],
     20_000

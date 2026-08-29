@@ -4,6 +4,8 @@
 
 The packaged account-link synchronizer reads Stripe and updates only `account_stripe_memberships`. It never writes to Stripe and never creates an account, person, membership, standing period, invoice, provider snapshot, or historical billing row. The separately packaged historical importer is preserved for its existing operator contract, but it is not an authorization or synchronization path for Stripe-first accounts and is never invoked by `stripe-sync-runner`.
 
+The same private runner packages a separate, organizer-initiated adoption command for one exact unmatched paid subscription. It sends a five-minute one-time link only to the freshly retrieved Stripe customer email. No account exists until that link is redeemed; redemption re-reads Stripe and atomically creates or reuses the verified account and unique customer/subscription link. It creates no person or historical membership data and makes no Stripe write.
+
 Each run does two bounded jobs:
 
 1. Retrieve every already-linked Subscription by its exact stored ID and refresh its local status projection after validating the exact customer, subscription, Price, quantity, and tier.
@@ -27,7 +29,7 @@ WCU_STRIPE_LEGACY_DUES10_PRICE_IDS=membership-10-1month
 WCU_STRIPE_LEGACY_DUES27_PRICE_IDS=solidarity-27-1month
 ```
 
-Use `mode=test` with an `rk_test_*` key in isolated staging and `mode=live` with an `rk_live_*` key in production. Comma-separated Price IDs are supported only when more than one exact historical Price for a tier has been reviewed. IDs must be nonempty, distinct across tiers, and already trimmed. Keep the restricted key Runtime-enabled and Build-disabled. Keep all four runner-only values out of `.env.production.example`, Git, image arguments, shared logs, Sentry, screenshots, and evidence.
+Use `mode=test` with an `rk_test_*` key in isolated staging and `mode=live` with an `rk_live_*` key in production. Comma-separated Price IDs are supported only when more than one exact historical Price for a tier has been reviewed. IDs must be nonempty, distinct across tiers, and already trimmed. Keep the restricted key Runtime-enabled and Build-disabled. Keep all four runner-only values out of `.env.production.example`, Git, image arguments, shared logs, Sentry, screenshots, and evidence. The adoption command additionally receives the application's public origin/name and Resend sender configuration from the existing Coolify runtime values; it does not receive unrelated application-provider secrets.
 
 ## First certification and adoption
 
@@ -48,6 +50,17 @@ node .output/server/sync-stripe-membership-links.mjs --validate-config
 node .output/server/sync-stripe-membership-links.mjs
 node .output/server/sync-stripe-membership-links.mjs --apply
 ```
+
+## Adopt one unmatched paid subscriber
+
+Use this only after an organizer has approved the exact subscription. There is no bulk mode and no public email or Stripe-ID lookup surface. Before issuing a link, confirm the subscription belongs to the intended person through an approved private organizer process; do not copy its identifiers or email into shared logs or evidence.
+
+```bash
+node .output/server/adopt-stripe-membership-account.mjs --validate-config
+node .output/server/adopt-stripe-membership-account.mjs --subscription-id sub_REDACTED
+```
+
+The command retrieves the exact subscription and customer with the dedicated read-only key and requires active status, one quantity-one allowlisted legacy $10 or $27 Price, a usable customer email, and no existing claim or deletion conflict. Its output reveals only success or a bounded failure code. If delivery succeeds, the customer has five minutes to redeem the emailed link; the app retrieves the same Stripe objects again and rejects expiration, changed email or subscription data, ambiguity, replay, and competing claims without creating another account or link. Do not retry indefinitely or substitute an email supplied outside Stripe.
 
 ## Daily resync backstop
 

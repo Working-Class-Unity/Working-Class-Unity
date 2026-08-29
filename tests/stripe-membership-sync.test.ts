@@ -37,11 +37,12 @@ const validLinkSyncEnvironment = {
 } as const
 
 describe('Stripe membership synchronization state', () => {
-  it('keeps the historical importer and account-link synchronizer as separate commands', () => {
+  it('keeps the historical importer, link synchronizer, and account adopter as separate commands', () => {
     const scripts = (JSON.parse(readFileSync(resolve('package.json'), 'utf8')) as { scripts: Record<string, string> })
       .scripts
     expect(scripts['db:import:stripe']).toContain('scripts/import-stripe-membership.ts')
     expect(scripts['db:sync:stripe-membership-links']).toContain('scripts/sync-stripe-membership-links.ts')
+    expect(scripts['db:adopt:stripe-membership-account']).toContain('scripts/adopt-stripe-membership-account.ts')
 
     const legacyHelp = runCliHelp('scripts/import-stripe-membership.ts')
     expect(legacyHelp.status).toBe(0)
@@ -49,6 +50,9 @@ describe('Stripe membership synchronization state', () => {
     const linkHelp = runCliHelp('scripts/sync-stripe-membership-links.ts')
     expect(linkHelp.status).toBe(0)
     expect(linkHelp.stdout).toContain('exact account membership links')
+    const adoptionHelp = runCliHelp('scripts/adopt-stripe-membership-account.ts')
+    expect(adoptionHelp.status).toBe(0)
+    expect(adoptionHelp.stdout).toContain('exact active allowlisted Stripe subscription')
   })
 
   it('rejects a restricted key from the wrong Stripe mode', () => {
