@@ -7,10 +7,11 @@ import { test } from 'node:test'
 const entry = resolve('scripts/ci-container-build.mjs')
 const canaryPath = resolve('.env.container-canary')
 
-test('Docker context packages the Stripe membership synchronizer', () => {
+test('Docker context packages the Stripe membership operators', () => {
   const dockerignore = readFileSync(resolve('.dockerignore'), 'utf8')
 
   assert.match(dockerignore, /^!scripts\/sync-stripe-membership-links\.ts$/m)
+  assert.match(dockerignore, /^!scripts\/adopt-stripe-membership-account\.ts$/m)
 })
 
 test('Docker build stage trusts public TLS certificates before Sentry upload', () => {

@@ -1,10 +1,9 @@
 import { existsSync } from 'node:fs'
 import { connectDatabase, resolveSqlitePath } from '../server/db/connect'
 import {
-  assertStripeMembershipAdoptionPrices,
+  readStripeMembershipAdoptionPrices,
   StripeMembershipLinkSyncReadError,
-  synchronizeStripeMembershipLinks,
-  type StripeMembershipAdoptionPrices
+  synchronizeStripeMembershipLinks
 } from '../server/services/membership/stripe-link-sync'
 import {
   acquireStripeMembershipSyncLock,
@@ -65,11 +64,6 @@ async function main(): Promise<void> {
     }
     assertStripeMembershipSyncKey(mode, secretKey)
     const legacyPrices = readLegacyPrices()
-    try {
-      assertStripeMembershipAdoptionPrices(legacyPrices)
-    } catch {
-      throw new StripeMembershipSyncError('configuration_invalid')
-    }
     connection = connectDatabase(databaseUrl)
     configureStripeMembershipSyncDatabase(connection)
     assertAccountMembershipSchema(connection)
@@ -106,20 +100,12 @@ async function main(): Promise<void> {
   }
 }
 
-function readLegacyPrices(): StripeMembershipAdoptionPrices {
-  return {
-    member: priceList(process.env.WCU_STRIPE_LEGACY_DUES10_PRICE_IDS),
-    solidarity: priceList(process.env.WCU_STRIPE_LEGACY_DUES27_PRICE_IDS)
-  }
-}
-
-function priceList(value: string | undefined): readonly string[] {
-  if (!value || value !== value.trim()) throw new StripeMembershipSyncError('configuration_invalid')
-  const prices = value.split(',')
-  if (prices.some((price) => !price || price !== price.trim())) {
+function readLegacyPrices() {
+  try {
+    return readStripeMembershipAdoptionPrices(process.env)
+  } catch {
     throw new StripeMembershipSyncError('configuration_invalid')
   }
-  return Object.freeze(prices)
 }
 
 function assertAccountMembershipSchema(connection: ReturnType<typeof connectDatabase>): void {

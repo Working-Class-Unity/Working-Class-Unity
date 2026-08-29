@@ -16,6 +16,7 @@ scripts/**
 !scripts/generate-hero-assets.mjs
 !scripts/import-stripe-membership.ts
 !scripts/sync-stripe-membership-links.ts
+!scripts/adopt-stripe-membership-account.ts
 !scripts/import-solidarity-events.ts
 !scripts/normalize-solidarity-events.ts
 
