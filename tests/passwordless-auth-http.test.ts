@@ -692,7 +692,9 @@ function testRuntimeConfig(): AppRuntimeConfig {
     },
     stripe: {
       membershipDues10PriceId: 'price_passwordless_membership_10',
-      solidarityDues27PriceId: 'price_passwordless_solidarity_27'
+      solidarityDues27PriceId: 'price_passwordless_solidarity_27',
+      legacyDues10PriceIds: 'membership-10-1month',
+      legacyDues27PriceIds: 'solidarity-27-1month'
     }
   } as AppRuntimeConfig
 }

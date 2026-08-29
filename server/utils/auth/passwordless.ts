@@ -95,6 +95,16 @@ function createPasswordlessAuthBeforeHook(authUrl: string) {
       }
     }
 
+    if (context.path === '/stripe-membership/activate') {
+      const requestOrigin = context.headers?.get('origin')
+      if (requestOrigin !== authOrigin) {
+        throw new APIError('FORBIDDEN', {
+          code: 'INVALID_ORIGIN',
+          message: 'Invalid origin'
+        })
+      }
+    }
+
     if (context.path === '/update-user' && context.body && 'name' in context.body) {
       throw new APIError('BAD_REQUEST', {
         code: 'INVALID_PROFILE_UPDATE',
@@ -157,7 +167,9 @@ function createTurnstileBeforeHook(config: AppRuntimeConfig) {
         ? turnstileActions.magicLink
         : context.path === '/phone-number/send-otp'
           ? turnstileActions.phoneOtp
-          : null
+          : context.path === '/stripe-membership/activate'
+            ? turnstileActions.membershipActivation
+            : null
     if (!expectedAction) return
 
     try {

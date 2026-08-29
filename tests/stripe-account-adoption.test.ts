@@ -6,16 +6,20 @@ import { migrate } from 'drizzle-orm/better-sqlite3/migrator'
 import { fileURLToPath } from 'node:url'
 import type Stripe from 'stripe'
 import { describe, expect, it, vi } from 'vitest'
+import { turnstileActions, turnstileHeaderName } from '../shared/turnstile'
 import type { DatabaseConnection } from '../server/db/connect'
 import * as schema from '../server/db/schema'
 import { readWebsiteMembershipAccess } from '../server/services/membership/member-access'
 import {
   claimStripeAccountAdoption,
-  issueStripeAccountAdoptionLink
+  issueStripeAccountAdoptionLink,
+  requestStripeAccountActivation
 } from '../server/services/membership/stripe-account-adoption'
 import { stripeMembershipConfiguration } from '../server/services/membership/stripe-first'
 import type { BillingStripeRuntimeConfiguration } from '../server/services/payments/stripe/configuration'
+import { createAuthenticationBeforeHook } from '../server/utils/auth/passwordless'
 import { stripeMembershipAuth } from '../server/utils/auth/stripe-membership'
+import type { AppRuntimeConfig } from '../server/utils/runtime'
 
 const migrationsFolder = fileURLToPath(new URL('../server/db/migrations/', import.meta.url))
 const legacyPrices = {
@@ -42,6 +46,175 @@ const membershipConfig = stripeMembershipConfiguration(billingConfig)
 type Provider = ReturnType<typeof createProvider>
 
 describe('Stripe subscriber account adoption', () => {
+  it('issues an activation link without creating an account before redemption', async () => {
+    await withDatabase(async (connection) => {
+      const provider = createProvider({
+        email: 'activate@example.test',
+        priceId: legacyPrices.member[0],
+        tier: 'member'
+      })
+
+      await requestStripeAccountActivation({
+        appName: membershipConfig.appName,
+        appUrl: membershipConfig.appUrl,
+        client: provider.client,
+        connection,
+        email: ' Activate@Example.test ',
+        prices: legacyPrices,
+        sender: { send: provider.send }
+      })
+
+      expect(provider.send).toHaveBeenCalledWith(
+        expect.objectContaining({ subject: 'Activate your WCU website account', to: 'activate@example.test' })
+      )
+      expect(connection.sqlite.prepare('select count(*) as count from verification').get()).toEqual({ count: 1 })
+      expect(counts(connection)).toEqual({ links: 0, people: 0, users: 0 })
+    })
+  })
+
+  it.each(['unknown', 'inactive', 'ambiguous'] as const)(
+    'does not reveal or issue an activation link for an %s request',
+    async (scenario) => {
+      await withDatabase(async (connection) => {
+        const provider = createProvider({
+          email: 'eligible@example.test',
+          priceId: legacyPrices.member[0],
+          tier: 'member'
+        })
+        if (scenario === 'inactive') provider.listedSubscriptions[0]!.status = 'past_due'
+        if (scenario === 'ambiguous') {
+          provider.listedSubscriptions.push({ ...provider.listedSubscriptions[0]!, id: 'sub_second' })
+        }
+
+        await requestStripeAccountActivation({
+          appName: membershipConfig.appName,
+          appUrl: membershipConfig.appUrl,
+          client: provider.client,
+          connection,
+          email: scenario === 'unknown' ? 'unknown@example.test' : 'eligible@example.test',
+          prices: legacyPrices,
+          sender: { send: provider.send }
+        })
+
+        expect(provider.send).not.toHaveBeenCalled()
+        expect(provider.client.subscriptions.retrieve).not.toHaveBeenCalled()
+        expect(connection.sqlite.prepare('select count(*) as count from verification').get()).toEqual({ count: 0 })
+        expect(counts(connection)).toEqual({ links: 0, people: 0, users: 0 })
+      })
+    }
+  )
+
+  it('issues nothing when the current Stripe email changes after discovery', async () => {
+    await withDatabase(async (connection) => {
+      const provider = createProvider({
+        email: 'requested@example.test',
+        priceId: legacyPrices.member[0],
+        tier: 'member'
+      })
+      provider.listedSubscriptions[0]!.customer = { ...provider.customer }
+      provider.customer.email = 'changed@example.test'
+
+      await requestStripeAccountActivation({
+        appName: membershipConfig.appName,
+        appUrl: membershipConfig.appUrl,
+        client: provider.client,
+        connection,
+        email: 'requested@example.test',
+        prices: legacyPrices,
+        sender: { send: provider.send }
+      })
+
+      expect(provider.send).not.toHaveBeenCalled()
+      expect(connection.sqlite.prepare('select count(*) as count from verification').get()).toEqual({ count: 0 })
+      expect(counts(connection)).toEqual({ links: 0, people: 0, users: 0 })
+    })
+  })
+
+  it('keeps eligible and unknown activation HTTP responses identical and accepts no public Stripe IDs', async () => {
+    await withDatabase(async (connection) => {
+      const provider = createProvider({
+        email: 'eligible@example.test',
+        priceId: legacyPrices.member[0],
+        tier: 'member'
+      })
+      const authentication = adoptionAuthentication(connection, provider)
+      const request = (body: object) =>
+        authentication.handler(
+          new Request(`${membershipConfig.appUrl}/api/auth/stripe-membership/activate`, {
+            method: 'POST',
+            headers: { 'content-type': 'application/json', origin: membershipConfig.appUrl },
+            body: JSON.stringify(body)
+          })
+        )
+
+      const eligible = await request({ email: 'eligible@example.test' })
+      const unknown = await request({ email: 'unknown@example.test' })
+      expect(eligible.status).toBe(200)
+      expect(unknown.status).toBe(200)
+      expect(await eligible.text()).toBe(await unknown.text())
+      expect(eligible.headers.get('set-cookie')).toBeNull()
+      expect(unknown.headers.get('set-cookie')).toBeNull()
+      expect(counts(connection)).toEqual({ links: 0, people: 0, users: 0 })
+      expect(connection.sqlite.prepare('select count(*) as count from session').get()).toEqual({ count: 0 })
+
+      const publicIdentifier = await request({ email: 'eligible@example.test', subscriptionId: 'sub_member' })
+      expect(publicIdentifier.status).toBe(400)
+    })
+  })
+
+  it('requires the application origin and activation-bound Turnstile proof before Stripe discovery', async () => {
+    await withDatabase(async (connection) => {
+      const provider = createProvider({
+        email: 'protected@example.test',
+        priceId: legacyPrices.member[0],
+        tier: 'member'
+      })
+      const authentication = adoptionAuthentication(connection, provider, true)
+      const request = (headers: Record<string, string>) =>
+        authentication.handler(
+          new Request(`${membershipConfig.appUrl}/api/auth/stripe-membership/activate`, {
+            method: 'POST',
+            headers: { 'content-type': 'application/json', ...headers },
+            body: JSON.stringify({ email: 'protected@example.test' })
+          })
+        )
+
+      const hostileOrigin = await request({
+        origin: 'https://attacker.example.test',
+        [turnstileHeaderName]: 'hostile-origin-token'
+      })
+      expect(hostileOrigin.status).toBe(403)
+      const missingChallenge = await request({ origin: membershipConfig.appUrl })
+      expect(missingChallenge.status).toBe(400)
+      expect(provider.client.subscriptions.list).not.toHaveBeenCalled()
+
+      const siteverify = vi.fn(
+        async () =>
+          new Response(
+            JSON.stringify({
+              success: true,
+              challenge_ts: new Date().toISOString(),
+              hostname: new URL(membershipConfig.appUrl).hostname,
+              action: turnstileActions.membershipActivation
+            }),
+            { status: 200, headers: { 'content-type': 'application/json' } }
+          )
+      )
+      vi.stubGlobal('fetch', siteverify)
+      try {
+        const accepted = await request({
+          origin: membershipConfig.appUrl,
+          [turnstileHeaderName]: 'valid-activation-token'
+        })
+        expect(accepted.status).toBe(200)
+        expect(siteverify).toHaveBeenCalledOnce()
+        expect(provider.client.subscriptions.list).toHaveBeenCalled()
+      } finally {
+        vi.unstubAllGlobals()
+      }
+    })
+  })
+
   it.each([
     ['member', legacyPrices.member[0]],
     ['solidarity', legacyPrices.solidarity[0]]
@@ -79,12 +252,7 @@ describe('Stripe subscriber account adoption', () => {
         tier: 'member'
       })
       const token = await issueToken(connection, provider)
-      const authentication = betterAuth({
-        baseURL: membershipConfig.appUrl,
-        secret: 'stripe-account-adoption-test-secret',
-        database: drizzleAdapter(connection.db, { provider: 'sqlite', schema }),
-        plugins: [stripeMembershipAuth({ client: () => provider.client, config: membershipConfig, connection })]
-      })
+      const authentication = adoptionAuthentication(connection, provider)
 
       const response = await authentication.handler(
         new Request(`${membershipConfig.appUrl}/api/auth/stripe-membership/adopt?token=${token}`, {
@@ -99,6 +267,37 @@ describe('Stripe subscriber account adoption', () => {
         { email: 'existing@example.test', id: 'existing-user', verified: 1 }
       ])
       expect(counts(connection)).toEqual({ links: 1, people: 0, users: 1 })
+    })
+  })
+
+  it('keeps a completed activation when automatic session creation fails', async () => {
+    await withDatabase(async (connection) => {
+      const provider = createProvider({
+        email: 'session-recovery@example.test',
+        priceId: legacyPrices.member[0],
+        tier: 'member'
+      })
+      const token = await issueToken(connection, provider)
+      connection.sqlite.exec(`
+        create trigger fail_activation_session before insert on session
+        begin
+          select raise(abort, 'injected session failure');
+        end;
+      `)
+      const authentication = adoptionAuthentication(connection, provider)
+
+      const response = await authentication.handler(
+        new Request(`${membershipConfig.appUrl}/api/auth/stripe-membership/adopt?token=${token}`, {
+          redirect: 'manual'
+        })
+      )
+
+      expect(response.status).toBe(302)
+      expect(response.headers.get('location')).toBe(`${membershipConfig.appUrl}/login?status=activation-complete`)
+      expect(counts(connection)).toEqual({ links: 1, people: 0, users: 1 })
+      expect(connection.sqlite.prepare('select count(*) as count from session').get()).toEqual({ count: 0 })
+      expect(connection.sqlite.prepare('select count(*) as count from verification').get()).toEqual({ count: 0 })
+      await expect(redeem(connection, provider, token, 'replay')).rejects.toMatchObject({ statusCode: 409 })
     })
   })
 
@@ -232,11 +431,19 @@ function createProvider(input: {
     }
   } as Stripe.Subscription
   const send = vi.fn(async () => undefined)
+  const listedSubscriptions = [{ ...subscription, customer }]
   const client = {
     customers: { retrieve: vi.fn(async () => customer) },
-    subscriptions: { retrieve: vi.fn(async () => subscription) }
+    subscriptions: {
+      list: vi.fn(() => ({
+        async *[Symbol.asyncIterator]() {
+          yield* listedSubscriptions
+        }
+      })),
+      retrieve: vi.fn(async () => subscription)
+    }
   } as unknown as Stripe
-  return { client, customer, send, subscription }
+  return { client, customer, listedSubscriptions, send, subscription }
 }
 
 function issue(provider: Provider, connection: DatabaseConnection) {
@@ -268,4 +475,31 @@ function counts(connection: DatabaseConnection) {
   const count = (table: string) =>
     (connection.sqlite.prepare(`select count(*) as count from ${table}`).get() as { count: number }).count
   return { links: count('account_stripe_memberships'), people: count('people'), users: count('user') }
+}
+
+function adoptionAuthentication(connection: DatabaseConnection, provider: Provider, activationSecurity = false) {
+  const hooks = activationSecurity
+    ? {
+        before: createAuthenticationBeforeHook({
+          betterAuth: { url: membershipConfig.appUrl },
+          cloudflare: { turnstile: { secretKey: 'activation-turnstile-secret' } },
+          public: { appUrl: membershipConfig.appUrl, turnstileSiteKey: 'activation-turnstile-site' }
+        } as unknown as AppRuntimeConfig)
+      }
+    : undefined
+  return betterAuth({
+    baseURL: membershipConfig.appUrl,
+    secret: 'stripe-account-activation-test-secret',
+    database: drizzleAdapter(connection.db, { provider: 'sqlite', schema }),
+    hooks,
+    plugins: [
+      stripeMembershipAuth({
+        client: () => provider.client,
+        config: membershipConfig,
+        connection,
+        getEmailSender: () => ({ send: provider.send }),
+        legacyPrices
+      })
+    ]
+  })
 }

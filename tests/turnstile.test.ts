@@ -15,7 +15,11 @@ describe('Turnstile boundary', () => {
     expect(turnstileTokenSchema.parse('x'.repeat(2_048))).toHaveLength(2_048)
     expect(turnstileTokenSchema.safeParse('')).toMatchObject({ success: false })
     expect(turnstileTokenSchema.safeParse('x'.repeat(2_049))).toMatchObject({ success: false })
-    expect(turnstileActions).toEqual({ magicLink: 'auth_magic_link', phoneOtp: 'auth_phone_otp' })
+    expect(turnstileActions).toEqual({
+      membershipActivation: 'auth_membership_activation',
+      magicLink: 'auth_magic_link',
+      phoneOtp: 'auth_phone_otp'
+    })
     expect(turnstileHeaderName).toBe('x-turnstile-token')
   })
 
@@ -284,6 +288,8 @@ function turnstileConfig(): AppRuntimeConfig {
       NUXT_STRIPE_PORTAL_CONFIGURATION_ID: 'bpc_turnstile',
       NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID: 'price_turnstile_personal_monthly',
       NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID: 'price_turnstile_family_monthly',
+      NUXT_STRIPE_LEGACY_DUES10_PRICE_IDS: 'membership-10-1month',
+      NUXT_STRIPE_LEGACY_DUES27_PRICE_IDS: 'solidarity-27-1month',
       NUXT_CLOUDFLARE_TURNSTILE_SECRET_KEY: 'live-turnstile-secret',
       NUXT_PUBLIC_TURNSTILE_SITE_KEY: 'live-turnstile-site'
     })

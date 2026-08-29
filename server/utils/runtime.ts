@@ -95,6 +95,8 @@ export const canonicalAppRuntimePaths = [
   ['STRIPE_PORTAL_CONFIGURATION_ID', 'leaf'],
   ['STRIPE_MEMBERSHIP_DUES10_PRICE_ID', 'leaf'],
   ['STRIPE_SOLIDARITY_DUES27_PRICE_ID', 'leaf'],
+  ['STRIPE_LEGACY_DUES10_PRICE_IDS', 'leaf'],
+  ['STRIPE_LEGACY_DUES27_PRICE_IDS', 'leaf'],
   ['FILES_DRIVER', 'leaf'],
   ['OPENAI_API_KEY', 'leaf'],
   ['OPENAI_PROJECT_ID', 'leaf'],
@@ -179,6 +181,18 @@ const runtimeRequirements = [
     environmentKey: 'NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID',
     configPath: 'stripe.solidarityDues27PriceId',
     kind: 'value'
+  },
+  {
+    environmentKey: 'NUXT_STRIPE_LEGACY_DUES10_PRICE_IDS',
+    configPath: 'stripe.legacyDues10PriceIds',
+    kind: 'value',
+    preserveBytes: true
+  },
+  {
+    environmentKey: 'NUXT_STRIPE_LEGACY_DUES27_PRICE_IDS',
+    configPath: 'stripe.legacyDues27PriceIds',
+    kind: 'value',
+    preserveBytes: true
   },
   {
     environmentKey: 'NUXT_FILES_DRIVER',
@@ -336,6 +350,8 @@ type NormalizedRuntimeConfig = {
     portalConfigurationId: string
     membershipDues10PriceId: string
     solidarityDues27PriceId: string
+    legacyDues10PriceIds: string
+    legacyDues27PriceIds: string
   }
   sentryDsn: string
   sentryEnvironment: string
@@ -532,7 +548,9 @@ export function runtimeConfigFromEnvironment(environment: RuntimeEnvironment): u
       webhookSecret: nitroEnvironmentValue(environment, 'NUXT_STRIPE_WEBHOOK_SECRET'),
       portalConfigurationId: nitroEnvironmentValue(environment, 'NUXT_STRIPE_PORTAL_CONFIGURATION_ID'),
       membershipDues10PriceId: nitroEnvironmentValue(environment, 'NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID'),
-      solidarityDues27PriceId: nitroEnvironmentValue(environment, 'NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID')
+      solidarityDues27PriceId: nitroEnvironmentValue(environment, 'NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID'),
+      legacyDues10PriceIds: nitroEnvironmentValue(environment, 'NUXT_STRIPE_LEGACY_DUES10_PRICE_IDS'),
+      legacyDues27PriceIds: nitroEnvironmentValue(environment, 'NUXT_STRIPE_LEGACY_DUES27_PRICE_IDS')
     },
     files: {
       driver: nitroEnvironmentValue(environment, 'NUXT_FILES_DRIVER')
@@ -650,7 +668,9 @@ function normalizeRuntimeConfig(config: ParsedRuntimeConfig): NormalizedRuntimeC
       webhookSecret: stringValue(stripe.webhookSecret),
       portalConfigurationId: trimmedStringValue(stripe.portalConfigurationId),
       membershipDues10PriceId: trimmedStringValue(stripe.membershipDues10PriceId),
-      solidarityDues27PriceId: trimmedStringValue(stripe.solidarityDues27PriceId)
+      solidarityDues27PriceId: trimmedStringValue(stripe.solidarityDues27PriceId),
+      legacyDues10PriceIds: trimmedStringValue(stripe.legacyDues10PriceIds),
+      legacyDues27PriceIds: trimmedStringValue(stripe.legacyDues27PriceIds)
     },
     files: {
       driver: normalizeFilesDriver(files.driver)
@@ -1033,6 +1053,31 @@ function validateStripeConfiguration(
     if (keys.length < 2) continue
     for (const key of keys) {
       issues.push(configIssue('invalid', key, 'must be distinct from every other configured Stripe Price ID'))
+    }
+  }
+
+  const legacyKeys = ['NUXT_STRIPE_LEGACY_DUES10_PRICE_IDS', 'NUXT_STRIPE_LEGACY_DUES27_PRICE_IDS'] as const
+  const keysByLegacyPriceId = new Map<string, string[]>()
+  for (const key of legacyKeys) {
+    const rawValue = environment[key] ?? ''
+    const values = rawValue.split(',')
+    if (rawValue && values.some((value) => !value || value !== value.trim())) {
+      issues.push(configIssue('invalid', key, 'must contain comma-separated, trimmed Stripe Price IDs'))
+    }
+    for (const priceId of values) {
+      if (!priceId) continue
+      if (!/^[A-Za-z0-9_-]{1,255}$/.test(priceId)) {
+        issues.push(configIssue('invalid', key, 'must contain valid Stripe Price IDs'))
+      }
+      const keys = keysByLegacyPriceId.get(priceId) ?? []
+      keys.push(key)
+      keysByLegacyPriceId.set(priceId, keys)
+    }
+  }
+  for (const keys of keysByLegacyPriceId.values()) {
+    if (keys.length < 2) continue
+    for (const key of keys) {
+      issues.push(configIssue('invalid', key, 'must not repeat a Stripe Price ID across legacy tiers'))
     }
   }
 }

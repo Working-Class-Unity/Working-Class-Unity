@@ -36,7 +36,9 @@ const canonicalBuildWebhookCanary = 'whsec_canonical_build_canary_must_not_enter
 const canonicalBuildStripeCatalogCanaries = {
   portalConfigurationId: 'bpc_canonical_build_must_not_enter_output',
   membershipDues10PriceId: 'price_canonical_build_personal_monthly',
-  solidarityDues27PriceId: 'price_canonical_build_family_monthly'
+  solidarityDues27PriceId: 'price_canonical_build_family_monthly',
+  legacyDues10PriceIds: 'membership-build-canary',
+  legacyDues27PriceIds: 'solidarity-build-canary'
 }
 const canonicalBuildSentryCanary = 'https://build-canary@o0.ingest.invalid/0'
 const runtimeAuthSecret = 'runtime-only-auth-secret-sentinel-not-a-credential'
@@ -47,7 +49,9 @@ const runtimeStripeWebhookSecret = 'whsec_runtime_config_boundary'
 const runtimeStripeCatalog = {
   portalConfigurationId: 'bpc_runtime',
   membershipDues10PriceId: 'price_runtime_personal_monthly',
-  solidarityDues27PriceId: 'price_runtime_family_monthly'
+  solidarityDues27PriceId: 'price_runtime_family_monthly',
+  legacyDues10PriceIds: 'membership-10-1month',
+  legacyDues27PriceIds: 'solidarity-27-1month'
 }
 const runtimeEmailFrom = 'baseline@example.test'
 const httpRequestTimeoutMs = 10_000
@@ -92,6 +96,8 @@ const buildEnv = {
   NUXT_STRIPE_PORTAL_CONFIGURATION_ID: canonicalBuildStripeCatalogCanaries.portalConfigurationId,
   NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID: canonicalBuildStripeCatalogCanaries.membershipDues10PriceId,
   NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID: canonicalBuildStripeCatalogCanaries.solidarityDues27PriceId,
+  NUXT_STRIPE_LEGACY_DUES10_PRICE_IDS: canonicalBuildStripeCatalogCanaries.legacyDues10PriceIds,
+  NUXT_STRIPE_LEGACY_DUES27_PRICE_IDS: canonicalBuildStripeCatalogCanaries.legacyDues27PriceIds,
   NUXT_SENTRY_DSN: canonicalBuildSentryCanary
 }
 const runtimeDatabaseEnv = {
@@ -159,7 +165,9 @@ await coordinator.run(async () => {
       NUXT_STRIPE_WEBHOOK_SECRET: runtimeStripeWebhookSecret,
       NUXT_STRIPE_PORTAL_CONFIGURATION_ID: runtimeStripeCatalog.portalConfigurationId,
       NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID: runtimeStripeCatalog.membershipDues10PriceId,
-      NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID: runtimeStripeCatalog.solidarityDues27PriceId
+      NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID: runtimeStripeCatalog.solidarityDues27PriceId,
+      NUXT_STRIPE_LEGACY_DUES10_PRICE_IDS: runtimeStripeCatalog.legacyDues10PriceIds,
+      NUXT_STRIPE_LEGACY_DUES27_PRICE_IDS: runtimeStripeCatalog.legacyDues27PriceIds
     }
     await assertStartupRejected(
       { ...runtimeEnv, NUXT_DATABASE_URL: undefined },

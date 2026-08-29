@@ -4,6 +4,7 @@ import { resolve } from 'node:path'
 import { Resend } from 'resend'
 import { getAppRuntimeConfig, type AppRuntimeConfig } from '../../utils/runtime'
 import {
+  renderEnglishAccountActivationEmail,
   renderEnglishAccountEmailVerificationEmail,
   renderEnglishBillingEmailVerificationEmail,
   renderEnglishIdentityReviewEmail,
@@ -65,6 +66,17 @@ export function createMagicLinkEmail(input: { to: string; url: string; appName: 
   const appName = normalizeDisplayText(input.appName)
   const url = requireHttpUrl(input.url)
   return renderEnglishMagicLinkEmail({ to, url, appName })
+}
+
+export function createAccountActivationEmail(input: {
+  to: string
+  url: string
+  appName: string
+}): TransactionalEmailMessage {
+  const to = requireHeaderValue(input.to)
+  const appName = normalizeDisplayText(input.appName)
+  const url = requireHttpUrl(input.url)
+  return renderEnglishAccountActivationEmail({ to, url, appName })
 }
 
 export function createAccountEmailVerificationEmail(input: {

@@ -4,7 +4,7 @@
 
 The packaged account-link synchronizer reads Stripe and updates only `account_stripe_memberships`. It never writes to Stripe and never creates an account, person, membership, standing period, invoice, provider snapshot, or historical billing row. The separately packaged historical importer is preserved for its existing operator contract, but it is not an authorization or synchronization path for Stripe-first accounts and is never invoked by `stripe-sync-runner`.
 
-The same private runner packages a separate, organizer-initiated adoption command for one exact unmatched paid subscription. It sends a five-minute one-time link only to the freshly retrieved Stripe customer email. No account exists until that link is redeemed; redemption re-reads Stripe and atomically creates or reuses the verified account and unique customer/subscription link. It creates no person or historical membership data and makes no Stripe write.
+The public `/activate` route lets an existing paid subscriber request the same five-minute one-time adoption link using the current email on an eligible legacy Stripe subscription. It accepts no Stripe identifiers, returns one neutral eligibility response, and creates no account until redemption. The private runner retains the exact-subscription command for exceptional organizer recovery. Both paths converge on the same fresh Stripe validator and atomic account/link claim, create no person or historical membership data, and make no Stripe write.
 
 Each run does two bounded jobs:
 
@@ -19,7 +19,7 @@ The default is a dry-run. `--apply` writes all planned changes in one immediate 
 
 Create a separate Stripe restricted key with Read access only to Customers and Subscriptions. Grant no write, Checkout, Customer Portal, webhook, invoice, payment, or subscription-mutation permission. Prove representative reads and denied writes in a Stripe sandbox before production use.
 
-Configure these values only on `stripe-sync-runner` in Coolify:
+Configure these source values in Coolify:
 
 ```text
 NUXT_DATABASE_URL=file:/app/data/app.db
@@ -29,7 +29,7 @@ WCU_STRIPE_LEGACY_DUES10_PRICE_IDS=membership-10-1month
 WCU_STRIPE_LEGACY_DUES27_PRICE_IDS=solidarity-27-1month
 ```
 
-Use `mode=test` with an `rk_test_*` key in isolated staging and `mode=live` with an `rk_live_*` key in production. Comma-separated Price IDs are supported only when more than one exact historical Price for a tier has been reviewed. IDs must be nonempty, distinct across tiers, and already trimmed. Keep the restricted key Runtime-enabled and Build-disabled. Keep all four runner-only values out of `.env.production.example`, Git, image arguments, shared logs, Sentry, screenshots, and evidence. The adoption command additionally receives the application's public origin/name and Resend sender configuration from the existing Coolify runtime values; it does not receive unrelated application-provider secrets.
+Use `mode=test` with an `rk_test_*` key in isolated staging and `mode=live` with an `rk_live_*` key in production. Comma-separated Price IDs are supported only when more than one exact historical Price for a tier has been reviewed. IDs must be nonempty, distinct across tiers, and already trimmed. Keep the restricted key and mode Runtime-enabled, Build-disabled, and available only to `stripe-sync-runner`. Compose also maps the two non-secret legacy Price lists into the web and worker `NUXT_STRIPE_LEGACY_*` runtime values so `/activate` can discover eligible subscriptions with the existing application Stripe read boundary; the `WCU_*` names remain blank there. Keep all four source values out of `.env.production.example`, Git, image arguments, shared logs, Sentry, screenshots, and evidence.
 
 ## First certification and adoption
 
@@ -51,9 +51,11 @@ node .output/server/sync-stripe-membership-links.mjs
 node .output/server/sync-stripe-membership-links.mjs --apply
 ```
 
-## Adopt one unmatched paid subscriber
+## Self-service activation and exceptional organizer recovery
 
-Use this only after an organizer has approved the exact subscription. There is no bulk mode and no public email or Stripe-ID lookup surface. Before issuing a link, confirm the subscription belongs to the intended person through an approved private organizer process; do not copy its identifiers or email into shared logs or evidence.
+Direct existing paid subscribers who do not yet have a website account to `/activate`. They submit only the current Stripe customer email and complete Turnstile. Eligible, unknown, canceled, already-claimed, and ambiguous email outcomes receive the same public response. An eligible request sends a distinct activation email to Stripe's current customer email. Redemption re-reads Stripe, then atomically creates or reuses the same-email account and unique customer/subscription link. If automatic sign-in fails after that durable claim, the login page tells the person to request an ordinary login link.
+
+Use the organizer command only for exceptional recovery after approving the exact subscription. There is no bulk mode and no public Stripe-ID lookup surface. Before issuing a link, confirm the subscription belongs to the intended person through an approved private organizer process; do not copy its identifiers or email into shared logs or evidence.
 
 ```bash
 node .output/server/adopt-stripe-membership-account.mjs --validate-config

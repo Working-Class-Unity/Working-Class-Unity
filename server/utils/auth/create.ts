@@ -7,6 +7,7 @@ import * as schema from '../../db/schema'
 import { createAccountEmailVerificationEmail, type TransactionalEmailSender } from '../../services/email'
 import { ensureWebsiteAccountIdentity, type WebsiteAccountIdentity } from '../../services/membership/account-identity'
 import { hasAccountStripeMembership, stripeMembershipConfiguration } from '../../services/membership/stripe-first'
+import { readStripeMembershipAdoptionPrices } from '../../services/membership/stripe-link-sync'
 import { billingStripeConfiguration } from '../../services/payments/stripe/app-composition'
 import { getStripeClient } from '../../services/payments/stripe/stripe-client'
 import { checkTwilioVerification, sendTwilioVerification } from '../../services/security/twilio-verify'
@@ -31,6 +32,10 @@ export function createAuthentication(
   const deliverMagicLink = createMagicLinkDelivery(config.public.appName, getEmailSender)
   const billingConfig = billingStripeConfiguration(config)
   const membershipConfig = stripeMembershipConfiguration(billingConfig)
+  const legacyPrices = readStripeMembershipAdoptionPrices({
+    WCU_STRIPE_LEGACY_DUES10_PRICE_IDS: config.stripe.legacyDues10PriceIds,
+    WCU_STRIPE_LEGACY_DUES27_PRICE_IDS: config.stripe.legacyDues27PriceIds
+  })
   const synchronizeIdentity = (user: WebsiteAccountIdentity) => {
     if (hasAccountStripeMembership(database, user.id)) return
     ensureWebsiteAccountIdentity(database, user, {
@@ -149,7 +154,9 @@ export function createAuthentication(
       stripeMembershipAuth({
         client: () => getStripeClient(billingConfig),
         config: membershipConfig,
-        connection: database
+        connection: database,
+        getEmailSender,
+        legacyPrices
       })
     ]
   })

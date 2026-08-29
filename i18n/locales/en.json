@@ -51,6 +51,9 @@
     "login": {
       "title": "Log in"
     },
+    "activate": {
+      "title": "Activate your account"
+    },
     "signup": {
       "title": "Sign up"
     },
@@ -222,7 +225,11 @@
     "login": {
       "eyebrow": "Welcome back",
       "title": "Log in",
-      "introduction": "Use your email address or U.S. phone number to log in without a password."
+      "introduction": "Use your email address or U.S. phone number to log in without a password.",
+      "needAccount": "Need a new account?",
+      "join": "Join WCU.",
+      "alreadyPay": "Already pay monthly dues?",
+      "activate": "Activate your account."
     },
     "signup": {
       "eyebrow": "Get started",
@@ -236,6 +243,9 @@
     },
     "errors": {
       "authenticationFailed": "We could not complete authentication. Request a new email link.",
+      "accountNotActivated": "This email does not have an activated WCU website account. Use Join WCU or Activate your account below.",
+      "loginLinkUnavailable": "This login link expired or was already used. Request a new email link.",
+      "activationLinkUnavailable": "This activation link is no longer available. Request another activation link or contact WCU.",
       "formInvalid": "Check the highlighted field and try again.",
       "securityRequired": "Complete the security check before continuing.",
       "emailLink": "We could not send an email link right now. Please try again.",
@@ -246,6 +256,7 @@
     "status": {
       "signedOut": "You are signed out.",
       "billingEmailChecked": "If this billing email could be verified, it is now ready for email login. Request a sign-in link below.",
+      "activationComplete": "Your account was activated, but automatic sign-in did not complete. Request a login link below.",
       "emailLinkSent": "If you can receive email at that address, a sign-in link is on its way.",
       "phoneCodeSent": "A one-time verification code is on its way."
     },
@@ -278,6 +289,21 @@
       "terms": "Terms",
       "privacy": "Privacy Policy"
     }
+  },
+  "activation": {
+    "eyebrow": "Existing paid members",
+    "title": "Activate your account",
+    "introduction": "If you already pay WCU monthly dues through Stripe, use the email on that Stripe membership to activate your website account.",
+    "emailHelp": "We will send the link only to the current email on the eligible Stripe membership.",
+    "submit": "Send activation link",
+    "sending": "Checking...",
+    "error": "We could not request account activation right now. Please try again.",
+    "status": "If this email is eligible, an activation link will be sent to the email currently held by Stripe. Otherwise, contact WCU.",
+    "existingAccount": "Already activated?",
+    "login": "Log in.",
+    "newAccount": "Need a new membership?",
+    "join": "Join WCU.",
+    "support": "Contact WCU"
   },
   "errors": {
     "notFound": {

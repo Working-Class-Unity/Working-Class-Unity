@@ -151,7 +151,15 @@ describe('Stripe-first membership', () => {
         baseURL: config.appUrl,
         secret: 'stripe-first-membership-test-secret',
         database: drizzleAdapter(connection.db, { provider: 'sqlite', schema }),
-        plugins: [stripeMembershipAuth({ client: () => provider.client, config, connection })]
+        plugins: [
+          stripeMembershipAuth({
+            client: () => provider.client,
+            config,
+            connection,
+            getEmailSender: () => ({ send: async () => undefined }),
+            legacyPrices: { member: ['membership-10-1month'], solidarity: ['solidarity-27-1month'] }
+          })
+        ]
       })
       const response = await authentication.handler(
         new Request(

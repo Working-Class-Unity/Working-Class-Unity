@@ -442,6 +442,8 @@ function stubRuntimeEnvironment(dsn: string) {
     NUXT_STRIPE_PORTAL_CONFIGURATION_ID: 'bpc_sentry',
     NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID: 'price_sentry_personal_monthly',
     NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID: 'price_sentry_family_monthly',
+    NUXT_STRIPE_LEGACY_DUES10_PRICE_IDS: 'membership-10-1month',
+    NUXT_STRIPE_LEGACY_DUES27_PRICE_IDS: 'solidarity-27-1month',
     NUXT_CLOUDFLARE_TURNSTILE_SECRET_KEY: 'sentry-turnstile-secret-not-a-provider-credential',
     NUXT_PUBLIC_TURNSTILE_SITE_KEY: 'sentry-turnstile-site-not-a-provider-credential',
     NUXT_SENTRY_DSN: dsn,

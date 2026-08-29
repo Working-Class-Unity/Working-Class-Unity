@@ -16,7 +16,7 @@ type AuthMethod = 'email' | 'phone'
 type PhoneStep = 'number' | 'code'
 
 const props = defineProps<{
-  intent: AuthEntryIntent
+  intent: AuthEntryIntent | 'activate'
   sessionError?: string
 }>()
 
@@ -34,13 +34,15 @@ const codeInput = ref<AppInputHandle | null>(null)
 const turnstileChallenge = ref<TurnstileChallengeHandle | null>(null)
 const turnstileToken = ref('')
 const fieldError = ref('')
-const formError = ref(route.query.error === undefined ? '' : t('auth.errors.authenticationFailed'))
+const formError = ref(authCallbackError(route.query.error))
 const formSuccess = ref(
   route.query.status === 'signed-out'
     ? t('auth.status.signedOut')
     : route.query.status === 'billing-email-checked'
       ? t('auth.status.billingEmailChecked')
-      : ''
+      : route.query.status === 'activation-complete'
+        ? t('auth.status.activationComplete')
+        : ''
 )
 const isSubmitting = ref(false)
 
@@ -51,22 +53,35 @@ const copy = computed(() =>
         title: t('auth.login.title'),
         intro: t('auth.login.introduction')
       }
-    : {
-        eyebrow: t('auth.signup.eyebrow'),
-        title: t('auth.signup.title'),
-        intro: t('auth.signup.introduction')
-      }
+    : props.intent === 'signup'
+      ? {
+          eyebrow: t('auth.signup.eyebrow'),
+          title: t('auth.signup.title'),
+          intro: t('auth.signup.introduction')
+        }
+      : {
+          eyebrow: t('activation.eyebrow'),
+          title: t('activation.title'),
+          intro: t('activation.introduction')
+        }
 )
-const callbacks = computed(() => resolveAuthCallbacks(props.intent))
+const callbacks = computed(() => (props.intent === 'activate' ? null : resolveAuthCallbacks(props.intent)))
 const inputId = computed(() =>
   method.value === 'email' ? `${props.intent}-email` : `${props.intent}-phone-${phoneStep.value}`
 )
 const formStatusId = computed(() => `${props.intent}-form-status`)
 const requiresTurnstile = computed(() => method.value === 'email' || phoneStep.value === 'number')
 const turnstileAction = computed(() =>
-  method.value === 'email' ? turnstileActions.magicLink : turnstileActions.phoneOtp
+  props.intent === 'activate'
+    ? turnstileActions.membershipActivation
+    : method.value === 'email'
+      ? turnstileActions.magicLink
+      : turnstileActions.phoneOtp
 )
 const submitLabel = computed(() => {
+  if (props.intent === 'activate') {
+    return isSubmitting.value ? t('activation.sending') : t('activation.submit')
+  }
   if (method.value === 'email') return isSubmitting.value ? t('auth.email.sending') : t('auth.email.submit')
   if (phoneStep.value === 'number') return isSubmitting.value ? t('auth.phone.sending') : t('auth.phone.send')
   return isSubmitting.value ? t('auth.phone.verifying') : t('auth.phone.verify')
@@ -129,7 +144,12 @@ async function submitAuth() {
       await verifyPhoneCode()
     }
   } catch {
-    formError.value = method.value === 'email' ? t('auth.errors.emailLink') : t('auth.errors.phoneUnavailable')
+    formError.value =
+      props.intent === 'activate'
+        ? t('activation.error')
+        : method.value === 'email'
+          ? t('auth.errors.emailLink')
+          : t('auth.errors.phoneUnavailable')
   } finally {
     if (requiresTurnstile.value) turnstileChallenge.value?.reset()
     isSubmitting.value = false
@@ -137,8 +157,18 @@ async function submitAuth() {
 }
 
 async function submitEmail() {
+  if (props.intent === 'activate') {
+    await $fetch('/api/auth/stripe-membership/activate', {
+      method: 'POST',
+      headers: { [turnstileHeaderName]: turnstileToken.value },
+      body: { email: email.value }
+    })
+    formSuccess.value = t('activation.status')
+    email.value = ''
+    return
+  }
   const result = await authClient.signIn.magicLink(
-    { email: email.value, ...callbacks.value },
+    { email: email.value, ...callbacks.value! },
     { headers: { [turnstileHeaderName]: turnstileToken.value } }
   )
   if (result.error) {
@@ -201,6 +231,15 @@ function validateAuthForm() {
 
   return !fieldError.value
 }
+
+function authCallbackError(value: unknown): string {
+  const error = Array.isArray(value) ? value[0] : value
+  if (error === undefined) return ''
+  if (error === 'new_user_signup_disabled') return t('auth.errors.accountNotActivated')
+  if (error === 'INVALID_TOKEN') return t('auth.errors.loginLinkUnavailable')
+  if (error === 'adoption') return t('auth.errors.activationLinkUnavailable')
+  return t('auth.errors.authenticationFailed')
+}
 </script>
 
 <template>
@@ -209,9 +248,20 @@ function validateAuthForm() {
       <p class="eyebrow">{{ copy.eyebrow }}</p>
       <h1 :id="`${intent}-title`">{{ copy.title }}</h1>
       <p class="auth-intro">{{ copy.intro }}</p>
+      <p v-if="intent === 'login'" class="account-help">
+        {{ t('auth.login.needAccount') }} <NuxtLink to="/join">{{ t('auth.login.join') }}</NuxtLink>
+        {{ t('auth.login.alreadyPay') }}
+        <NuxtLink to="/activate">{{ t('auth.login.activate') }}</NuxtLink>
+      </p>
+      <p v-else-if="intent === 'activate'" class="account-help">
+        {{ t('activation.existingAccount') }} <NuxtLink to="/login">{{ t('activation.login') }}</NuxtLink>
+        {{ t('activation.newAccount') }} <NuxtLink to="/join">{{ t('activation.join') }}</NuxtLink>
+        <a href="mailto:info@workingclassunity.com">{{ t('activation.support') }}</a
+        >.
+      </p>
     </div>
 
-    <div class="auth-methods" role="group" :aria-label="t('auth.method.label')">
+    <div v-if="intent !== 'activate'" class="auth-methods" role="group" :aria-label="t('auth.method.label')">
       <AppButton
         variant="secondary"
         :aria-pressed="method === 'email' ? 'true' : 'false'"
@@ -244,6 +294,7 @@ function validateAuthForm() {
         v-if="method === 'email'"
         :id="inputId"
         :label="t('common.email')"
+        :hint="intent === 'activate' ? t('activation.emailHelp') : undefined"
         :error="fieldError"
         required
         :required-label="t('common.required')"
@@ -393,6 +444,17 @@ function validateAuthForm() {
     max-width: 54ch;
     margin: 0;
     color: var(--color-text-muted);
+  }
+
+  .account-help {
+    max-width: 54ch;
+    margin: var(--space-2) 0 0;
+    color: var(--color-text-muted);
+  }
+
+  .account-help a {
+    color: var(--color-text);
+    font-weight: var(--font-weight-strong);
   }
 
   .auth-form {
