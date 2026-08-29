@@ -8,7 +8,6 @@ import CampaignLandingSafety from '~/components/campaign/LandingSafety.vue'
 import CampaignLandingSystem from '~/components/campaign/LandingSystem.vue'
 import { campaignFacts, campaignLandingPage, petitionDemand } from '~/content/remove-flock-stockton'
 import type { CampaignSection } from '~/content/remove-flock-stockton'
-import heroAssets from '~/generated/hero-assets.json'
 
 const landingSections: readonly CampaignSection[] = campaignLandingPage.sections
 const sectionById = new Map(landingSections.map((section) => [section.id, section]))
@@ -18,7 +17,6 @@ const system = sectionById.get('system')!
 const safeguards = sectionById.get('safeguards')!
 const realSafety = sectionById.get('real-safety')!
 const participate = sectionById.get('participate')!
-const organizingPhoto = heroAssets.photos.find((photo) => photo.source === 'PXL_20241029_023558588.RAW-01.COVER.jpg')
 const petitionUrl = 'https://tech.workingclassunity.com/deflock-stockton'
 </script>
 
@@ -32,7 +30,6 @@ const petitionUrl = 'https://tech.workingclassunity.com/deflock-stockton'
     />
     <CampaignLandingArgument
       class="campaign-landing-divider campaign-landing-section"
-      :image="organizingPhoto"
       image-alt="Working Class Unity members meeting around a table."
       :section="whyRemove"
     />
