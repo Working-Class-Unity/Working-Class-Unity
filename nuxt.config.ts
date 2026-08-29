@@ -78,7 +78,9 @@ export default defineNuxtConfig({
       webhookSecret: '',
       portalConfigurationId: '',
       membershipDues10PriceId: '',
-      solidarityDues27PriceId: ''
+      solidarityDues27PriceId: '',
+      legacyDues10PriceIds: '',
+      legacyDues27PriceIds: ''
     },
     files: {
       driver: ''
@@ -162,6 +164,11 @@ export default defineNuxtConfig({
       }
     },
     '/login': {
+      headers: {
+        'cache-control': 'private, no-store'
+      }
+    },
+    '/activate': {
       headers: {
         'cache-control': 'private, no-store'
       }

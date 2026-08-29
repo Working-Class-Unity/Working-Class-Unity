@@ -45,9 +45,15 @@ const stripeSyncEnvironmentNames = [
   'WCU_STRIPE_LEGACY_DUES10_PRICE_IDS',
   'WCU_STRIPE_LEGACY_DUES27_PRICE_IDS'
 ]
+const activationPriceSources = {
+  NUXT_STRIPE_LEGACY_DUES10_PRICE_IDS: 'WCU_STRIPE_LEGACY_DUES10_PRICE_IDS',
+  NUXT_STRIPE_LEGACY_DUES27_PRICE_IDS: 'WCU_STRIPE_LEGACY_DUES27_PRICE_IDS'
+}
+const activationPriceEnvironmentNames = Object.keys(activationPriceSources)
 const clearedApplicationEnvironmentNames = [
   ...applicationSecretNames,
   ...excludedProviderEnvironmentNames,
+  ...activationPriceEnvironmentNames,
   ...stripeSyncEnvironmentNames
 ]
 const backupEnvironmentNames = [
@@ -109,9 +115,12 @@ test('required Coolify variables have no placeholder defaults', () => {
   const requiredEntries = Object.entries(services.web.environment).filter(
     ([, value]) => typeof value === 'string' && value.includes(':?')
   )
-  assert.deepEqual(requiredEntries.map(([name]) => name).sort(), requiredEnvironmentNames.toSorted())
+  assert.deepEqual(
+    requiredEntries.map(([name]) => name).sort(),
+    [...requiredEnvironmentNames, ...activationPriceEnvironmentNames].sort()
+  )
   for (const [name, value] of requiredEntries) {
-    assert.equal(value, '${' + name + ':?}')
+    assert.equal(value, '${' + (activationPriceSources[name] ?? name) + ':?}')
   }
   assert.equal(services.web.environment.NUXT_SENTRY_DSN, '${NUXT_SENTRY_DSN-}')
   assert.equal(services.web.environment.NUXT_PUBLIC_SENTRY_DSN, '${NUXT_PUBLIC_SENTRY_DSN-}')
@@ -247,6 +256,13 @@ test('service environment overrides Coolify shared env-file backup credentials',
       }
       assert.equal(rendered.services['stripe-sync-runner'].environment[name], validStripeSyncEnvironment[name])
     }
+    for (const [name, source] of Object.entries(activationPriceSources)) {
+      assert.equal(rendered.services.web.environment[name], validStripeSyncEnvironment[source])
+      assert.equal(rendered.services.worker.environment[name], validStripeSyncEnvironment[source])
+      for (const serviceName of ['migrate', 'backup-runner', 'stripe-sync-runner']) {
+        assert.equal(rendered.services[serviceName].environment[name], '')
+      }
+    }
     assert.equal(rendered.services['stripe-sync-runner'].environment.NODE_ENV, 'production')
   } finally {
     rmSync(directory, { recursive: true, force: true })
@@ -282,7 +298,11 @@ test('private operators receive only the provider credentials their commands req
   assert.equal(services.migrate.environment.NUXT_DATABASE_URL, 'file:/app/data/app.db')
   assert.equal(services['backup-runner'].environment.NUXT_DATABASE_URL, 'file:/app/data/app.db')
   assert.equal(services['stripe-sync-runner'].environment.NUXT_DATABASE_URL, 'file:/app/data/app.db')
-  for (const name of [...applicationSecretNames, ...excludedProviderEnvironmentNames]) {
+  for (const name of [
+    ...applicationSecretNames,
+    ...excludedProviderEnvironmentNames,
+    ...activationPriceEnvironmentNames
+  ]) {
     assert.equal(
       services['stripe-sync-runner'].environment[name],
       name === stripeAdoptionEmailSecretName ? '${NUXT_EMAIL_RESEND_API_KEY:?}' : clearedEnvironmentExpression

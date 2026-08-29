@@ -3,8 +3,8 @@ import type Stripe from 'stripe'
 import { z } from 'zod'
 import type { DatabaseConnection } from '../../db/connect'
 import { conflictError, upstreamServiceError, validationError } from '../../utils/errors'
-import { createMagicLinkEmail, type TransactionalEmailSender } from '../email'
-import type { StripeMembershipAdoptionPrices } from './stripe-link-sync'
+import { createAccountActivationEmail, type TransactionalEmailSender } from '../email'
+import { assertStripeMembershipAdoptionPrices, type StripeMembershipAdoptionPrices } from './stripe-link-sync'
 import { exactStripeMembershipStatus } from './stripe-projection'
 
 type AdoptionConnection = Readonly<{ sqlite: DatabaseConnection['sqlite'] }>
@@ -28,8 +28,12 @@ export async function issueStripeAccountAdoptionLink(input: {
   prices: StripeMembershipAdoptionPrices
   sender: TransactionalEmailSender
   subscriptionId: string
+  expectedEmail?: string
 }): Promise<void> {
   const membership = await validateAllowlistedSubscription(input.client, input.prices, input.subscriptionId)
+  if (input.expectedEmail && membership.email !== input.expectedEmail) {
+    throw conflictError('Stripe account adoption details changed')
+  }
   assertUnclaimed(input.connection, membership)
 
   const token = randomBytes(32).toString('base64url')
@@ -46,11 +50,42 @@ export async function issueStripeAccountAdoptionLink(input: {
   const url = `${appUrl}/api/auth/stripe-membership/adopt?token=${encodeURIComponent(token)}`
   try {
     await input.sender.send({
-      ...createMagicLinkEmail({ appName: input.appName, to: membership.email, url }),
+      ...createAccountActivationEmail({ appName: input.appName, to: membership.email, url }),
       idempotencyKey: `stripe-account-adoption-${digest(verificationId).slice(0, 32)}`
     })
   } catch (error) {
     input.connection.sqlite.prepare('delete from verification where id = ?').run(verificationId)
+    throw error
+  }
+}
+
+export async function requestStripeAccountActivation(input: {
+  appName: string
+  appUrl: string
+  client: Stripe
+  connection: AdoptionConnection
+  email: string
+  prices: StripeMembershipAdoptionPrices
+  sender: TransactionalEmailSender
+}): Promise<void> {
+  const email = normalizeEmail(input.email)
+  if (!email) throw validationError('Invalid account activation email')
+  const subscriptionId = await discoverEligibleSubscription(input.client, input.prices, email)
+  if (!subscriptionId) return
+
+  try {
+    await issueStripeAccountAdoptionLink({
+      appName: input.appName,
+      appUrl: input.appUrl,
+      client: input.client,
+      connection: input.connection,
+      expectedEmail: email,
+      prices: input.prices,
+      sender: input.sender,
+      subscriptionId
+    })
+  } catch (error) {
+    if (hasStatusCode(error, 409)) return
     throw error
   }
 }
@@ -120,6 +155,45 @@ export async function claimStripeAccountAdoption(input: {
 }
 
 type AdoptionMembership = z.infer<typeof adoptionClaimSchema>
+
+async function discoverEligibleSubscription(
+  client: Stripe,
+  prices: StripeMembershipAdoptionPrices,
+  email: string
+): Promise<string | null> {
+  assertStripeMembershipAdoptionPrices(prices)
+  const candidates = new Set<string>()
+
+  try {
+    for (const tier of ['member', 'solidarity'] as const) {
+      for (const priceId of prices[tier]) {
+        for await (const subscription of client.subscriptions.list({
+          expand: ['data.customer'],
+          limit: 100,
+          price: priceId,
+          status: 'active'
+        })) {
+          const customer = expandedCustomer(subscription.customer)
+          if (!customer || normalizeEmail(customer.email) !== email) continue
+          if (
+            exactStripeMembershipStatus(subscription, {
+              stripeCustomerId: customer.id,
+              stripePriceId: priceId,
+              stripeSubscriptionId: subscription.id,
+              tier
+            }) === 'active'
+          ) {
+            candidates.add(subscription.id)
+          }
+        }
+      }
+    }
+  } catch {
+    throw upstreamServiceError(502, 'Stripe is temporarily unavailable')
+  }
+
+  return candidates.size === 1 ? [...candidates][0]! : null
+}
 
 async function validateAllowlistedSubscription(
   client: Stripe,
@@ -232,6 +306,10 @@ function normalizeEmail(value: string | null | undefined): string | null {
   return email.length >= 3 && email.length <= 320 && email.indexOf('@') > 0 ? email : null
 }
 
+function expandedCustomer(value: Stripe.Subscription['customer']): Stripe.Customer | null {
+  return typeof value === 'string' || value.deleted ? null : value
+}
+
 function stripeId(value: string | { id: string } | null, prefix: string): string | null {
   const id = typeof value === 'string' ? value : value?.id
   return id?.startsWith(prefix) ? id : null
@@ -243,6 +321,10 @@ async function stripeRead<T>(read: () => Promise<T>): Promise<T> {
   } catch {
     throw upstreamServiceError(502, 'Stripe is temporarily unavailable')
   }
+}
+
+function hasStatusCode(error: unknown, statusCode: number): boolean {
+  return Boolean(error && typeof error === 'object' && 'statusCode' in error && error.statusCode === statusCode)
 }
 
 function verificationIdentifier(token: string): string {

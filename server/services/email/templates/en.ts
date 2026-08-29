@@ -22,6 +22,30 @@ export function renderEnglishMagicLinkEmail(input: { to: string; url: string; ap
   }
 }
 
+export function renderEnglishAccountActivationEmail(input: { to: string; url: string; appName: string }) {
+  const escapedAppName = escapeHtml(input.appName)
+  const escapedUrl = escapeHtml(input.url)
+
+  return {
+    to: input.to,
+    subject: 'Activate your WCU website account',
+    text: [
+      `Activate your ${input.appName} website account:`,
+      '',
+      input.url,
+      '',
+      'This link expires in 5 minutes and can be used once.',
+      "If you didn't request this link, you can ignore this email."
+    ].join('\n'),
+    html: [
+      `<p>Activate your ${escapedAppName} website account:</p>`,
+      `<p><a href="${escapedUrl}">Activate your ${escapedAppName} account</a></p>`,
+      '<p>This link expires in 5 minutes and can be used once.</p>',
+      "<p>If you didn't request this link, you can ignore this email.</p>"
+    ].join('')
+  }
+}
+
 export function renderEnglishAccountEmailVerificationEmail(input: { to: string; url: string; appName: string }) {
   const escapedAppName = escapeHtml(input.appName)
   const escapedUrl = escapeHtml(input.url)

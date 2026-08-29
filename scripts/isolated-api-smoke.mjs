@@ -65,7 +65,9 @@ const stripeProviderRequests = []
 const stripeCatalog = {
   portalConfigurationId: 'bpc_isolated',
   membershipDues10PriceId: 'price_isolated_personal_monthly',
-  solidarityDues27PriceId: 'price_isolated_family_monthly'
+  solidarityDues27PriceId: 'price_isolated_family_monthly',
+  legacyDues10PriceIds: 'membership-10-1month',
+  legacyDues27PriceIds: 'solidarity-27-1month'
 }
 let server
 let serverOutputMonitor
@@ -227,6 +229,8 @@ function applicationEnvironment(baseUrl, port) {
     NUXT_STRIPE_PORTAL_CONFIGURATION_ID: stripeCatalog.portalConfigurationId,
     NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID: stripeCatalog.membershipDues10PriceId,
     NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID: stripeCatalog.solidarityDues27PriceId,
+    NUXT_STRIPE_LEGACY_DUES10_PRICE_IDS: stripeCatalog.legacyDues10PriceIds,
+    NUXT_STRIPE_LEGACY_DUES27_PRICE_IDS: stripeCatalog.legacyDues27PriceIds,
     SWL_ISOLATED_STRIPE_PROVIDER_URL: stripeProviderUrl,
     SWL_ISOLATED_TURNSTILE_HOSTNAME: new URL(baseUrl).hostname
   }

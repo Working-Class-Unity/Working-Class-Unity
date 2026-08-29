@@ -1493,6 +1493,8 @@ function runtimeEnvironment(overrides: Record<string, string | undefined> = {}) 
     NUXT_STRIPE_PORTAL_CONFIGURATION_ID: 'bpc_foundation',
     NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID: 'price_foundation_personal_monthly',
     NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID: 'price_foundation_family_monthly',
+    NUXT_STRIPE_LEGACY_DUES10_PRICE_IDS: 'membership-10-1month',
+    NUXT_STRIPE_LEGACY_DUES27_PRICE_IDS: 'solidarity-27-1month',
     NUXT_FILES_DRIVER: 'local',
     NUXT_OPENAI_API_KEY: 'foundation-openai-key-not-a-provider-credential',
     NUXT_OPENAI_PROJECT_ID: 'proj_foundation_test',
@@ -1537,7 +1539,9 @@ function completeRuntimeConfig() {
       webhookSecret: 'whsec_foundation_not_a_provider_credential',
       portalConfigurationId: 'bpc_foundation',
       membershipDues10PriceId: 'price_foundation_personal_monthly',
-      solidarityDues27PriceId: 'price_foundation_family_monthly'
+      solidarityDues27PriceId: 'price_foundation_family_monthly',
+      legacyDues10PriceIds: 'membership-10-1month',
+      legacyDues27PriceIds: 'solidarity-27-1month'
     },
     files: {
       driver: 'local' as '' | 'local' | 'r2'

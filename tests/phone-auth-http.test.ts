@@ -210,7 +210,9 @@ function runtimeConfig(): AppRuntimeConfig {
     },
     stripe: {
       membershipDues10PriceId: 'price_phone_auth_membership_10',
-      solidarityDues27PriceId: 'price_phone_auth_solidarity_27'
+      solidarityDues27PriceId: 'price_phone_auth_solidarity_27',
+      legacyDues10PriceIds: 'membership-10-1month',
+      legacyDues27PriceIds: 'solidarity-27-1month'
     },
     twilioVerify: {
       apiKeySid: 'SK00000000000000000000000000000000',

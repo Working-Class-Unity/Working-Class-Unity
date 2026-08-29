@@ -37,7 +37,9 @@ const runtimeStripeWebhookSecret = 'whsec_ci_only_runtime_browser_webhook_secret
 const runtimeStripeCatalog = {
   portalConfigurationId: 'bpc_ci_runtime',
   membershipDues10PriceId: 'price_ci_runtime_personal_monthly',
-  solidarityDues27PriceId: 'price_ci_runtime_family_monthly'
+  solidarityDues27PriceId: 'price_ci_runtime_family_monthly',
+  legacyDues10PriceIds: 'membership-10-1month',
+  legacyDues27PriceIds: 'solidarity-27-1month'
 }
 const browserAuthEmailMarker = 'ci-only-browser-auth-recipient'
 const bearerEmailSubjects = new Set(['Your sign-in link'])
@@ -219,7 +221,9 @@ function applicationEnvironment({ appName, appUrl, databasePath: selectedDatabas
     NUXT_STRIPE_WEBHOOK_SECRET: runtimeStripeWebhookSecret,
     NUXT_STRIPE_PORTAL_CONFIGURATION_ID: runtimeStripeCatalog.portalConfigurationId,
     NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID: runtimeStripeCatalog.membershipDues10PriceId,
-    NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID: runtimeStripeCatalog.solidarityDues27PriceId
+    NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID: runtimeStripeCatalog.solidarityDues27PriceId,
+    NUXT_STRIPE_LEGACY_DUES10_PRICE_IDS: runtimeStripeCatalog.legacyDues10PriceIds,
+    NUXT_STRIPE_LEGACY_DUES27_PRICE_IDS: runtimeStripeCatalog.legacyDues27PriceIds
   }
 }
 

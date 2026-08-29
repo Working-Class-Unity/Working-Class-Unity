@@ -192,6 +192,8 @@ function configureRuntime(databasePath: string) {
     NUXT_STRIPE_PORTAL_CONFIGURATION_ID: 'bpc_account_deletion_integration',
     NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID: 'price_account_deletion_personal_monthly',
     NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID: 'price_account_deletion_family_monthly',
+    NUXT_STRIPE_LEGACY_DUES10_PRICE_IDS: 'membership-10-1month',
+    NUXT_STRIPE_LEGACY_DUES27_PRICE_IDS: 'solidarity-27-1month',
     NUXT_CLOUDFLARE_TURNSTILE_SECRET_KEY: 'account-deletion-turnstile-not-a-provider-credential',
     NUXT_PUBLIC_TURNSTILE_SITE_KEY: 'account-deletion-turnstile-site-not-a-provider-credential'
   }

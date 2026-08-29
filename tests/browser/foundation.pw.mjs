@@ -75,7 +75,7 @@ const isolatedTurnstileBrowserSource = `
       if (
         !(container instanceof HTMLElement) ||
         !String(options?.sitekey || '').startsWith('isolated-turnstile-') ||
-        options?.action !== 'auth_magic_link' ||
+        !['auth_magic_link', 'auth_membership_activation'].includes(options?.action) ||
         typeof options?.callback !== 'function'
       ) {
         throw new Error('Invalid isolated Turnstile widget configuration')
@@ -585,6 +585,35 @@ test('login is accessible before and after requesting a magic link', async ({ pa
   await expect(page.getByText('Security check complete.', { exact: true })).toBeVisible()
   await expect(page.locator('input[type="password"]')).toHaveCount(0)
   await expect(page.locator('.mode-tabs')).toHaveCount(0)
+  await assertAccessibleWithoutOverflow(page)
+  await assertCleanPage(page, observations)
+})
+
+test('unknown login guidance leads to neutral paid-member activation', async ({ page }) => {
+  const observations = observePage(page)
+  await page.goto('/login?error=new_user_signup_disabled')
+  await expect(page.getByRole('alert')).toContainText('This email does not have an activated WCU website account.')
+  await expect(page.getByRole('link', { name: 'Join WCU.' })).toHaveAttribute('href', '/join')
+  await expect(page.getByRole('link', { name: 'Activate your account.' })).toHaveAttribute('href', '/activate')
+  await page.waitForLoadState('networkidle')
+
+  let activationRequest
+  await page.route('**/api/auth/stripe-membership/activate', async (route) => {
+    activationRequest = route.request()
+    await route.fulfill({ status: 200, contentType: 'application/json', body: '{"status":true}' })
+  })
+  await page.goto('/activate')
+  await expect(page).toHaveTitle('Activate your account')
+  await expect(page.getByRole('heading', { name: 'Activate your account', level: 1 })).toBeVisible()
+  await expect(page.getByText('Security check complete.', { exact: true })).toBeVisible()
+  const email = page.getByRole('textbox', { name: 'Email', exact: true })
+  await email.fill('legacy.member@example.test')
+  await page.getByRole('button', { name: 'Send activation link' }).click()
+  await expect(page.locator('#activate-form-status[role="status"]')).toContainText(
+    'If this email is eligible, an activation link will be sent to the email currently held by Stripe.'
+  )
+  expect(activationRequest?.postDataJSON()).toEqual({ email: 'legacy.member@example.test' })
+  expect(activationRequest?.headers()['x-turnstile-token']).toMatch(/^isolated-turnstile-/)
   await assertAccessibleWithoutOverflow(page)
   await assertCleanPage(page, observations)
 })

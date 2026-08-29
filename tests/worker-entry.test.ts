@@ -167,7 +167,9 @@ describe('worker entry', () => {
         NUXT_STRIPE_WEBHOOK_SECRET: 'whsec_worker_entry',
         NUXT_STRIPE_PORTAL_CONFIGURATION_ID: 'bpc_worker_entry',
         NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID: 'price_worker_personal_monthly',
-        NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID: 'price_worker_family_monthly'
+        NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID: 'price_worker_family_monthly',
+        NUXT_STRIPE_LEGACY_DUES10_PRICE_IDS: 'membership-10-1month',
+        NUXT_STRIPE_LEGACY_DUES27_PRICE_IDS: 'solidarity-27-1month'
       })
 
       expect(await waitForCompletedJob(sqlite, jobId)).toEqual(completedOnce)
@@ -318,6 +320,8 @@ function workerEnvironment(databasePath: string, overrides: Record<string, strin
     NUXT_STRIPE_PORTAL_CONFIGURATION_ID: 'bpc_worker_entry',
     NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID: 'price_worker_personal_monthly',
     NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID: 'price_worker_family_monthly',
+    NUXT_STRIPE_LEGACY_DUES10_PRICE_IDS: 'membership-10-1month',
+    NUXT_STRIPE_LEGACY_DUES27_PRICE_IDS: 'solidarity-27-1month',
     NUXT_CLOUDFLARE_TURNSTILE_SECRET_KEY: 'worker-turnstile-secret-not-a-provider-credential',
     NUXT_PUBLIC_TURNSTILE_SITE_KEY: 'worker-turnstile-site-not-a-provider-credential',
     NUXT_SENTRY_DSN: 'https://server@example.ingest.sentry.io/1',
