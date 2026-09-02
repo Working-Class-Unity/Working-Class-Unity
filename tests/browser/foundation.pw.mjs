@@ -313,30 +313,32 @@ test('global public navigation exposes current routes and a route-closing mobile
   await assertCleanPage(page, observations)
 })
 
-test('campaign update prompts use the hosted Deflock form without collecting contact details', async ({ page }) => {
+test('campaign update prompt uses the hosted Deflock form without collecting contact details', async ({ page }) => {
   const observations = observePage(page)
   await page.setViewportSize({ width: 1280, height: 900 })
   await page.goto('/campaigns/remove-flock-stockton')
 
   const updatesLinks = page.getByRole('link', { name: 'Stay informed', exact: true })
-  const updatesNotes = page.locator('.campaign-newsletter > p')
-  await expect(updatesLinks).toHaveCount(2)
-  await expect(updatesNotes).toHaveCount(2)
+  const updatesNotes = page.locator('#campaign-updates-note')
+  await expect(page.locator('.campaign-newsletter')).toHaveCount(1)
+  await expect(updatesLinks).toHaveCount(1)
+  await expect(updatesNotes).toHaveCount(1)
   await expect(page.locator('.campaign-newsletter form')).toHaveCount(0)
   await expect(page.locator('.campaign-newsletter input')).toHaveCount(0)
   await expect(page.locator('.campaign-newsletter iframe')).toHaveCount(0)
 
-  for (let index = 0; index < 2; index += 1) {
-    const updatesLink = updatesLinks.nth(index)
-    await expect(updatesLink).toHaveAttribute('href', 'https://tech.workingclassunity.com/deflock-stockton-updates')
-    await assertMinimumTargetSize(updatesLink)
-    const colors = await updatesLink.evaluate((element) => {
-      const style = getComputedStyle(element)
-      return { background: style.backgroundColor, text: style.color }
-    })
-    expect(contrastRatio(colors.text, colors.background), 'signup link text contrast').toBeGreaterThanOrEqual(4.5)
-    await expect(updatesNotes.nth(index)).toHaveText(campaignUpdatesDisclaimer)
-  }
+  const updatesLink = updatesLinks.first()
+  await expect(updatesLink).toHaveAttribute('href', 'https://tech.workingclassunity.com/deflock-stockton-updates')
+  await assertMinimumTargetSize(updatesLink)
+  const colors = await updatesLink.evaluate((element) => {
+    const section = element.closest('.campaign-participation')
+    return {
+      background: getComputedStyle(section ?? element).backgroundColor,
+      text: getComputedStyle(element).color
+    }
+  })
+  expect(contrastRatio(colors.text, colors.background), 'signup link text contrast').toBeGreaterThanOrEqual(4.5)
+  await expect(updatesNotes).toHaveText(campaignUpdatesDisclaimer)
   await assertAccessibleWithoutOverflow(page, '.campaign-newsletter')
 
   await page.setViewportSize({ width: 390, height: 844 })
@@ -392,16 +394,17 @@ test('campaign citations preview, navigate, and return at desktop and mobile wid
   await expect(firstCitation).toBeFocused()
 
   await page.goto('/campaigns/remove-flock-stockton/what-stockton-bought')
-  const costGridColumnCounts = []
+  const costRowColumnCounts = []
   for (const width of [1600, 1280, 920, 880, 600]) {
     await page.setViewportSize({ width, height: 900 })
-    costGridColumnCounts.push(
+    costRowColumnCounts.push(
       await page
-        .locator('.record-costs')
+        .locator('.record-costs > div')
+        .first()
         .evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(' ').length)
     )
   }
-  expect(costGridColumnCounts).toEqual([5, 2, 1, 1, 1])
+  expect(costRowColumnCounts).toEqual([3, 3, 3, 1, 1])
   await page.setViewportSize({ width: 1280, height: 900 })
 
   const customSectionCitation = page.locator('#what-stockton-bought-title-contract-fact-1-citation-1-1')

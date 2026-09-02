@@ -115,7 +115,9 @@ function currentPage(path: string) {
   .campaign-name {
     display: grid;
     gap: var(--space-1);
+    min-block-size: var(--control-min-block-size);
     min-inline-size: max-content;
+    align-content: center;
     color: var(--color-brand-primary);
     font-family: var(--font-family-display);
     font-size: 1.125rem;
@@ -227,6 +229,9 @@ function currentPage(path: string) {
   }
 
   .campaign-footer-home {
+    display: inline-flex;
+    min-block-size: var(--control-min-block-size);
+    align-items: center;
     color: var(--color-brand-primary);
     font-family: var(--font-family-display);
     font-size: 1.25rem;
@@ -270,6 +275,13 @@ function currentPage(path: string) {
     color: var(--color-text-muted);
     font-size: 1rem;
     font-weight: 400;
+  }
+
+  .campaign-footer-column a {
+    display: inline-flex;
+    min-block-size: var(--control-min-block-size);
+    min-inline-size: var(--control-min-inline-size);
+    align-items: center;
   }
 
   .campaign-footer-column a:hover,

@@ -186,6 +186,8 @@ function itemMarker(item: PageOutlineItem, index: number) {
 
   .page-outline-link {
     grid-template-columns: 1.75rem minmax(0, 1fr);
+    min-block-size: var(--control-min-block-size);
+    align-items: center;
     padding: var(--space-2);
     font-size: 0.875rem;
   }
