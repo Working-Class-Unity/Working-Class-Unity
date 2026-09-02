@@ -78,17 +78,19 @@
   },
   "navigation": {
     "skipToMain": "Skip to main content",
-    "applicationLabel": "Application",
+    "applicationLabel": "Working Class Unity site header",
     "brandHome": "{appName} home",
     "primaryLabel": "Primary",
     "sessionUnavailable": "Session check unavailable",
-    "about": "About",
-    "calendar": "Calendar",
-    "forum": "Forum",
+    "about": "Who We Are",
+    "currentWork": "Current Work",
+    "calendar": "Events",
+    "forum": "Member Forum",
     "menu": "Menu",
     "app": "App",
-    "login": "Log In",
-    "signup": "JOIN NOW"
+    "login": "Member Login",
+    "signup": "Join WCU",
+    "getInvolved": "Get Involved"
   },
   "removeFlock": {
     "campaignLabel": "Remove mass surveillance from Stockton side-quest",
@@ -428,13 +430,72 @@
   "home": {
     "eyebrow": "WORKING CLASS UNITY · SAN JOAQUIN COUNTY",
     "title": "Working People Need an Organization of Our Own",
-    "introduction": "WCU brings tenants, workers, and neighbors together to win concrete changes, develop new leaders, and build lasting power.",
-    "join": "JOIN WCU",
-    "nextEvent": "NEXT EVENT",
-    "newsletterHeading": "Stay informed about meetings and actions.",
-    "newsletterSubmit": "STAY INFORMED",
+    "introduction": "WCU is a member-run organization bringing working people together across San Joaquin County. We act collectively to win concrete changes, develop new leaders, and build lasting power.",
+    "actions": {
+      "events": "See upcoming events",
+      "currentWork": "See what WCU is working on"
+    },
+    "media": {
+      "placeholder": "Documentary image pending final approval.",
+      "caption": "This space is reserved for an approved image of WCU members acting together."
+    },
+    "identity": {
+      "eyebrow": "WHAT MEMBER-RUN MEANS",
+      "title": "Members make the decisions",
+      "description": "Working Class Unity is not a service provider speaking for people from a distance. Members govern the organization, choose its focus campaigns, and carry out the work together.",
+      "action": "Read who we are"
+    },
+    "currentWork": {
+      "eyebrow": "ACTIVE NOW",
+      "place": "STOCKTON",
+      "currentThrough": "Public record checked August 8, 2026",
+      "source": "Public-record summary",
+      "title": "Remove mass surveillance",
+      "titleContext": "from Stockton",
+      "description": "Stockton extended its Flock agreement through April 14, 2031, with a stated contract maximum of $5.4167 million. WCU is organizing for removal and meaningful public control over surveillance spending.",
+      "contractValue": "$5.4167M",
+      "contractLabel": "stated contract maximum",
+      "termValue": "APR. 14, 2031",
+      "termLabel": "current agreement end date",
+      "campaignAction": "See the campaign",
+      "petitionAction": "Sign the demand letter"
+    },
+    "governance": {
+      "eyebrow": "HOW WCU WORKS",
+      "title": "Member-run is a real structure",
+      "description": "The bylaws put governing power in the membership. These are operating rules, not a slogan.",
+      "sourceCurrentThrough": "Bylaws updated February 12, 2026",
+      "source": "Read the bylaws",
+      "generalMeetings": {
+        "value": "GENERAL MEETINGS",
+        "label": "Primary governing body",
+        "context": "Members participate in the body's decisions and direct the organization."
+      },
+      "campaignVote": {
+        "value": "TWO-THIRDS",
+        "label": "Vote to adopt a focus campaign",
+        "context": "A proposed focus campaign becomes WCU work only after a membership vote."
+      },
+      "campaignReview": {
+        "value": "6 MONTHS",
+        "label": "Campaign reapproval cycle",
+        "context": "Focus campaigns return to the membership for reapproval and leadership elections."
+      }
+    },
+    "participation": {
+      "eyebrow": "YOUR FIRST STEP",
+      "title": "Start by showing up",
+      "description": "Come to a public event, meet people, and see the work for yourself. You can return for another social event or try a concrete task before deciding whether membership is right for you.",
+      "eventsAction": "See upcoming events",
+      "nextTitle": "What happens next",
+      "stepOne": "Choose a public event that fits your interests and availability.",
+      "stepTwo": "Meet members and take part at the level that feels right.",
+      "stepThree": "If you want a deeper commitment, ask about membership orientation."
+    },
+    "newsletterHeading": "Not ready to attend yet? Stay informed about meetings and actions.",
+    "newsletterSubmit": "Stay informed",
     "newsletterNote": "Choose email, text messages, or both. By signing up, you agree to receive WCU updates through the options you select. Message frequency varies; message and data rates may apply. Unsubscribe from email or reply STOP to stop texts.",
-    "photoCaption": "Real WCU moments across San Joaquin County."
+    "accountability": "Working Class Unity is a member-run organization. Public claims on this page link to the record that supports them."
   },
   "personalApp": {
     "eyebrow": "Working Class Unity",

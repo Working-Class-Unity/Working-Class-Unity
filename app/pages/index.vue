@@ -1,39 +1,34 @@
 <script setup lang="ts">
-import heroAssets from '~/generated/hero-assets.json'
-
-type ImageVariant = Readonly<{
-  src: string
-  width: number
-}>
-
-type HeroBackground = Readonly<{
-  id: string
-  variants: Readonly<{
-    avif: readonly ImageVariant[]
-    webp: readonly ImageVariant[]
-  }>
-}>
+import { computed } from 'vue'
 
 const { t } = useI18n()
-const backgrounds = heroAssets.backgrounds as HeroBackground[]
 
-function background(id: string) {
-  const asset = backgrounds.find((item) => item.id === id)
-  if (!asset) throw new Error(`Missing generated hero background: ${id}`)
-  return asset
-}
-
-function sourceSet(variants: readonly ImageVariant[]) {
-  return variants.map((variant) => `${variant.src} ${variant.width}w`).join(', ')
-}
-
-function fallbackSource(asset: HeroBackground) {
-  return asset.variants.webp.at(-1)!.src
-}
-
-const landscape = background('landscape')
-const portrait = background('portrait')
-const portraitTall = background('portrait-tall')
+const governanceProof = computed(() => [
+  {
+    value: t('home.governance.generalMeetings.value'),
+    label: t('home.governance.generalMeetings.label'),
+    context: t('home.governance.generalMeetings.context'),
+    currentThrough: t('home.governance.sourceCurrentThrough'),
+    sourceLabel: t('home.governance.source'),
+    sourceHref: '/bylaws'
+  },
+  {
+    value: t('home.governance.campaignVote.value'),
+    label: t('home.governance.campaignVote.label'),
+    context: t('home.governance.campaignVote.context'),
+    currentThrough: t('home.governance.sourceCurrentThrough'),
+    sourceLabel: t('home.governance.source'),
+    sourceHref: '/bylaws'
+  },
+  {
+    value: t('home.governance.campaignReview.value'),
+    label: t('home.governance.campaignReview.label'),
+    context: t('home.governance.campaignReview.context'),
+    currentThrough: t('home.governance.sourceCurrentThrough'),
+    sourceLabel: t('home.governance.source'),
+    sourceHref: '/bylaws'
+  }
+])
 
 useHead(() => ({
   title: t('metadata.home.title'),
@@ -42,335 +37,474 @@ useHead(() => ({
 </script>
 
 <template>
-  <!-- eslint-disable vue/html-self-closing -->
-  <section class="home-hero" aria-labelledby="home-hero-title">
-    <picture class="hero-landscape" aria-hidden="true">
-      <source
-        media="(max-width: 37.5rem)"
-        type="image/avif"
-        :srcset="sourceSet(portraitTall.variants.avif)"
-        sizes="100vw"
-      />
-      <source
-        media="(max-width: 37.5rem)"
-        type="image/webp"
-        :srcset="sourceSet(portraitTall.variants.webp)"
-        sizes="100vw"
-      />
-      <source media="(max-width: 60rem)" type="image/avif" :srcset="sourceSet(portrait.variants.avif)" sizes="100vw" />
-      <source media="(max-width: 60rem)" type="image/webp" :srcset="sourceSet(portrait.variants.webp)" sizes="100vw" />
-      <source type="image/avif" :srcset="sourceSet(landscape.variants.avif)" sizes="100vw" />
-      <source type="image/webp" :srcset="sourceSet(landscape.variants.webp)" sizes="100vw" />
-      <img :src="fallbackSource(landscape)" alt="" width="1672" height="941" fetchpriority="high" />
-    </picture>
-
-    <div class="hero-layout">
-      <div class="hero-copy">
-        <div class="hero-heading-group">
-          <p class="hero-eyebrow">{{ t('home.eyebrow') }}</p>
-          <h1 id="home-hero-title" class="hero-title">{{ t('home.title') }}</h1>
-          <p class="hero-introduction">{{ t('home.introduction') }}</p>
+  <article class="home-page">
+    <section class="home-hero open-split" aria-labelledby="home-hero-title">
+      <div class="home-hero-copy">
+        <p class="section-eyebrow">{{ t('home.eyebrow') }}</p>
+        <h1 id="home-hero-title">{{ t('home.title') }}</h1>
+        <p class="home-introduction">{{ t('home.introduction') }}</p>
+        <div class="home-actions">
+          <AppActionLink to="/calendar">{{ t('home.actions.events') }}</AppActionLink>
+          <AppActionLink to="/#current-work" variant="secondary">
+            {{ t('home.actions.currentWork') }}
+          </AppActionLink>
         </div>
-
-        <div class="hero-actions">
-          <NuxtLink class="hero-action hero-action--primary" to="/join">{{ t('home.join') }}</NuxtLink>
-          <NuxtLink class="hero-action hero-action--secondary" to="/calendar">
-            {{ t('home.nextEvent') }}
-          </NuxtLink>
-        </div>
-
-        <section class="newsletter" aria-labelledby="newsletter-heading">
-          <h2 id="newsletter-heading" class="newsletter-heading">{{ t('home.newsletterHeading') }}</h2>
-          <a
-            class="newsletter-action"
-            href="https://tech.workingclassunity.com/wcu-updates"
-            aria-describedby="newsletter-note"
-          >
-            {{ t('home.newsletterSubmit') }}
-          </a>
-          <p id="newsletter-note" class="newsletter-note">{{ t('home.newsletterNote') }}</p>
-        </section>
       </div>
 
-      <HeroPhotoWall class="hero-photos" />
-    </div>
-  </section>
+      <DocumentaryFigure
+        class="home-documentary"
+        ratio="4:3"
+        :caption="t('home.media.caption')"
+        :placeholder-label="t('home.media.placeholder')"
+      />
+    </section>
+
+    <section class="home-identity" aria-labelledby="home-identity-title">
+      <header>
+        <p class="section-eyebrow">{{ t('home.identity.eyebrow') }}</p>
+        <h2 id="home-identity-title">{{ t('home.identity.title') }}</h2>
+      </header>
+      <div class="home-identity-copy">
+        <p>{{ t('home.identity.description') }}</p>
+        <AppActionLink to="/about" variant="secondary">{{ t('home.identity.action') }}</AppActionLink>
+      </div>
+    </section>
+
+    <section id="current-work" class="home-current-work" aria-labelledby="home-current-work-title">
+      <EvidenceMetaLine
+        :current-through="t('home.currentWork.currentThrough')"
+        :place="t('home.currentWork.place')"
+        :source-href="'/campaigns/remove-flock-stockton/what-stockton-bought'"
+        :source-label="t('home.currentWork.source')"
+        :status="t('home.currentWork.eyebrow')"
+      />
+
+      <div class="home-current-work-grid">
+        <div class="home-current-work-copy">
+          <h2 id="home-current-work-title">
+            <span>{{ t('home.currentWork.title') }}</span>
+            {{ t('home.currentWork.titleContext') }}
+          </h2>
+          <p>{{ t('home.currentWork.description') }}</p>
+          <div class="home-current-work-actions">
+            <AppActionLink to="https://tech.workingclassunity.com/deflock-stockton" variant="campaign">
+              {{ t('home.currentWork.petitionAction') }}
+            </AppActionLink>
+            <NuxtLink class="campaign-brief-link" to="/campaigns/remove-flock-stockton">
+              {{ t('home.currentWork.campaignAction') }}
+            </NuxtLink>
+          </div>
+        </div>
+
+        <dl class="home-current-work-facts">
+          <div>
+            <dt>{{ t('home.currentWork.contractLabel') }}</dt>
+            <dd>{{ t('home.currentWork.contractValue') }}</dd>
+          </div>
+          <div>
+            <dt>{{ t('home.currentWork.termLabel') }}</dt>
+            <dd>{{ t('home.currentWork.termValue') }}</dd>
+          </div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="home-governance" aria-labelledby="home-governance-title">
+      <header class="home-section-heading">
+        <p class="section-eyebrow">{{ t('home.governance.eyebrow') }}</p>
+        <h2 id="home-governance-title">{{ t('home.governance.title') }}</h2>
+        <p class="home-section-description">{{ t('home.governance.description') }}</p>
+      </header>
+      <ProofStrip :items="governanceProof" />
+    </section>
+
+    <section id="get-involved" class="home-participation open-split" aria-labelledby="home-participation-title">
+      <div class="home-participation-copy">
+        <p class="section-eyebrow">{{ t('home.participation.eyebrow') }}</p>
+        <h2 id="home-participation-title">{{ t('home.participation.title') }}</h2>
+        <p>{{ t('home.participation.description') }}</p>
+        <div class="home-actions">
+          <AppActionLink to="/calendar">{{ t('home.participation.eventsAction') }}</AppActionLink>
+        </div>
+      </div>
+
+      <div class="participation-steps">
+        <h3>{{ t('home.participation.nextTitle') }}</h3>
+        <ol>
+          <li>{{ t('home.participation.stepOne') }}</li>
+          <li>{{ t('home.participation.stepTwo') }}</li>
+          <li>{{ t('home.participation.stepThree') }}</li>
+        </ol>
+      </div>
+    </section>
+
+    <aside class="home-updates" aria-labelledby="home-updates-title">
+      <div class="home-updates-copy">
+        <h2 id="home-updates-title">{{ t('home.newsletterHeading') }}</h2>
+        <p id="newsletter-note" class="home-updates-note">{{ t('home.newsletterNote') }}</p>
+      </div>
+      <AppActionLink
+        aria-describedby="newsletter-note"
+        to="https://tech.workingclassunity.com/wcu-updates"
+        variant="secondary"
+      >
+        {{ t('home.newsletterSubmit') }}
+      </AppActionLink>
+    </aside>
+
+    <p class="home-accountability">{{ t('home.accountability') }}</p>
+  </article>
 </template>
 
 <style scoped>
 @layer components {
-  .home-hero {
-    --hero-header-block-size: clamp(5.75rem, 8vw, 6.75rem);
-
-    position: relative;
-    isolation: isolate;
-    block-size: calc(100svh - var(--hero-header-block-size));
-    min-block-size: 37rem;
-    max-block-size: 52rem;
-    overflow: hidden;
-    border-radius: 0 0 var(--radius-2) var(--radius-2);
+  .home-page {
+    min-width: 0;
     background: var(--color-canvas);
   }
 
-  .hero-landscape,
-  .hero-landscape img {
-    position: absolute;
-    z-index: -2;
-    inset: 0;
-    inline-size: 100%;
-    block-size: 100%;
+  .home-hero,
+  .home-identity,
+  .home-governance,
+  .home-participation {
+    padding-block: var(--space-9);
   }
 
-  .hero-landscape img {
-    object-fit: cover;
-    object-position: bottom center;
+  .home-hero {
+    --split-align: center;
   }
 
-  .home-hero::after {
-    position: absolute;
-    z-index: -1;
-    inset: 0;
-    background: linear-gradient(90deg, rgb(247 249 252 / 97%) 0%, rgb(247 249 252 / 86%) 47%, transparent 70%);
-    content: '';
-    pointer-events: none;
-  }
-
-  .hero-layout {
+  .home-hero-copy,
+  .home-section-heading,
+  .home-participation-copy {
     display: grid;
-    grid-template-columns: minmax(22rem, 1fr) 40%;
-    grid-template-rows: minmax(0, 1fr);
-    gap: clamp(1rem, 2.5vw, 2.75rem);
-    block-size: 100%;
-    min-block-size: 0;
-    overflow: hidden;
-  }
-
-  .hero-copy {
-    z-index: 1;
-    align-self: center;
-    max-inline-size: 43rem;
-    padding: clamp(2.5rem, 6vh, 4.75rem) clamp(1rem, 2vw, 2.25rem) clamp(4.5rem, 10vh, 7rem) var(--home-content-inset);
-  }
-
-  .hero-heading-group {
-    display: grid;
+    justify-items: start;
     gap: var(--space-5);
   }
 
-  .hero-eyebrow,
-  .hero-title,
-  .hero-introduction,
-  .newsletter-note {
+  .section-eyebrow,
+  .home-introduction,
+  .home-identity p,
+  .home-current-work p,
+  .home-governance p,
+  .home-participation p,
+  .home-updates p,
+  .home-accountability {
     margin: 0;
   }
 
-  .hero-eyebrow {
+  .section-eyebrow {
     color: var(--color-accent-action);
-    font-family: var(--font-family-body);
-    font-size: clamp(0.875rem, 0.78rem + 0.2vw, 1rem);
-    font-weight: 750;
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-bold);
     letter-spacing: 0.08em;
     line-height: 1.35;
     text-transform: uppercase;
   }
 
-  .hero-title {
-    max-inline-size: 12ch;
+  .home-hero h1 {
+    max-inline-size: 14ch;
+    margin: 0;
     color: var(--color-brand-primary);
-    font-family: var(--font-family-display);
-    font-size: clamp(3rem, 2rem + 3.1vw, 5rem);
-    font-stretch: 115%;
-    font-weight: 650;
-    letter-spacing: -0.055em;
-    line-height: 0.94;
+    font-size: var(--font-size-heading-1);
+    letter-spacing: -0.035em;
     text-wrap: balance;
   }
 
-  .hero-introduction {
-    max-inline-size: 46ch;
-    color: var(--color-text);
-    font-size: clamp(1.05rem, 0.95rem + 0.3vw, 1.25rem);
-    line-height: 1.55;
+  .home-introduction,
+  .home-participation-copy > p {
+    max-inline-size: 56ch;
+    font-size: var(--font-size-lede);
+    line-height: 1.6;
     text-wrap: pretty;
   }
 
-  .hero-actions {
+  .home-actions {
     display: flex;
-    gap: var(--space-4);
+    gap: var(--space-3);
     flex-wrap: wrap;
-    margin-block-start: var(--space-7);
-  }
-
-  .hero-action {
-    --color-action: var(--color-brand-primary);
-
-    display: inline-flex;
-    min-block-size: 3.5rem;
-    min-inline-size: min(11.5rem, 100%);
-    align-items: center;
-    justify-content: center;
-    border: 2px solid var(--color-brand-primary);
-    border-radius: var(--radius-2);
-    padding: var(--space-3) var(--space-4);
-    font-family: var(--font-family-body);
-    font-size: 0.9375rem;
-    font-weight: 750;
-    letter-spacing: 0.01em;
-    text-align: center;
-    text-decoration: none;
-  }
-
-  .hero-action--primary {
-    --color-action: var(--color-accent-action-contrast);
-
-    border-color: var(--color-accent-action);
-    color: var(--color-accent-action-contrast);
-    background: var(--color-accent-action);
-  }
-
-  .hero-action--secondary {
-    color: var(--color-brand-primary);
-    background: rgb(247 249 252 / 72%);
-  }
-
-  .hero-action--primary:hover,
-  .hero-action--primary:focus-visible,
-  .hero-action--secondary:hover,
-  .hero-action--secondary:focus-visible {
-    --color-action: var(--color-action-contrast);
-
-    border-color: var(--color-brand-primary);
-    color: var(--color-action-contrast);
-    background: var(--color-brand-primary);
-  }
-
-  .newsletter {
-    max-inline-size: 34rem;
-    border-block-start: var(--border-width) solid rgb(4 51 79 / 38%);
-    padding-block-start: var(--space-5);
-    margin-block-start: var(--space-7);
-  }
-
-  .newsletter-heading {
-    margin-block-end: var(--space-4);
-    color: var(--color-text);
-    font-size: 1rem;
-    font-weight: 600;
-  }
-
-  .newsletter-action {
-    --anchor-color: var(--color-brand-primary);
-
-    display: inline-flex;
-    min-block-size: 3.25rem;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid var(--color-brand-primary);
-    border-radius: var(--radius-2);
-    padding-inline: var(--space-4);
-    color: var(--color-brand-primary);
-    background: rgb(247 249 252 / 72%);
-    font-family: var(--font-family-body);
-    font-size: 1rem;
-    font-weight: 700;
-    text-align: center;
-    text-decoration: none;
-  }
-
-  .newsletter-action:hover,
-  .newsletter-action:focus-visible {
-    --anchor-color: var(--color-action-contrast);
-
-    color: var(--color-action-contrast);
-    background: var(--color-brand-primary);
-  }
-
-  .newsletter-note {
-    max-inline-size: 55ch;
     margin-block-start: var(--space-3);
-    color: var(--color-text-muted);
-    font-size: 0.875rem;
-    line-height: 1.45;
   }
 
-  .hero-photos {
-    align-self: stretch;
-    block-size: auto;
-    margin-inline-end: var(--home-content-inset);
+  .home-documentary {
     min-width: 0;
-    min-block-size: 0;
-    overflow: hidden;
   }
 
-  @media (width <= 60rem) {
-    .home-hero {
-      block-size: auto;
-      max-block-size: none;
-      min-block-size: 0;
+  .home-identity {
+    display: grid;
+    grid-template-columns: minmax(12rem, 4fr) minmax(0, 8fr);
+    gap: var(--space-8);
+    border-block: var(--border-width) solid var(--color-border);
+  }
+
+  .home-identity header,
+  .home-identity-copy {
+    display: grid;
+    align-content: start;
+    justify-items: start;
+    gap: var(--space-5);
+  }
+
+  .home-identity h2,
+  .home-governance h2,
+  .home-participation h2 {
+    max-inline-size: 16ch;
+    margin: 0;
+    font-size: var(--font-size-heading-2);
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+
+  .home-identity-copy > p {
+    max-inline-size: 62ch;
+    font-size: var(--font-size-lede);
+    line-height: 1.6;
+  }
+
+  .home-current-work {
+    --evidence-meta-color: rgb(255 255 255 / 78%);
+    --evidence-meta-link-hover: var(--color-brand-highlight);
+
+    margin-inline: calc(-1 * var(--content-gutter));
+    padding: var(--space-9) var(--content-gutter);
+    color: var(--color-surface);
+    background: var(--color-brand-primary);
+    scroll-margin-block-start: var(--space-4);
+  }
+
+  .home-current-work-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(15rem, 5fr);
+    gap: var(--space-8);
+    align-items: end;
+    margin-block-start: var(--space-7);
+  }
+
+  .home-current-work-copy {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-5);
+  }
+
+  .home-current-work h2 {
+    display: grid;
+    gap: var(--space-2);
+    max-inline-size: 13ch;
+    margin: 0;
+    color: var(--color-surface);
+    font-size: clamp(2.25rem, 1.25rem + 3.2vw, 4.25rem);
+    line-height: 1.02;
+  }
+
+  .home-current-work h2 span {
+    color: var(--color-brand-highlight);
+    font-family: var(--font-family-statement);
+    font-size: 0.92em;
+    font-weight: 400;
+    line-height: 0.98;
+  }
+
+  .home-current-work-copy > p {
+    max-inline-size: 56ch;
+    color: rgb(255 255 255 / 88%);
+    font-size: var(--font-size-lede);
+    line-height: 1.6;
+  }
+
+  .home-current-work-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4) var(--space-5);
+    flex-wrap: wrap;
+    margin-block-start: var(--space-3);
+  }
+
+  .campaign-brief-link {
+    min-block-size: var(--control-min-block-size);
+    display: inline-flex;
+    align-items: center;
+    color: var(--color-surface);
+    font-weight: var(--font-weight-bold);
+    text-underline-offset: 0.22em;
+  }
+
+  .campaign-brief-link:hover,
+  .campaign-brief-link:focus-visible {
+    color: var(--color-brand-highlight);
+  }
+
+  .home-current-work-facts {
+    margin: 0;
+    border-block: var(--border-width) solid rgb(255 255 255 / 34%);
+  }
+
+  .home-current-work-facts > div {
+    display: grid;
+    gap: var(--space-2);
+    padding-block: var(--space-5);
+  }
+
+  .home-current-work-facts > div + div {
+    border-block-start: var(--border-width) solid rgb(255 255 255 / 34%);
+  }
+
+  .home-current-work-facts dd,
+  .home-current-work-facts dt {
+    margin: 0;
+  }
+
+  .home-current-work-facts dd {
+    color: var(--color-brand-highlight);
+    font-family: var(--font-family-statement);
+    font-size: clamp(1.75rem, 1.2rem + 1.8vw, 3rem);
+    line-height: 1;
+  }
+
+  .home-current-work-facts dt {
+    order: 2;
+    color: rgb(255 255 255 / 78%);
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .home-governance {
+    display: grid;
+    gap: var(--space-8);
+  }
+
+  .home-section-heading {
+    max-inline-size: var(--reading-max-width);
+  }
+
+  .home-section-description {
+    max-inline-size: 58ch;
+    font-size: var(--font-size-lede);
+  }
+
+  .home-participation {
+    --split-align: start;
+
+    border-block-start: var(--border-width) solid var(--color-border);
+    scroll-margin-block-start: var(--space-4);
+  }
+
+  .participation-steps {
+    min-width: 0;
+  }
+
+  .participation-steps h3 {
+    margin: 0 0 var(--space-5);
+    color: var(--color-brand-primary);
+    font-size: 1.25rem;
+  }
+
+  .participation-steps ol {
+    padding: 0;
+    margin: 0;
+    border-block-start: var(--border-width) solid var(--color-border);
+    counter-reset: participation;
+    list-style: none;
+  }
+
+  .participation-steps li {
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr);
+    gap: var(--space-3);
+    padding-block: var(--space-4);
+    border-block-end: var(--border-width) solid var(--color-border);
+    counter-increment: participation;
+  }
+
+  .participation-steps li::before {
+    color: var(--color-accent-action);
+    font-weight: var(--font-weight-bold);
+    content: counter(participation, decimal-leading-zero);
+  }
+
+  .home-updates {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--space-6);
+    align-items: start;
+    padding-block: var(--space-8);
+    border-block: var(--border-width) solid var(--color-border);
+  }
+
+  .home-updates-copy {
+    display: grid;
+    gap: var(--space-3);
+    max-inline-size: var(--reading-max-width);
+  }
+
+  .home-updates h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    line-height: 1.2;
+  }
+
+  .home-updates-note,
+  .home-accountability {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-small);
+    line-height: 1.5;
+  }
+
+  .home-accountability {
+    max-inline-size: 72ch;
+    padding-block: var(--space-5) 0;
+  }
+
+  @media (width <= 56rem) {
+    .home-hero,
+    .home-identity,
+    .home-governance,
+    .home-participation {
+      padding-block: var(--space-8);
     }
 
-    .home-hero::after {
-      background: linear-gradient(180deg, rgb(247 249 252 / 95%) 0%, rgb(247 249 252 / 72%) 52%, transparent 78%);
-    }
-
-    .hero-layout {
-      block-size: auto;
+    .home-identity,
+    .home-current-work-grid {
       grid-template-columns: minmax(0, 1fr);
-      grid-template-rows: auto auto;
-      overflow: visible;
+      gap: var(--space-7);
     }
 
-    .hero-copy {
-      padding: clamp(2.5rem, 8vw, 4.5rem) clamp(1rem, 5vw, 2.5rem) clamp(5rem, 13vw, 8rem);
+    .home-current-work {
+      padding-block: var(--space-8);
     }
 
-    .hero-title {
-      max-inline-size: 13ch;
-      font-size: clamp(2.25rem, 8.5vw, 4.75rem);
+    .home-current-work-grid {
+      align-items: start;
     }
 
-    .hero-photos {
-      block-size: clamp(30rem, 78vw, 45rem);
-      margin-inline-end: 0;
-      max-block-size: none;
-      min-block-size: clamp(30rem, 78vw, 45rem);
+    .home-updates {
+      grid-template-columns: minmax(0, 1fr);
     }
   }
 
-  @media (width <= 37.5rem) {
-    .home-hero {
-      border-radius: 0;
-    }
-
-    .hero-copy {
-      padding-inline: var(--space-4);
-      padding-block-end: 4rem;
-    }
-
-    .hero-actions {
+  @media (width <= 32rem) {
+    .home-actions {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: var(--space-2);
-    }
-
-    .hero-action {
-      min-inline-size: 0;
-      padding-inline: var(--space-3);
-      font-size: 0.875rem;
-    }
-
-    .newsletter-action {
+      grid-template-columns: minmax(0, 1fr);
       inline-size: 100%;
-      min-block-size: 3rem;
     }
 
-    .newsletter-note {
-      font-size: 1rem;
+    .home-actions :deep(.app-action-link),
+    .home-updates :deep(.app-action-link) {
+      inline-size: 100%;
     }
 
-    .hero-photos {
-      block-size: 34rem;
-      min-block-size: 34rem;
+    .home-current-work-actions {
+      align-items: stretch;
+      flex-direction: column;
+      inline-size: 100%;
+    }
+
+    .home-current-work-actions :deep(.app-action-link),
+    .campaign-brief-link {
+      inline-size: 100%;
+      justify-content: center;
     }
   }
 }

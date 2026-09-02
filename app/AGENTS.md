@@ -1,6 +1,7 @@
 # Nuxt application contract
 
-The root [`AGENTS.md`](../AGENTS.md) governs all work. The normative interface architecture is
+The root [`AGENTS.md`](../AGENTS.md) governs all work. [`DESIGN.md`](../DESIGN.md) is the normative
+WCU visual and product-design authority. The CSS and component implementation architecture remains
 [`docs/baseline/css-and-interface.md`](../docs/baseline/css-and-interface.md).
 
 ## Commands
@@ -26,10 +27,14 @@ The root [`AGENTS.md`](../AGENTS.md) governs all work. The normative interface a
 ## Component inventory
 
 - `AppButton`: native command button; never navigation.
+- `AppActionLink`: internal or external navigational action with primary, secondary, and campaign emphasis.
+- `EvidenceMetaLine`: ordered status, place, freshness, and source metadata; unknown fields are omitted.
+- `DocumentaryFigure`: approved documentary media or an explicitly labelled neutral placeholder.
+- `ProofStrip`: sourced organizational facts presented as open, divided cells rather than cards.
 - `AppField`: label, hint, required, and validation-message relationships for a slotted native control.
 - `AppInput`: native input contract with model, attribute, class, focus, and validity forwarding.
 - `AppNotice`: persistent visual feedback with explicit, opt-in announcement behavior.
-- `AppTopbar`: application-shell header, Reka desktop primary navigation, and native mobile disclosure.
+- `AppTopbar`: site header, Reka desktop primary navigation, and native mobile disclosure.
 - `AccountMenu`: feature-owned Reka dropdown for identity, account navigation, and sign-out.
 - `calendar/CalendarDatePicker`: feature-owned Reka calendar and popover for agenda date navigation.
 - `calendar/EventDirectionsMenu`: feature-owned Reka dropdown for map and address actions.

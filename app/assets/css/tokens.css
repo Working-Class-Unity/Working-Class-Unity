@@ -10,19 +10,20 @@
   --color-surface: var(--primitive-white);
   --color-surface-subtle: var(--primitive-navy-100);
   --color-text: var(--primitive-brand-ink);
-  --color-text-muted: var(--primitive-ink-800);
-  --color-border: var(--primitive-ink-200);
+  --color-text-muted: #5f6f79;
+  --color-border: #cbd4dc;
+  --color-placeholder: #e6ebef;
   --color-control-border: var(--primitive-ink-500);
   --color-action: var(--primitive-brand-navy);
   --color-action-contrast: var(--primitive-white);
   --color-action-soft: var(--primitive-navy-100);
   --color-neutral-tag-surface: var(--primitive-ink-100);
   --color-neutral-tag-text: var(--primitive-ink-800);
-  --color-accent-action: var(--primitive-red-700);
+  --color-accent-action: var(--primitive-red-800);
   --color-accent-action-hover: var(--primitive-red-800);
   --color-accent-action-contrast: var(--primitive-white);
-  --color-divider: rgb(4 51 79 / 12%);
-  --color-divider-strong: rgb(4 51 79 / 18%);
+  --color-divider: var(--color-border);
+  --color-divider-strong: var(--primitive-navy-200);
   --color-event-organizing-surface: var(--primitive-navy-100);
   --color-event-organizing-text: var(--primitive-brand-navy);
   --color-event-action-surface: var(--primitive-red-100);
@@ -41,47 +42,56 @@
   --color-status-error-surface: var(--primitive-red-100);
 
   /* Typography roles. */
-  --font-family-body: 'Inter Variable', 'Arial', ui-sans-serif, system-ui, sans-serif;
-  --font-family-display: 'Mona Sans Variable', 'Arial Black', ui-sans-serif, sans-serif;
+  --font-family-body: 'Acumin Pro', 'Arial', ui-sans-serif, system-ui, sans-serif;
+  --font-family-heading: var(--font-family-body);
+  --font-family-statement: 'Akira Jimbo', 'Arial Black', ui-sans-serif, system-ui, sans-serif;
+
+  /* Transitional alias for inherited pages; migrate intentional short declarations to --font-family-statement. */
+  --font-family-display: var(--font-family-heading);
   --font-family-mono: ui-monospace, 'SFMono-Regular', 'Cascadia Code', 'Roboto Mono', consolas, monospace;
-  --font-size-heading-1: clamp(2.2rem, 1.6rem + 2.4vw, 3.75rem);
-  --font-size-heading-2: clamp(1.35rem, 1.1rem + 1vw, 2rem);
-  --font-size-heading-3: 1rem;
-  --font-size-small: 0.82rem;
+  --font-size-heading-1: clamp(2.75rem, 1.75rem + 3.15vw, 4.5rem);
+  --font-size-heading-2: clamp(2rem, 1.55rem + 1.4vw, 2.75rem);
+  --font-size-heading-3: 1.75rem;
+  --font-size-lede: clamp(1.125rem, 1rem + 0.4vw, 1.25rem);
+  --font-size-small: 0.875rem;
   --font-size-caption: 0.75rem;
-  --line-height-body: 1.5;
+  --line-height-body: 1.55;
   --line-height-heading: 1.08;
-  --font-weight-strong: 750;
-  --font-weight-bold: 800;
-  --font-weight-heavy: 900;
+  --font-weight-strong: 700;
+  --font-weight-bold: 700;
+  --font-weight-heavy: 700;
 
   /* Spacing scale. */
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
   --space-4: 1rem;
-  --space-5: 1.375rem;
-  --space-6: 1.75rem;
-  --space-7: 2.25rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+  --space-9: 6rem;
+  --space-10: 8rem;
 
   /* Component and interaction roles. */
   --border-width: 1px;
   --border-width-accent: 4px;
   --radius-1: 0.25rem;
-  --radius-2: 0.5rem;
-  --radius-3: 0.75rem;
+  --radius-2: 0.25rem;
+  --radius-3: 0.5rem;
   --radius-round: 999px;
   --shadow-panel: 0 1rem 2.625rem rgb(35 55 58 / 10%);
   --shadow-dialog: 0 1.5rem 4rem rgb(4 20 31 / 28%);
   --focus-outline: 3px solid var(--color-focus-ring);
   --focus-offset: 3px;
-  --control-min-block-size: 2.75rem;
-  --control-min-inline-size: 2.75rem;
-  --content-max-width: 92rem;
-  --home-content-max-width: 100rem;
+  --control-min-block-size: 3rem;
+  --control-min-inline-size: 3rem;
+  --content-max-width: 78rem;
+  --home-content-max-width: 78rem;
+  --reading-max-width: 45rem;
+  --content-gutter: clamp(1.5rem, 6.667vw, 6rem);
   --home-content-inset: clamp(1rem, 3vw, 3.25rem);
-  --content-gutter: clamp(1rem, 2.5vw, 2.5rem);
-  --content-gutter-compact: 1rem;
+  --content-gutter-compact: 1.5rem;
   --motion-duration-fast: 150ms;
   --motion-duration-none: 0.01ms;
   --z-menu: 20;

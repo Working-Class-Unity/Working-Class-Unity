@@ -11,7 +11,7 @@
 
 .app-frame {
   min-block-size: 100vh;
-  padding-block-end: var(--space-6);
+  padding-block-end: var(--space-8);
 }
 
 .flow {
@@ -31,23 +31,31 @@
   gap: var(--grid-gap, var(--space-3));
 }
 
+.reading-measure {
+  max-inline-size: var(--reading-max-width);
+}
+
+.open-split {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(16rem, 5fr);
+  gap: var(--split-gap, var(--space-8));
+  align-items: var(--split-align, start);
+}
+
 .page-shell:focus-visible {
   outline: var(--focus-outline);
   outline-offset: var(--focus-offset);
 }
 
 @media (width <= 620px) {
-  .container,
-  .page-shell {
-    inline-size: min(var(--content-max-width), calc(100% - (2 * var(--content-gutter-compact))));
-  }
-
-  .container.container--wide,
-  .page-shell.container--wide {
-    inline-size: min(var(--home-content-max-width), calc(100% - (2 * var(--content-gutter-compact))));
-  }
-
   .app-frame {
     padding-block-start: 0;
+  }
+}
+
+@media (width <= 56rem) {
+  .open-split {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--split-gap-small, var(--space-7));
   }
 }

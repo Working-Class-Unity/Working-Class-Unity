@@ -212,3 +212,9 @@
       - List changed categories, then state:
       - "All other change-audit categories were inspected and are unchanged."
     - Never claim completion while required work remains. Never claim checks that were not run, and never describe a local pass as protected CI.
+
+# Working Class Unity design authority
+
+Before shaping, designing, implementing, reviewing, or materially changing anything a visitor or member sees, reads, chooses, or does, read and follow [`DESIGN.md`](DESIGN.md).
+
+`DESIGN.md` owns WCU's public visual language, composition, voice, design tokens, and interface evaluation rules. This file and the nearest scoped `AGENTS.md` continue to own engineering process and implementation boundaries. Harpreet Chima's explicit instructions and verified organizational records outrank both.
