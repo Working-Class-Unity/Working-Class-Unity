@@ -6,7 +6,7 @@ defineOptions({ inheritAttrs: false })
 const props = withDefaults(
   defineProps<{
     to: string
-    variant?: 'primary' | 'secondary' | 'campaign'
+    variant?: 'primary' | 'secondary' | 'campaign' | 'text' | 'text-inverse'
     size?: 'default' | 'compact'
   }>(),
   {
@@ -88,6 +88,22 @@ const opensNewContext = computed(() => attrs.target === '_blank')
     --action-link-background: var(--color-accent-action);
   }
 
+  .app-action-link[data-variant='text'],
+  .app-action-link[data-variant='text-inverse'] {
+    justify-content: flex-start;
+    border-color: transparent;
+    padding-inline: 0;
+    background: transparent;
+  }
+
+  .app-action-link[data-variant='text'] {
+    --action-link-foreground: var(--color-brand-primary);
+  }
+
+  .app-action-link[data-variant='text-inverse'] {
+    --action-link-foreground: var(--color-surface);
+  }
+
   .app-action-link[data-variant='primary']:hover,
   .app-action-link[data-variant='primary']:focus-visible,
   .app-action-link[data-variant='campaign']:hover,
@@ -99,6 +115,15 @@ const opensNewContext = computed(() => attrs.target === '_blank')
   .app-action-link[data-variant='secondary']:hover,
   .app-action-link[data-variant='secondary']:focus-visible {
     --action-link-background: var(--color-action-soft);
+  }
+
+  .app-action-link[data-variant='text']:hover,
+  .app-action-link[data-variant='text']:focus-visible,
+  .app-action-link[data-variant='text-inverse']:hover,
+  .app-action-link[data-variant='text-inverse']:focus-visible {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.22em;
   }
 }
 </style>

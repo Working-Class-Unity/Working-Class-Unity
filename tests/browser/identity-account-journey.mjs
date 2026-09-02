@@ -17,10 +17,10 @@ async function assertPublicEntryAndLegalRoutes(context, helpers) {
     await expect(page.locator('html')).toHaveAttribute('lang', 'en-US')
     await expect(page.locator('html')).toHaveAttribute('dir', 'ltr')
     expect(new URL(page.url()).pathname).toBe('/')
-    await expect(page.getByRole('heading', { name: 'Working People Need an Organization of Our Own' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Working people need an organization of our own' })).toBeVisible()
     await expect(
       page.getByText(
-        'WCU is a member-run organization bringing working people together across San Joaquin County. We act collectively to win concrete changes, develop new leaders, and build lasting power.',
+        'WCU is a member-run organization bringing working people together across San Joaquin County to win concrete changes, develop leaders, and build lasting power.',
         { exact: true }
       )
     ).toBeVisible()
@@ -109,7 +109,7 @@ async function assertNotFoundRecovery(context, helpers) {
     await expect(recovery).toBeFocused()
     await page.keyboard.press('Enter')
     await expect(page).toHaveURL(/\/$/)
-    await expect(page.getByRole('heading', { name: 'Working People Need an Organization of Our Own' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Working people need an organization of our own' })).toBeVisible()
     await helpers.assertAccessibleWithoutOverflow(page)
 
     observations.errorResponses = observations.errorResponses.filter(

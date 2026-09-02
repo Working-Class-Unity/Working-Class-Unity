@@ -23,8 +23,6 @@ const runtimeSentryOrigin = requiredEnvironment('BROWSER_RUNTIME_SENTRY_ORIGIN')
 const turnstileOrigin = 'https://challenges.cloudflare.com'
 const turnstileScriptUrl = `${turnstileOrigin}/turnstile/v0/api.js?render=explicit`
 const forumUrl = 'https://chat.workingclassunity.com/'
-const updatesDisclaimer =
-  'Choose email, text messages, or both. By signing up, you agree to receive WCU updates through the options you select. Message frequency varies; message and data rates may apply. Unsubscribe from email or reply STOP to stop texts.'
 const campaignUpdatesDisclaimer = 'Sign up for updates about this campaign and other WCU updates.'
 const sentryEnvelopePath = '/api/1/envelope/'
 const maxCaptureFileBytes = 65_536
@@ -113,10 +111,10 @@ test('home presents the WCU foundation and preserves client navigation', async (
   )
   const response = await page.goto('/')
   await assertContentSecurityPolicy(page, response, observations)
-  await expect(page.getByRole('heading', { name: 'Working People Need an Organization of Our Own' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Working people need an organization of our own' })).toBeVisible()
   await expect(
     page.getByText(
-      'WCU is a member-run organization bringing working people together across San Joaquin County. We act collectively to win concrete changes, develop new leaders, and build lasting power.',
+      'WCU is a member-run organization bringing working people together across San Joaquin County to win concrete changes, develop leaders, and build lasting power.',
       {
         exact: true
       }
@@ -124,20 +122,17 @@ test('home presents the WCU foundation and preserves client navigation', async (
   ).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Members make the decisions', exact: true })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Remove mass surveillance from Stockton', exact: true })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Member-run is a real structure', exact: true })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Start by showing up', exact: true })).toBeVisible()
   await expect(page.locator('.documentary-placeholder')).toHaveAttribute('aria-hidden', 'true')
-  await expect(page.locator('.home-documentary figcaption')).toContainText('reserved for an approved image')
+  await expect(page.locator('.home-documentary figcaption')).toContainText('Caption · date · source · consent')
   await expect(page.locator('.brand')).toHaveAccessibleName(`${runtimeName} home`)
   await expect(page.locator('.brand')).toHaveAttribute('aria-current', 'page')
   await expect(page).toHaveTitle('Working Class Unity')
-  const updatesLink = page.getByRole('link', { name: 'Stay informed', exact: true })
+  const updatesLink = page.getByRole('link', { name: 'Get WCU updates', exact: true })
   await expect(updatesLink).toHaveAttribute('href', 'https://tech.workingclassunity.com/wcu-updates')
-  await expect(updatesLink).toHaveAttribute('aria-describedby', 'newsletter-note')
-  await expect(page.locator('.home-updates form')).toHaveCount(0)
-  await expect(page.locator('.home-updates input')).toHaveCount(0)
-  await expect(page.locator('.home-updates iframe')).toHaveCount(0)
-  await expect(page.locator('#newsletter-note')).toHaveText(updatesDisclaimer)
+  await expect(page.locator('.home-participation form')).toHaveCount(0)
+  await expect(page.locator('.home-participation input')).toHaveCount(0)
+  await expect(page.locator('.home-participation iframe')).toHaveCount(0)
   await expect(page.locator('script[src*="challenges.cloudflare.com/turnstile"]')).toHaveCount(0)
   await assertRuntimePublicConfig(page)
   await assertAccessibleWithoutOverflow(page)
@@ -149,7 +144,7 @@ test('home presents the WCU foundation and preserves client navigation', async (
   await assertMinimumTargetSize(topbar.getByRole('link', { name: 'Member Login', exact: true }))
   await assertMinimumTargetSize(topbar.getByRole('link', { name: 'Get Involved', exact: true }))
   await assertMinimumTargetSize(hero.getByRole('link', { name: 'See upcoming events', exact: true }))
-  await assertMinimumTargetSize(hero.getByRole('link', { name: 'See what WCU is working on', exact: true }))
+  await assertMinimumTargetSize(hero.getByRole('link', { name: 'See current work', exact: true }))
   await assertMinimumTargetSize(updatesLink)
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.keyboard.press('Tab')
@@ -177,7 +172,7 @@ test('home presents the WCU foundation and preserves client navigation', async (
   await page.evaluate(() => {
     const replacements = [
       ['.home-hero h1', 'Working people need a durable, democratic organization of our own in every community'],
-      ['.home-identity h2', 'Members collectively make the consequential organizational decisions'],
+      ['.home-governance h2', 'Members collectively make the consequential organizational decisions'],
       ['.home-participation h2', 'Start by showing up to a public gathering near you']
     ]
     for (const [selector, copy] of replacements) {

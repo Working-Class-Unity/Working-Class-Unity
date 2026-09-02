@@ -23,13 +23,14 @@ const completeItems = computed(() =>
   <ul class="proof-strip" role="list">
     <li v-for="item in completeItems" :key="`${item.value}-${item.label}`">
       <p class="proof-value">{{ item.value }}</p>
-      <p class="proof-label">{{ item.label }}</p>
+      <p class="proof-meta">
+        <span>{{ item.label }}</span>
+        <span aria-hidden="true"> · </span>
+        <span>{{ item.currentThrough }}</span>
+        <span aria-hidden="true"> · </span>
+        <a :href="item.sourceHref"><span class="visually-hidden">Source: </span>{{ item.sourceLabel }}</a>
+      </p>
       <p v-if="item.context" class="proof-context">{{ item.context }}</p>
-      <EvidenceMetaLine
-        :current-through="item.currentThrough"
-        :source-href="item.sourceHref"
-        :source-label="item.sourceLabel"
-      />
     </li>
   </ul>
 </template>
@@ -41,24 +42,24 @@ const completeItems = computed(() =>
     grid-template-columns: repeat(3, minmax(0, 1fr));
     padding: 0;
     margin: 0;
-    border-block: var(--border-width) solid var(--color-border);
+    border-block: var(--border-width) solid rgb(4 51 79 / 24%);
     list-style: none;
   }
 
   .proof-strip > li {
     display: grid;
     align-content: start;
-    gap: var(--space-2);
+    gap: 0.625rem;
     min-width: 0;
-    padding: var(--space-6);
+    padding: 2.125rem 2rem;
   }
 
   .proof-strip > li + li {
-    border-inline-start: var(--border-width) solid var(--color-border);
+    border-inline-start: var(--border-width) solid rgb(4 51 79 / 24%);
   }
 
   .proof-value,
-  .proof-label,
+  .proof-meta,
   .proof-context {
     margin: 0;
   }
@@ -66,15 +67,20 @@ const completeItems = computed(() =>
   .proof-value {
     color: var(--color-brand-primary);
     font-family: var(--font-family-statement);
-    font-size: clamp(1.75rem, 1.35rem + 1.1vw, 2.5rem);
-    line-height: 1;
+    font-size: clamp(1.875rem, 1.45rem + 1.2vw, 2.5rem);
+    line-height: 1.1;
   }
 
-  .proof-label {
-    color: var(--color-text);
-    font-size: 1.125rem;
-    font-weight: var(--font-weight-bold);
-    line-height: 1.25;
+  .proof-meta,
+  .proof-meta a {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-small);
+    line-height: 1.5;
+  }
+
+  .proof-meta a:hover,
+  .proof-meta a:focus-visible {
+    color: var(--color-brand-primary);
   }
 
   .proof-context {
@@ -88,11 +94,11 @@ const completeItems = computed(() =>
     }
 
     .proof-strip > li {
-      padding-inline: 0;
+      padding: 1.375rem 0;
     }
 
     .proof-strip > li + li {
-      border-block-start: var(--border-width) solid var(--color-border);
+      border-block-start: var(--border-width) solid rgb(4 51 79 / 24%);
       border-inline-start: 0;
     }
   }

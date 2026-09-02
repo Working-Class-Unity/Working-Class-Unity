@@ -429,73 +429,76 @@
   },
   "home": {
     "eyebrow": "WORKING CLASS UNITY · SAN JOAQUIN COUNTY",
-    "title": "Working People Need an Organization of Our Own",
-    "introduction": "WCU is a member-run organization bringing working people together across San Joaquin County. We act collectively to win concrete changes, develop new leaders, and build lasting power.",
+    "title": "Working people need an organization of our own",
+    "introduction": "WCU is a member-run organization bringing working people together across San Joaquin County to win concrete changes, develop leaders, and build lasting power.",
     "actions": {
       "events": "See upcoming events",
-      "currentWork": "See what WCU is working on"
+      "currentWork": "See current work"
     },
     "media": {
-      "placeholder": "Documentary image pending final approval.",
-      "caption": "This space is reserved for an approved image of WCU members acting together."
-    },
-    "identity": {
-      "eyebrow": "WHAT MEMBER-RUN MEANS",
-      "title": "Members make the decisions",
-      "description": "Working Class Unity is not a service provider speaking for people from a distance. Members govern the organization, choose its focus campaigns, and carry out the work together.",
-      "action": "Read who we are"
+      "placeholder": "DOCUMENTARY IMAGE PENDING APPROVAL · 16:6",
+      "mobilePlaceholder": "DOCUMENTARY IMAGE PENDING APPROVAL · 6:5",
+      "caption": "Caption · date · source · consent",
+      "endLabel": "WCU · IMAGE PENDING"
     },
     "currentWork": {
-      "eyebrow": "ACTIVE NOW",
-      "place": "STOCKTON",
-      "currentThrough": "Public record checked August 8, 2026",
-      "source": "Public-record summary",
-      "title": "Remove mass surveillance",
-      "titleContext": "from Stockton",
+      "meta": "CAMPAIGN RIGHT NOW · STOCKTON · UPDATED AUGUST 8, 2026",
+      "source": "Read the public-record summary",
+      "title": "Remove mass surveillance from Stockton",
       "description": "Stockton extended its Flock agreement through April 14, 2031, with a stated contract maximum of $5.4167 million. WCU is organizing for removal and meaningful public control over surveillance spending.",
-      "contractValue": "$5.4167M",
-      "contractLabel": "stated contract maximum",
-      "termValue": "APR. 14, 2031",
-      "termLabel": "current agreement end date",
       "campaignAction": "See the campaign",
       "petitionAction": "Sign the demand letter"
     },
     "governance": {
       "eyebrow": "HOW WCU WORKS",
-      "title": "Member-run is a real structure",
-      "description": "The bylaws put governing power in the membership. These are operating rules, not a slogan.",
+      "title": "Members make the decisions",
+      "description": "General Meetings are WCU’s primary governing body. Members vote, propose business, serve on committees, hold office, and direct campaigns.",
+      "action": "Read how WCU works",
       "sourceCurrentThrough": "Bylaws updated February 12, 2026",
       "source": "Read the bylaws",
       "generalMeetings": {
         "value": "GENERAL MEETINGS",
-        "label": "Primary governing body",
-        "context": "Members participate in the body's decisions and direct the organization."
+        "label": "Primary governing body"
       },
       "campaignVote": {
         "value": "TWO-THIRDS",
-        "label": "Vote to adopt a focus campaign",
-        "context": "A proposed focus campaign becomes WCU work only after a membership vote."
+        "label": "Vote to adopt a focus campaign"
       },
       "campaignReview": {
         "value": "6 MONTHS",
-        "label": "Campaign reapproval cycle",
-        "context": "Focus campaigns return to the membership for reapproval and leadership elections."
+        "label": "Campaign reapproval cycle"
       }
     },
+    "proofLabel": "PUBLIC RULES · VERIFIED IN THE BYLAWS",
     "participation": {
-      "eyebrow": "YOUR FIRST STEP",
       "title": "Start by showing up",
-      "description": "Come to a public event, meet people, and see the work for yourself. You can return for another social event or try a concrete task before deciding whether membership is right for you.",
-      "eventsAction": "See upcoming events",
-      "nextTitle": "What happens next",
-      "stepOne": "Choose a public event that fits your interests and availability.",
-      "stepTwo": "Meet members and take part at the level that feels right.",
-      "stepThree": "If you want a deeper commitment, ask about membership orientation."
+      "description": "You do not have to become a member before meeting WCU. Begin with a public event, campaign, or bounded task.",
+      "routes": {
+        "events": {
+          "title": "Come to an event",
+          "description": "Meet members and learn what WCU is doing now.",
+          "action": "See upcoming events"
+        },
+        "campaign": {
+          "title": "Join a campaign action",
+          "description": "Sign, share, canvass, table, or help with research.",
+          "action": "See current work"
+        },
+        "updates": {
+          "title": "Stay informed",
+          "description": "Receive invitations to meetings, actions, and social events.",
+          "action": "Get WCU updates"
+        }
+      },
+      "closingTitle": "The first step is showing up",
+      "closingDescription": "No upcoming event is published right now. Get updates to hear about the next way to meet us.",
+      "closingAction": "Get involved"
     },
-    "newsletterHeading": "Not ready to attend yet? Stay informed about meetings and actions.",
-    "newsletterSubmit": "Stay informed",
-    "newsletterNote": "Choose email, text messages, or both. By signing up, you agree to receive WCU updates through the options you select. Message frequency varies; message and data rates may apply. Unsubscribe from email or reply STOP to stop texts.",
-    "accountability": "Working Class Unity is a member-run organization. Public claims on this page link to the record that supports them."
+    "footer": {
+      "boundary": "Automatic acknowledgement now; a human response within one week. No emergency response, legal representation, or guaranteed casework.",
+      "navigationLabel": "Footer",
+      "privacy": "Privacy"
+    }
   },
   "personalApp": {
     "eyebrow": "Working Class Unity",

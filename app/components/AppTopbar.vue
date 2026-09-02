@@ -216,14 +216,6 @@ function currentParticipationLocation() {
             <NuxtLink class="topbar-link topbar-link--login" to="/login" :aria-current="currentPage('/login')">
               {{ t('navigation.login') }}
             </NuxtLink>
-            <NuxtLink
-              class="topbar-link topbar-link--involved"
-              to="/#get-involved"
-              :aria-current="currentParticipationLocation()"
-              @click="closeMobileMenu"
-            >
-              {{ t('navigation.getInvolved') }}
-            </NuxtLink>
           </template>
           <template v-else>
             <NuxtLink class="topbar-link topbar-link--app" to="/app" :aria-current="currentPage('/app')">
@@ -233,6 +225,15 @@ function currentParticipationLocation() {
           </template>
         </div>
       </div>
+
+      <NuxtLink
+        class="topbar-link topbar-link--involved"
+        to="/#get-involved"
+        :aria-current="currentParticipationLocation()"
+        @click="closeMobileMenu"
+      >
+        {{ t('navigation.getInvolved') }}
+      </NuxtLink>
     </div>
   </header>
 </template>
@@ -241,17 +242,19 @@ function currentParticipationLocation() {
 @layer components {
   .topbar {
     position: relative;
-    border-block-end: var(--border-width) solid var(--color-border);
-    background: var(--color-canvas);
+    border-block-end: var(--border-width) solid rgb(4 51 79 / 12%);
+    background: var(--color-surface);
   }
 
   .topbar-row {
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-columns: 12.125rem minmax(0, 1fr) auto auto;
     align-items: center;
-    gap: var(--space-6);
-    min-block-size: 6rem;
+    gap: 1.25rem;
+    inline-size: min(var(--content-max-width), calc(100% - (2 * var(--content-gutter))));
+    min-block-size: 6.5rem;
     min-width: 0;
+    margin-inline: auto;
   }
 
   .topbar-brand-area,
@@ -264,7 +267,7 @@ function currentParticipationLocation() {
     min-block-size: var(--control-min-block-size);
     min-inline-size: var(--control-min-inline-size);
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     border-radius: var(--radius-1);
     padding: var(--space-1);
     text-decoration: none;
@@ -272,7 +275,7 @@ function currentParticipationLocation() {
 
   .brand-mark {
     display: block;
-    inline-size: 4rem;
+    inline-size: 3rem;
     block-size: auto;
     flex: 0 0 auto;
   }
@@ -293,7 +296,7 @@ function currentParticipationLocation() {
   }
 
   :deep(.desktop-navigation-list) {
-    gap: var(--space-1);
+    gap: 0.375rem;
     padding: 0;
     margin: 0;
     list-style: none;
@@ -301,7 +304,7 @@ function currentParticipationLocation() {
 
   .topbar-actions {
     justify-content: flex-end;
-    gap: var(--space-2);
+    gap: 0.25rem;
   }
 
   .mobile-navigation,
@@ -335,7 +338,7 @@ function currentParticipationLocation() {
 
   .topbar-link--public {
     border-radius: 0;
-    border-block-end-width: var(--border-width-accent);
+    border-block-end-width: 2px;
   }
 
   .topbar-link--public:hover,
@@ -368,18 +371,16 @@ function currentParticipationLocation() {
   }
 
   .topbar-link--involved {
-    --color-action: var(--color-action-contrast);
-
     border-color: var(--color-brand-primary);
     padding-inline: var(--space-4);
-    color: var(--color-action-contrast);
-    background: var(--color-brand-primary);
+    color: var(--color-brand-primary);
+    background: transparent;
   }
 
   .topbar-link--involved:hover,
   .topbar-link--involved:focus-visible {
-    border-color: var(--color-text);
-    background: var(--color-text);
+    color: var(--color-action-contrast);
+    background: var(--color-brand-primary);
   }
 
   .topbar .topbar-actions :deep(.account-menu-trigger) {
@@ -400,9 +401,10 @@ function currentParticipationLocation() {
 
   @media (width <= 60rem) {
     .topbar-row {
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 0 var(--space-3);
-      min-block-size: 5rem;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      gap: 0 0.625rem;
+      inline-size: min(var(--content-max-width), calc(100% - 3rem));
+      min-block-size: 4.5rem;
     }
 
     .topbar-brand-area {
@@ -410,7 +412,7 @@ function currentParticipationLocation() {
     }
 
     .brand-mark {
-      inline-size: 4rem;
+      inline-size: 2.375rem;
     }
 
     .mobile-menu-toggle {
@@ -420,9 +422,9 @@ function currentParticipationLocation() {
       min-inline-size: var(--control-min-inline-size);
       align-items: center;
       justify-content: center;
-      border: var(--border-width) solid var(--color-brand-primary);
+      border: 0;
       border-radius: var(--radius-1);
-      padding: var(--space-2) var(--space-4);
+      padding: var(--space-2);
       color: var(--color-brand-primary);
       background: transparent;
       font: inherit;
@@ -432,18 +434,28 @@ function currentParticipationLocation() {
     .mobile-menu-toggle:hover,
     .mobile-menu-toggle:focus-visible,
     .mobile-menu-toggle[aria-expanded='true'] {
-      color: var(--color-action-contrast);
-      background: var(--color-brand-primary);
+      color: var(--color-brand-primary);
+      background: var(--color-action-soft);
+    }
+
+    .topbar-row > .topbar-link--involved {
+      grid-area: 1 / 3;
+      min-block-size: 2.75rem;
+      min-inline-size: auto;
+      justify-content: center;
+      padding-inline: var(--space-3);
+      font-size: 0.875rem;
+      text-align: center;
     }
 
     .topbar-panel {
-      grid-column: 1 / -1;
+      grid-column: 1 / 4;
       grid-row: 2;
       display: none;
       gap: var(--space-4);
       border-block-start: var(--border-width) solid var(--color-border);
       padding-block: var(--space-3) var(--space-5);
-      background: var(--color-canvas);
+      background: var(--color-surface);
     }
 
     .topbar-panel--open {
@@ -491,11 +503,6 @@ function currentParticipationLocation() {
 
     .topbar-link--public[aria-current] {
       border-inline-start: var(--border-width-accent) solid var(--color-brand-primary);
-    }
-
-    .topbar-link--involved {
-      justify-content: center;
-      text-align: center;
     }
 
     .topbar-session {

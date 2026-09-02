@@ -7,7 +7,6 @@ const governanceProof = computed(() => [
   {
     value: t('home.governance.generalMeetings.value'),
     label: t('home.governance.generalMeetings.label'),
-    context: t('home.governance.generalMeetings.context'),
     currentThrough: t('home.governance.sourceCurrentThrough'),
     sourceLabel: t('home.governance.source'),
     sourceHref: '/bylaws'
@@ -15,7 +14,6 @@ const governanceProof = computed(() => [
   {
     value: t('home.governance.campaignVote.value'),
     label: t('home.governance.campaignVote.label'),
-    context: t('home.governance.campaignVote.context'),
     currentThrough: t('home.governance.sourceCurrentThrough'),
     sourceLabel: t('home.governance.source'),
     sourceHref: '/bylaws'
@@ -23,10 +21,33 @@ const governanceProof = computed(() => [
   {
     value: t('home.governance.campaignReview.value'),
     label: t('home.governance.campaignReview.label'),
-    context: t('home.governance.campaignReview.context'),
     currentThrough: t('home.governance.sourceCurrentThrough'),
     sourceLabel: t('home.governance.source'),
     sourceHref: '/bylaws'
+  }
+])
+
+const participationRoutes = computed(() => [
+  {
+    number: '01',
+    title: t('home.participation.routes.events.title'),
+    description: t('home.participation.routes.events.description'),
+    action: t('home.participation.routes.events.action'),
+    to: '/calendar'
+  },
+  {
+    number: '02',
+    title: t('home.participation.routes.campaign.title'),
+    description: t('home.participation.routes.campaign.description'),
+    action: t('home.participation.routes.campaign.action'),
+    to: '/#current-work'
+  },
+  {
+    number: '03',
+    title: t('home.participation.routes.updates.title'),
+    description: t('home.participation.routes.updates.description'),
+    action: t('home.participation.routes.updates.action'),
+    to: 'https://tech.workingclassunity.com/wcu-updates'
   }
 ])
 
@@ -38,473 +59,785 @@ useHead(() => ({
 
 <template>
   <article class="home-page">
-    <section class="home-hero open-split" aria-labelledby="home-hero-title">
-      <div class="home-hero-copy">
-        <p class="section-eyebrow">{{ t('home.eyebrow') }}</p>
-        <h1 id="home-hero-title">{{ t('home.title') }}</h1>
-        <p class="home-introduction">{{ t('home.introduction') }}</p>
-        <div class="home-actions">
-          <AppActionLink to="/calendar">{{ t('home.actions.events') }}</AppActionLink>
-          <AppActionLink to="/#current-work" variant="secondary">
-            {{ t('home.actions.currentWork') }}
-          </AppActionLink>
-        </div>
-      </div>
+    <section class="home-hero" aria-labelledby="home-hero-title">
+      <div class="home-section-inner home-hero-inner">
+        <div class="home-hero-statement">
+          <header class="home-hero-headline">
+            <p class="section-eyebrow">{{ t('home.eyebrow') }}</p>
+            <h1 id="home-hero-title">{{ t('home.title') }}</h1>
+          </header>
 
-      <DocumentaryFigure
-        class="home-documentary"
-        ratio="4:3"
-        :caption="t('home.media.caption')"
-        :placeholder-label="t('home.media.placeholder')"
-      />
-    </section>
-
-    <section class="home-identity" aria-labelledby="home-identity-title">
-      <header>
-        <p class="section-eyebrow">{{ t('home.identity.eyebrow') }}</p>
-        <h2 id="home-identity-title">{{ t('home.identity.title') }}</h2>
-      </header>
-      <div class="home-identity-copy">
-        <p>{{ t('home.identity.description') }}</p>
-        <AppActionLink to="/about" variant="secondary">{{ t('home.identity.action') }}</AppActionLink>
-      </div>
-    </section>
-
-    <section id="current-work" class="home-current-work" aria-labelledby="home-current-work-title">
-      <EvidenceMetaLine
-        :current-through="t('home.currentWork.currentThrough')"
-        :place="t('home.currentWork.place')"
-        :source-href="'/campaigns/remove-flock-stockton/what-stockton-bought'"
-        :source-label="t('home.currentWork.source')"
-        :status="t('home.currentWork.eyebrow')"
-      />
-
-      <div class="home-current-work-grid">
-        <div class="home-current-work-copy">
-          <h2 id="home-current-work-title">
-            <span>{{ t('home.currentWork.title') }}</span>
-            {{ t('home.currentWork.titleContext') }}
-          </h2>
-          <p>{{ t('home.currentWork.description') }}</p>
-          <div class="home-current-work-actions">
-            <AppActionLink to="https://tech.workingclassunity.com/deflock-stockton" variant="campaign">
-              {{ t('home.currentWork.petitionAction') }}
-            </AppActionLink>
-            <NuxtLink class="campaign-brief-link" to="/campaigns/remove-flock-stockton">
-              {{ t('home.currentWork.campaignAction') }}
-            </NuxtLink>
+          <div class="home-hero-invitation">
+            <p>{{ t('home.introduction') }}</p>
+            <div class="home-hero-actions">
+              <AppActionLink class="home-hero-primary" to="/calendar">
+                {{ t('home.actions.events') }}
+              </AppActionLink>
+              <AppActionLink to="/#current-work" variant="text">
+                {{ t('home.actions.currentWork') }} <span aria-hidden="true">→</span>
+              </AppActionLink>
+            </div>
           </div>
         </div>
 
-        <dl class="home-current-work-facts">
-          <div>
-            <dt>{{ t('home.currentWork.contractLabel') }}</dt>
-            <dd>{{ t('home.currentWork.contractValue') }}</dd>
-          </div>
-          <div>
-            <dt>{{ t('home.currentWork.termLabel') }}</dt>
-            <dd>{{ t('home.currentWork.termValue') }}</dd>
-          </div>
-        </dl>
+        <DocumentaryFigure
+          class="home-documentary"
+          ratio="3:2"
+          variant="assembly-home"
+          :caption="t('home.media.caption')"
+          :end-label="t('home.media.endLabel')"
+          :mobile-placeholder-label="t('home.media.mobilePlaceholder')"
+          :placeholder-label="t('home.media.placeholder')"
+        />
+      </div>
+    </section>
+
+    <section id="current-work" class="home-campaign" aria-labelledby="home-current-work-title">
+      <div class="home-section-inner home-campaign-inner">
+        <p class="home-campaign-meta">{{ t('home.currentWork.meta') }}</p>
+        <h2 id="home-current-work-title">{{ t('home.currentWork.title') }}</h2>
+        <p class="home-campaign-description">{{ t('home.currentWork.description') }}</p>
+        <AppActionLink class="home-campaign-link" to="/campaigns/remove-flock-stockton" variant="text-inverse">
+          {{ t('home.currentWork.campaignAction') }} <span aria-hidden="true">→</span>
+        </AppActionLink>
+        <AppActionLink
+          class="home-campaign-source"
+          to="/campaigns/remove-flock-stockton/what-stockton-bought"
+          variant="text-inverse"
+          size="compact"
+        >
+          {{ t('home.currentWork.source') }} <span aria-hidden="true">→</span>
+        </AppActionLink>
+        <AppActionLink
+          class="home-rule-action home-campaign-petition"
+          to="https://tech.workingclassunity.com/deflock-stockton"
+          variant="text-inverse"
+        >
+          <span aria-hidden="true" />
+          {{ t('home.currentWork.petitionAction') }}
+        </AppActionLink>
       </div>
     </section>
 
     <section class="home-governance" aria-labelledby="home-governance-title">
-      <header class="home-section-heading">
-        <p class="section-eyebrow">{{ t('home.governance.eyebrow') }}</p>
-        <h2 id="home-governance-title">{{ t('home.governance.title') }}</h2>
-        <p class="home-section-description">{{ t('home.governance.description') }}</p>
-      </header>
-      <ProofStrip :items="governanceProof" />
-    </section>
+      <div class="home-section-inner home-governance-inner">
+        <header class="home-governance-heading">
+          <p class="section-eyebrow">{{ t('home.governance.eyebrow') }}</p>
+          <h2 id="home-governance-title">{{ t('home.governance.title') }}</h2>
+        </header>
 
-    <section id="get-involved" class="home-participation open-split" aria-labelledby="home-participation-title">
-      <div class="home-participation-copy">
-        <p class="section-eyebrow">{{ t('home.participation.eyebrow') }}</p>
-        <h2 id="home-participation-title">{{ t('home.participation.title') }}</h2>
-        <p>{{ t('home.participation.description') }}</p>
-        <div class="home-actions">
-          <AppActionLink to="/calendar">{{ t('home.participation.eventsAction') }}</AppActionLink>
+        <div class="home-governance-detail">
+          <p>{{ t('home.governance.description') }}</p>
+          <AppActionLink class="home-governance-rule" to="/about" variant="text">
+            {{ t('home.governance.action') }}
+            <span aria-hidden="true">→</span>
+          </AppActionLink>
+          <AppActionLink to="/bylaws" variant="text">
+            {{ t('home.governance.source') }} <span aria-hidden="true">→</span>
+          </AppActionLink>
         </div>
       </div>
+    </section>
 
-      <div class="participation-steps">
-        <h3>{{ t('home.participation.nextTitle') }}</h3>
-        <ol>
-          <li>{{ t('home.participation.stepOne') }}</li>
-          <li>{{ t('home.participation.stepTwo') }}</li>
-          <li>{{ t('home.participation.stepThree') }}</li>
+    <section class="home-proof" :aria-label="t('home.proofLabel')">
+      <div class="home-section-inner home-proof-inner">
+        <p class="home-proof-label">{{ t('home.proofLabel') }}</p>
+        <ProofStrip :items="governanceProof" />
+      </div>
+    </section>
+
+    <section id="get-involved" class="home-participation" aria-labelledby="home-participation-title">
+      <div class="home-section-inner home-participation-inner">
+        <header class="home-participation-heading">
+          <h2 id="home-participation-title">{{ t('home.participation.title') }}</h2>
+          <p>{{ t('home.participation.description') }}</p>
+        </header>
+
+        <ol class="home-participation-routes">
+          <li v-for="route in participationRoutes" :key="route.number">
+            <span class="home-route-number" aria-hidden="true">{{ route.number }}</span>
+            <h3>{{ route.title }}</h3>
+            <p>{{ route.description }}</p>
+            <AppActionLink :to="route.to" variant="text">
+              {{ route.action }} <span aria-hidden="true">→</span>
+            </AppActionLink>
+          </li>
         </ol>
       </div>
     </section>
 
-    <aside class="home-updates" aria-labelledby="home-updates-title">
-      <div class="home-updates-copy">
-        <h2 id="home-updates-title">{{ t('home.newsletterHeading') }}</h2>
-        <p id="newsletter-note" class="home-updates-note">{{ t('home.newsletterNote') }}</p>
+    <section class="home-close" aria-labelledby="home-close-title">
+      <div class="home-section-inner home-close-inner">
+        <div class="home-close-copy">
+          <h2 id="home-close-title">{{ t('home.participation.closingTitle') }}</h2>
+          <p>{{ t('home.participation.closingDescription') }}</p>
+        </div>
+        <AppActionLink class="home-rule-action home-close-action" to="/#get-involved" variant="text-inverse">
+          <span aria-hidden="true" />
+          {{ t('home.participation.closingAction') }} <span aria-hidden="true">→</span>
+        </AppActionLink>
       </div>
-      <AppActionLink
-        aria-describedby="newsletter-note"
-        to="https://tech.workingclassunity.com/wcu-updates"
-        variant="secondary"
-      >
-        {{ t('home.newsletterSubmit') }}
-      </AppActionLink>
-    </aside>
+    </section>
 
-    <p class="home-accountability">{{ t('home.accountability') }}</p>
+    <footer class="home-footer">
+      <div class="home-section-inner home-footer-inner">
+        <NuxtLink
+          class="home-footer-brand"
+          to="/"
+          :aria-label="t('navigation.brandHome', { appName: 'Working Class Unity' })"
+        >
+          <!-- eslint-disable-next-line vue/html-self-closing -->
+          <img src="/images/wcu-logo-light.png" alt="" width="2000" height="2000" />
+        </NuxtLink>
+        <p>{{ t('home.footer.boundary') }}</p>
+        <nav :aria-label="t('home.footer.navigationLabel')">
+          <ul role="list">
+            <li>
+              <NuxtLink to="/#get-involved">{{ t('navigation.getInvolved') }}</NuxtLink>
+            </li>
+            <li>
+              <NuxtLink to="/legal/privacy">{{ t('home.footer.privacy') }}</NuxtLink>
+            </li>
+            <li>
+              <NuxtLink to="/login">{{ t('navigation.login') }}</NuxtLink>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </footer>
   </article>
 </template>
 
 <style scoped>
 @layer components {
   .home-page {
+    position: relative;
+    inset-inline-start: 50%;
+    inline-size: 100vw;
     min-width: 0;
-    background: var(--color-canvas);
+    margin-block-end: calc(-1 * var(--space-8));
+    margin-inline-start: -50vw;
+    overflow: clip;
+    background: var(--color-surface);
   }
 
-  .home-hero,
-  .home-identity,
-  .home-governance,
-  .home-participation {
-    padding-block: var(--space-9);
-  }
-
-  .home-hero {
-    --split-align: center;
-  }
-
-  .home-hero-copy,
-  .home-section-heading,
-  .home-participation-copy {
-    display: grid;
-    justify-items: start;
-    gap: var(--space-5);
+  .home-section-inner {
+    inline-size: min(var(--content-max-width), calc(100% - (2 * var(--content-gutter))));
+    margin-inline: auto;
   }
 
   .section-eyebrow,
-  .home-introduction,
-  .home-identity p,
-  .home-current-work p,
+  .home-hero p,
+  .home-campaign p,
   .home-governance p,
+  .home-proof p,
   .home-participation p,
-  .home-updates p,
-  .home-accountability {
+  .home-close p,
+  .home-footer p {
     margin: 0;
+  }
+
+  .section-eyebrow,
+  .home-campaign-meta,
+  .home-proof-label {
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: 0.12em;
+    line-height: 1.4;
+    text-transform: uppercase;
   }
 
   .section-eyebrow {
     color: var(--color-accent-action);
-    font-size: var(--font-size-small);
-    font-weight: var(--font-weight-bold);
-    letter-spacing: 0.08em;
-    line-height: 1.35;
-    text-transform: uppercase;
+  }
+
+  .home-hero {
+    overflow: visible;
+    background: var(--color-surface);
+  }
+
+  .home-hero-inner {
+    display: grid;
+    gap: 3.5rem;
+    padding-block-start: 4.5rem;
+  }
+
+  .home-hero-statement {
+    display: grid;
+    grid-template-columns: minmax(0, 51.25rem) minmax(0, 22.25rem);
+    gap: 4.5rem;
+    align-items: end;
+  }
+
+  .home-hero-headline,
+  .home-hero-invitation,
+  .home-hero-actions,
+  .home-governance-heading,
+  .home-governance-detail,
+  .home-close-copy {
+    display: grid;
+    justify-items: start;
+  }
+
+  .home-hero-headline {
+    gap: 1.375rem;
   }
 
   .home-hero h1 {
-    max-inline-size: 14ch;
+    --font-size-heading-1: clamp(4.25rem, 5.42vw, 4.875rem);
+    --line-height-heading: 1.025;
+
+    max-inline-size: 51.25rem;
     margin: 0;
     color: var(--color-brand-primary);
+    font-family: var(--font-family-heading);
     font-size: var(--font-size-heading-1);
+    font-weight: var(--font-weight-bold);
     letter-spacing: -0.035em;
+    line-height: var(--line-height-heading);
     text-wrap: balance;
   }
 
-  .home-introduction,
-  .home-participation-copy > p {
-    max-inline-size: 56ch;
-    font-size: var(--font-size-lede);
-    line-height: 1.6;
+  .home-hero-invitation {
+    gap: var(--space-5);
+    padding-block-end: var(--space-2);
+  }
+
+  .home-hero-invitation > p {
+    font-size: 1.25rem;
+    line-height: 1.55;
     text-wrap: pretty;
   }
 
-  .home-actions {
-    display: flex;
-    gap: var(--space-3);
-    flex-wrap: wrap;
-    margin-block-start: var(--space-3);
+  .home-hero-actions {
+    gap: 0.875rem;
+  }
+
+  .home-hero-primary {
+    min-block-size: 3.25rem;
+    padding-inline: var(--space-4);
   }
 
   .home-documentary {
     min-width: 0;
   }
 
-  .home-identity {
-    display: grid;
-    grid-template-columns: minmax(12rem, 4fr) minmax(0, 8fr);
-    gap: var(--space-8);
-    border-block: var(--border-width) solid var(--color-border);
+  .home-campaign {
+    color: var(--color-surface);
+    background: var(--color-accent-action);
+    scroll-margin-block-start: var(--space-4);
   }
 
-  .home-identity header,
-  .home-identity-copy {
+  .home-campaign-inner {
     display: grid;
-    align-content: start;
-    justify-items: start;
-    gap: var(--space-5);
+    grid-template-columns: minmax(0, 45.75rem) minmax(0, 26.25rem);
+    column-gap: 6rem;
+    padding-block: 8rem 7.5rem;
   }
 
-  .home-identity h2,
-  .home-governance h2,
-  .home-participation h2 {
-    max-inline-size: 16ch;
-    margin: 0;
+  .home-campaign-meta {
+    grid-column: 1;
+    grid-row: 1;
+    color: var(--color-surface);
+  }
+
+  .home-campaign h2 {
+    --color-brand-primary: var(--color-surface);
+    --font-size-heading-2: 3.75rem;
+    --line-height-heading: 1.035;
+
+    grid-column: 1;
+    grid-row: 2;
+    max-inline-size: 12ch;
+    margin: 1.75rem 0 0;
+    color: var(--color-brand-primary);
     font-size: var(--font-size-heading-2);
-    letter-spacing: -0.025em;
+    letter-spacing: -0.03em;
+    line-height: var(--line-height-heading);
     text-wrap: balance;
   }
 
-  .home-identity-copy > p {
-    max-inline-size: 62ch;
-    font-size: var(--font-size-lede);
-    line-height: 1.6;
+  .home-campaign-description {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    padding-block-start: 3.5rem;
+    font-size: 1.25rem;
+    line-height: 1.55;
   }
 
-  .home-current-work {
-    --evidence-meta-color: rgb(255 255 255 / 78%);
-    --evidence-meta-link-hover: var(--color-brand-highlight);
-
-    margin-inline: calc(-1 * var(--content-gutter));
-    padding: var(--space-9) var(--content-gutter);
-    color: var(--color-surface);
-    background: var(--color-brand-primary);
-    scroll-margin-block-start: var(--space-4);
+  .home-campaign-link,
+  .home-campaign-petition {
+    grid-row: 3;
+    margin-block-start: 1.75rem;
   }
 
-  .home-current-work-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 7fr) minmax(15rem, 5fr);
-    gap: var(--space-8);
-    align-items: end;
-    margin-block-start: var(--space-7);
+  .home-campaign-link,
+  .home-campaign-source {
+    grid-column: 1;
   }
 
-  .home-current-work-copy {
-    display: grid;
-    justify-items: start;
-    gap: var(--space-5);
+  .home-campaign-source {
+    grid-row: 4;
   }
 
-  .home-current-work h2 {
-    display: grid;
-    gap: var(--space-2);
-    max-inline-size: 13ch;
-    margin: 0;
-    color: var(--color-surface);
-    font-size: clamp(2.25rem, 1.25rem + 3.2vw, 4.25rem);
-    line-height: 1.02;
-  }
-
-  .home-current-work h2 span {
-    color: var(--color-brand-highlight);
-    font-family: var(--font-family-statement);
-    font-size: 0.92em;
-    font-weight: 400;
-    line-height: 0.98;
-  }
-
-  .home-current-work-copy > p {
-    max-inline-size: 56ch;
-    color: rgb(255 255 255 / 88%);
-    font-size: var(--font-size-lede);
-    line-height: 1.6;
-  }
-
-  .home-current-work-actions {
-    display: flex;
-    align-items: center;
-    gap: var(--space-4) var(--space-5);
-    flex-wrap: wrap;
-    margin-block-start: var(--space-3);
-  }
-
-  .campaign-brief-link {
-    min-block-size: var(--control-min-block-size);
-    display: inline-flex;
-    align-items: center;
-    color: var(--color-surface);
-    font-weight: var(--font-weight-bold);
-    text-underline-offset: 0.22em;
-  }
-
-  .campaign-brief-link:hover,
-  .campaign-brief-link:focus-visible {
-    color: var(--color-brand-highlight);
-  }
-
-  .home-current-work-facts {
-    margin: 0;
-    border-block: var(--border-width) solid rgb(255 255 255 / 34%);
-  }
-
-  .home-current-work-facts > div {
-    display: grid;
-    gap: var(--space-2);
-    padding-block: var(--space-5);
-  }
-
-  .home-current-work-facts > div + div {
-    border-block-start: var(--border-width) solid rgb(255 255 255 / 34%);
-  }
-
-  .home-current-work-facts dd,
-  .home-current-work-facts dt {
-    margin: 0;
-  }
-
-  .home-current-work-facts dd {
-    color: var(--color-brand-highlight);
-    font-family: var(--font-family-statement);
-    font-size: clamp(1.75rem, 1.2rem + 1.8vw, 3rem);
-    line-height: 1;
-  }
-
-  .home-current-work-facts dt {
-    order: 2;
+  .home-campaign-source[data-size='compact'] {
+    min-block-size: 2.75rem;
     color: rgb(255 255 255 / 78%);
     font-size: var(--font-size-small);
-    font-weight: var(--font-weight-bold);
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+  }
+
+  .home-campaign-petition {
+    grid-column: 2;
+  }
+
+  .home-rule-action {
+    gap: 0.875rem;
+  }
+
+  .home-rule-action > span:first-child {
+    inline-size: 4rem;
+    block-size: 2px;
+    flex: 0 0 auto;
+    background: currentcolor;
   }
 
   .home-governance {
+    background: var(--color-surface);
+  }
+
+  .home-governance-inner {
     display: grid;
-    gap: var(--space-8);
+    grid-template-columns: minmax(0, 35rem) minmax(0, 35.5rem);
+    gap: 7.5rem;
+    padding-block: 9rem 8.25rem;
   }
 
-  .home-section-heading {
-    max-inline-size: var(--reading-max-width);
+  .home-governance-heading {
+    gap: var(--space-5);
   }
 
-  .home-section-description {
-    max-inline-size: 58ch;
-    font-size: var(--font-size-lede);
+  .home-governance h2,
+  .home-close h2 {
+    --font-size-heading-2: 3.625rem;
+    --line-height-heading: 1.05;
+
+    margin: 0;
+    font-size: var(--font-size-heading-2);
+    letter-spacing: -0.03em;
+    line-height: var(--line-height-heading);
+    text-wrap: balance;
+  }
+
+  .home-governance-detail {
+    gap: var(--space-6);
+    padding-block-start: 2.875rem;
+  }
+
+  .home-governance-detail > p {
+    color: var(--color-text);
+    font-size: 1.25rem;
+    line-height: 1.55;
+  }
+
+  .home-governance-rule {
+    inline-size: 100%;
+    justify-content: space-between;
+    border-block: var(--border-width) solid rgb(4 51 79 / 24%);
+    border-inline: 0;
+    padding-block: 1.125rem;
+  }
+
+  .home-governance-rule > span:last-child {
+    color: var(--color-accent-action);
+    font-size: 1.125rem;
+  }
+
+  .home-proof {
+    background: var(--color-canvas);
+  }
+
+  .home-proof-inner {
+    display: grid;
+    gap: 2.25rem;
+    padding-block: 4.5rem 4.75rem;
+  }
+
+  .home-proof-label {
+    color: var(--color-brand-primary);
   }
 
   .home-participation {
-    --split-align: start;
-
-    border-block-start: var(--border-width) solid var(--color-border);
+    background: var(--color-surface);
     scroll-margin-block-start: var(--space-4);
   }
 
-  .participation-steps {
-    min-width: 0;
+  .home-participation-inner {
+    display: grid;
+    gap: 3.375rem;
+    padding-block: 8.25rem 7.25rem;
   }
 
-  .participation-steps h3 {
-    margin: 0 0 var(--space-5);
+  .home-participation-heading {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 29.375rem);
+    gap: var(--space-8);
+    align-items: end;
+  }
+
+  .home-participation h2 {
+    --font-size-heading-2: 3.875rem;
+    --line-height-heading: 1.035;
+
+    margin: 0;
     color: var(--color-brand-primary);
-    font-size: 1.25rem;
+    font-size: var(--font-size-heading-2);
+    letter-spacing: -0.03em;
+    line-height: var(--line-height-heading);
   }
 
-  .participation-steps ol {
+  .home-participation-heading > p {
+    font-size: 1.125rem;
+    line-height: 1.55;
+  }
+
+  .home-participation-routes {
     padding: 0;
     margin: 0;
-    border-block-start: var(--border-width) solid var(--color-border);
-    counter-reset: participation;
+    border-block-start: var(--border-width) solid rgb(4 51 79 / 24%);
     list-style: none;
   }
 
-  .participation-steps li {
+  .home-participation-routes > li {
     display: grid;
-    grid-template-columns: 2rem minmax(0, 1fr);
-    gap: var(--space-3);
-    padding-block: var(--space-4);
-    border-block-end: var(--border-width) solid var(--color-border);
-    counter-increment: participation;
+    grid-template-columns: 7.5rem 22.5rem minmax(0, 1fr) 11rem;
+    gap: 1.75rem;
+    align-items: center;
+    min-width: 0;
+    padding-block: 1.875rem;
+    border-block-end: var(--border-width) solid rgb(4 51 79 / 24%);
   }
 
-  .participation-steps li::before {
-    color: var(--color-accent-action);
-    font-weight: var(--font-weight-bold);
-    content: counter(participation, decimal-leading-zero);
+  .home-route-number {
+    color: var(--color-brand-primary);
+    font-family: var(--font-family-statement);
+    font-size: 2.625rem;
+    line-height: 1.05;
   }
 
-  .home-updates {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: var(--space-6);
-    align-items: start;
-    padding-block: var(--space-8);
-    border-block: var(--border-width) solid var(--color-border);
+  .home-participation-routes > li:nth-child(1) .home-route-number {
+    color: var(--color-brand-highlight);
   }
 
-  .home-updates-copy {
-    display: grid;
-    gap: var(--space-3);
-    max-inline-size: var(--reading-max-width);
+  .home-participation-routes > li:nth-child(2) .home-route-number {
+    color: var(--color-brand-accent);
   }
 
-  .home-updates h2 {
+  .home-participation-routes h3,
+  .home-participation-routes p {
+    min-width: 0;
     margin: 0;
-    font-size: 1.5rem;
+  }
+
+  .home-participation-routes h3 {
+    color: var(--color-brand-primary);
+    font-size: 1.75rem;
     line-height: 1.2;
   }
 
-  .home-updates-note,
-  .home-accountability {
-    color: var(--color-text-muted);
-    font-size: var(--font-size-small);
-    line-height: 1.5;
+  .home-participation-routes p {
+    font-size: 1rem;
+    line-height: 1.55;
   }
 
-  .home-accountability {
-    max-inline-size: 72ch;
-    padding-block: var(--space-5) 0;
+  .home-participation-routes :deep(.app-action-link) {
+    inline-size: 100%;
+    justify-content: flex-end;
+    text-align: end;
   }
 
-  @media (width <= 56rem) {
-    .home-hero,
-    .home-identity,
-    .home-governance,
-    .home-participation {
-      padding-block: var(--space-8);
+  .home-close {
+    color: var(--color-surface);
+    background: var(--color-brand-primary);
+  }
+
+  .home-close-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 47.5rem) auto;
+    gap: 6rem;
+    align-items: end;
+    justify-content: space-between;
+    padding-block: 7rem 6.5rem;
+  }
+
+  .home-close-copy {
+    gap: 1.375rem;
+  }
+
+  .home-close h2 {
+    --color-brand-primary: var(--color-surface);
+
+    color: var(--color-brand-primary);
+  }
+
+  .home-close-copy > p {
+    max-inline-size: 38.75rem;
+    font-size: 1.125rem;
+    line-height: 1.55;
+  }
+
+  .home-close-action {
+    padding-block-end: var(--space-2);
+    font-size: 1.25rem;
+  }
+
+  .home-close-action > span:first-child {
+    background: var(--color-brand-highlight);
+  }
+
+  .home-footer {
+    color: var(--color-surface);
+    background: var(--color-brand-primary);
+    border-block-start: var(--border-width) solid rgb(255 255 255 / 18%);
+  }
+
+  .home-footer-inner {
+    display: grid;
+    grid-template-columns: 10.625rem minmax(0, 35rem) auto;
+    gap: var(--space-7);
+    align-items: center;
+    justify-content: space-between;
+    padding-block: 2.125rem;
+  }
+
+  .home-footer-brand {
+    display: inline-flex;
+    min-block-size: var(--control-min-block-size);
+    min-inline-size: var(--control-min-inline-size);
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .home-footer-brand img {
+    inline-size: 2.625rem;
+    block-size: 2.625rem;
+  }
+
+  .home-footer p {
+    color: rgb(255 255 255 / 76%);
+    font-size: 0.8125rem;
+    line-height: 1.55;
+  }
+
+  .home-footer ul {
+    display: flex;
+    gap: var(--space-5);
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .home-footer a {
+    display: inline-flex;
+    min-block-size: var(--control-min-block-size);
+    align-items: center;
+    color: var(--color-surface);
+    font-size: 0.8125rem;
+  }
+
+  @media (width <= 64rem) {
+    .home-hero-inner {
+      gap: 2.125rem;
+      padding-block-start: 3.25rem;
     }
 
-    .home-identity,
-    .home-current-work-grid {
+    .home-hero-statement,
+    .home-campaign-inner,
+    .home-governance-inner,
+    .home-participation-heading,
+    .home-close-inner,
+    .home-footer-inner {
       grid-template-columns: minmax(0, 1fr);
-      gap: var(--space-7);
     }
 
-    .home-current-work {
-      padding-block: var(--space-8);
+    .home-hero-statement,
+    .home-hero-headline,
+    .home-hero-invitation {
+      gap: 1.125rem;
     }
 
-    .home-current-work-grid {
-      align-items: start;
+    .home-hero h1 {
+      --font-size-heading-1: 2.75rem;
+      --line-height-heading: 1.045;
+
+      max-inline-size: none;
+      font-size: var(--font-size-heading-1);
+      line-height: var(--line-height-heading);
     }
 
-    .home-updates {
-      grid-template-columns: minmax(0, 1fr);
+    .home-hero-invitation {
+      padding-block-end: 0;
+    }
+
+    .home-hero-invitation > p {
+      font-size: 1.125rem;
+      line-height: 1.55;
+    }
+
+    .home-campaign-inner {
+      gap: 0;
+      padding-block: 4.5rem 4.25rem;
+    }
+
+    .home-campaign h2,
+    .home-governance h2,
+    .home-participation h2,
+    .home-close h2 {
+      --font-size-heading-2: 2.375rem;
+      --line-height-heading: 1.08;
+
+      max-inline-size: none;
+      font-size: var(--font-size-heading-2);
+      line-height: var(--line-height-heading);
+    }
+
+    .home-governance-detail {
+      padding-block-start: 0;
+    }
+
+    .home-campaign-description,
+    .home-governance-detail > p,
+    .home-participation-heading > p,
+    .home-close-copy > p {
+      font-size: 1.0625rem;
+      line-height: 1.6;
+    }
+
+    .home-campaign-meta,
+    .home-campaign h2,
+    .home-campaign-description,
+    .home-campaign-link,
+    .home-campaign-source,
+    .home-campaign-petition {
+      grid-column: 1;
+      grid-row: auto;
+    }
+
+    .home-campaign h2,
+    .home-campaign-description,
+    .home-campaign-link,
+    .home-campaign-petition {
+      margin-block-start: 1.375rem;
+    }
+
+    .home-campaign-description {
+      padding-block-start: 0;
+    }
+
+    .home-campaign-source {
+      margin-block-start: var(--space-1);
+    }
+
+    .home-governance-inner {
+      gap: 1.375rem;
+      padding-block: 4.875rem 4.5rem;
+    }
+
+    .home-governance-heading,
+    .home-governance-detail {
+      gap: 1.375rem;
+    }
+
+    .home-proof-inner {
+      gap: var(--space-5);
+      padding-block: var(--space-8) 4.125rem;
+    }
+
+    .home-participation-inner {
+      gap: 1.75rem;
+      padding-block: 4.75rem 4.5rem;
+    }
+
+    .home-participation-heading {
+      gap: 0.875rem;
+    }
+
+    .home-participation-routes > li {
+      grid-template-columns: 3rem minmax(0, 1fr);
+      gap: 0.625rem 1.125rem;
+      padding-block: 1.375rem 1.5rem;
+    }
+
+    .home-route-number {
+      grid-column: 1;
+      grid-row: 1;
+      font-size: 1.75rem;
+      line-height: 1.15;
+    }
+
+    .home-participation-routes h3 {
+      grid-column: 2;
+      grid-row: 1;
+      align-self: baseline;
+      font-size: 1.375rem;
+      line-height: 1.27;
+    }
+
+    .home-participation-routes p,
+    .home-participation-routes :deep(.app-action-link) {
+      grid-column: 2;
+    }
+
+    .home-participation-routes :deep(.app-action-link) {
+      inline-size: auto;
+      justify-content: flex-start;
+      text-align: start;
+    }
+
+    .home-close-inner {
+      gap: 1.375rem;
+      padding-block: 4.5rem 4.25rem;
+    }
+
+    .home-close-copy {
+      gap: 1.375rem;
+    }
+
+    .home-rule-action > span:first-child {
+      inline-size: 2.625rem;
+    }
+
+    .home-close-action {
+      font-size: 1.0625rem;
+    }
+
+    .home-footer-inner {
+      gap: 1.375rem;
+      padding-block: 1.75rem 2rem;
+    }
+
+    .home-footer-brand img {
+      inline-size: 2.125rem;
+      block-size: 2.125rem;
+    }
+
+    .home-footer ul {
+      gap: 1.375rem;
+      flex-wrap: wrap;
+    }
+
+    .home-footer p,
+    .home-footer a {
+      font-size: 0.875rem;
     }
   }
 
-  @media (width <= 32rem) {
-    .home-actions {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr);
+  @media (width <= 30rem) {
+    .home-hero-actions {
       inline-size: 100%;
     }
 
-    .home-actions :deep(.app-action-link),
-    .home-updates :deep(.app-action-link) {
-      inline-size: 100%;
-    }
-
-    .home-current-work-actions {
-      align-items: stretch;
-      flex-direction: column;
-      inline-size: 100%;
-    }
-
-    .home-current-work-actions :deep(.app-action-link),
-    .campaign-brief-link {
-      inline-size: 100%;
-      justify-content: center;
+    .home-hero-primary {
+      inline-size: auto;
     }
   }
 }
