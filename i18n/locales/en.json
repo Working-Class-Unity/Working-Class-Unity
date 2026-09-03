@@ -26,6 +26,10 @@
       "title": "Calendar",
       "description": "Find upcoming Working Class Unity events and meetings."
     },
+    "links": {
+      "title": "Links",
+      "description": "Find Working Class Unity's current campaign, upcoming events, and ways to get involved."
+    },
     "forum": {
       "title": "Forum",
       "description": "Visit the Working Class Unity community forum."
@@ -421,6 +425,44 @@
     "calendar": {
       "title": "Calendar",
       "description": "Our public meetings, events, and actions will appear here soon."
+    },
+    "links": {
+      "eyebrow": "WCU · Quick links",
+      "title": "Working Class Unity",
+      "introduction": "A member-run organization bringing working people together across San Joaquin County to win concrete changes, develop leaders, and build lasting power.",
+      "campaign": {
+        "eyebrow": "Current campaign · Stockton",
+        "title": "Remove mass surveillance from Stockton",
+        "description": "See what Stockton bought, why safeguards are not enough, and how residents can help remove Flock's mass-tracking system.",
+        "action": "Open the Deflock campaign overview"
+      },
+      "events": {
+        "eyebrow": "Meet WCU",
+        "title": "Upcoming events",
+        "all": "Full calendar",
+        "loading": "Loading upcoming events…",
+        "error": "Upcoming events are temporarily unavailable.",
+        "empty": "No upcoming events are published right now. Check the full calendar for updates.",
+        "rsvp": "RSVP or details",
+        "virtual": "Online",
+        "hybrid": "In person and online",
+        "locationPending": "Location shared by organizer"
+      },
+      "more": {
+        "title": "More ways to connect",
+        "getInvolved": {
+          "title": "Get involved",
+          "description": "Find a low-pressure first step into the work."
+        },
+        "join": {
+          "title": "Join WCU",
+          "description": "Learn about membership in a member-run organization."
+        },
+        "about": {
+          "title": "Who we are",
+          "description": "Read why WCU exists and how members govern it."
+        }
+      }
     },
     "forum": {
       "title": "Forum",
