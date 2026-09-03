@@ -42,6 +42,8 @@ The root [`AGENTS.md`](../AGENTS.md) governs all work. The normative interface a
 - `CampaignPageOutline`: campaign-owned configuration of `PageOutline`.
 - `CampaignEditorialHeader`: shared long-form campaign page heading group.
 - `campaign/Landing*`: campaign-owned narrative sections composed by `CampaignLanding`.
+- `KnowYourRightsShell`, `KnowYourRightsGuide`, and `KnowYourRightsScript`: feature-owned localized
+  navigation, long-form guide framing, and speakable scripts for the Know Your Rights page family.
 - `AuthEntryForm`, `TurnstileChallenge`, `AccountProfileForm`, and `AccountDeletionSection`: feature components, not shared primitives.
 
 Direct `reka-ui` imports are allowed only in `components/AccountMenu.vue`, `components/AppTopbar.vue`,

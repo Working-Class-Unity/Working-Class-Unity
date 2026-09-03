@@ -1,0 +1,434 @@
+{
+  "kyr": {
+    "otherResources": "Other Know Your Rights Resources",
+    "overview": {
+      "title": "Immigration Enforcement: Know Your Rights",
+      "description": "Learn about your rights when interacting with ICE."
+    },
+    "public": {
+      "title": "If ICE Stops You in Public",
+      "description": "What to do if stopped by ICE in a public space."
+    },
+    "car": {
+      "title": "If ICE Pulls You Over",
+      "description": "Your rights during a traffic stop by ICE."
+    },
+    "home": {
+      "title": "If ICE Comes to Your Home",
+      "description": "How to handle ICE agents at your door."
+    },
+    "work": {
+      "title": "If ICE Comes to Your Work",
+      "description": "Your rights if ICE raids or visits your workplace."
+    },
+    "documents": {
+      "title": "Documents to Keep on You",
+      "description": "Essential documents to carry at all times."
+    }
+  },
+  "kyr_home": {
+    "hero": {
+      "title": "Know Your Rights. Protect Your Community.",
+      "description": "Immigration enforcement and police are used to divide and intimidate the working class. Know your rights, prepare your family, and stand together so no one faces ICE or the courts alone. This is how we fight back."
+    },
+    "disclaimer": "Disclaimer: These materials are for information only, not legal advice. Always consult a trusted attorney or legal worker about your specific situation.",
+    "buttons": {
+      "emergency": {
+        "title": "Emergency & Preparation",
+        "subtitle": "I need to know my rights or prepare my family."
+      }
+    },
+    "sections": {
+      "rights_prep_title": "Know Your Rights & Prepare Your Family",
+      "rights_prep_intro": "The most important tools you have are the right to remain silent and the right to not consent to searches. Memorize them. Teach them to your family. The guides below provide step-by-step instructions for what to do in common situations."
+    }
+  },
+  "kyr_nav": {
+    "section_label": "Know Your Rights"
+  },
+  "kyr_ice_in_public": {
+    "tactics": {
+      "title": "ICE Tactics",
+      "surveillance": {
+        "title": "Surveillance",
+        "description": "Follow you near your home or in public spaces"
+      },
+      "plain_clothes": {
+        "title": "Plain Clothes",
+        "description": "Wear plain clothes without identifying themselves"
+      },
+      "identity": {
+        "title": "Identity Confirmation",
+        "description": "Call out your name to confirm your identity"
+      },
+      "list": [
+        "Follow you near your home or in public spaces.",
+        "Wear plain clothes without identifying themselves.",
+        "Call out your name to confirm your identity."
+      ]
+    },
+    "stopped": {
+      "title": "If stopped by ICE",
+      "caution_badge": "Caution",
+      "caution_aria": "Caution warning",
+      "stay_silent": "Stay Silent",
+      "silent": "Stay silent. Do not state your name or answer questions.",
+      "say_this": "Say this",
+      "am_i_free": "\"Am I free to go?\"",
+      "ask_free": {
+        "question": "Ask: \"Am I free to go?\"",
+        "if_yes": {
+          "title": "If they say YES:",
+          "steps": ["SAY: \"I will not answer questions.\"", "Walk away calmly if they let you."]
+        },
+        "if_no": {
+          "title": "If they say NO:",
+          "steps": [
+            "SAY: \"I will not answer questions. I want a lawyer.\"",
+            "Do not lie, show false documents, or run."
+          ]
+        }
+      }
+    },
+    "protect": {
+      "title": "Protect Yourself",
+      "record": {
+        "title": "Record",
+        "description": "Record the encounter or ask someone to record. Anything you say can be used against you, so stick to repeating your rights."
+      },
+      "anonymity": {
+        "title": "Stay Anonymous",
+        "description": "When requesting help, avoid saying your name. Give them a contact's name to send the video."
+      },
+      "emergency_card": {
+        "title": "Emergency Card",
+        "description": "Carry an emergency card with your lawyer's and family's contact information."
+      },
+      "non_consent": {
+        "title": "Do Not Consent",
+        "description": "If searched without consent, say: \"I do not consent to this search. I want a lawyer.\""
+      },
+      "if_searched": "If searched, say this",
+      "search_script": "\"I do not consent to this search. I want a lawyer.\"",
+      "list": [
+        "Record the encounter or ask someone to record. Remember that anything you say in that recording can be used against you, so stick to repeating your rights.",
+        "When requesting help, avoid saying your name. Give them a contact's name to send the video.",
+        "Carry an emergency card with your lawyer's and family's contact information.",
+        "If searched without consent: Say, \"I do not consent to this search. I want a lawyer.\""
+      ]
+    }
+  },
+  "kyr_ice_pulls_you_over": {
+    "hero": {
+      "description": "Stay calm, know your rights, and protect yourself during a traffic stop."
+    },
+    "warnings": {
+      "caution": "Caution",
+      "critical": "Critical"
+    },
+    "always_pull_over": {
+      "title": "Always pull over",
+      "content": "Pull over when any law enforcement signals you to stop, even if you do not think you did anything wrong.",
+      "recording_tip": "Start recording. If alone, place the phone in a cup holder or pocket while recording continues."
+    },
+    "identify_officers": {
+      "title": "Identify the officers",
+      "questions": ["Are you police?", "Are you highway patrol?", "Are you immigration?", "Why did you stop me?"],
+      "warning": {
+        "title": "Warning",
+        "content": "ICE uses unmarked vehicles and may wear plain clothes or vests labeled “POLICE” without identifying themselves as immigration."
+      }
+    },
+    "during_stop": {
+      "title": "During the stop",
+      "window": {
+        "title": "Your window",
+        "content": "Roll down your window slightly when asked.",
+        "questions_title": "Before anything else, ask:",
+        "questions": ["Am I free to go?", "Who are you?", "Why did you stop me?", "Do you have a warrant?"]
+      },
+      "providing_info": {
+        "title": "Providing information",
+        "drivers": {
+          "title": "Drivers must provide:",
+          "list": ["Driver’s license.", "Registration and proof of insurance."]
+        },
+        "passengers": {
+          "title": "Passengers",
+          "list": [
+            "Cannot be forced to show ID.",
+            "Cannot be forced to give name, address, legal status or place of birth."
+          ]
+        },
+        "advice": [
+          "Request officer identification before presenting any documents.",
+          "Do not lie or give false documents."
+        ],
+        "all_occupants": {
+          "title": "For all occupants:",
+          "list": ["Decline to discuss immigration status or criminal history."],
+          "say": "Am I free to go? I do not consent to provide ID or answer questions."
+        }
+      }
+    },
+    "compliance_searches": {
+      "title": "Physical compliance and searches",
+      "exiting": {
+        "title": "Exiting the vehicle",
+        "content": "Officer may order you to get out for “officer safety.” This order often precedes arrest.",
+        "ask_title": "Before moving, ask:",
+        "questions": ["Am I free to go?", "Who are you?", "Why did you stop me?"],
+        "warning": "Officers may force removal if you delay."
+      },
+      "search_limitations": {
+        "title": "Search limitations",
+        "content": "ICE needs a judicial warrant or your consent to search:",
+        "list": ["Your body (beyond a pat-down).", "The inside of your vehicle.", "Glove compartment or trunk."],
+        "say": "I do not consent to any searches.",
+        "repeat": "Repeat this even if officers proceed anyway."
+      },
+      "fingerprints": {
+        "title": "Fingerprint collection",
+        "when": {
+          "title": "ICE can take fingerprints only when:",
+          "list": ["Officers suspect immigration violations.", "You are under arrest."]
+        },
+        "if_requested": {
+          "title": "If requested without a clear cause:",
+          "list": ["Ask: “Why am I being fingerprinted?”", "Say: “I do not consent to fingerprinting.”"]
+        },
+        "resistance": "Do not physically resist. Verbal objection may protect your legal rights."
+      }
+    },
+    "labels": {
+      "timeline_aria": "Steps to follow if ICE pulls you over",
+      "step_01": "Step 01",
+      "step_02": "Step 02",
+      "step_03": "Step 03",
+      "step_04": "Step 04",
+      "step_1_of_4": "Step 1 of 4",
+      "step_2_of_4": "Step 2 of 4",
+      "step_3_of_4": "Step 3 of 4",
+      "step_4_of_4": "Step 4 of 4",
+      "start_recording": "Start Recording",
+      "questions_to_ask": "Questions to Ask",
+      "driver": "Driver",
+      "passenger": "Passenger",
+      "say_this": "Say This"
+    }
+  },
+  "kyr_ice_at_home": {
+    "header": {
+      "title": "Protocol: ICE Interaction.",
+      "subtitle": "Follow these steps immediately if approached at your home."
+    },
+    "steps": {
+      "entry_protocol": "Entry Protocol",
+      "verification": "Ask for identification",
+      "warrant_protocol": "Demand to see a warrant",
+      "if_enters": "If ICE enters your home"
+    },
+    "do_not_consent": {
+      "title": "Do not consent to a search",
+      "say": "I do not consent to entry.",
+      "do_not": "Open the door or step outside.",
+      "do": "Record from inside your home.",
+      "instruction": "Request badge numbers and names through the closed door."
+    },
+    "ask_id": {
+      "title": "Ask for identification",
+      "list": ["Request badge numbers and names.", "Record or write down this information."]
+    },
+    "warrant": {
+      "title": "Demand to see a warrant",
+      "no_warrant": {
+        "title": "If they claim to have no warrant or you see it lacks a judge’s signature:",
+        "list": [
+          "Say: “I exercise my right to remain silent.”",
+          "Say: “You cannot enter without my consent.”",
+          "Keep the door closed."
+        ]
+      },
+      "has_warrant": {
+        "title": "If they claim to have a warrant:",
+        "list": ["Request they slide it under the door or display it at a window.", "Photograph the warrant."]
+      },
+      "check_items": {
+        "title": "Check these four items:",
+        "list": [
+          "Issuing authority: Must be from a COURT, not Homeland Security or ICE.",
+          "Subject identity: Your correct name and address must appear, not someone else’s.",
+          "Expiration date: The “execute by” date must be within 14 days.",
+          "Signature: A judge or magistrate must sign it, not an immigration officer."
+        ]
+      }
+    },
+    "if_enters": {
+      "title": "If ICE enters your home",
+      "list": [
+        "Record these violations: force, violence, intimidation, lies, or excessive searching.",
+        "If you cannot film during the incident, record yourself describing what happened as soon as possible afterward."
+      ],
+      "remember_script": "I do not consent to any searches. I wish to remain silent. I want to speak with a lawyer."
+    }
+  },
+  "kyr_ice_at_work": {
+    "timeline_label": "Steps to follow if ICE comes to your workplace",
+    "where_ice_can_go": {
+      "title": "Where ICE can go",
+      "public_areas": {
+        "title": "Public areas (no permission needed):",
+        "description": "Lobbies, dining rooms, and retail spaces. Entry alone does not grant authority to stop, question, or arrest anyone."
+      },
+      "private_areas": {
+        "title": "Private areas (permission required):",
+        "description": "ICE needs a judicial warrant signed by a judge—not a DHS order. If an employee or employer consents, ICE can enter without a warrant."
+      },
+      "public_areas_examples": "Lobbies, parking lots, customer areas",
+      "private_areas_examples": "Offices, warehouses, employee-only areas",
+      "warrant_note": "ICE needs a warrant signed by a judge to enter private/non-public areas without consent."
+    },
+    "rights_at_work": {
+      "title": "Your rights at work",
+      "intro": "All workers can:",
+      "list": [
+        "Remain silent.",
+        "Refuse searches.",
+        "Refuse to show documentation or ID.",
+        "Stand together in the center of the room. Refuse to separate by immigration status. ICE uses this tactic to isolate individuals—protect each other."
+      ]
+    },
+    "hero": {
+      "subtitle": "Caution",
+      "description": "Understand your rights when ICE appears at your workplace. Know where they can and cannot go."
+    },
+    "approaches": {
+      "title": "If ICE Approaches You",
+      "critical": "Critical",
+      "do_not_list": ["Run, resist, or lie about your identity", "Sign any documents without an attorney"],
+      "do_list": ["Stay calm and remember your rights", "Ask if you are free to leave"],
+      "say_this_title": "Say This",
+      "say_this_text": "\"I wish to remain silent. I do not consent to a search. Am I free to go?\""
+    },
+    "employer": {
+      "title": "Employer Responsibilities",
+      "intro": "Your employer has rights and responsibilities during an ICE visit:",
+      "cards": {
+        "warrant": {
+          "title": "Ask for Warrant",
+          "desc": "Can request to see a valid judicial warrant"
+        },
+        "deny": {
+          "title": "Deny Access",
+          "desc": "Can refuse entry to non-public areas without warrant"
+        },
+        "attorney": {
+          "title": "Call Attorney",
+          "desc": "Can contact company lawyer before cooperating"
+        },
+        "notify": {
+          "title": "Notify Workers",
+          "desc": "Can inform employees of their rights"
+        }
+      }
+    }
+  },
+  "kyr_documents_to_keep": {
+    "header": {
+      "title": "Documents to Keep",
+      "description": "Know which documents to carry, when to show them, and how to protect your rights based on your immigration status."
+    },
+    "safety": {
+      "title": "Document Safety",
+      "list": [
+        "Make copies of everything. Store originals with trusted family or friends.",
+        "Never show foreign documents (passports, birth certificates) that reveal birthplace outside the U.S. These can trigger deportation."
+      ]
+    },
+    "legal_status": {
+      "title": "If You Have Legal Status",
+      "badge": "Legal",
+      "includes_label": "Includes",
+      "includes_text": "Green card, asylum, refugee status, valid student visa, or TPS.",
+      "carry_label": "Carry",
+      "carry_list": ["Your lawful resident card or immigration papers"],
+      "show_label": "Show",
+      "show_list": ["Present these documents if law enforcement requests them"]
+    },
+    "pending_status": {
+      "title": "If You Have Pending Status",
+      "badge": "Pending",
+      "includes_label": "Includes",
+      "includes_text": "Pending asylum application, open immigration court case, or immigration appeal.",
+      "carry_label": "Carry",
+      "carry_list": ["Copies of papers proving you applied for status or filed an appeal"],
+      "show_label": "Show",
+      "show_list": ["Present these documents only if arrested"],
+      "otherwise_label": "Otherwise",
+      "otherwise_list": ["Remain silent"]
+    },
+    "undocumented": {
+      "title": "If Undocumented or Expired",
+      "badge": "Critical",
+      "carry_label": "Carry proof of U.S. residence for 2+ years",
+      "carry_list": [
+        "Rental agreements",
+        "School records with address",
+        "Mail addressed to you",
+        "Documents showing your name, U.S. address, and date"
+      ],
+      "callout_title": "Why this matters",
+      "callout_text": "These documents can prevent expedited removal without a hearing. Without proof of 2+ years residence, you can face deportation without seeing a judge."
+    },
+    "quick_ref": {
+      "title": "Quick Reference",
+      "table": {
+        "headers": {
+          "status": "Status",
+          "carry": "What to Carry",
+          "show": "When to Show"
+        },
+        "rows": {
+          "legal": {
+            "status": "Legal Status",
+            "carry": "Lawful resident card or immigration papers",
+            "show": "If law enforcement requests"
+          },
+          "pending": {
+            "status": "Pending Status",
+            "carry": "Copies of application/appeal papers",
+            "show": "Only if arrested"
+          },
+          "undocumented": {
+            "status": "Undocumented",
+            "carry": "Proof of 2+ years U.S. residence",
+            "show": "To prevent expedited removal"
+          }
+        }
+      }
+    },
+    "remember": {
+      "title": "Remember",
+      "text": "\"I wish to remain silent. I do not consent to any searches.\""
+    }
+  },
+  "knowYourRights": {
+    "interface": {
+      "language": "Language",
+      "navigationLabel": "Know Your Rights guides",
+      "backToHub": "Back to Know Your Rights",
+      "disclaimerLabel": "Legal information disclaimer",
+      "sayThis": "Say this",
+      "do": "DO",
+      "doNot": "DO NOT",
+      "remember": "Remember",
+      "outline": {
+        "label": "Guide sections",
+        "title": "On This Page",
+        "description": "Jump to a section of this guide.",
+        "trigger": "On this page",
+        "close": "Close guide contents"
+      }
+    }
+  }
+}

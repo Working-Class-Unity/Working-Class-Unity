@@ -1,0 +1,450 @@
+{
+  "kyr": {
+    "otherResources": "Otros recursos de Conozca sus derechos",
+    "overview": {
+      "title": "Control de inmigración: Conozca sus derechos",
+      "description": "Conozca sus derechos al interactuar con ICE."
+    },
+    "public": {
+      "title": "Si ICE lo detiene en público",
+      "description": "Qué hacer si ICE lo detiene en un espacio público."
+    },
+    "car": {
+      "title": "Si ICE lo detiene en su auto",
+      "description": "Sus derechos durante una parada de tráfico por ICE."
+    },
+    "home": {
+      "title": "Si ICE llega a su casa",
+      "description": "Cómo manejar a los agentes de ICE en su puerta."
+    },
+    "work": {
+      "title": "Si ICE llega a su trabajo",
+      "description": "Sus derechos si ICE realiza una redada o visita su lugar de trabajo."
+    },
+    "documents": {
+      "title": "Documentos para llevar consigo",
+      "description": "Documentos esenciales para llevar en todo momento."
+    }
+  },
+  "kyr_home": {
+    "hero": {
+      "title": "Conozca Sus Derechos. Proteja a Su Comunidad.",
+      "description": "El control migratorio y la policía se usan para dividir e intimidar a la clase trabajadora. Conozca sus derechos, prepare a su familia y manténgase unido para que nadie enfrente a ICE o a los tribunales solo. Así es como nos defendemos."
+    },
+    "disclaimer": "Aviso legal: Estos materiales son solo informativos, no constituyen asesoría legal. Siempre consulte a un abogado o trabajador legal de confianza sobre su situación específica.",
+    "buttons": {
+      "emergency": {
+        "title": "Emergencia y Preparación",
+        "subtitle": "Necesito conocer mis derechos o preparar a mi familia."
+      }
+    },
+    "sections": {
+      "rights_prep_title": "Conozca Sus Derechos y Prepare a Su Familia",
+      "rights_prep_intro": "Las herramientas más importantes que tiene son el derecho a permanecer en silencio y el derecho a no consentir registros. Memorícelos. Enséñelos a su familia. Las guías a continuación proporcionan instrucciones paso a paso sobre qué hacer en situaciones comunes."
+    }
+  },
+  "kyr_nav": {
+    "section_label": "Conozca Sus Derechos"
+  },
+  "kyr_ice_in_public": {
+    "tactics": {
+      "title": "Tácticas de ICE",
+      "surveillance": {
+        "title": "Vigilancia",
+        "description": "Seguirlo cerca de su casa o en espacios públicos"
+      },
+      "plain_clothes": {
+        "title": "Ropa de Civil",
+        "description": "Vestir ropa de civil sin identificarse"
+      },
+      "identity": {
+        "title": "Confirmación de Identidad",
+        "description": "Llamarlo por su nombre para confirmar su identidad"
+      },
+      "list": [
+        "Seguirlo cerca de su casa o en espacios públicos.",
+        "Vestir ropa de civil sin identificarse.",
+        "Llamarlo por su nombre para confirmar su identidad."
+      ]
+    },
+    "stopped": {
+      "title": "Si ICE lo detiene",
+      "caution_badge": "Precaución",
+      "caution_aria": "Advertencia de precaución",
+      "stay_silent": "Guarde Silencio",
+      "silent": "Permanezca en silencio. No diga su nombre ni responda preguntas.",
+      "say_this": "Diga esto",
+      "am_i_free": "\"¿Soy libre de irme?\"",
+      "ask_free": {
+        "question": "Pregunte: \"¿Soy libre de irme?\"",
+        "if_yes": {
+          "title": "Si dicen SÍ:",
+          "steps": ["DIGA: \"No voy a responder preguntas.\"", "Aléjese con calma si lo dejan ir."]
+        },
+        "if_no": {
+          "title": "Si dicen NO:",
+          "steps": [
+            "DIGA: \"No voy a responder preguntas. Quiero un abogado.\"",
+            "No mienta, no muestre documentos falsos ni corra."
+          ]
+        }
+      }
+    },
+    "protect": {
+      "title": "Protéjase",
+      "record": {
+        "title": "Grabe",
+        "description": "Grabe el encuentro o pida a alguien que grabe. Todo lo que diga puede usarse en su contra, así que repita solo sus derechos."
+      },
+      "anonymity": {
+        "title": "Manténgase Anónimo",
+        "description": "Al pedir ayuda, evite decir su nombre. Dé el nombre de un contacto para enviar el video."
+      },
+      "emergency_card": {
+        "title": "Tarjeta de Emergencia",
+        "description": "Lleve una tarjeta de emergencia con la información de contacto de su abogado y familia."
+      },
+      "non_consent": {
+        "title": "No Dé Consentimiento",
+        "description": "Si lo registran sin consentimiento, diga: \"No consiento a este registro. Quiero un abogado.\""
+      },
+      "if_searched": "Si lo registran, diga esto",
+      "search_script": "\"No consiento a este registro. Quiero un abogado.\"",
+      "list": [
+        "Grabe el encuentro o pida a alguien que grabe. Recuerde que todo lo que diga en esa grabación puede usarse en su contra, así que repita solo sus derechos.",
+        "Al pedir ayuda, evite decir su nombre. Dé el nombre de un contacto para enviar el video.",
+        "Lleve una tarjeta de emergencia con la información de contacto de su abogado y familia.",
+        "Si lo registran sin consentimiento: Diga, \"No consiento a este registro. Quiero un abogado.\""
+      ]
+    }
+  },
+  "kyr_ice_pulls_you_over": {
+    "hero": {
+      "description": "Mantenga la calma, conozca sus derechos y protéjase durante una parada de tráfico."
+    },
+    "warnings": {
+      "caution": "Precaución",
+      "critical": "Crítico"
+    },
+    "always_pull_over": {
+      "title": "Siempre deténgase",
+      "content": "Deténgase cuando cualquier autoridad le indique que pare, aunque no crea haber hecho nada malo.",
+      "recording_tip": "Comience a grabar. Si está solo, coloque el teléfono en un portavasos o bolsillo mientras continúa grabando."
+    },
+    "identify_officers": {
+      "title": "Identifique a los oficiales",
+      "questions": [
+        "¿Es usted policía?",
+        "¿Es usted patrulla de carreteras?",
+        "¿Es usted de inmigración?",
+        "¿Por qué me detuvo?"
+      ],
+      "warning": {
+        "title": "Advertencia",
+        "content": "ICE usa vehículos sin identificación y puede vestir ropa de civil o chalecos que dicen \"POLICE\" sin identificarse como inmigración."
+      }
+    },
+    "during_stop": {
+      "title": "Durante la parada",
+      "window": {
+        "title": "Su ventana",
+        "content": "Baje la ventana ligeramente cuando se lo pidan.",
+        "questions_title": "Antes que nada, pregunte:",
+        "questions": ["¿Soy libre de irme?", "¿Quién es usted?", "¿Por qué me detuvo?", "¿Tiene una orden judicial?"]
+      },
+      "providing_info": {
+        "title": "Proporcionar información",
+        "drivers": {
+          "title": "Los conductores deben proporcionar:",
+          "list": ["Licencia de conducir.", "Registro y comprobante de seguro."]
+        },
+        "passengers": {
+          "title": "Pasajeros",
+          "list": [
+            "No pueden ser obligados a mostrar identificación.",
+            "No pueden ser obligados a dar nombre, dirección, estatus legal o lugar de nacimiento."
+          ]
+        },
+        "advice": [
+          "Solicite identificación del oficial antes de presentar cualquier documento.",
+          "No mienta ni entregue documentos falsos."
+        ],
+        "all_occupants": {
+          "title": "Para todos los ocupantes:",
+          "list": ["Negarse a discutir estatus migratorio o historial criminal."],
+          "say": "¿Soy libre de irme? No consiento a proporcionar identificación ni responder preguntas."
+        }
+      }
+    },
+    "compliance_searches": {
+      "title": "Cumplimiento físico y registros",
+      "exiting": {
+        "title": "Salir del vehículo",
+        "content": "El oficial puede ordenarle que salga por \"seguridad del oficial\". Esta orden a menudo precede a un arresto.",
+        "ask_title": "Antes de moverse, pregunte:",
+        "questions": ["¿Soy libre de irme?", "¿Quién es usted?", "¿Por qué me detuvo?"],
+        "warning": "Los oficiales pueden forzar su salida si se demora."
+      },
+      "search_limitations": {
+        "title": "Limitaciones de registro",
+        "content": "ICE necesita una orden judicial o su consentimiento para registrar:",
+        "list": ["Su cuerpo (más allá de un cacheo).", "El interior de su vehículo.", "Guantera o maletero."],
+        "say": "No consiento a ningún registro.",
+        "repeat": "Repita esto aunque los oficiales procedan de todos modos."
+      },
+      "fingerprints": {
+        "title": "Toma de huellas dactilares",
+        "when": {
+          "title": "ICE solo puede tomar huellas cuando:",
+          "list": ["Los oficiales sospechan violaciones de inmigración.", "Usted está bajo arresto."]
+        },
+        "if_requested": {
+          "title": "Si se solicita sin causa clara:",
+          "list": [
+            "Pregunte: \"¿Por qué me están tomando las huellas?\"",
+            "Diga: \"No consiento a que me tomen las huellas.\""
+          ]
+        },
+        "resistance": "No resista físicamente. La objeción verbal puede proteger sus derechos legales."
+      }
+    },
+    "labels": {
+      "timeline_aria": "Pasos a seguir si ICE lo detiene en el camino",
+      "step_01": "Paso 01",
+      "step_02": "Paso 02",
+      "step_03": "Paso 03",
+      "step_04": "Paso 04",
+      "step_1_of_4": "Paso 1 de 4",
+      "step_2_of_4": "Paso 2 de 4",
+      "step_3_of_4": "Paso 3 de 4",
+      "step_4_of_4": "Paso 4 de 4",
+      "start_recording": "Comience a Grabar",
+      "questions_to_ask": "Preguntas para Hacer",
+      "driver": "Conductor",
+      "passenger": "Pasajero",
+      "say_this": "Diga Esto"
+    }
+  },
+  "kyr_ice_at_home": {
+    "header": {
+      "title": "SI LA POLICÍA DE INMIGRACIÓN Y ADUANAS (ICE) LLEGA A SU HOGAR",
+      "subtitle": "Siga estos pasos inmediatamente si lo abordan en su casa."
+    },
+    "steps": {
+      "entry_protocol": "Protocolo de Entrada",
+      "verification": "Pida Identificación",
+      "warrant_protocol": "Exija Ver la Orden Judicial",
+      "if_enters": "Si ICE Entra a Su Hogar"
+    },
+    "do_not_consent": {
+      "title": "No consienta que registren",
+      "say": "No consiento que entren.",
+      "do_not": "Abra la puerta ni salga afuera.",
+      "do": "Grabe el encuentro desde dentro de su hogar.",
+      "instruction": "Pida los números de placa y sus nombres a través de la puerta cerrada."
+    },
+    "ask_id": {
+      "title": "PIDA POR IDENTIFICACIÓN",
+      "list": ["Pida los números de placa y sus nombres.", "Grabe o anote esta información."]
+    },
+    "warrant": {
+      "title": "EXIJA QUE PRESENTEN LA ORDEN JUDICIAL",
+      "no_warrant": {
+        "title": "Si afirman no tener una orden judicial o si ve que no tiene la firma de un juez:",
+        "list": [
+          "Diga: «Ejerzo mi derecho a permanecer en silencio».",
+          "Diga: «No pueden entrar sin mi consentimiento».",
+          "Mantenga la puerta cerrada."
+        ]
+      },
+      "has_warrant": {
+        "title": "Si afirman tener una orden judicial:",
+        "list": [
+          "Pídales que la deslicen por debajo de la puerta o que la muestren por la ventana.",
+          "Saque foto de la orden judicial."
+        ]
+      },
+      "check_items": {
+        "title": "Compruebe estos cuatro puntos:",
+        "list": [
+          "Autoridad emisora: Debe ser un TRIBUNAL, no el Departamento de Seguridad Nacional ni el ICE",
+          "Identidad del sujeto: Deben aparecer su nombre y dirección correcta, no los de otra persona",
+          "Fecha de caducidad: La fecha de «ejecución» debe ser dentro de los 14 días",
+          "Firma: Debe tener firma de un juez o magistrado, no por un funcionario de inmigración"
+        ]
+      }
+    },
+    "if_enters": {
+      "title": "Si la orden judicial pasa los cuatro puntos",
+      "list": [
+        "Cuando sólo aparezca su nombre en la orden: Salga solo y cierre la puerta detrás de usted",
+        "Cuando la orden también incluya el registro de domicilio: Siga grabando. Los agentes deben proporcionar recibos por cualquier propiedad incautada",
+        "Para cualquier orden judicial válida: No diga nada. No firme nada. No mienta. Proporcione los documentos solo cuando se le soliciten. Pida por un abogado."
+      ],
+      "invalid_warrant": {
+        "title": "Si la orden judicial no pasa algún punto:",
+        "list": ["Diga: «Ejerzo mi derecho a permanecer en silencio. No pueden entrar».", "Mantenga la puerta cerrada."]
+      },
+      "remember_script": "No consiento ningún registro. Deseo permanecer en silencio. Quiero hablar con un abogado."
+    }
+  },
+  "kyr_ice_at_work": {
+    "timeline_label": "Pasos a seguir si ICE viene a su lugar de trabajo",
+    "where_ice_can_go": {
+      "title": "Dónde puede ir ICE",
+      "public_areas": {
+        "title": "Áreas públicas (no se necesita permiso):",
+        "description": "Vestíbulos, comedores y espacios comerciales. El solo hecho de entrar no les da autoridad para detener, interrogar o arrestar a nadie."
+      },
+      "private_areas": {
+        "title": "Áreas privadas (se requiere permiso):",
+        "description": "ICE necesita una orden judicial firmada por un juez, no una orden del DHS. Si un empleado o empleador da su consentimiento, ICE puede entrar sin orden."
+      },
+      "public_areas_examples": "Vestíbulos, estacionamientos, áreas de clientes",
+      "private_areas_examples": "Oficinas, almacenes, áreas solo para empleados",
+      "warrant_note": "ICE necesita una orden firmada por un juez para entrar a áreas privadas/no públicas sin consentimiento."
+    },
+    "rights_at_work": {
+      "title": "Sus derechos en el trabajo",
+      "intro": "Todos los trabajadores pueden:",
+      "list": [
+        "Permanecer en silencio.",
+        "Rechazar registros.",
+        "Negarse a mostrar documentación o identificación.",
+        "Permanecer juntos en el centro de la habitación. Negarse a separarse por estatus migratorio. ICE usa esta táctica para aislar a las personas—protéjanse mutuamente."
+      ]
+    },
+    "hero": {
+      "subtitle": "Precaución",
+      "description": "Entienda sus derechos cuando ICE aparece en su lugar de trabajo. Sepa dónde pueden y no pueden ir."
+    },
+    "approaches": {
+      "title": "Si ICE se le acerca",
+      "critical": "Crítico",
+      "do_not_list": ["Correr, resistir o mentir sobre su identidad", "Firmar cualquier documento sin un abogado"],
+      "do_list": ["Mantener la calma y recordar sus derechos", "Preguntar si es libre de irse"],
+      "say_this_title": "Diga esto",
+      "say_this_text": "\"Deseo permanecer en silencio. No consiento a un registro. ¿Soy libre de irme?\""
+    },
+    "employer": {
+      "title": "Responsabilidades del empleador",
+      "intro": "Su empleador tiene derechos y responsabilidades durante una visita de ICE:",
+      "cards": {
+        "warrant": {
+          "title": "Pedir la orden",
+          "desc": "Puede solicitar ver una orden judicial válida"
+        },
+        "deny": {
+          "title": "Negar acceso",
+          "desc": "Puede rechazar la entrada a áreas no públicas sin orden"
+        },
+        "attorney": {
+          "title": "Llamar al abogado",
+          "desc": "Puede contactar al abogado de la empresa antes de cooperar"
+        },
+        "notify": {
+          "title": "Notificar a trabajadores",
+          "desc": "Puede informar a los empleados sobre sus derechos"
+        }
+      }
+    }
+  },
+  "kyr_documents_to_keep": {
+    "header": {
+      "title": "Documentos que debe llevar consigo",
+      "description": "Sepa qué documentos llevar, cuándo mostrarlos y cómo proteger sus derechos según su estatus migratorio."
+    },
+    "safety": {
+      "title": "Seguridad de documentos",
+      "list": [
+        "Haga copias de todo. Guarde los originales con familiares o amigos de confianza.",
+        "Nunca muestre documentos extranjeros (pasaportes, actas de nacimiento) que revelen un lugar de nacimiento fuera de EE.UU. Estos pueden provocar la deportación."
+      ]
+    },
+    "legal_status": {
+      "title": "Si tiene estatus legal",
+      "badge": "Legal",
+      "includes_label": "Incluye",
+      "includes_text": "Tarjeta verde, asilo, estatus de refugiado, visa de estudiante válida o TPS.",
+      "carry_label": "Llevar",
+      "carry_list": ["Su tarjeta de residente legal o documentos de inmigración"],
+      "show_label": "Mostrar",
+      "show_list": ["Presente estos documentos si las autoridades lo solicitan"]
+    },
+    "pending_status": {
+      "title": "Si tiene estatus pendiente",
+      "badge": "Pendiente",
+      "includes_label": "Incluye",
+      "includes_text": "Solicitud de asilo pendiente, caso abierto en corte de inmigración o apelación de inmigración.",
+      "carry_label": "Llevar",
+      "carry_list": ["Copias de documentos que demuestren que solicitó estatus o presentó una apelación"],
+      "show_label": "Mostrar",
+      "show_list": ["Presente estos documentos solo si es arrestado"],
+      "otherwise_label": "De lo contrario",
+      "otherwise_list": ["Permanezca en silencio"]
+    },
+    "undocumented": {
+      "title": "Si es indocumentado o tiene estatus vencido",
+      "badge": "Crítico",
+      "carry_label": "Lleve prueba de residencia en EE.UU. por más de 2 años",
+      "carry_list": [
+        "Contratos de alquiler",
+        "Registros escolares con dirección",
+        "Correo dirigido a usted",
+        "Documentos que muestren su nombre, dirección en EE.UU. y fecha"
+      ],
+      "callout_title": "Por qué es importante",
+      "callout_text": "Estos documentos pueden evitar la deportación acelerada sin audiencia. Sin prueba de 2 o más años de residencia, puede enfrentar deportación sin ver a un juez."
+    },
+    "quick_ref": {
+      "title": "Referencia rápida",
+      "table": {
+        "headers": {
+          "status": "Estatus",
+          "carry": "Qué llevar",
+          "show": "Cuándo mostrar"
+        },
+        "rows": {
+          "legal": {
+            "status": "Estatus legal",
+            "carry": "Tarjeta de residente legal o documentos de inmigración",
+            "show": "Si las autoridades lo solicitan"
+          },
+          "pending": {
+            "status": "Estatus pendiente",
+            "carry": "Copias de documentos de solicitud/apelación",
+            "show": "Solo si es arrestado"
+          },
+          "undocumented": {
+            "status": "Indocumentado",
+            "carry": "Prueba de 2+ años de residencia en EE.UU.",
+            "show": "Para evitar deportación acelerada"
+          }
+        }
+      }
+    },
+    "remember": {
+      "title": "Recuerde",
+      "text": "\"Deseo permanecer en silencio. No consiento a ningún registro.\""
+    }
+  },
+  "knowYourRights": {
+    "interface": {
+      "language": "Idioma",
+      "navigationLabel": "Guías de Conozca Sus Derechos",
+      "backToHub": "Volver a Conozca Sus Derechos",
+      "disclaimerLabel": "Aviso sobre información legal",
+      "sayThis": "Diga esto",
+      "do": "SÍ",
+      "doNot": "NO",
+      "remember": "Recuerde",
+      "outline": {
+        "label": "Secciones de la guía",
+        "title": "En esta página",
+        "description": "Vaya a una sección de esta guía.",
+        "trigger": "En esta página",
+        "close": "Cerrar el contenido de la guía"
+      }
+    }
+  }
+}

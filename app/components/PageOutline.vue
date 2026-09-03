@@ -490,7 +490,8 @@ function itemMarker(item: PageOutlineItem, index: number) {
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .page-outline-drawer {
+    .page-outline-drawer[data-state='open'],
+    .page-outline-drawer[data-state='closed'] {
       animation-duration: 1ms;
       transition-duration: 1ms;
     }
