@@ -206,7 +206,7 @@ useHead({
 
   .stockton-record :deep(.campaign-editorial-description) {
     grid-column: 9 / -1;
-    align-self: end;
+    align-self: center;
     max-inline-size: 36ch;
     font-size: clamp(1.125rem, 1rem + 0.4vw, 1.25rem);
     line-height: 1.55;
@@ -214,6 +214,7 @@ useHead({
 
   .stockton-record :deep(.campaign-editorial-reviewed) {
     grid-column: 1 / span 4;
+    grid-row: 3;
     align-self: start;
     padding-block-start: var(--space-4);
     border-block-start: var(--border-width) solid var(--article-divider);
@@ -223,6 +224,7 @@ useHead({
 
   .stockton-record :deep(.campaign-editorial-qualification) {
     grid-column: 5 / -1;
+    grid-row: 3;
     max-inline-size: 62ch;
     padding-block-start: var(--space-4);
     padding-inline-start: 0;
@@ -402,15 +404,9 @@ useHead({
   }
 
   .stockton-record :deep(.campaign-article-section-heading) {
-    grid-template-columns: minmax(2.5rem, 1fr) minmax(0, 4fr) minmax(0, 7fr);
+    grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
     gap: var(--space-4) var(--space-6);
     align-items: start;
-  }
-
-  .stockton-record :deep(.campaign-article-section-heading > p:first-child) {
-    padding-block-start: 0.45rem;
-    font-family: var(--font-family-body);
-    font-size: 0.875rem;
   }
 
   .stockton-record :deep(.campaign-article-section h2) {
@@ -502,7 +498,7 @@ useHead({
     }
 
     .stockton-record :deep(.campaign-article-section-heading) {
-      grid-template-columns: minmax(2.5rem, 1fr) minmax(0, 4fr) minmax(0, 6fr);
+      grid-template-columns: minmax(0, 4fr) minmax(0, 6fr);
     }
 
     .stockton-record :deep(.campaign-article-prose),
@@ -525,6 +521,11 @@ useHead({
     .stockton-record :deep(.campaign-editorial-qualification),
     .record-facts {
       grid-column: 1;
+    }
+
+    .stockton-record :deep(.campaign-editorial-reviewed),
+    .stockton-record :deep(.campaign-editorial-qualification) {
+      grid-row: auto;
     }
 
     .stockton-record :deep(.campaign-editorial-header h1) {
@@ -565,10 +566,6 @@ useHead({
 
     .stockton-record :deep(.campaign-article-section-heading) {
       grid-template-columns: minmax(0, 1fr);
-    }
-
-    .stockton-record :deep(.campaign-article-section-heading > p:first-child) {
-      padding-block-start: 0;
     }
 
     .stockton-record :deep(.campaign-article-section h2) {

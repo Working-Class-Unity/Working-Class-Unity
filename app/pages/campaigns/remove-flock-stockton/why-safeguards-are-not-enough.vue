@@ -102,21 +102,15 @@ useHead({
   }
 
   .safeguards-article :deep(.campaign-article-section-heading) {
-    grid-template-columns: 3.5rem minmax(0, 1fr);
-    gap: var(--space-3) var(--space-5);
-  }
-
-  .safeguards-article :deep(.campaign-article-section-heading > p:first-child) {
-    grid-column: 1;
-    grid-row: 1 / span 2;
-    padding-block-start: 0.35rem;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-3);
   }
 
   .safeguards-article :deep(.campaign-article-section h2) {
     --font-size-heading-2: clamp(2rem, 1.65rem + 1.2vw, 2.875rem);
     --line-height-heading: 1.06;
 
-    grid-column: 2;
+    grid-column: 1;
     max-inline-size: 24ch;
     color: var(--color-brand-primary);
     font-family: var(--font-family-heading);
@@ -127,7 +121,7 @@ useHead({
   }
 
   .safeguards-article :deep(.campaign-article-section-heading > p:last-child) {
-    grid-column: 2;
+    grid-column: 1;
     max-inline-size: 60ch;
     color: var(--color-text);
     font-size: 1.125rem;
@@ -136,7 +130,7 @@ useHead({
 
   .safeguards-article :deep(.campaign-article-prose),
   .safeguards-article :deep(.campaign-article-points) {
-    padding-inline-start: calc(3.5rem + var(--space-5));
+    padding-inline-start: 0;
   }
 
   .safeguards-article :deep(.campaign-cited-paragraph > p:first-child),
@@ -209,19 +203,9 @@ useHead({
       font-size: 1rem;
     }
 
-    .safeguards-article :deep(.campaign-article-section-heading) {
-      grid-template-columns: 2.25rem minmax(0, 1fr);
-      column-gap: var(--space-3);
-    }
-
     .safeguards-article :deep(.campaign-article-section h2) {
       --font-size-heading-2: 2rem;
       --line-height-heading: 1.1;
-    }
-
-    .safeguards-article :deep(.campaign-article-section-heading > p:last-child) {
-      grid-column: 1 / -1;
-      padding-block-start: var(--space-2);
     }
 
     .safeguards-article :deep(.campaign-article-prose),

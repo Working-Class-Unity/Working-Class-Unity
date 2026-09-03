@@ -43,15 +43,9 @@ function citationIdPrefix(groupId: string, itemId: string, kind: 'answer' | 'poi
           <h1 id="stockton-flock-faq-title">{{ campaignFaqPage.title }}</h1>
           <div class="campaign-faq-introduction">
             <p class="campaign-faq-description">{{ campaignFaqPage.description }}</p>
-            <p class="campaign-faq-qualification">{{ campaignFaqPage.qualification }}</p>
-            <div class="campaign-faq-actions">
-              <AppActionLink :to="petitionUrl" variant="campaign">
-                {{ t('removeFlock.petitionAction') }}
-              </AppActionLink>
-              <AppActionLink to="#stockton-flock-faq-title-source-register-title" variant="text-inverse">
-                Read the source register <span aria-hidden="true">↓</span>
-              </AppActionLink>
-            </div>
+            <AppActionLink :to="petitionUrl" variant="campaign">
+              {{ t('removeFlock.petitionAction') }}
+            </AppActionLink>
           </div>
         </div>
       </div>
@@ -166,8 +160,7 @@ function citationIdPrefix(groupId: string, itemId: string, kind: 'answer' | 'poi
   }
 
   .campaign-faq-context p,
-  .campaign-faq-description,
-  .campaign-faq-qualification {
+  .campaign-faq-description {
     margin: 0;
   }
 
@@ -217,23 +210,6 @@ function citationIdPrefix(groupId: string, itemId: string, kind: 'answer' | 'poi
     font-size: var(--font-size-lede);
     line-height: 1.55;
     text-wrap: pretty;
-  }
-
-  .campaign-faq-qualification {
-    max-inline-size: 66ch;
-    border-inline-start: var(--border-width-accent) solid var(--color-brand-highlight);
-    padding-inline-start: var(--space-4);
-    color: rgb(255 255 255 / 80%);
-    font-size: 1rem;
-    line-height: 1.6;
-    text-wrap: pretty;
-  }
-
-  .campaign-faq-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-3) var(--space-5);
-    align-items: center;
   }
 
   .campaign-faq-layout {

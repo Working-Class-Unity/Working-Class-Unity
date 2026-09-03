@@ -72,18 +72,17 @@ function slotCitationOccurrences(slotName: string) {
     </CampaignEditorialHeader>
 
     <div class="campaign-article-layout">
-      <CampaignPageOutline :items="outlineItems" :label="`${content.title} sections`" />
+      <CampaignPageOutline :items="outlineItems" :label="`${content.title} sections`" :show-markers="false" />
 
       <div class="campaign-article-body">
         <section
-          v-for="(section, index) in articleSections"
+          v-for="section in articleSections"
           :id="section.id"
           :key="section.id"
           class="campaign-article-section"
           :aria-labelledby="`${section.id}-title`"
         >
           <div class="campaign-article-section-heading">
-            <p>{{ String(index + 1).padStart(2, '0') }}</p>
             <h2 :id="`${section.id}-title`">{{ section.title }}</h2>
             <p>{{ section.summary }}</p>
           </div>
@@ -145,15 +144,6 @@ function slotCitationOccurrences(slotName: string) {
 
     min-width: 0;
     padding-block-end: clamp(4rem, 8vw, 7rem);
-  }
-
-  .campaign-article-section-heading > p:first-child {
-    margin: 0;
-    color: var(--color-accent-action);
-    font-family: var(--font-family-mono);
-    font-size: 0.8125rem;
-    font-weight: var(--font-weight-strong);
-    letter-spacing: 0.08em;
   }
 
   .campaign-article-section h2 {
@@ -244,12 +234,6 @@ function slotCitationOccurrences(slotName: string) {
     .campaign-article-layout {
       grid-template-columns: minmax(0, 1fr);
       gap: 0;
-    }
-  }
-
-  @media (width <= 40rem) {
-    .campaign-article-section-heading > p:first-child {
-      font-size: 1rem;
     }
   }
 }

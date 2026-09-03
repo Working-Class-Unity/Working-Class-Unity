@@ -490,8 +490,6 @@ export const campaignFaqPage = {
   description:
     'Direct answers about public safety, movement data, immigration enforcement, private police technology, public spending, and what removal requires.',
   reviewedThrough: 'August 12, 2026',
-  qualification:
-    'This page does not claim that Stockton shared Flock data with ICE, broke state law, or deployed every contracted product. It separates Stockton records from vendor claims and examples from other cities.',
   sections: faqGroups.map((group) => ({
     id: group.id,
     title: group.title,
