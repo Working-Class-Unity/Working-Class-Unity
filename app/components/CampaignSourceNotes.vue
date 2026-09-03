@@ -197,6 +197,11 @@ function focusCitation(citationId: string) {
   }
 
   .campaign-source-title {
+    display: inline-flex;
+    min-block-size: var(--control-min-block-size);
+    min-inline-size: var(--control-min-inline-size);
+    align-items: center;
+    max-inline-size: 100%;
     overflow-wrap: anywhere;
     color: var(--color-brand-primary);
     font-weight: 650;
@@ -248,7 +253,8 @@ function focusCitation(citationId: string) {
 
     display: inline-flex;
     align-items: center;
-    min-block-size: 2.25rem;
+    min-block-size: var(--control-min-block-size);
+    min-inline-size: var(--control-min-inline-size);
     border: var(--border-width) solid var(--color-border);
     border-radius: var(--radius-1);
     padding-inline: var(--space-3);

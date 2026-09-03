@@ -23,8 +23,6 @@ const runtimeSentryOrigin = requiredEnvironment('BROWSER_RUNTIME_SENTRY_ORIGIN')
 const turnstileOrigin = 'https://challenges.cloudflare.com'
 const turnstileScriptUrl = `${turnstileOrigin}/turnstile/v0/api.js?render=explicit`
 const forumUrl = 'https://chat.workingclassunity.com/'
-const updatesDisclaimer =
-  'Choose email, text messages, or both. By signing up, you agree to receive WCU updates through the options you select. Message frequency varies; message and data rates may apply. Unsubscribe from email or reply STOP to stop texts.'
 const campaignUpdatesDisclaimer = 'Sign up for updates about this campaign and other WCU updates.'
 const sentryEnvelopePath = '/api/1/envelope/'
 const maxCaptureFileBytes = 65_536
@@ -98,7 +96,7 @@ const isolatedTurnstileBrowserSource = `
 
 test('home presents the WCU foundation and preserves client navigation', async ({ page }) => {
   const observations = observePage(page)
-  await page.setViewportSize({ width: 1280, height: 900 })
+  await page.setViewportSize({ width: 1440, height: 1000 })
   await page.route(
     `${runtimeUrl}/`,
     async (route) => {
@@ -113,35 +111,44 @@ test('home presents the WCU foundation and preserves client navigation', async (
   )
   const response = await page.goto('/')
   await assertContentSecurityPolicy(page, response, observations)
-  await expect(page.getByRole('heading', { name: 'Working People Need an Organization of Our Own' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Working people need an organization of our own' })).toBeVisible()
   await expect(
     page.getByText(
-      'WCU brings tenants, workers, and neighbors together to win concrete changes, develop new leaders, and build lasting power.',
+      'WCU is a member-run organization bringing working people together across San Joaquin County to win concrete changes, develop leaders, and build lasting power.',
       {
         exact: true
       }
     )
   ).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Members make the decisions', exact: true })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Remove mass surveillance from Stockton', exact: true })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Start by showing up', exact: true })).toBeVisible()
+  await expect(page.locator('.home-documentary')).toHaveAttribute('data-photo-count', '10')
+  await expect(
+    page.locator(
+      '.home-documentary button, .home-documentary figcaption, .home-documentary .documentary-carousel-position'
+    )
+  ).toHaveCount(0)
   await expect(page.locator('.brand')).toHaveAccessibleName(`${runtimeName} home`)
   await expect(page.locator('.brand')).toHaveAttribute('aria-current', 'page')
   await expect(page).toHaveTitle('Working Class Unity')
-  const updatesLink = page.getByRole('link', { name: 'STAY INFORMED', exact: true })
+  const updatesLink = page.getByRole('link', { name: 'Get WCU updates', exact: true })
   await expect(updatesLink).toHaveAttribute('href', 'https://tech.workingclassunity.com/wcu-updates')
-  await expect(updatesLink).toHaveAttribute('aria-describedby', 'newsletter-note')
-  await expect(page.locator('.newsletter form')).toHaveCount(0)
-  await expect(page.locator('.newsletter input')).toHaveCount(0)
-  await expect(page.locator('.newsletter iframe')).toHaveCount(0)
-  await expect(page.locator('#newsletter-note')).toHaveText(updatesDisclaimer)
+  await expect(page.locator('.home-participation form')).toHaveCount(0)
+  await expect(page.locator('.home-participation input')).toHaveCount(0)
+  await expect(page.locator('.home-participation iframe')).toHaveCount(0)
   await expect(page.locator('script[src*="challenges.cloudflare.com/turnstile"]')).toHaveCount(0)
   await assertRuntimePublicConfig(page)
   await assertAccessibleWithoutOverflow(page)
 
   const skipLink = page.getByRole('link', { name: 'Skip to main content' })
-  const topbar = page.getByRole('banner', { name: 'Application' })
+  const topbar = page.getByRole('banner', { name: 'Working Class Unity site header' })
+  const hero = page.locator('.home-hero')
   await assertMinimumTargetSize(page.locator('.brand'))
-  await assertMinimumTargetSize(topbar.getByRole('link', { name: 'Log In', exact: true }))
-  await assertMinimumTargetSize(topbar.getByRole('link', { name: 'JOIN NOW', exact: true }))
-  await assertMinimumTargetSize(page.getByRole('link', { name: 'JOIN WCU', exact: true }))
+  await assertMinimumTargetSize(topbar.getByRole('link', { name: 'Member Login', exact: true }))
+  await assertMinimumTargetSize(topbar.getByRole('link', { name: 'Get Involved', exact: true }))
+  await assertMinimumTargetSize(hero.getByRole('link', { name: 'See upcoming events', exact: true }))
+  await expect(hero.getByRole('link', { name: 'See current work', exact: true })).toHaveCount(0)
   await assertMinimumTargetSize(updatesLink)
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.keyboard.press('Tab')
@@ -154,17 +161,8 @@ test('home presents the WCU foundation and preserves client navigation', async (
   await page.keyboard.press('Enter')
   await expect(page.locator('#main-content')).toBeFocused()
 
-  const timeOrigin = await page.evaluate(() => performance.timeOrigin)
-  await page.getByRole('link', { name: 'JOIN WCU', exact: true }).click()
-  await expect(page).toHaveURL(/\/join$/)
-  await expect(page.getByRole('heading', { name: 'Join Working Class Unity' })).toBeVisible()
-  await expect(page.getByRole('button', { name: 'Continue to Stripe' })).toBeVisible()
-  await expect(page.getByText(/connected to .*County/i)).toHaveCount(0)
-  await expect(page.getByRole('link', { name: /Code of Conduct/i })).toBeVisible()
-  await expect(page.getByRole('link', { name: 'JOIN NOW', exact: true })).toHaveAttribute('aria-current', 'page')
-  await expect(page).toHaveTitle('Join Working Class Unity')
-  await expect(page.locator(`script[src="${turnstileScriptUrl}"]`)).toHaveCount(0)
-  expect(await page.evaluate(() => performance.timeOrigin)).toBe(timeOrigin)
+  await page.setViewportSize({ width: 390, height: 844 })
+  await assertAccessibleWithoutOverflow(page)
   await page.setViewportSize({ width: 320, height: 800 })
   await assertNoHorizontalOverflow(page)
   await page.setViewportSize({ width: 640, height: 900 })
@@ -172,6 +170,41 @@ test('home presents the WCU foundation and preserves client navigation', async (
     document.documentElement.style.fontSize = '200%'
   })
   await assertNoHorizontalOverflow(page)
+
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/')
+  await page.evaluate(() => {
+    const replacements = [
+      ['.home-hero h1', 'Working people need a durable, democratic organization of our own in every community'],
+      ['.home-governance h2', 'Members collectively make the consequential organizational decisions'],
+      ['.home-participation h2', 'Start by showing up to a public gathering near you']
+    ]
+    for (const [selector, copy] of replacements) {
+      const element = document.querySelector(selector)
+      if (element) element.textContent = copy
+    }
+    for (const [index, element] of document.querySelectorAll('.app-action-link').entries()) {
+      element.textContent = `Expanded translated action label ${index + 1} with additional context`
+    }
+  })
+  await assertNoHorizontalOverflow(page)
+
+  await page.setViewportSize({ width: 1280, height: 900 })
+  await page.goto('/')
+  const timeOrigin = await page.evaluate(() => performance.timeOrigin)
+  await topbar.getByRole('link', { name: 'Get Involved', exact: true }).click()
+  await expect(page).toHaveURL(/\/#get-involved$/)
+  await expect(page.getByRole('heading', { name: 'Start by showing up', exact: true })).toBeVisible()
+  expect(await page.evaluate(() => performance.timeOrigin)).toBe(timeOrigin)
+
+  await page.goto('/join')
+  await expect(page).toHaveURL(/\/join$/)
+  await expect(page.getByRole('heading', { name: 'Join Working Class Unity' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Continue to Stripe' })).toBeVisible()
+  await expect(page.getByText(/connected to .*County/i)).toHaveCount(0)
+  await expect(page.getByRole('link', { name: /Code of Conduct/i })).toBeVisible()
+  await expect(page).toHaveTitle('Join Working Class Unity')
+  await expect(page.locator(`script[src="${turnstileScriptUrl}"]`)).toHaveCount(0)
   await assertCleanPage(page, observations)
 })
 
@@ -192,11 +225,11 @@ test('global public navigation exposes current routes and a route-closing mobile
   for (const destination of [
     {
       path: '/about',
-      label: 'About',
+      label: 'Who We Are',
       heading: 'They Have Their Parties. We Need Our Own Organization',
       title: 'About'
     },
-    { path: '/calendar', label: 'Calendar', heading: 'Find your place in the work', title: 'Calendar' }
+    { path: '/calendar', label: 'Events', heading: 'Find your place in the work', title: 'Calendar' }
   ]) {
     await page.goto(destination.path)
     const primaryNavigation = page.getByRole('navigation', { name: 'Primary' })
@@ -211,24 +244,28 @@ test('global public navigation exposes current routes and a route-closing mobile
   }
 
   const desktopNavigation = page.locator('[data-reka-navigation-menu]')
-  const aboutLink = desktopNavigation.getByRole('link', { name: 'About', exact: true })
-  const calendarLink = desktopNavigation.getByRole('link', { name: 'Calendar', exact: true })
-  const forumLink = desktopNavigation.getByRole('link', { name: 'Forum', exact: true })
+  const aboutLink = desktopNavigation.getByRole('link', { name: 'Who We Are', exact: true })
+  const currentWorkLink = desktopNavigation.getByRole('link', { name: 'Current Work', exact: true })
+  const calendarLink = desktopNavigation.getByRole('link', { name: 'Events', exact: true })
+  const forumLink = page.getByRole('link', { name: /Member Forum.*opens in a new tab/ })
 
   await expect(desktopNavigation).toHaveRole('navigation')
   await expect(desktopNavigation).toHaveAttribute('data-orientation', 'horizontal')
+  await expect(currentWorkLink).toHaveAttribute('href', '/#current-work')
   await expect(forumLink).toHaveAttribute('href', forumUrl)
   await expect(forumLink).toHaveAttribute('target', '_blank')
   await expect(forumLink).toHaveAttribute('rel', 'noopener noreferrer')
   expect(await forumLink.getAttribute('aria-current')).toBeNull()
   await aboutLink.focus()
   await page.keyboard.press('ArrowRight')
+  await expect(currentWorkLink).toBeFocused()
+  await page.keyboard.press('ArrowRight')
   await expect(calendarLink).toBeFocused()
   await page.keyboard.press('End')
-  await expect(forumLink).toBeFocused()
-  await assertForumPopup(page, () => page.keyboard.press('Enter'))
+  await expect(calendarLink).toBeFocused()
   await page.keyboard.press('Home')
   await expect(aboutLink).toBeFocused()
+  await assertForumPopup(page, () => forumLink.click())
 
   await page.setViewportSize({ width: 320, height: 800 })
   const menuToggle = page.getByRole('button', { name: 'Menu', exact: true })
@@ -241,13 +278,14 @@ test('global public navigation exposes current routes and a route-closing mobile
   await menuToggle.click()
   await expect(menuToggle).toHaveAttribute('aria-expanded', 'true')
   await expect(navigationPanel).toBeVisible()
-  const mobileForumLink = page.getByRole('link', { name: 'Forum', exact: true })
+  const mobileForumLink = page.getByRole('link', { name: /Member Forum.*opens in a new tab/ })
 
-  await assertMinimumTargetSize(page.getByRole('link', { name: 'About', exact: true }))
-  await assertMinimumTargetSize(page.getByRole('link', { name: 'Calendar', exact: true }))
+  await assertMinimumTargetSize(page.getByRole('link', { name: 'Who We Are', exact: true }))
+  await assertMinimumTargetSize(page.getByRole('link', { name: 'Current Work', exact: true }))
+  await assertMinimumTargetSize(page.getByRole('link', { name: 'Events', exact: true }))
   await assertMinimumTargetSize(mobileForumLink)
-  await assertMinimumTargetSize(page.getByRole('link', { name: 'Log In', exact: true }))
-  await assertMinimumTargetSize(page.getByRole('link', { name: 'JOIN NOW', exact: true }))
+  await assertMinimumTargetSize(page.getByRole('link', { name: 'Member Login', exact: true }))
+  await assertMinimumTargetSize(page.getByRole('link', { name: 'Get Involved', exact: true }))
   await expect(mobileForumLink).toHaveAttribute('href', forumUrl)
   await expect(mobileForumLink).toHaveAttribute('target', '_blank')
   await expect(mobileForumLink).toHaveAttribute('rel', 'noopener noreferrer')
@@ -255,11 +293,10 @@ test('global public navigation exposes current routes and a route-closing mobile
   await assertNoHorizontalOverflow(page)
 
   await expect(menuToggle).toBeFocused()
-  await page.keyboard.press('Shift+Tab')
-  await page.keyboard.press('Shift+Tab')
-  await page.keyboard.press('Shift+Tab')
-  await expect(mobileForumLink).toBeFocused()
-  await assertVisibleFocusIndicator(page, mobileForumLink)
+  await page.keyboard.press('Tab')
+  const firstMobileNavigationLink = page.getByRole('link', { name: 'Who We Are', exact: true })
+  await expect(firstMobileNavigationLink).toBeFocused()
+  await assertVisibleFocusIndicator(page, firstMobileNavigationLink)
   await page.keyboard.press('Escape')
   await expect(menuToggle).toHaveAttribute('aria-expanded', 'false')
   await expect(navigationPanel).toBeHidden()
@@ -272,7 +309,7 @@ test('global public navigation exposes current routes and a route-closing mobile
   await expect(menuToggle).toBeFocused()
 
   await menuToggle.click()
-  await page.getByRole('link', { name: 'About', exact: true }).click()
+  await page.getByRole('link', { name: 'Who We Are', exact: true }).click()
   await expect(page).toHaveURL(/\/about$/)
   await expect(menuToggle).toHaveAttribute('aria-expanded', 'false')
   await expect(navigationPanel).toBeHidden()
@@ -280,30 +317,32 @@ test('global public navigation exposes current routes and a route-closing mobile
   await assertCleanPage(page, observations)
 })
 
-test('campaign update prompts use the hosted Deflock form without collecting contact details', async ({ page }) => {
+test('campaign update prompt uses the hosted Deflock form without collecting contact details', async ({ page }) => {
   const observations = observePage(page)
   await page.setViewportSize({ width: 1280, height: 900 })
   await page.goto('/campaigns/remove-flock-stockton')
 
   const updatesLinks = page.getByRole('link', { name: 'Stay informed', exact: true })
-  const updatesNotes = page.locator('.campaign-newsletter > p')
-  await expect(updatesLinks).toHaveCount(2)
-  await expect(updatesNotes).toHaveCount(2)
+  const updatesNotes = page.locator('#campaign-updates-note')
+  await expect(page.locator('.campaign-newsletter')).toHaveCount(1)
+  await expect(updatesLinks).toHaveCount(1)
+  await expect(updatesNotes).toHaveCount(1)
   await expect(page.locator('.campaign-newsletter form')).toHaveCount(0)
   await expect(page.locator('.campaign-newsletter input')).toHaveCount(0)
   await expect(page.locator('.campaign-newsletter iframe')).toHaveCount(0)
 
-  for (let index = 0; index < 2; index += 1) {
-    const updatesLink = updatesLinks.nth(index)
-    await expect(updatesLink).toHaveAttribute('href', 'https://tech.workingclassunity.com/deflock-stockton-updates')
-    await assertMinimumTargetSize(updatesLink)
-    const colors = await updatesLink.evaluate((element) => {
-      const style = getComputedStyle(element)
-      return { background: style.backgroundColor, text: style.color }
-    })
-    expect(contrastRatio(colors.text, colors.background), 'signup link text contrast').toBeGreaterThanOrEqual(4.5)
-    await expect(updatesNotes.nth(index)).toHaveText(campaignUpdatesDisclaimer)
-  }
+  const updatesLink = updatesLinks.first()
+  await expect(updatesLink).toHaveAttribute('href', 'https://tech.workingclassunity.com/deflock-stockton-updates')
+  await assertMinimumTargetSize(updatesLink)
+  const colors = await updatesLink.evaluate((element) => {
+    const section = element.closest('.campaign-participation')
+    return {
+      background: getComputedStyle(section ?? element).backgroundColor,
+      text: getComputedStyle(element).color
+    }
+  })
+  expect(contrastRatio(colors.text, colors.background), 'signup link text contrast').toBeGreaterThanOrEqual(4.5)
+  await expect(updatesNotes).toHaveText(campaignUpdatesDisclaimer)
   await assertAccessibleWithoutOverflow(page, '.campaign-newsletter')
 
   await page.setViewportSize({ width: 390, height: 844 })
@@ -359,16 +398,17 @@ test('campaign citations preview, navigate, and return at desktop and mobile wid
   await expect(firstCitation).toBeFocused()
 
   await page.goto('/campaigns/remove-flock-stockton/what-stockton-bought')
-  const costGridColumnCounts = []
+  const costRowColumnCounts = []
   for (const width of [1600, 1280, 920, 880, 600]) {
     await page.setViewportSize({ width, height: 900 })
-    costGridColumnCounts.push(
+    costRowColumnCounts.push(
       await page
-        .locator('.record-costs')
+        .locator('.record-costs > div')
+        .first()
         .evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(' ').length)
     )
   }
-  expect(costGridColumnCounts).toEqual([5, 2, 1, 1, 1])
+  expect(costRowColumnCounts).toEqual([3, 3, 3, 1, 1])
   await page.setViewportSize({ width: 1280, height: 900 })
 
   const customSectionCitation = page.locator('#what-stockton-bought-title-contract-fact-1-citation-1-1')
@@ -510,7 +550,7 @@ test('session retry announces progress and failure without losing focus', async 
     await sessionData.execute()
   })
 
-  const topbar = page.getByRole('banner', { name: 'Application' })
+  const topbar = page.getByRole('banner', { name: 'Working Class Unity site header' })
   await expect(topbar.getByText('Session check unavailable', { exact: true })).toBeVisible()
   await expect(topbar.getByRole('alert')).toHaveCount(0)
   await expect(topbar.getByRole('status')).toHaveCount(0)
@@ -720,7 +760,7 @@ privateBrowserTest(
     await expect(page.getByRole('button', { name: /^Account menu for / })).toBeVisible()
     await expect(page.getByText(/workspace/i)).toHaveCount(0)
     await expect(page.getByRole('link', { name: /workspace/i })).toHaveCount(0)
-    const topbar = page.getByRole('banner', { name: 'Application' })
+    const topbar = page.getByRole('banner', { name: 'Working Class Unity site header' })
     await expect(topbar.locator('[aria-current="page"]')).toHaveCount(1)
     await expect(topbar.getByRole('link', { name: 'App', exact: true })).toHaveAttribute('aria-current', 'page')
     expect(observations.sameOriginRequests.some((request) => request.includes('/api/workspaces'))).toBe(false)

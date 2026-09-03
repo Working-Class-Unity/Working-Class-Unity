@@ -38,6 +38,15 @@ async function createFixture() {
     color: '#04334f',
     orientation: 6
   })
+  await createImage(join(photoSources, 'not-selected.jpg'), {
+    width: 800,
+    height: 600,
+    color: '#232323'
+  })
+  await writeFile(
+    join(root, 'app/assets/images/hero-wall/selection.json'),
+    JSON.stringify(['a-oriented.jpg', 'b-photo.jpg'])
+  )
   await createImage(join(backgroundSources, 'landscape.png'), {
     width: 900,
     height: 500,

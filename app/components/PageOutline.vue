@@ -27,9 +27,11 @@ const props = withDefaults(
     triggerLabel: string
     closeLabel: string
     triggerVariant?: 'primary' | 'secondary'
+    showMarkers?: boolean
     showTriggerIndicator?: boolean
   }>(),
   {
+    showMarkers: false,
     triggerVariant: 'secondary',
     showTriggerIndicator: false
   }
@@ -43,20 +45,24 @@ function itemMarker(item: PageOutlineItem, index: number) {
 </script>
 
 <template>
-  <div class="page-outline" :data-nested="hasNestedItems || undefined">
+  <div
+    class="page-outline"
+    :data-markers="showMarkers ? undefined : 'hidden'"
+    :data-nested="hasNestedItems || undefined"
+  >
     <aside class="page-outline-desktop">
       <p>{{ title }}</p>
       <nav :aria-label="label">
         <ol class="page-outline-list" role="list">
           <li v-for="(item, index) in items" :key="item.id">
             <a class="page-outline-link" :href="`#${item.id}`">
-              <span aria-hidden="true">{{ itemMarker(item, index) }}</span>
+              <span v-if="showMarkers" aria-hidden="true">{{ itemMarker(item, index) }}</span>
               {{ item.label }}
             </a>
             <ol v-if="item.children?.length" class="page-outline-children" role="list">
               <li v-for="(child, childIndex) in item.children" :key="child.id">
                 <a :href="`#${child.id}`">
-                  <span aria-hidden="true">{{ itemMarker(child, childIndex) }}</span>
+                  <span v-if="showMarkers" aria-hidden="true">{{ itemMarker(child, childIndex) }}</span>
                   {{ child.label }}
                 </a>
               </li>
@@ -75,7 +81,11 @@ function itemMarker(item: PageOutlineItem, index: number) {
       </DrawerTrigger>
       <DrawerPortal>
         <DrawerOverlay class="page-outline-overlay" />
-        <DrawerContent class="page-outline-drawer" :data-nested="hasNestedItems || undefined">
+        <DrawerContent
+          class="page-outline-drawer"
+          :data-markers="showMarkers ? undefined : 'hidden'"
+          :data-nested="hasNestedItems || undefined"
+        >
           <DrawerHandle class="page-outline-handle" />
           <div class="page-outline-content">
             <div class="page-outline-heading">
@@ -101,7 +111,7 @@ function itemMarker(item: PageOutlineItem, index: number) {
                 <li v-for="(item, index) in items" :key="item.id">
                   <DrawerClose as-child>
                     <a class="page-outline-drawer-link" :href="`#${item.id}`">
-                      <span aria-hidden="true">{{ itemMarker(item, index) }}</span>
+                      <span v-if="showMarkers" aria-hidden="true">{{ itemMarker(item, index) }}</span>
                       {{ item.label }}
                     </a>
                   </DrawerClose>
@@ -109,7 +119,7 @@ function itemMarker(item: PageOutlineItem, index: number) {
                     <li v-for="(child, childIndex) in item.children" :key="child.id">
                       <DrawerClose as-child>
                         <a :href="`#${child.id}`">
-                          <span aria-hidden="true">{{ itemMarker(child, childIndex) }}</span>
+                          <span v-if="showMarkers" aria-hidden="true">{{ itemMarker(child, childIndex) }}</span>
                           {{ child.label }}
                         </a>
                       </DrawerClose>
@@ -186,8 +196,15 @@ function itemMarker(item: PageOutlineItem, index: number) {
 
   .page-outline-link {
     grid-template-columns: 1.75rem minmax(0, 1fr);
+    min-block-size: var(--control-min-block-size);
+    align-items: center;
     padding: var(--space-2);
     font-size: 0.875rem;
+  }
+
+  .page-outline[data-markers='hidden'] .page-outline-link,
+  .page-outline[data-markers='hidden'] .page-outline-children a {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .page-outline[data-nested] .page-outline-link {
@@ -419,6 +436,11 @@ function itemMarker(item: PageOutlineItem, index: number) {
     border-block-start: var(--border-width) solid var(--color-border);
     padding-block: var(--space-4);
     font-weight: var(--font-weight-strong);
+  }
+
+  .page-outline-drawer[data-markers='hidden'] .page-outline-drawer-link,
+  .page-outline-drawer[data-markers='hidden'] .page-outline-drawer-children a {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .page-outline-drawer-children {

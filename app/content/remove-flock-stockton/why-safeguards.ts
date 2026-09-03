@@ -4,8 +4,8 @@ import type { CampaignPageContent } from './types'
 
 export const whySafeguardsPage = {
   path: '/campaigns/remove-flock-stockton/why-safeguards-are-not-enough',
-  eyebrow: 'WHY REMOVAL',
-  title: 'Why Safeguards Are Not Enough',
+  eyebrow: 'Why Safeguards Are Not Enough',
+  title: 'Removal, not Reform',
   description:
     'Rules can reduce immediate harm. They cannot solve the basic problem of recording everyone first and deciding later how that information may be used.',
   reviewedThrough: 'August 12, 2026',

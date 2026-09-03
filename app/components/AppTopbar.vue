@@ -82,6 +82,14 @@ async function retrySession() {
 function currentPage(path: string) {
   return route.path === path ? 'page' : undefined
 }
+
+function currentWorkLocation() {
+  return route.path === '/' && route.hash === '#current-work' ? 'location' : undefined
+}
+
+function currentParticipationLocation() {
+  return route.path === '/' && route.hash === '#get-involved' ? 'location' : undefined
+}
 </script>
 
 <template>
@@ -98,6 +106,17 @@ function currentPage(path: string) {
           <img src="/images/wcu-logo-dark.png" alt="" class="brand-mark" width="2000" height="2000" />
         </NuxtLink>
       </div>
+
+      <button
+        ref="mobileMenuToggle"
+        class="mobile-menu-toggle"
+        type="button"
+        aria-controls="primary-navigation-panel"
+        :aria-expanded="mobileMenuOpen"
+        @click="toggleMobileMenu"
+      >
+        {{ t('navigation.menu') }}
+      </button>
 
       <div
         id="primary-navigation-panel"
@@ -116,22 +135,21 @@ function currentPage(path: string) {
                 </NavigationMenuLink>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <NavigationMenuLink as-child :active="route.path === '/calendar'">
-                  <NuxtLink class="topbar-link topbar-link--public" to="/calendar">
-                    {{ t('navigation.calendar') }}
+                <NavigationMenuLink as-child :active="Boolean(currentWorkLocation())">
+                  <NuxtLink
+                    class="topbar-link topbar-link--public"
+                    to="/#current-work"
+                    :aria-current="currentWorkLocation()"
+                  >
+                    {{ t('navigation.currentWork') }}
                   </NuxtLink>
                 </NavigationMenuLink>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <NavigationMenuLink as-child>
-                  <a
-                    class="topbar-link topbar-link--public"
-                    href="https://chat.workingclassunity.com/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {{ t('navigation.forum') }}
-                  </a>
+                <NavigationMenuLink as-child :active="route.path === '/calendar'">
+                  <NuxtLink class="topbar-link topbar-link--public" to="/calendar">
+                    {{ t('navigation.calendar') }}
+                  </NuxtLink>
                 </NavigationMenuLink>
               </NavigationMenuItem>
             </NavigationMenuList>
@@ -146,25 +164,34 @@ function currentPage(path: string) {
               </NuxtLink>
             </li>
             <li>
-              <NuxtLink class="topbar-link topbar-link--public" to="/calendar" :aria-current="currentPage('/calendar')">
-                {{ t('navigation.calendar') }}
+              <NuxtLink
+                class="topbar-link topbar-link--public"
+                to="/#current-work"
+                :aria-current="currentWorkLocation()"
+                @click="closeMobileMenu"
+              >
+                {{ t('navigation.currentWork') }}
               </NuxtLink>
             </li>
             <li>
-              <a
-                class="topbar-link topbar-link--public"
-                href="https://chat.workingclassunity.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                @click="closeMobileMenu"
-              >
-                {{ t('navigation.forum') }}
-              </a>
+              <NuxtLink class="topbar-link topbar-link--public" to="/calendar" :aria-current="currentPage('/calendar')">
+                {{ t('navigation.calendar') }}
+              </NuxtLink>
             </li>
           </ul>
         </nav>
 
         <div class="topbar-actions">
+          <a
+            class="topbar-link topbar-link--utility"
+            href="https://chat.workingclassunity.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            @click="closeMobileMenu"
+          >
+            {{ t('navigation.forum') }}
+            <span class="visually-hidden"> (opens in a new tab)</span>
+          </a>
           <AppNotice
             v-if="sessionError"
             class="topbar-session"
@@ -189,9 +216,6 @@ function currentPage(path: string) {
             <NuxtLink class="topbar-link topbar-link--login" to="/login" :aria-current="currentPage('/login')">
               {{ t('navigation.login') }}
             </NuxtLink>
-            <NuxtLink class="topbar-link topbar-link--join" to="/join" :aria-current="currentPage('/join')">
-              {{ t('navigation.signup') }}
-            </NuxtLink>
           </template>
           <template v-else>
             <NuxtLink class="topbar-link topbar-link--app" to="/app" :aria-current="currentPage('/app')">
@@ -202,16 +226,14 @@ function currentPage(path: string) {
         </div>
       </div>
 
-      <button
-        ref="mobileMenuToggle"
-        class="mobile-menu-toggle"
-        type="button"
-        aria-controls="primary-navigation-panel"
-        :aria-expanded="mobileMenuOpen"
-        @click="toggleMobileMenu"
+      <NuxtLink
+        class="topbar-link topbar-link--involved"
+        to="/#get-involved"
+        :aria-current="currentParticipationLocation()"
+        @click="closeMobileMenu"
       >
-        {{ t('navigation.menu') }}
-      </button>
+        {{ t('navigation.getInvolved') }}
+      </NuxtLink>
     </div>
   </header>
 </template>
@@ -220,21 +242,19 @@ function currentPage(path: string) {
 @layer components {
   .topbar {
     position: relative;
-    background: var(--color-canvas);
+    border-block-end: var(--border-width) solid rgb(4 51 79 / 12%);
+    background: var(--color-surface);
   }
 
   .topbar-row {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    grid-template-columns: 12.125rem minmax(0, 1fr) auto auto;
     align-items: center;
-    gap: var(--space-5);
-    min-block-size: 6.75rem;
+    gap: 1.25rem;
+    inline-size: min(var(--content-max-width), calc(100% - (2 * var(--content-gutter))));
+    min-block-size: 6.5rem;
     min-width: 0;
-    padding-block: var(--space-2);
-  }
-
-  .topbar--wide .topbar-row {
-    padding-inline: var(--home-content-inset);
+    margin-inline: auto;
   }
 
   .topbar-brand-area,
@@ -245,20 +265,17 @@ function currentPage(path: string) {
   .brand {
     display: inline-flex;
     min-block-size: var(--control-min-block-size);
+    min-inline-size: var(--control-min-inline-size);
     align-items: center;
-    min-width: 0;
-    border-radius: var(--radius-2);
-    padding: var(--space-1) var(--space-2);
+    justify-content: flex-start;
+    border-radius: var(--radius-1);
+    padding: var(--space-1);
     text-decoration: none;
-  }
-
-  .topbar--wide .brand {
-    padding-inline: 0;
   }
 
   .brand-mark {
     display: block;
-    inline-size: clamp(4.75rem, 6vw, 5.75rem);
+    inline-size: 3rem;
     block-size: auto;
     flex: 0 0 auto;
   }
@@ -268,7 +285,7 @@ function currentPage(path: string) {
   }
 
   .desktop-navigation {
-    justify-self: center;
+    justify-self: start;
     min-width: 0;
   }
 
@@ -276,10 +293,10 @@ function currentPage(path: string) {
   .topbar-actions {
     display: flex;
     align-items: center;
-    gap: var(--space-2);
   }
 
   :deep(.desktop-navigation-list) {
+    gap: 0.375rem;
     padding: 0;
     margin: 0;
     list-style: none;
@@ -287,6 +304,7 @@ function currentPage(path: string) {
 
   .topbar-actions {
     justify-content: flex-end;
+    gap: 0.25rem;
   }
 
   .mobile-navigation,
@@ -304,71 +322,70 @@ function currentPage(path: string) {
     display: inline-flex;
     min-block-size: var(--control-min-block-size);
     min-inline-size: var(--control-min-inline-size);
+    max-inline-size: 100%;
     align-items: center;
     justify-content: center;
     border: var(--border-width) solid transparent;
     border-radius: var(--radius-1);
     padding: var(--space-2) var(--space-3);
     color: var(--color-brand-primary);
-    font-size: 0.95rem;
+    font-size: 0.9375rem;
     font-weight: var(--font-weight-strong);
-    line-height: 1;
+    line-height: 1.15;
+    text-align: center;
     text-decoration: none;
   }
 
-  .topbar-link--public:hover,
-  .topbar-link--public:focus-visible,
-  .topbar-link--public[data-active],
-  .topbar-link--public[aria-current='page'] {
-    color: var(--color-brand-primary);
-    background: var(--color-surface-subtle);
+  .topbar-link--public {
+    border-radius: 0;
+    border-block-end-width: 2px;
   }
 
+  .topbar-link--public:hover,
+  .topbar-link--public:focus-visible {
+    border-block-end-color: var(--color-border);
+  }
+
+  .topbar-link--public[data-active],
+  .topbar-link--public[aria-current] {
+    border-block-end-color: var(--color-brand-primary);
+  }
+
+  .topbar-link--utility,
   .topbar-link--login,
   .topbar-link--app {
-    min-block-size: 3rem;
-    border-width: 2px;
-    border-color: var(--color-brand-primary);
-    padding-inline: var(--space-4);
-    color: var(--color-brand-primary);
-    background: transparent;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
   }
 
+  .topbar-link--utility:hover,
+  .topbar-link--utility:focus-visible,
   .topbar-link--login:hover,
   .topbar-link--login:focus-visible,
   .topbar-link--login[aria-current='page'],
   .topbar-link--app:hover,
   .topbar-link--app:focus-visible,
   .topbar-link--app[aria-current='page'] {
-    --color-action: var(--color-action-contrast);
-
-    color: var(--color-action-contrast);
-    background: var(--color-brand-primary);
+    color: var(--color-brand-primary);
+    background: var(--color-action-soft);
   }
 
-  .topbar-link--join {
-    --color-action: var(--color-accent-action-contrast);
-
-    min-block-size: 3rem;
-    border-width: 2px;
-    border-color: var(--color-accent-action);
-    padding-inline: var(--space-4);
-    color: var(--color-accent-action-contrast);
-    background: var(--color-accent-action);
-  }
-
-  .topbar-link--join:hover,
-  .topbar-link--join:focus-visible {
-    --color-action: var(--color-action-contrast);
-
+  .topbar-link--involved {
     border-color: var(--color-brand-primary);
+    padding-inline: var(--space-4);
+    color: var(--color-brand-primary);
+    background: transparent;
+  }
+
+  .topbar-link--involved:hover,
+  .topbar-link--involved:focus-visible {
     color: var(--color-action-contrast);
     background: var(--color-brand-primary);
   }
 
   .topbar .topbar-actions :deep(.account-menu-trigger) {
-    min-block-size: 3rem;
-    border: 2px solid var(--color-brand-primary);
+    min-block-size: var(--control-min-block-size);
+    border: var(--border-width) solid var(--color-brand-primary);
     border-radius: var(--radius-1);
     padding-inline: var(--space-4);
     color: var(--color-brand-primary);
@@ -378,21 +395,16 @@ function currentPage(path: string) {
   .topbar .topbar-actions :deep(.account-menu-trigger:hover),
   .topbar .topbar-actions :deep(.account-menu-trigger:focus-visible),
   .topbar .topbar-actions :deep(.account-menu-trigger[data-state='open']) {
-    border-color: var(--color-brand-primary);
     color: var(--color-action-contrast);
     background: var(--color-brand-primary);
   }
 
-  @media (width <= 900px) {
+  @media (width <= 60rem) {
     .topbar-row {
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 0 var(--space-3);
-      min-block-size: 5.75rem;
-      padding-block: var(--space-2) 0;
-    }
-
-    .topbar--wide .topbar-row {
-      padding-inline: var(--space-4);
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      gap: 0 0.625rem;
+      inline-size: min(var(--content-max-width), calc(100% - 3rem));
+      min-block-size: 4.5rem;
     }
 
     .topbar-brand-area {
@@ -400,7 +412,7 @@ function currentPage(path: string) {
     }
 
     .brand-mark {
-      inline-size: 4.5rem;
+      inline-size: 2.375rem;
     }
 
     .mobile-menu-toggle {
@@ -410,9 +422,9 @@ function currentPage(path: string) {
       min-inline-size: var(--control-min-inline-size);
       align-items: center;
       justify-content: center;
-      border: 2px solid var(--color-brand-primary);
+      border: 0;
       border-radius: var(--radius-1);
-      padding: var(--space-2) var(--space-4);
+      padding: var(--space-2);
       color: var(--color-brand-primary);
       background: transparent;
       font: inherit;
@@ -422,18 +434,28 @@ function currentPage(path: string) {
     .mobile-menu-toggle:hover,
     .mobile-menu-toggle:focus-visible,
     .mobile-menu-toggle[aria-expanded='true'] {
-      border-color: var(--color-brand-primary);
-      color: var(--color-action-contrast);
-      background: var(--color-brand-primary);
+      color: var(--color-brand-primary);
+      background: var(--color-action-soft);
+    }
+
+    .topbar-row > .topbar-link--involved {
+      grid-area: 1 / 3;
+      min-block-size: 2.75rem;
+      min-inline-size: auto;
+      justify-content: center;
+      padding-inline: var(--space-3);
+      font-size: 0.875rem;
+      text-align: center;
     }
 
     .topbar-panel {
-      grid-column: 1 / -1;
+      grid-column: 1 / 4;
       grid-row: 2;
       display: none;
-      gap: var(--space-3);
-      border-block-start: var(--border-width) solid var(--color-brand-primary);
-      padding-block: var(--space-3) var(--space-4);
+      gap: var(--space-4);
+      border-block-start: var(--border-width) solid var(--color-border);
+      padding-block: var(--space-3) var(--space-5);
+      background: var(--color-surface);
     }
 
     .topbar-panel--open {
@@ -450,40 +472,42 @@ function currentPage(path: string) {
 
     .mobile-navigation-list {
       display: grid;
-      gap: var(--space-1);
       padding: 0;
       margin: 0;
       list-style: none;
     }
 
-    .topbar-actions {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      align-items: stretch;
-      gap: var(--space-2);
-      border-block-start: var(--border-width) solid var(--color-border);
-      padding-block-start: var(--space-3);
+    .mobile-navigation-list li {
+      border-block-end: var(--border-width) solid var(--color-border);
     }
 
-    .topbar-link {
+    .topbar-actions {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      align-items: stretch;
+      gap: var(--space-2);
+    }
+
+    .topbar-link,
+    .topbar .topbar-actions :deep(.account-menu-trigger) {
       inline-size: 100%;
       justify-content: flex-start;
       font-size: 1rem;
+      text-align: start;
     }
 
-    .topbar-actions .topbar-link {
-      justify-content: center;
+    .topbar-link--public {
+      border-block-end: 0;
+      padding-block: var(--space-3);
+    }
+
+    .topbar-link--public[aria-current] {
+      border-inline-start: var(--border-width-accent) solid var(--color-brand-primary);
     }
 
     .topbar-session {
-      grid-column: 1 / -1;
       max-inline-size: none;
       inline-size: 100%;
-    }
-
-    .topbar .topbar-actions :deep(.account-menu-trigger) {
-      inline-size: 100%;
-      justify-content: center;
     }
   }
 }

@@ -6,7 +6,10 @@
     "retry": "Try again",
     "checkingSession": "Checking your session...",
     "sessionVerificationFailed": "We could not verify your session right now.",
-    "working": "Working..."
+    "working": "Working...",
+    "carousel": {
+      "label": "Working Class Unity community photos"
+    }
   },
   "metadata": {
     "defaultDescription": "Working Class Unity.",
@@ -25,6 +28,10 @@
     "calendar": {
       "title": "Calendar",
       "description": "Find upcoming Working Class Unity events and meetings."
+    },
+    "links": {
+      "title": "Links",
+      "description": "Find Working Class Unity's current campaign, upcoming events, and ways to get involved."
     },
     "forum": {
       "title": "Forum",
@@ -78,17 +85,19 @@
   },
   "navigation": {
     "skipToMain": "Skip to main content",
-    "applicationLabel": "Application",
+    "applicationLabel": "Working Class Unity site header",
     "brandHome": "{appName} home",
     "primaryLabel": "Primary",
     "sessionUnavailable": "Session check unavailable",
-    "about": "About",
-    "calendar": "Calendar",
-    "forum": "Forum",
+    "about": "Who We Are",
+    "currentWork": "Current Work",
+    "calendar": "Events",
+    "forum": "Member Forum",
     "menu": "Menu",
     "app": "App",
-    "login": "Log In",
-    "signup": "JOIN NOW"
+    "login": "Member Login",
+    "signup": "Join WCU",
+    "getInvolved": "Get Involved"
   },
   "removeFlock": {
     "campaignLabel": "Remove mass surveillance from Stockton side-quest",
@@ -97,7 +106,7 @@
     "navigation": {
       "overview": "Overview",
       "whatStocktonBought": "What Stockton Bought",
-      "whySafeguards": "Why Removal",
+      "whySafeguards": "Removal, not Reform",
       "faq": "FAQ"
     },
     "petitionAction": "Sign Demand",
@@ -375,8 +384,7 @@
       "eyebrow": "Our Story",
       "title": "They Have Their Parties. We Need Our Own Organization",
       "introduction": "The bosses and landlords have two political parties. The working class needs a fighting organization of its own.",
-      "photoAlt": "Working Class Unity members standing together at a community meeting.",
-      "photoCaption": "Working Class Unity members in San Joaquin County.",
+      "photoCaption": "Working Class Unity, comrades, and allies in San Joaquin County.",
       "problem": {
         "title": "The Problem",
         "bodyOne": "Across San Joaquin, rents rise while our wages stall. Bosses demand more while giving less. Both the Democratic and Republican parties answer to their donors, not to us.",
@@ -420,6 +428,44 @@
       "title": "Calendar",
       "description": "Our public meetings, events, and actions will appear here soon."
     },
+    "links": {
+      "eyebrow": "WCU · Quick links",
+      "title": "Working Class Unity",
+      "introduction": "A member-run organization bringing working people together across San Joaquin County to win concrete changes, develop leaders, and build lasting power.",
+      "campaign": {
+        "eyebrow": "Current campaign · Stockton",
+        "title": "Remove mass surveillance from Stockton",
+        "description": "See what Stockton bought, why safeguards are not enough, and how residents can help remove Flock's mass-tracking system.",
+        "action": "Open the Deflock campaign overview"
+      },
+      "events": {
+        "eyebrow": "Meet WCU",
+        "title": "Upcoming events",
+        "all": "Full calendar",
+        "loading": "Loading upcoming events…",
+        "error": "Upcoming events are temporarily unavailable.",
+        "empty": "No upcoming events are published right now. Check the full calendar for updates.",
+        "rsvp": "RSVP or details",
+        "virtual": "Online",
+        "hybrid": "In person and online",
+        "locationPending": "Location shared by organizer"
+      },
+      "more": {
+        "title": "More ways to connect",
+        "getInvolved": {
+          "title": "Get involved",
+          "description": "Find a low-pressure first step into the work."
+        },
+        "join": {
+          "title": "Join WCU",
+          "description": "Learn about membership in a member-run organization."
+        },
+        "about": {
+          "title": "Who we are",
+          "description": "Read why WCU exists and how members govern it."
+        }
+      }
+    },
     "forum": {
       "title": "Forum",
       "description": "The community discussion space is being prepared."
@@ -427,14 +473,74 @@
   },
   "home": {
     "eyebrow": "WORKING CLASS UNITY · SAN JOAQUIN COUNTY",
-    "title": "Working People Need an Organization of Our Own",
-    "introduction": "WCU brings tenants, workers, and neighbors together to win concrete changes, develop new leaders, and build lasting power.",
-    "join": "JOIN WCU",
-    "nextEvent": "NEXT EVENT",
-    "newsletterHeading": "Stay informed about meetings and actions.",
-    "newsletterSubmit": "STAY INFORMED",
-    "newsletterNote": "Choose email, text messages, or both. By signing up, you agree to receive WCU updates through the options you select. Message frequency varies; message and data rates may apply. Unsubscribe from email or reply STOP to stop texts.",
-    "photoCaption": "Real WCU moments across San Joaquin County."
+    "title": "Working people need an organization of our own",
+    "introduction": "WCU is a member-run organization bringing working people together across San Joaquin County to win concrete changes, develop leaders, and build lasting power.",
+    "actions": {
+      "events": "See upcoming events"
+    },
+    "currentWork": {
+      "meta": "Current Side-Quest · Stockton",
+      "title": "Remove mass surveillance from Stockton",
+      "description": "Stockton extended its Flock agreement through April 14, 2031, with a stated contract maximum of $5.4167 million. WCU is organizing for removal and meaningful public control over surveillance spending.",
+      "navigationLabel": "Explore the Remove Flock from Stockton campaign",
+      "pages": {
+        "overview": "Campaign overview · what WCU is demanding",
+        "whatStocktonBought": "What Stockton Bought · contracts, cameras, and costs",
+        "removalNotReform": "Removal, not Reform · why safeguards are not enough",
+        "faq": "Flock FAQ · answers about safety, data, and removal"
+      },
+      "petitionAction": "Sign the demand letter"
+    },
+    "governance": {
+      "eyebrow": "HOW WCU WORKS",
+      "title": "Members make the decisions",
+      "description": "General Meetings are our highest governing body. Members vote, propose new ideas, hold office, and direct campaigns.",
+      "action": "Read how WCU works",
+      "sourceCurrentThrough": "Bylaws updated February 12, 2026",
+      "source": "Read the bylaws",
+      "generalMeetings": {
+        "value": "GENERAL MEETINGS",
+        "label": "Primary governing body"
+      },
+      "campaignVote": {
+        "value": "TWO-THIRDS",
+        "label": "Vote to adopt a focus campaign"
+      },
+      "campaignReview": {
+        "value": "6 MONTHS",
+        "label": "Campaign reapproval cycle"
+      }
+    },
+    "proofLabel": "PUBLIC RULES · VERIFIED IN THE BYLAWS",
+    "participation": {
+      "title": "Start by showing up",
+      "description": "You do not have to become a member before meeting WCU. Begin with a public event, campaign, or bounded task.",
+      "routes": {
+        "events": {
+          "title": "Come to an event",
+          "description": "Meet members and learn what WCU is doing now.",
+          "action": "See upcoming events"
+        },
+        "campaign": {
+          "title": "Join a campaign action",
+          "description": "Sign, share, canvass, table, or help with research.",
+          "action": "See current work"
+        },
+        "updates": {
+          "title": "Stay informed",
+          "description": "Receive invitations to meetings, actions, and social events.",
+          "action": "Get WCU updates"
+        }
+      },
+      "closingTitle": "The first step is showing up",
+      "closingDescription": "No upcoming event is published right now. Get updates to hear about the next way to meet us.",
+      "closingAction": "Get involved"
+    },
+    "footer": {
+      "boundary": "Automatic acknowledgement now; a human response within one week. No emergency response, legal representation, or guaranteed casework.",
+      "navigationLabel": "Footer",
+      "privacy": "Privacy"
+    }
   },
   "personalApp": {
     "eyebrow": "Working Class Unity",

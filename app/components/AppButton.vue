@@ -39,11 +39,12 @@ const props = withDefaults(
     align-items: center;
     justify-content: center;
     border: var(--border-width) solid var(--color-action);
-    border-radius: var(--radius-2);
+    border-radius: var(--radius-1);
     padding-inline: var(--space-4);
     color: var(--color-action-contrast);
     background: var(--color-action);
     font-weight: var(--font-weight-bold);
+    line-height: 1.2;
     text-align: center;
   }
 
@@ -73,14 +74,14 @@ const props = withDefaults(
 
   .app-button:focus-visible,
   .app-button:hover:not(:disabled) {
-    filter: brightness(0.9);
+    border-color: var(--color-text);
+    background: var(--color-text);
   }
 
   .app-button[data-variant='secondary']:focus-visible,
   .app-button[data-variant='secondary']:hover:not(:disabled) {
     border-color: var(--color-action);
     background: var(--color-action-soft);
-    filter: none;
   }
 }
 </style>

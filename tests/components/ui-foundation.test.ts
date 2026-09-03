@@ -3,12 +3,47 @@
 import { mount } from '@vue/test-utils'
 import { h } from 'vue'
 import { describe, expect, it } from 'vitest'
+import AppActionLink from '../../app/components/AppActionLink.vue'
 import AppButton from '../../app/components/AppButton.vue'
+import DocumentaryFigure from '../../app/components/DocumentaryFigure.vue'
+import EvidenceMetaLine from '../../app/components/EvidenceMetaLine.vue'
 import AppField from '../../app/components/AppField.vue'
 import AppInput from '../../app/components/AppInput.vue'
 import AppNotice from '../../app/components/AppNotice.vue'
+import ProofStrip from '../../app/components/ProofStrip.vue'
+
+const NuxtLinkStub = {
+  props: ['to'],
+  template: '<a :href="to"><slot /></a>'
+}
 
 describe('the shared UI foundation', () => {
+  it('keeps navigational actions separate from command buttons', () => {
+    const internal = mount(AppActionLink, {
+      props: { to: '/calendar', variant: 'secondary' },
+      slots: { default: 'See upcoming events' },
+      global: { stubs: { NuxtLink: NuxtLinkStub } }
+    })
+    const external = mount(AppActionLink, {
+      props: { to: 'https://example.test/action', variant: 'campaign', size: 'compact' },
+      attrs: { target: '_blank', rel: 'noopener noreferrer' },
+      slots: { default: 'Sign the demand letter' },
+      global: { stubs: { NuxtLink: NuxtLinkStub } }
+    })
+
+    expect(internal.get('a').attributes('href')).toBe('/calendar')
+    expect(internal.get('a').attributes('data-variant')).toBe('secondary')
+    expect(internal.find('button').exists()).toBe(false)
+    expect(external.get('a').attributes()).toMatchObject({
+      href: 'https://example.test/action',
+      rel: 'noopener noreferrer',
+      target: '_blank',
+      'data-size': 'compact',
+      'data-variant': 'campaign'
+    })
+    expect(external.text()).toContain('opens in a new tab')
+  })
+
   it('keeps AppButton native and prevents duplicate pending actions', async () => {
     const wrapper = mount(AppButton, { slots: { default: 'Save' } })
     const button = wrapper.get('button')
@@ -129,5 +164,73 @@ describe('the shared UI foundation', () => {
     expect(politeNotice.attributes('aria-live')).toBe('polite')
     expect(assertiveNotice.attributes('role')).toBe('alert')
     expect(assertiveNotice.attributes('aria-live')).toBe('assertive')
+  })
+
+  it('orders evidence metadata and omits unknown fields', () => {
+    const wrapper = mount(EvidenceMetaLine, {
+      props: {
+        status: 'Active now',
+        place: 'Stockton',
+        currentThrough: 'Checked August 8, 2026',
+        sourceLabel: 'Public-record summary',
+        sourceHref: '/source'
+      }
+    })
+    const items = wrapper.findAll('li')
+
+    expect(items).toHaveLength(4)
+    expect(items[0]?.text()).toBe('Active now')
+    expect(items[1]?.text()).toBe('Stockton')
+    expect(items[2]?.text()).toBe('Checked August 8, 2026')
+    expect(items[3]?.get('a').attributes('href')).toBe('/source')
+
+    const partial = mount(EvidenceMetaLine, { props: { status: 'In development' } })
+    expect(partial.findAll('li')).toHaveLength(1)
+  })
+
+  it('distinguishes a documentary placeholder from approved media', () => {
+    const placeholder = mount(DocumentaryFigure, {
+      props: { ratio: '16:9', placeholderLabel: 'Image pending approval.' },
+      global: { components: { EvidenceMetaLine } }
+    })
+
+    expect(placeholder.find('img').exists()).toBe(false)
+    expect(placeholder.get('.documentary-placeholder').attributes('aria-hidden')).toBe('true')
+    expect(placeholder.get('figcaption').text()).toContain('Image pending approval.')
+    expect(() =>
+      mount(DocumentaryFigure, {
+        props: { src: '/approved-image.webp' },
+        global: { components: { EvidenceMetaLine } }
+      })
+    ).toThrow('requires alt text')
+  })
+
+  it('renders only proof records with freshness and a source', () => {
+    const wrapper = mount(ProofStrip, {
+      props: {
+        items: [
+          {
+            value: '6 months',
+            label: 'Campaign reapproval cycle',
+            context: 'Members reconsider every focus campaign.',
+            currentThrough: 'Bylaws updated February 12, 2026',
+            sourceLabel: 'Read the bylaws',
+            sourceHref: '/bylaws'
+          },
+          {
+            value: 'Unverified',
+            label: 'Missing source',
+            currentThrough: '',
+            sourceLabel: '',
+            sourceHref: ''
+          }
+        ]
+      },
+      global: { components: { EvidenceMetaLine } }
+    })
+
+    expect(wrapper.findAll('.proof-strip > li')).toHaveLength(1)
+    expect(wrapper.text()).toContain('Campaign reapproval cycle')
+    expect(wrapper.text()).not.toContain('Unverified')
   })
 })

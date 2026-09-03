@@ -129,6 +129,16 @@
             "src": "/images/hero-wall/photo-edca1b354c5c2b91-640w-200f20f115c7.avif",
             "width": 640,
             "height": 640
+          },
+          {
+            "src": "/images/hero-wall/photo-edca1b354c5c2b91-960w-a9f923754250.avif",
+            "width": 960,
+            "height": 960
+          },
+          {
+            "src": "/images/hero-wall/photo-edca1b354c5c2b91-1280w-2c7a64030789.avif",
+            "width": 1280,
+            "height": 1280
           }
         ],
         "webp": [
@@ -141,6 +151,16 @@
             "src": "/images/hero-wall/photo-edca1b354c5c2b91-640w-5b61c8e317b3.webp",
             "width": 640,
             "height": 640
+          },
+          {
+            "src": "/images/hero-wall/photo-edca1b354c5c2b91-960w-7063ea67ac49.webp",
+            "width": 960,
+            "height": 960
+          },
+          {
+            "src": "/images/hero-wall/photo-edca1b354c5c2b91-1280w-bd5f9f46fc86.webp",
+            "width": 1280,
+            "height": 1280
           }
         ]
       }
@@ -162,6 +182,16 @@
             "src": "/images/hero-wall/photo-4177ccb32c71cae7-640w-707b866ca68c.avif",
             "width": 640,
             "height": 640
+          },
+          {
+            "src": "/images/hero-wall/photo-4177ccb32c71cae7-960w-a3cde848a6ea.avif",
+            "width": 960,
+            "height": 960
+          },
+          {
+            "src": "/images/hero-wall/photo-4177ccb32c71cae7-1080w-b2563ae6ba24.avif",
+            "width": 1080,
+            "height": 1080
           }
         ],
         "webp": [
@@ -174,39 +204,16 @@
             "src": "/images/hero-wall/photo-4177ccb32c71cae7-640w-7cb6f0d12d15.webp",
             "width": 640,
             "height": 640
-          }
-        ]
-      }
-    },
-    {
-      "id": "photo-d44892112ca00291",
-      "source": "431500135_1134522594384441_8583764439149219001_n.jpeg",
-      "width": 1080,
-      "height": 1080,
-      "aspectRatio": 1,
-      "variants": {
-        "avif": [
-          {
-            "src": "/images/hero-wall/photo-d44892112ca00291-320w-ee3aa9ba5c0b.avif",
-            "width": 320,
-            "height": 320
           },
           {
-            "src": "/images/hero-wall/photo-d44892112ca00291-640w-b91594e530ec.avif",
-            "width": 640,
-            "height": 640
-          }
-        ],
-        "webp": [
-          {
-            "src": "/images/hero-wall/photo-d44892112ca00291-320w-ed2df84d09cb.webp",
-            "width": 320,
-            "height": 320
+            "src": "/images/hero-wall/photo-4177ccb32c71cae7-960w-e9d6f992cda1.webp",
+            "width": 960,
+            "height": 960
           },
           {
-            "src": "/images/hero-wall/photo-d44892112ca00291-640w-2f1def62568a.webp",
-            "width": 640,
-            "height": 640
+            "src": "/images/hero-wall/photo-4177ccb32c71cae7-1080w-649e0b955b28.webp",
+            "width": 1080,
+            "height": 1080
           }
         ]
       }
@@ -228,6 +235,16 @@
             "src": "/images/hero-wall/photo-9b41dba422222e34-640w-389889d7a50e.avif",
             "width": 640,
             "height": 640
+          },
+          {
+            "src": "/images/hero-wall/photo-9b41dba422222e34-960w-1dce7a613dd7.avif",
+            "width": 960,
+            "height": 960
+          },
+          {
+            "src": "/images/hero-wall/photo-9b41dba422222e34-1080w-470bb35b6655.avif",
+            "width": 1080,
+            "height": 1080
           }
         ],
         "webp": [
@@ -240,39 +257,16 @@
             "src": "/images/hero-wall/photo-9b41dba422222e34-640w-f29148317a66.webp",
             "width": 640,
             "height": 640
-          }
-        ]
-      }
-    },
-    {
-      "id": "photo-3061a6c8cb2db5e5",
-      "source": "456042006_1215105842863510_7320402006812495033_n.jpg",
-      "width": 479,
-      "height": 319,
-      "aspectRatio": 1.501567,
-      "variants": {
-        "avif": [
-          {
-            "src": "/images/hero-wall/photo-3061a6c8cb2db5e5-320w-c474d0377ac3.avif",
-            "width": 320,
-            "height": 213
           },
           {
-            "src": "/images/hero-wall/photo-3061a6c8cb2db5e5-479w-2e60273ebe41.avif",
-            "width": 479,
-            "height": 319
-          }
-        ],
-        "webp": [
-          {
-            "src": "/images/hero-wall/photo-3061a6c8cb2db5e5-320w-3f2e3b46322d.webp",
-            "width": 320,
-            "height": 213
+            "src": "/images/hero-wall/photo-9b41dba422222e34-960w-221662f0bc40.webp",
+            "width": 960,
+            "height": 960
           },
           {
-            "src": "/images/hero-wall/photo-3061a6c8cb2db5e5-479w-23e126ab25f8.webp",
-            "width": 479,
-            "height": 319
+            "src": "/images/hero-wall/photo-9b41dba422222e34-1080w-a1810f71b714.webp",
+            "width": 1080,
+            "height": 1080
           }
         ]
       }
@@ -294,6 +288,16 @@
             "src": "/images/hero-wall/photo-e6e0d98e30ebfb83-640w-07a928fd7525.avif",
             "width": 640,
             "height": 428
+          },
+          {
+            "src": "/images/hero-wall/photo-e6e0d98e30ebfb83-960w-c2e9090265f4.avif",
+            "width": 960,
+            "height": 643
+          },
+          {
+            "src": "/images/hero-wall/photo-e6e0d98e30ebfb83-1080w-c5640d5bd9d5.avif",
+            "width": 1080,
+            "height": 723
           }
         ],
         "webp": [
@@ -306,6 +310,16 @@
             "src": "/images/hero-wall/photo-e6e0d98e30ebfb83-640w-971a94987449.webp",
             "width": 640,
             "height": 428
+          },
+          {
+            "src": "/images/hero-wall/photo-e6e0d98e30ebfb83-960w-3b815ff58578.webp",
+            "width": 960,
+            "height": 643
+          },
+          {
+            "src": "/images/hero-wall/photo-e6e0d98e30ebfb83-1080w-e39839e5f34b.webp",
+            "width": 1080,
+            "height": 723
           }
         ]
       }
@@ -327,6 +341,16 @@
             "src": "/images/hero-wall/photo-3b9cb77b036ffca1-640w-80becdc74072.avif",
             "width": 640,
             "height": 640
+          },
+          {
+            "src": "/images/hero-wall/photo-3b9cb77b036ffca1-960w-e2a02ad1a5a3.avif",
+            "width": 960,
+            "height": 960
+          },
+          {
+            "src": "/images/hero-wall/photo-3b9cb77b036ffca1-1080w-295ef8c6b650.avif",
+            "width": 1080,
+            "height": 1080
           }
         ],
         "webp": [
@@ -339,6 +363,16 @@
             "src": "/images/hero-wall/photo-3b9cb77b036ffca1-640w-c0027372bb9b.webp",
             "width": 640,
             "height": 640
+          },
+          {
+            "src": "/images/hero-wall/photo-3b9cb77b036ffca1-960w-bfd18f5ba782.webp",
+            "width": 960,
+            "height": 960
+          },
+          {
+            "src": "/images/hero-wall/photo-3b9cb77b036ffca1-1080w-831c16cb5877.webp",
+            "width": 1080,
+            "height": 1080
           }
         ]
       }
@@ -360,6 +394,11 @@
             "src": "/images/hero-wall/photo-9530117a3ac5f1bd-640w-9ff2ca5e5113.avif",
             "width": 640,
             "height": 640
+          },
+          {
+            "src": "/images/hero-wall/photo-9530117a3ac5f1bd-912w-22b7946083da.avif",
+            "width": 912,
+            "height": 912
           }
         ],
         "webp": [
@@ -372,6 +411,11 @@
             "src": "/images/hero-wall/photo-9530117a3ac5f1bd-640w-5731ab37ac89.webp",
             "width": 640,
             "height": 640
+          },
+          {
+            "src": "/images/hero-wall/photo-9530117a3ac5f1bd-912w-20bb26b97bd9.webp",
+            "width": 912,
+            "height": 912
           }
         ]
       }
@@ -393,6 +437,16 @@
             "src": "/images/hero-wall/photo-5f71412f051d1381-640w-2aed96fe0260.avif",
             "width": 640,
             "height": 640
+          },
+          {
+            "src": "/images/hero-wall/photo-5f71412f051d1381-960w-e4f999370138.avif",
+            "width": 960,
+            "height": 960
+          },
+          {
+            "src": "/images/hero-wall/photo-5f71412f051d1381-1122w-81904e6ea65e.avif",
+            "width": 1122,
+            "height": 1122
           }
         ],
         "webp": [
@@ -405,6 +459,16 @@
             "src": "/images/hero-wall/photo-5f71412f051d1381-640w-c3a2bba67ee2.webp",
             "width": 640,
             "height": 640
+          },
+          {
+            "src": "/images/hero-wall/photo-5f71412f051d1381-960w-0a8991f1f255.webp",
+            "width": 960,
+            "height": 960
+          },
+          {
+            "src": "/images/hero-wall/photo-5f71412f051d1381-1122w-132fecba88e0.webp",
+            "width": 1122,
+            "height": 1122
           }
         ]
       }
@@ -426,6 +490,16 @@
             "src": "/images/hero-wall/photo-6e3ceabf9793a714-640w-c49b3f92fd5a.avif",
             "width": 640,
             "height": 480
+          },
+          {
+            "src": "/images/hero-wall/photo-6e3ceabf9793a714-960w-67e0c77ff7fe.avif",
+            "width": 960,
+            "height": 720
+          },
+          {
+            "src": "/images/hero-wall/photo-6e3ceabf9793a714-1080w-664e4d152c9a.avif",
+            "width": 1080,
+            "height": 810
           }
         ],
         "webp": [
@@ -438,6 +512,16 @@
             "src": "/images/hero-wall/photo-6e3ceabf9793a714-640w-e998024acc90.webp",
             "width": 640,
             "height": 480
+          },
+          {
+            "src": "/images/hero-wall/photo-6e3ceabf9793a714-960w-77efb2019664.webp",
+            "width": 960,
+            "height": 720
+          },
+          {
+            "src": "/images/hero-wall/photo-6e3ceabf9793a714-1080w-f9dd3b9e35aa.webp",
+            "width": 1080,
+            "height": 810
           }
         ]
       }
@@ -459,6 +543,11 @@
             "src": "/images/hero-wall/photo-dd4addc5fc31c9e6-640w-76728f322844.avif",
             "width": 640,
             "height": 480
+          },
+          {
+            "src": "/images/hero-wall/photo-dd4addc5fc31c9e6-768w-8599c5e8104a.avif",
+            "width": 768,
+            "height": 576
           }
         ],
         "webp": [
@@ -471,6 +560,11 @@
             "src": "/images/hero-wall/photo-dd4addc5fc31c9e6-640w-5e66c21e3eb5.webp",
             "width": 640,
             "height": 480
+          },
+          {
+            "src": "/images/hero-wall/photo-dd4addc5fc31c9e6-768w-ca417eeef9b6.webp",
+            "width": 768,
+            "height": 576
           }
         ]
       }
@@ -492,6 +586,16 @@
             "src": "/images/hero-wall/photo-7747cbd784207a24-640w-3f672f7b1763.avif",
             "width": 640,
             "height": 480
+          },
+          {
+            "src": "/images/hero-wall/photo-7747cbd784207a24-960w-0ecfdaacb89f.avif",
+            "width": 960,
+            "height": 720
+          },
+          {
+            "src": "/images/hero-wall/photo-7747cbd784207a24-1080w-0b455bebe98e.avif",
+            "width": 1080,
+            "height": 810
           }
         ],
         "webp": [
@@ -504,6 +608,16 @@
             "src": "/images/hero-wall/photo-7747cbd784207a24-640w-15b04c99656b.webp",
             "width": 640,
             "height": 480
+          },
+          {
+            "src": "/images/hero-wall/photo-7747cbd784207a24-960w-74f6a95477ed.webp",
+            "width": 960,
+            "height": 720
+          },
+          {
+            "src": "/images/hero-wall/photo-7747cbd784207a24-1080w-dd999d01cb4b.webp",
+            "width": 1080,
+            "height": 810
           }
         ]
       }
@@ -525,6 +639,16 @@
             "src": "/images/hero-wall/photo-75c983bfee7592d1-640w-889fcfead9dd.avif",
             "width": 640,
             "height": 480
+          },
+          {
+            "src": "/images/hero-wall/photo-75c983bfee7592d1-960w-ce7a0e908110.avif",
+            "width": 960,
+            "height": 720
+          },
+          {
+            "src": "/images/hero-wall/photo-75c983bfee7592d1-1280w-093e2b5f9d9e.avif",
+            "width": 1280,
+            "height": 960
           }
         ],
         "webp": [
@@ -537,6 +661,16 @@
             "src": "/images/hero-wall/photo-75c983bfee7592d1-640w-8c4753def1cc.webp",
             "width": 640,
             "height": 480
+          },
+          {
+            "src": "/images/hero-wall/photo-75c983bfee7592d1-960w-c5256a073a14.webp",
+            "width": 960,
+            "height": 720
+          },
+          {
+            "src": "/images/hero-wall/photo-75c983bfee7592d1-1280w-0f8ccc4041d5.webp",
+            "width": 1280,
+            "height": 960
           }
         ]
       }
@@ -558,6 +692,16 @@
             "src": "/images/hero-wall/photo-68be8bc76836567c-640w-32a1efc6dc5d.avif",
             "width": 640,
             "height": 600
+          },
+          {
+            "src": "/images/hero-wall/photo-68be8bc76836567c-960w-1db29c8dc30c.avif",
+            "width": 960,
+            "height": 900
+          },
+          {
+            "src": "/images/hero-wall/photo-68be8bc76836567c-1008w-7b23c825332e.avif",
+            "width": 1008,
+            "height": 945
           }
         ],
         "webp": [
@@ -570,6 +714,16 @@
             "src": "/images/hero-wall/photo-68be8bc76836567c-640w-029a9e55c719.webp",
             "width": 640,
             "height": 600
+          },
+          {
+            "src": "/images/hero-wall/photo-68be8bc76836567c-960w-6b6618f9d0a5.webp",
+            "width": 960,
+            "height": 900
+          },
+          {
+            "src": "/images/hero-wall/photo-68be8bc76836567c-1008w-a76d65b8d931.webp",
+            "width": 1008,
+            "height": 945
           }
         ]
       }
@@ -591,6 +745,16 @@
             "src": "/images/hero-wall/photo-d5c8f5bf02c8c461-640w-cb8321d65fab.avif",
             "width": 640,
             "height": 480
+          },
+          {
+            "src": "/images/hero-wall/photo-d5c8f5bf02c8c461-960w-81898182d797.avif",
+            "width": 960,
+            "height": 720
+          },
+          {
+            "src": "/images/hero-wall/photo-d5c8f5bf02c8c461-1280w-be6f2cf85a21.avif",
+            "width": 1280,
+            "height": 960
           }
         ],
         "webp": [
@@ -603,39 +767,16 @@
             "src": "/images/hero-wall/photo-d5c8f5bf02c8c461-640w-570ae0b39416.webp",
             "width": 640,
             "height": 480
-          }
-        ]
-      }
-    },
-    {
-      "id": "photo-ee970bcd133a2e0e",
-      "source": "IMG_0204.jpg",
-      "width": 1533,
-      "height": 1152,
-      "aspectRatio": 1.330729,
-      "variants": {
-        "avif": [
-          {
-            "src": "/images/hero-wall/photo-ee970bcd133a2e0e-320w-b348d7525631.avif",
-            "width": 320,
-            "height": 241
           },
           {
-            "src": "/images/hero-wall/photo-ee970bcd133a2e0e-640w-07d3a75990e5.avif",
-            "width": 640,
-            "height": 481
-          }
-        ],
-        "webp": [
-          {
-            "src": "/images/hero-wall/photo-ee970bcd133a2e0e-320w-dcfde3aa4139.webp",
-            "width": 320,
-            "height": 241
+            "src": "/images/hero-wall/photo-d5c8f5bf02c8c461-960w-68268c457b9e.webp",
+            "width": 960,
+            "height": 720
           },
           {
-            "src": "/images/hero-wall/photo-ee970bcd133a2e0e-640w-191fa122f78b.webp",
-            "width": 640,
-            "height": 481
+            "src": "/images/hero-wall/photo-d5c8f5bf02c8c461-1280w-e1599136d3d5.webp",
+            "width": 1280,
+            "height": 960
           }
         ]
       }
@@ -657,6 +798,16 @@
             "src": "/images/hero-wall/photo-061196d03f5f594d-640w-7c820ae6268d.avif",
             "width": 640,
             "height": 360
+          },
+          {
+            "src": "/images/hero-wall/photo-061196d03f5f594d-960w-759a5505a484.avif",
+            "width": 960,
+            "height": 540
+          },
+          {
+            "src": "/images/hero-wall/photo-061196d03f5f594d-1280w-19b4a0dd38c2.avif",
+            "width": 1280,
+            "height": 719
           }
         ],
         "webp": [
@@ -669,6 +820,16 @@
             "src": "/images/hero-wall/photo-061196d03f5f594d-640w-7459fe7cd29f.webp",
             "width": 640,
             "height": 360
+          },
+          {
+            "src": "/images/hero-wall/photo-061196d03f5f594d-960w-f0eab22e5172.webp",
+            "width": 960,
+            "height": 540
+          },
+          {
+            "src": "/images/hero-wall/photo-061196d03f5f594d-1280w-d21e92f76279.webp",
+            "width": 1280,
+            "height": 719
           }
         ]
       }
@@ -756,6 +917,11 @@
             "src": "/images/hero-wall/photo-22a31639a9f805fd-640w-13f44d1f6d54.avif",
             "width": 640,
             "height": 640
+          },
+          {
+            "src": "/images/hero-wall/photo-22a31639a9f805fd-673w-1467cd189127.avif",
+            "width": 673,
+            "height": 673
           }
         ],
         "webp": [
@@ -768,6 +934,11 @@
             "src": "/images/hero-wall/photo-22a31639a9f805fd-640w-738e502cc781.webp",
             "width": 640,
             "height": 640
+          },
+          {
+            "src": "/images/hero-wall/photo-22a31639a9f805fd-673w-54846f13436e.webp",
+            "width": 673,
+            "height": 673
           }
         ]
       }
@@ -789,6 +960,16 @@
             "src": "/images/hero-wall/photo-3c6f212e5b9d8c25-640w-067279fa3d88.avif",
             "width": 640,
             "height": 480
+          },
+          {
+            "src": "/images/hero-wall/photo-3c6f212e5b9d8c25-960w-549125e4b547.avif",
+            "width": 960,
+            "height": 720
+          },
+          {
+            "src": "/images/hero-wall/photo-3c6f212e5b9d8c25-1260w-0def18bbec40.avif",
+            "width": 1260,
+            "height": 945
           }
         ],
         "webp": [
@@ -801,6 +982,16 @@
             "src": "/images/hero-wall/photo-3c6f212e5b9d8c25-640w-49b35bce61d5.webp",
             "width": 640,
             "height": 480
+          },
+          {
+            "src": "/images/hero-wall/photo-3c6f212e5b9d8c25-960w-45ba9c961d6c.webp",
+            "width": 960,
+            "height": 720
+          },
+          {
+            "src": "/images/hero-wall/photo-3c6f212e5b9d8c25-1260w-4d5d6b4f01f6.webp",
+            "width": 1260,
+            "height": 945
           }
         ]
       }
@@ -822,6 +1013,16 @@
             "src": "/images/hero-wall/photo-4d3296e2fb5cab57-640w-9323ead29ff6.avif",
             "width": 640,
             "height": 480
+          },
+          {
+            "src": "/images/hero-wall/photo-4d3296e2fb5cab57-960w-6338dc506fae.avif",
+            "width": 960,
+            "height": 720
+          },
+          {
+            "src": "/images/hero-wall/photo-4d3296e2fb5cab57-1260w-4265a9b2ee9e.avif",
+            "width": 1260,
+            "height": 945
           }
         ],
         "webp": [
@@ -834,6 +1035,16 @@
             "src": "/images/hero-wall/photo-4d3296e2fb5cab57-640w-0a3a4bb1c776.webp",
             "width": 640,
             "height": 480
+          },
+          {
+            "src": "/images/hero-wall/photo-4d3296e2fb5cab57-960w-25b11bf029b1.webp",
+            "width": 960,
+            "height": 720
+          },
+          {
+            "src": "/images/hero-wall/photo-4d3296e2fb5cab57-1260w-d71cacb472db.webp",
+            "width": 1260,
+            "height": 945
           }
         ]
       }
@@ -855,6 +1066,16 @@
             "src": "/images/hero-wall/photo-88af19d3d35c11ca-640w-ff1614e5d0a2.avif",
             "width": 640,
             "height": 480
+          },
+          {
+            "src": "/images/hero-wall/photo-88af19d3d35c11ca-960w-40449b232505.avif",
+            "width": 960,
+            "height": 720
+          },
+          {
+            "src": "/images/hero-wall/photo-88af19d3d35c11ca-1260w-70a9d086c1c9.avif",
+            "width": 1260,
+            "height": 945
           }
         ],
         "webp": [
@@ -867,6 +1088,16 @@
             "src": "/images/hero-wall/photo-88af19d3d35c11ca-640w-50ccb6100eaa.webp",
             "width": 640,
             "height": 480
+          },
+          {
+            "src": "/images/hero-wall/photo-88af19d3d35c11ca-960w-02dfc8ee65ec.webp",
+            "width": 960,
+            "height": 720
+          },
+          {
+            "src": "/images/hero-wall/photo-88af19d3d35c11ca-1260w-5cfdf9b16ac0.webp",
+            "width": 1260,
+            "height": 945
           }
         ]
       }
@@ -888,6 +1119,16 @@
             "src": "/images/hero-wall/photo-f7cdf4da286fef60-640w-cf88fda27ec4.avif",
             "width": 640,
             "height": 480
+          },
+          {
+            "src": "/images/hero-wall/photo-f7cdf4da286fef60-960w-88116156531c.avif",
+            "width": 960,
+            "height": 720
+          },
+          {
+            "src": "/images/hero-wall/photo-f7cdf4da286fef60-1260w-6107dbeab1f2.avif",
+            "width": 1260,
+            "height": 945
           }
         ],
         "webp": [
@@ -900,6 +1141,16 @@
             "src": "/images/hero-wall/photo-f7cdf4da286fef60-640w-afe4519199c4.webp",
             "width": 640,
             "height": 480
+          },
+          {
+            "src": "/images/hero-wall/photo-f7cdf4da286fef60-960w-8cd66a034b03.webp",
+            "width": 960,
+            "height": 720
+          },
+          {
+            "src": "/images/hero-wall/photo-f7cdf4da286fef60-1260w-086d29aa30b3.webp",
+            "width": 1260,
+            "height": 945
           }
         ]
       }
@@ -921,6 +1172,11 @@
             "src": "/images/hero-wall/photo-f750b9e3c3831e37-640w-36a3d0b6435e.avif",
             "width": 640,
             "height": 853
+          },
+          {
+            "src": "/images/hero-wall/photo-f750b9e3c3831e37-709w-d9aefd80670d.avif",
+            "width": 709,
+            "height": 945
           }
         ],
         "webp": [
@@ -933,6 +1189,11 @@
             "src": "/images/hero-wall/photo-f750b9e3c3831e37-640w-f9acd4bcf628.webp",
             "width": 640,
             "height": 853
+          },
+          {
+            "src": "/images/hero-wall/photo-f750b9e3c3831e37-709w-e97d1c803397.webp",
+            "width": 709,
+            "height": 945
           }
         ]
       }
@@ -954,6 +1215,16 @@
             "src": "/images/hero-wall/photo-d25afd4e46af9907-640w-5843c8db74a3.avif",
             "width": 640,
             "height": 480
+          },
+          {
+            "src": "/images/hero-wall/photo-d25afd4e46af9907-960w-895ff7d7e0f8.avif",
+            "width": 960,
+            "height": 720
+          },
+          {
+            "src": "/images/hero-wall/photo-d25afd4e46af9907-1280w-0208a6142988.avif",
+            "width": 1280,
+            "height": 960
           }
         ],
         "webp": [
@@ -966,6 +1237,16 @@
             "src": "/images/hero-wall/photo-d25afd4e46af9907-640w-914a9d1f395c.webp",
             "width": 640,
             "height": 480
+          },
+          {
+            "src": "/images/hero-wall/photo-d25afd4e46af9907-960w-fcbd61dcc449.webp",
+            "width": 960,
+            "height": 720
+          },
+          {
+            "src": "/images/hero-wall/photo-d25afd4e46af9907-1280w-8a971023fe22.webp",
+            "width": 1280,
+            "height": 960
           }
         ]
       }
@@ -987,6 +1268,11 @@
             "src": "/images/hero-wall/photo-d58401bd9cb5c36d-640w-f7095e4bbdb3.avif",
             "width": 640,
             "height": 853
+          },
+          {
+            "src": "/images/hero-wall/photo-d58401bd9cb5c36d-709w-32763c3ac65c.avif",
+            "width": 709,
+            "height": 945
           }
         ],
         "webp": [
@@ -999,6 +1285,11 @@
             "src": "/images/hero-wall/photo-d58401bd9cb5c36d-640w-0a350825642b.webp",
             "width": 640,
             "height": 853
+          },
+          {
+            "src": "/images/hero-wall/photo-d58401bd9cb5c36d-709w-9594c39a363f.webp",
+            "width": 709,
+            "height": 945
           }
         ]
       }
@@ -1020,6 +1311,16 @@
             "src": "/images/hero-wall/photo-4a59c150aa2170a9-640w-9d7e268cac1a.avif",
             "width": 640,
             "height": 480
+          },
+          {
+            "src": "/images/hero-wall/photo-4a59c150aa2170a9-960w-a89a5e3f108e.avif",
+            "width": 960,
+            "height": 720
+          },
+          {
+            "src": "/images/hero-wall/photo-4a59c150aa2170a9-1260w-65f81a4b1a0f.avif",
+            "width": 1260,
+            "height": 945
           }
         ],
         "webp": [
@@ -1032,6 +1333,16 @@
             "src": "/images/hero-wall/photo-4a59c150aa2170a9-640w-392048cd05c6.webp",
             "width": 640,
             "height": 480
+          },
+          {
+            "src": "/images/hero-wall/photo-4a59c150aa2170a9-960w-ee183a344d9b.webp",
+            "width": 960,
+            "height": 720
+          },
+          {
+            "src": "/images/hero-wall/photo-4a59c150aa2170a9-1260w-14a878b1be17.webp",
+            "width": 1260,
+            "height": 945
           }
         ]
       }
@@ -1053,6 +1364,16 @@
             "src": "/images/hero-wall/photo-cd117022ba57b0c0-640w-c4487f526549.avif",
             "width": 640,
             "height": 480
+          },
+          {
+            "src": "/images/hero-wall/photo-cd117022ba57b0c0-960w-4e71bc8c448d.avif",
+            "width": 960,
+            "height": 720
+          },
+          {
+            "src": "/images/hero-wall/photo-cd117022ba57b0c0-1280w-bd51dbc9ea4a.avif",
+            "width": 1280,
+            "height": 960
           }
         ],
         "webp": [
@@ -1065,6 +1386,16 @@
             "src": "/images/hero-wall/photo-cd117022ba57b0c0-640w-359edde6bbee.webp",
             "width": 640,
             "height": 480
+          },
+          {
+            "src": "/images/hero-wall/photo-cd117022ba57b0c0-960w-45c30263870f.webp",
+            "width": 960,
+            "height": 720
+          },
+          {
+            "src": "/images/hero-wall/photo-cd117022ba57b0c0-1280w-957fae3e1a62.webp",
+            "width": 1280,
+            "height": 960
           }
         ]
       }
@@ -1086,6 +1417,16 @@
             "src": "/images/hero-wall/photo-c8428619da423136-640w-7f4c0ac3379e.avif",
             "width": 640,
             "height": 480
+          },
+          {
+            "src": "/images/hero-wall/photo-c8428619da423136-960w-688d2f0796fd.avif",
+            "width": 960,
+            "height": 720
+          },
+          {
+            "src": "/images/hero-wall/photo-c8428619da423136-1280w-cfd247a84300.avif",
+            "width": 1280,
+            "height": 960
           }
         ],
         "webp": [
@@ -1098,6 +1439,16 @@
             "src": "/images/hero-wall/photo-c8428619da423136-640w-6363fa905703.webp",
             "width": 640,
             "height": 480
+          },
+          {
+            "src": "/images/hero-wall/photo-c8428619da423136-960w-c116cbf77082.webp",
+            "width": 960,
+            "height": 720
+          },
+          {
+            "src": "/images/hero-wall/photo-c8428619da423136-1280w-71136c62be35.webp",
+            "width": 1280,
+            "height": 960
           }
         ]
       }
@@ -1119,6 +1470,16 @@
             "src": "/images/hero-wall/photo-a02e30d0dd97cb84-640w-d0a57a156a44.avif",
             "width": 640,
             "height": 480
+          },
+          {
+            "src": "/images/hero-wall/photo-a02e30d0dd97cb84-960w-c26d6658cb05.avif",
+            "width": 960,
+            "height": 720
+          },
+          {
+            "src": "/images/hero-wall/photo-a02e30d0dd97cb84-1280w-d49b8bcfd191.avif",
+            "width": 1280,
+            "height": 960
           }
         ],
         "webp": [
@@ -1131,6 +1492,16 @@
             "src": "/images/hero-wall/photo-a02e30d0dd97cb84-640w-c3eec41c44aa.webp",
             "width": 640,
             "height": 480
+          },
+          {
+            "src": "/images/hero-wall/photo-a02e30d0dd97cb84-960w-ac3e7433b2a7.webp",
+            "width": 960,
+            "height": 720
+          },
+          {
+            "src": "/images/hero-wall/photo-a02e30d0dd97cb84-1280w-e16d172591a3.webp",
+            "width": 1280,
+            "height": 960
           }
         ]
       }
@@ -1152,6 +1523,16 @@
             "src": "/images/hero-wall/photo-b1e22e8b2687943d-640w-57fc92668dc8.avif",
             "width": 640,
             "height": 480
+          },
+          {
+            "src": "/images/hero-wall/photo-b1e22e8b2687943d-960w-ac1dfd17e9e0.avif",
+            "width": 960,
+            "height": 720
+          },
+          {
+            "src": "/images/hero-wall/photo-b1e22e8b2687943d-1280w-da8677cf9040.avif",
+            "width": 1280,
+            "height": 960
           }
         ],
         "webp": [
@@ -1164,6 +1545,16 @@
             "src": "/images/hero-wall/photo-b1e22e8b2687943d-640w-213265bafde1.webp",
             "width": 640,
             "height": 480
+          },
+          {
+            "src": "/images/hero-wall/photo-b1e22e8b2687943d-960w-ea7a7d6729b3.webp",
+            "width": 960,
+            "height": 720
+          },
+          {
+            "src": "/images/hero-wall/photo-b1e22e8b2687943d-1280w-768e4c63f521.webp",
+            "width": 1280,
+            "height": 960
           }
         ]
       }
@@ -1185,6 +1576,16 @@
             "src": "/images/hero-wall/photo-6f10d56e5278dacf-640w-c3c692cc709d.avif",
             "width": 640,
             "height": 853
+          },
+          {
+            "src": "/images/hero-wall/photo-6f10d56e5278dacf-960w-39c4d473348c.avif",
+            "width": 960,
+            "height": 1280
+          },
+          {
+            "src": "/images/hero-wall/photo-6f10d56e5278dacf-1200w-810e568813e1.avif",
+            "width": 1200,
+            "height": 1600
           }
         ],
         "webp": [
@@ -1197,6 +1598,16 @@
             "src": "/images/hero-wall/photo-6f10d56e5278dacf-640w-3aed1b6ef396.webp",
             "width": 640,
             "height": 853
+          },
+          {
+            "src": "/images/hero-wall/photo-6f10d56e5278dacf-960w-52a8542d860c.webp",
+            "width": 960,
+            "height": 1280
+          },
+          {
+            "src": "/images/hero-wall/photo-6f10d56e5278dacf-1200w-9e1e971b007c.webp",
+            "width": 1200,
+            "height": 1600
           }
         ]
       }

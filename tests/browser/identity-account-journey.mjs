@@ -17,18 +17,26 @@ async function assertPublicEntryAndLegalRoutes(context, helpers) {
     await expect(page.locator('html')).toHaveAttribute('lang', 'en-US')
     await expect(page.locator('html')).toHaveAttribute('dir', 'ltr')
     expect(new URL(page.url()).pathname).toBe('/')
-    await expect(page.getByRole('heading', { name: 'Working People Need an Organization of Our Own' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Working people need an organization of our own' })).toBeVisible()
     await expect(
       page.getByText(
-        'WCU brings tenants, workers, and neighbors together to win concrete changes, develop new leaders, and build lasting power.',
+        'WCU is a member-run organization bringing working people together across San Joaquin County to win concrete changes, develop leaders, and build lasting power.',
         { exact: true }
       )
     ).toBeVisible()
-    const getStarted = page.getByRole('link', { name: 'JOIN WCU', exact: true })
+    if (await page.getByRole('button', { name: 'Menu', exact: true }).isVisible()) {
+      await page.getByRole('button', { name: 'Menu', exact: true }).click()
+    }
+    const getStarted = page.getByRole('link', { name: 'Get Involved', exact: true })
     await getStarted.focus()
     await expect(getStarted).toBeFocused()
     await page.keyboard.press('Enter')
 
+    await expect(page).toHaveURL(/\/#get-involved$/)
+    await expect(page.getByRole('heading', { name: 'Start by showing up', exact: true })).toBeVisible()
+    await helpers.assertAccessibleWithoutOverflow(page)
+
+    await page.goto('/join')
     await expect(page).toHaveURL(/\/join$/)
     await expect(page.getByRole('heading', { name: 'Join Working Class Unity' })).toBeVisible()
     await helpers.assertAccessibleWithoutOverflow(page)
@@ -36,7 +44,7 @@ async function assertPublicEntryAndLegalRoutes(context, helpers) {
     if (await page.getByRole('button', { name: 'Menu', exact: true }).isVisible()) {
       await page.getByRole('button', { name: 'Menu', exact: true }).click()
     }
-    await page.getByRole('link', { name: 'Log In', exact: true }).click()
+    await page.getByRole('link', { name: 'Member Login', exact: true }).click()
     await expect(page).toHaveURL(/\/login$/)
     await expect(page.getByRole('heading', { name: 'Log in' })).toBeVisible()
     await expect(
@@ -53,8 +61,9 @@ async function assertPublicEntryAndLegalRoutes(context, helpers) {
     if (await page.getByRole('button', { name: 'Menu', exact: true }).isVisible()) {
       await page.getByRole('button', { name: 'Menu', exact: true }).click()
     }
-    await page.getByRole('link', { name: 'JOIN NOW', exact: true }).click()
-    await expect(page).toHaveURL(/\/join$/)
+    await page.getByRole('link', { name: 'Get Involved', exact: true }).click()
+    await expect(page).toHaveURL(/\/#get-involved$/)
+    await expect(page.getByRole('heading', { name: 'Start by showing up', exact: true })).toBeVisible()
     await page.goto('/legal/terms')
     await expect(page).toHaveURL(/\/legal\/terms$/)
     await expect(page.getByRole('heading', { name: 'Terms', exact: true })).toBeVisible()
@@ -100,7 +109,7 @@ async function assertNotFoundRecovery(context, helpers) {
     await expect(recovery).toBeFocused()
     await page.keyboard.press('Enter')
     await expect(page).toHaveURL(/\/$/)
-    await expect(page.getByRole('heading', { name: 'Working People Need an Organization of Our Own' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Working people need an organization of our own' })).toBeVisible()
     await helpers.assertAccessibleWithoutOverflow(page)
 
     observations.errorResponses = observations.errorResponses.filter(

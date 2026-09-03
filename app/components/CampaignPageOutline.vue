@@ -1,11 +1,17 @@
 <script setup lang="ts">
-defineProps<{
-  items: readonly Readonly<{
-    id: string
+withDefaults(
+  defineProps<{
+    items: readonly Readonly<{
+      id: string
+      label: string
+    }>[]
     label: string
-  }>[]
-  label: string
-}>()
+    showMarkers?: boolean
+  }>(),
+  {
+    showMarkers: false
+  }
+)
 </script>
 
 <template>
@@ -18,6 +24,7 @@ defineProps<{
     trigger-label="On this page"
     close-label="Close page outline"
     trigger-variant="primary"
+    :show-markers="showMarkers"
     show-trigger-indicator
   />
 </template>

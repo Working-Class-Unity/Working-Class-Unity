@@ -29,7 +29,7 @@ export const campaignLandingPage = {
   eyebrow: 'A WORKING CLASS UNITY SIDE-QUEST',
   title: 'Remove Mass Surveillance from Stockton',
   description:
-    'Our tax dollars should build safety that working people decide and trust, not a private surveillance system City Council rubber-stamps and residents cannot control.',
+    'Our tax dollars should fund safety measures that working people can help shape and trust, not a private surveillance system City Council rubber-stamps and residents cannot control.',
   qualification:
     'WCU starts from a different idea of public safety. Working people should have democratic control over the institutions, budgets, and technologies that shape our lives. Safety should be built through stable homes, safe jobs, care, prevention, and public systems we can inspect and direct.',
   sections: [
@@ -74,22 +74,33 @@ export const campaignLandingPage = {
     {
       id: 'system',
       title: 'Stockton bought a system, not a single tool',
-      summary: 'Collection, search, aerial observation, and vendor infrastructure work as one connected platform.',
+      summary:
+        'City records describe a package that reaches from routine movement records to emergency response, live observation, and private vendor infrastructure.',
+      paragraphs: [
+        {
+          text: 'The records establish what Stockton authorized or purchased—not that every product is deployed or every connection is active.'
+        }
+      ],
       points: [
-        { text: 'Street-level collection: license plates, vehicle details, time, and location.' },
-        { text: 'Search and integration: alerts, emergency-response links, plate lookups, and connected video.' },
-        { text: 'Aerial observation: six contracted drones and docks, radar, and live video.' },
-        { text: 'Private infrastructure: vendor software, permissions, support, subscriptions, and contract terms.' }
+        { text: 'Plate readers create records of plates, vehicle details, times, and locations.' },
+        {
+          text: 'The package includes alerts, plate searches, 911 response tools, and connections to compatible video.'
+        },
+        {
+          text: 'The 2026 quote lists six drones and docks, two radar units, a mobile trailer, and ten compatible video streams.'
+        },
+        {
+          text: 'Flock supplies the software, permissions, support, subscriptions, and contract terms behind the package.'
+        }
       ]
     },
     {
       id: 'safeguards',
       title: 'Rules can reduce harm. They cannot end routine mass collection.',
-      summary:
-        'An immigration-enforcement ban and strict access rules would protect people now. The final demand remains removal.',
+      summary: 'An immigration-enforcement ban and strict access rules serve only as a temporary band-aid.',
       paragraphs: [
         {
-          text: 'A written rule does not erase the movement records, connected tools, vendor dependence, or power that the system places in police hands.'
+          text: 'A written rule does not erase the power that the system places in police hands.'
         },
         {
           text: 'Other California cities found gaps between written policy and the platform settings or network access in practice.',

@@ -83,7 +83,7 @@ export const faqGroups = [
             text: 'Safety reaches beyond policing. It includes stable housing, safe work, dependable emergency and crisis response, youth programs, parks and libraries, protection from violence, safe streets, care, and the freedom to ask for support without exposing a family to needless police or immigration scrutiny.'
           },
           {
-            text: 'Flock’s answer is more cameras, searches, data, and police technology. WCU starts from public investment, public accountability, and working people gaining real power over the institutions responsible for safety.'
+            text: 'Flock’s answer is more cameras, searches, data, and police technology. WCU starts from public investment, public accountability, and working people gaining real power over the institutions responsible for our safety.'
           }
         ]
       },
@@ -96,7 +96,7 @@ export const faqGroups = [
             sourceIds: ['flock-license-plate-readers']
           },
           {
-            text: 'Those needs do not give the city a blank check to collect and search everyone’s movement data. Targeted investigations should be targeted.'
+            text: 'Those needs, however, do not give the city a blank check to collect and search everyone’s movement data. Targeted investigations should be targeted.'
           }
         ]
       },
@@ -490,8 +490,6 @@ export const campaignFaqPage = {
   description:
     'Direct answers about public safety, movement data, immigration enforcement, private police technology, public spending, and what removal requires.',
   reviewedThrough: 'August 12, 2026',
-  qualification:
-    'This page does not claim that Stockton shared Flock data with ICE, broke state law, or deployed every contracted product. It separates Stockton records from vendor claims and examples from other cities.',
   sections: faqGroups.map((group) => ({
     id: group.id,
     title: group.title,

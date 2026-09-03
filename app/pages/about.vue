@@ -1,30 +1,5 @@
 <script setup lang="ts">
-import heroAssets from '~/generated/hero-assets.json'
-
-type ImageVariant = Readonly<{
-  src: string
-  width: number
-}>
-
-type AboutPhoto = Readonly<{
-  id: string
-  width: number
-  height: number
-  variants: Readonly<{
-    avif: readonly ImageVariant[]
-    webp: readonly ImageVariant[]
-  }>
-}>
-
 const { t } = useI18n()
-const photos = heroAssets.photos as readonly AboutPhoto[]
-const aboutPhoto = photos.find((photo) => photo.id === 'photo-cd117022ba57b0c0')
-
-if (!aboutPhoto) throw new Error('Missing generated About page photo')
-
-function sourceSet(variants: readonly ImageVariant[]) {
-  return variants.map((variant) => `${variant.src} ${variant.width}w`).join(', ')
-}
 
 useHead(() => ({
   title: t('metadata.about.title'),
@@ -42,34 +17,12 @@ useHead(() => ({
         <p class="about-introduction">{{ t('publicPages.about.introduction') }}</p>
       </div>
 
-      <figure class="about-photo">
-        <picture>
-          <source
-            type="image/avif"
-            :srcset="sourceSet(aboutPhoto.variants.avif)"
-            sizes="(max-width: 60rem) calc(100vw - 4rem), 38vw"
-          />
-          <source
-            type="image/webp"
-            :srcset="sourceSet(aboutPhoto.variants.webp)"
-            sizes="(max-width: 60rem) calc(100vw - 4rem), 38vw"
-          />
-          <img
-            :src="aboutPhoto.variants.webp.at(-1)!.src"
-            :width="aboutPhoto.width"
-            :height="aboutPhoto.height"
-            :alt="t('publicPages.about.photoAlt')"
-            fetchpriority="high"
-          />
-        </picture>
-        <figcaption>{{ t('publicPages.about.photoCaption') }}</figcaption>
-      </figure>
+      <DocumentaryCarousel class="about-photo" variant="about" :caption="t('publicPages.about.photoCaption')" />
     </section>
 
     <div class="about-story">
       <section class="story-section" aria-labelledby="problem-title">
         <header class="story-heading">
-          <p class="story-number" aria-hidden="true">01</p>
           <h2 id="problem-title">{{ t('publicPages.about.problem.title') }}</h2>
         </header>
         <div class="story-copy">
@@ -80,7 +33,6 @@ useHead(() => ({
 
       <section class="story-section" aria-labelledby="solution-title">
         <header class="story-heading">
-          <p class="story-number" aria-hidden="true">02</p>
           <h2 id="solution-title">{{ t('publicPages.about.solution.title') }}</h2>
         </header>
         <div class="story-copy">
@@ -158,11 +110,9 @@ useHead(() => ({
 
   .about-eyebrow,
   .about-introduction,
-  .story-number,
   .story-copy p,
   .governance p,
-  .about-cta p,
-  .about-photo figcaption {
+  .about-cta p {
     margin: 0;
   }
 
@@ -202,32 +152,6 @@ useHead(() => ({
     margin: 0;
   }
 
-  .about-photo picture,
-  .about-photo img {
-    display: block;
-    inline-size: 100%;
-  }
-
-  .about-photo picture {
-    overflow: hidden;
-    border-radius: min(1vw, 0.75rem);
-    outline: var(--border-width) solid var(--color-divider);
-    outline-offset: -1px;
-  }
-
-  .about-photo img {
-    aspect-ratio: 4 / 3;
-    block-size: auto;
-    object-fit: cover;
-  }
-
-  .about-photo figcaption {
-    padding-block-start: var(--space-3);
-    color: var(--color-text-muted);
-    font-size: 0.875rem;
-    line-height: 1.5;
-  }
-
   .about-story {
     padding-inline: clamp(1.5rem, 5vw, 5rem);
     background: var(--color-surface);
@@ -240,22 +164,6 @@ useHead(() => ({
     padding-inline: 0;
     padding-block: clamp(4rem, 8vw, 7rem);
     border-block-start: var(--border-width) solid var(--color-divider-strong);
-  }
-
-  .story-heading {
-    display: grid;
-    gap: var(--space-4);
-    align-content: start;
-  }
-
-  .story-number {
-    color: var(--color-brand-highlight);
-    font-family: var(--font-family-display);
-    font-size: clamp(2.75rem, 2rem + 2vw, 4.25rem);
-    font-stretch: 112%;
-    font-weight: 650;
-    letter-spacing: -0.045em;
-    line-height: 1;
   }
 
   .story-heading h2,
@@ -449,15 +357,6 @@ useHead(() => ({
       padding-block: clamp(3.5rem, 12vw, 5rem);
     }
 
-    .story-heading {
-      grid-template-columns: auto minmax(0, 1fr);
-      align-items: end;
-    }
-
-    .story-number {
-      font-size: 2.5rem;
-    }
-
     .story-copy {
       font-size: 1.0625rem;
       line-height: 1.75;
@@ -496,10 +395,6 @@ useHead(() => ({
 
     .about-page {
       border-radius: 0;
-    }
-
-    .about-photo picture {
-      border-radius: min(2vw, 0.75rem);
     }
 
     .mission-statement {

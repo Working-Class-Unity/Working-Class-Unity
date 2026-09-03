@@ -7,7 +7,7 @@ const wideContainerClass = computed(() => ({ 'container--wide': usesWideSurface.
 <template>
   <div class="app-frame">
     <a class="skip-link" href="#main-content">{{ t('navigation.skipToMain') }}</a>
-    <div class="container" :class="wideContainerClass"><AppTopbar /></div>
+    <AppTopbar />
     <main id="main-content" class="container page-shell flow" :class="wideContainerClass" tabindex="-1">
       <slot />
     </main>

@@ -6,6 +6,7 @@ const { t } = useI18n()
 const outlineItems = bylawsArticles.map((article) => ({
   id: article.id,
   label: article.title,
+  marker: article.number,
   children: article.sections.map((section) => ({
     id: section.id,
     label: section.title,
