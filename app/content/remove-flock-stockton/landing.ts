@@ -74,12 +74,24 @@ export const campaignLandingPage = {
     {
       id: 'system',
       title: 'Stockton bought a system, not a single tool',
-      summary: 'Collection, search, aerial observation, and vendor infrastructure work as one connected platform.',
+      summary:
+        'City records describe a package that reaches from routine movement records to emergency response, live observation, and private vendor infrastructure.',
+      paragraphs: [
+        {
+          text: 'The records establish what Stockton authorized or purchased—not that every product is deployed or every connection is active.'
+        }
+      ],
       points: [
-        { text: 'Street-level collection: license plates, vehicle details, time, and location.' },
-        { text: 'Search and integration: alerts, emergency-response links, plate lookups, and connected video.' },
-        { text: 'Aerial observation: six contracted drones and docks, radar, and live video.' },
-        { text: 'Private infrastructure: vendor software, permissions, support, subscriptions, and contract terms.' }
+        { text: 'Plate readers create records of plates, vehicle details, times, and locations.' },
+        {
+          text: 'The package includes alerts, plate searches, 911 response tools, and connections to compatible video.'
+        },
+        {
+          text: 'The 2026 quote lists six drones and docks, two radar units, a mobile trailer, and ten compatible video streams.'
+        },
+        {
+          text: 'Flock supplies the software, permissions, support, subscriptions, and contract terms behind the package.'
+        }
       ]
     },
     {

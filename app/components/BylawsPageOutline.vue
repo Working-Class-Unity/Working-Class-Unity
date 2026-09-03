@@ -3,6 +3,7 @@ defineProps<{
   items: readonly Readonly<{
     id: string
     label: string
+    marker: string
     children: readonly Readonly<{
       id: string
       label: string
@@ -25,5 +26,6 @@ defineProps<{
     :description="description"
     :trigger-label="triggerLabel"
     :close-label="closeLabel"
+    show-markers
   />
 </template>

@@ -23,7 +23,6 @@ useHead(() => ({
     <div class="about-story">
       <section class="story-section" aria-labelledby="problem-title">
         <header class="story-heading">
-          <p class="story-number" aria-hidden="true">01</p>
           <h2 id="problem-title">{{ t('publicPages.about.problem.title') }}</h2>
         </header>
         <div class="story-copy">
@@ -34,7 +33,6 @@ useHead(() => ({
 
       <section class="story-section" aria-labelledby="solution-title">
         <header class="story-heading">
-          <p class="story-number" aria-hidden="true">02</p>
           <h2 id="solution-title">{{ t('publicPages.about.solution.title') }}</h2>
         </header>
         <div class="story-copy">
@@ -112,7 +110,6 @@ useHead(() => ({
 
   .about-eyebrow,
   .about-introduction,
-  .story-number,
   .story-copy p,
   .governance p,
   .about-cta p {
@@ -167,22 +164,6 @@ useHead(() => ({
     padding-inline: 0;
     padding-block: clamp(4rem, 8vw, 7rem);
     border-block-start: var(--border-width) solid var(--color-divider-strong);
-  }
-
-  .story-heading {
-    display: grid;
-    gap: var(--space-4);
-    align-content: start;
-  }
-
-  .story-number {
-    color: var(--color-brand-highlight);
-    font-family: var(--font-family-display);
-    font-size: clamp(2.75rem, 2rem + 2vw, 4.25rem);
-    font-stretch: 112%;
-    font-weight: 650;
-    letter-spacing: -0.045em;
-    line-height: 1;
   }
 
   .story-heading h2,
@@ -374,15 +355,6 @@ useHead(() => ({
       gap: var(--space-7);
       padding-inline: 0;
       padding-block: clamp(3.5rem, 12vw, 5rem);
-    }
-
-    .story-heading {
-      grid-template-columns: auto minmax(0, 1fr);
-      align-items: end;
-    }
-
-    .story-number {
-      font-size: 2.5rem;
     }
 
     .story-copy {

@@ -9,7 +9,7 @@ withDefaults(
     showMarkers?: boolean
   }>(),
   {
-    showMarkers: true
+    showMarkers: false
   }
 )
 </script>

@@ -48,21 +48,18 @@ const campaignPages = computed(() => [
 
 const participationRoutes = computed(() => [
   {
-    number: '01',
     title: t('home.participation.routes.events.title'),
     description: t('home.participation.routes.events.description'),
     action: t('home.participation.routes.events.action'),
     to: '/calendar'
   },
   {
-    number: '02',
     title: t('home.participation.routes.campaign.title'),
     description: t('home.participation.routes.campaign.description'),
     action: t('home.participation.routes.campaign.action'),
     to: '/#current-work'
   },
   {
-    number: '03',
     title: t('home.participation.routes.updates.title'),
     description: t('home.participation.routes.updates.description'),
     action: t('home.participation.routes.updates.action'),
@@ -158,16 +155,15 @@ useHead(() => ({
           <p>{{ t('home.participation.description') }}</p>
         </header>
 
-        <ol class="home-participation-routes">
-          <li v-for="route in participationRoutes" :key="route.number">
-            <span class="home-route-number" aria-hidden="true">{{ route.number }}</span>
+        <ul class="home-participation-routes">
+          <li v-for="route in participationRoutes" :key="route.to">
             <h3>{{ route.title }}</h3>
             <p>{{ route.description }}</p>
             <AppActionLink :to="route.to" variant="text">
               {{ route.action }} <span aria-hidden="true">→</span>
             </AppActionLink>
           </li>
-        </ol>
+        </ul>
       </div>
     </section>
 
@@ -528,27 +524,12 @@ useHead(() => ({
 
   .home-participation-routes > li {
     display: grid;
-    grid-template-columns: 7.5rem 22.5rem minmax(0, 1fr) 11rem;
+    grid-template-columns: 22.5rem minmax(0, 1fr) 11rem;
     gap: 1.75rem;
     align-items: center;
     min-width: 0;
     padding-block: 1.875rem;
     border-block-end: var(--border-width) solid rgb(4 51 79 / 24%);
-  }
-
-  .home-route-number {
-    color: var(--color-brand-primary);
-    font-family: var(--font-family-statement);
-    font-size: 2.625rem;
-    line-height: 1.05;
-  }
-
-  .home-participation-routes > li:nth-child(1) .home-route-number {
-    color: var(--color-brand-highlight);
-  }
-
-  .home-participation-routes > li:nth-child(2) .home-route-number {
-    color: var(--color-brand-accent);
   }
 
   .home-participation-routes h3,
@@ -776,29 +757,14 @@ useHead(() => ({
     }
 
     .home-participation-routes > li {
-      grid-template-columns: 3rem minmax(0, 1fr);
-      gap: 0.625rem 1.125rem;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0.625rem;
       padding-block: 1.375rem 1.5rem;
     }
 
-    .home-route-number {
-      grid-column: 1;
-      grid-row: 1;
-      font-size: 1.75rem;
-      line-height: 1.15;
-    }
-
     .home-participation-routes h3 {
-      grid-column: 2;
-      grid-row: 1;
-      align-self: baseline;
       font-size: 1.375rem;
       line-height: 1.27;
-    }
-
-    .home-participation-routes p,
-    .home-participation-routes :deep(.app-action-link) {
-      grid-column: 2;
     }
 
     .home-participation-routes :deep(.app-action-link) {

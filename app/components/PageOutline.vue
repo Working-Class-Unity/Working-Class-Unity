@@ -31,7 +31,7 @@ const props = withDefaults(
     showTriggerIndicator?: boolean
   }>(),
   {
-    showMarkers: true,
+    showMarkers: false,
     triggerVariant: 'secondary',
     showTriggerIndicator: false
   }

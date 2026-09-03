@@ -101,24 +101,24 @@ dates and sources, little or no texture, and no decorative motion.
 
 **Organizing/editorial** appears only when pressure is truthful: active campaigns, actions, selected
 event moments, Voices features, and historical packages. Use one strong red, orange, navy, or ink field;
-a short Akira Jimbo declaration; asymmetry, large numerals, or a restrained print device; and keep claim,
+a short Akira Jimbo declaration; asymmetry, meaningful data or sequence numerals, or a restrained print device; and keep claim,
 proof, status/source, and action together. Forms, logistics, legal language, payments, and long reading
 stay calm. An ordinary page gets at most one dominant organizing moment.
 
 ## Brand anchors
 
-| Role           | Value     | Use                                                         |
-| -------------- | --------- | ----------------------------------------------------------- |
-| Navy           | `#04334f` | institutional anchor, headings, shell, stable actions       |
-| Red            | `#ef2525` | large organizing accents and display moments                |
-| Accessible red | `#ae0000` | urgent controls or fields carrying normal white text        |
-| Orange         | `#ff9f48` | annotation, community warmth, large numerals with dark text |
-| Canvas         | `#f7f9fc` | public page ground                                          |
-| Ink            | `#232323` | body text and calm dark fields                              |
-| White          | `#ffffff` | primary surface and text on dark fields                     |
-| Rule           | `#cbd4dc` | quiet structural dividers                                   |
-| Muted text     | `#5f6f79` | legible secondary information                               |
-| Placeholder    | `#e6ebef` | neutral media placeholders                                  |
+| Role           | Value     | Use                                                              |
+| -------------- | --------- | ---------------------------------------------------------------- |
+| Navy           | `#04334f` | institutional anchor, headings, shell, stable actions            |
+| Red            | `#ef2525` | large organizing accents and display moments                     |
+| Accessible red | `#ae0000` | urgent controls or fields carrying normal white text             |
+| Orange         | `#ff9f48` | annotation, community warmth, meaningful numerals with dark text |
+| Canvas         | `#f7f9fc` | public page ground                                               |
+| Ink            | `#232323` | body text and calm dark fields                                   |
+| White          | `#ffffff` | primary surface and text on dark fields                          |
+| Rule           | `#cbd4dc` | quiet structural dividers                                        |
+| Muted text     | `#5f6f79` | legible secondary information                                    |
+| Placeholder    | `#e6ebef` | neutral media placeholders                                       |
 
 Canvas, white, ink, and navy do most of the work. Red and orange are punctuation. Orange always uses a
 dark foreground. Raw red never carries normal-size white text. Color never communicates state alone.
@@ -135,6 +135,13 @@ Use 12–14px metadata, 16px minimum body/UI, 18–20px ledes, approximately 28p
 60–72ch. Sentence case is the default. Short uppercase is reserved for real status, place, or
 currentness labels. Never shrink a translation to preserve a composition; let the layout grow or
 recompose.
+
+### Numerals must carry meaning
+
+Do not use decorative ordinal numbers for parallel choices, arguments, FAQ entries, headings, cards,
+or page-outline entries. Use numbers only for verified quantities, source references, formal document
+structure, or a genuinely ordered sequence such as instructions, a timeline, or canonical numbered
+demands. If items can be rearranged without changing their meaning, do not number them.
 
 ## Grid, spacing, and geometry
 

@@ -20,10 +20,18 @@ const participate = sectionById.get('participate')!
 const petitionUrl = 'https://tech.workingclassunity.com/deflock-stockton'
 const updatesUrl = 'https://tech.workingclassunity.com/deflock-stockton-updates'
 const caseLabels = ['Safety is a public good', 'The risk is unequal', 'The public should hold power'] as const
-const systemLabels = ['Collect', 'Connect', 'Observe', 'Depend'] as const
+const systemLabels = [
+  'Movement becomes data',
+  'Records connect to response',
+  'Observation expands',
+  'One vendor ties it together'
+] as const
 const safetyLabels = ['Stable homes', 'Safe work and public space', 'Care and prevention', 'Public control'] as const
 const recordValues = ['April 14, 2031', '$5,416,700', 'A connected system'] as const
 const sourcesById = new Map<string, CampaignSource>(campaignLandingPage.sources.map((source) => [source.id, source]))
+const systemQualification = system.paragraphs?.[0]
+
+if (!systemQualification) throw new Error('The campaign system qualification is required')
 
 function sourcesForIds(sourceIds: readonly string[]) {
   return sourceIds.map((sourceId) => {
@@ -78,14 +86,16 @@ function pointDetail(text: string) {
             <dd>{{ fact.detail }}</dd>
             <dd class="campaign-source-line">
               <span>Sources:</span>
-              <a
-                v-for="source in sourcesForIds(fact.sourceIds)"
-                :key="source.id"
-                :href="source.url"
-                target="_blank"
-                rel="noopener noreferrer"
-                >{{ source.title }}</a
-              >
+              <span class="campaign-source-links">
+                <a
+                  v-for="source in sourcesForIds(fact.sourceIds)"
+                  :key="source.id"
+                  :href="source.url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >{{ source.title }}</a
+                >
+              </span>
             </dd>
           </div>
         </dl>
@@ -100,10 +110,7 @@ function pointDetail(text: string) {
         </div>
         <dl class="campaign-case-list">
           <div v-for="(point, index) in whyRemove.points" :key="citedTextPlainText(point)">
-            <dt>
-              <span aria-hidden="true">0{{ index + 1 }}</span
-              >{{ caseLabels[index] }}
-            </dt>
+            <dt>{{ caseLabels[index] }}</dt>
             <dd>{{ citedTextPlainText(point) }}</dd>
             <dd>
               <NuxtLink
@@ -121,29 +128,19 @@ function pointDetail(text: string) {
     <section class="campaign-system" aria-labelledby="campaign-system-title">
       <div class="campaign-field campaign-system-inner">
         <div class="campaign-section-turn campaign-system-heading">
-          <h2 id="campaign-system-title">{{ system.title }}</h2>
+          <div>
+            <h2 id="campaign-system-title">{{ system.title }}</h2>
+            <p>{{ system.summary }}</p>
+          </div>
           <NuxtLink class="campaign-text-action" to="/campaigns/remove-flock-stockton/what-stockton-bought">
             Explore the full system <span aria-hidden="true">→</span>
           </NuxtLink>
         </div>
-        <div
-          class="campaign-system-diagram"
-          aria-label="Connected system described in the source-linked sequence below"
-          role="img"
-        >
-          <span aria-hidden="true" />
-          <p>Connected system · source-linked below</p>
-          <div aria-hidden="true">
-            <b>Plate readers</b><b>911 + search</b><b>Drones + video</b><b>Vendor platform</b>
-          </div>
-        </div>
+        <p class="campaign-system-qualification">{{ citedTextPlainText(systemQualification) }}</p>
         <dl class="campaign-system-list">
           <div v-for="(point, index) in system.points" :key="citedTextPlainText(point)">
-            <dt>
-              <span aria-hidden="true">0{{ index + 1 }}</span
-              >{{ systemLabels[index] }}
-            </dt>
-            <dd>{{ pointDetail(citedTextPlainText(point)) }}</dd>
+            <dt>{{ systemLabels[index] }}</dt>
+            <dd>{{ citedTextPlainText(point) }}</dd>
           </div>
         </dl>
       </div>
@@ -200,10 +197,7 @@ function pointDetail(text: string) {
         </div>
         <dl class="campaign-safety-list">
           <div v-for="(point, index) in realSafety.points" :key="citedTextPlainText(point)">
-            <dt>
-              <span aria-hidden="true">0{{ index + 1 }}</span
-              >{{ safetyLabels[index] }}
-            </dt>
+            <dt>{{ safetyLabels[index] }}</dt>
             <dd>{{ pointDetail(citedTextPlainText(point)) }}</dd>
           </div>
         </dl>
@@ -497,11 +491,22 @@ function pointDetail(text: string) {
     text-wrap: pretty;
   }
 
-  .campaign-source-line,
+  .campaign-source-line {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0 var(--space-2);
+    align-items: baseline;
+  }
+
+  .campaign-source-links {
+    display: grid;
+    min-width: 0;
+  }
+
   .campaign-removal-sources {
     display: flex;
     flex-wrap: wrap;
-    gap: 0 var(--space-2);
+    gap: var(--space-2) var(--space-3);
   }
 
   .campaign-source-line a,
@@ -576,19 +581,10 @@ function pointDetail(text: string) {
   }
 
   .campaign-case-list dt {
-    display: grid;
-    gap: 0.875rem;
     color: var(--color-brand-primary);
     font-size: 1.75rem;
     font-weight: var(--font-weight-bold);
     line-height: 1.2;
-  }
-
-  .campaign-case-list dt span {
-    color: var(--color-accent-action);
-    font-size: 0.8125rem;
-    letter-spacing: 0.08em;
-    line-height: 1.4;
   }
 
   .campaign-case-list dd {
@@ -617,65 +613,52 @@ function pointDetail(text: string) {
     gap: 4rem;
   }
 
-  .campaign-system-diagram {
-    position: relative;
+  .campaign-system-heading > div {
     display: grid;
-    place-content: center;
-    gap: 2.25rem;
-    min-block-size: 22.5rem;
-    padding: var(--space-7);
-    overflow: hidden;
-    color: var(--color-text-muted);
-    background: var(--color-placeholder);
-    text-align: center;
-  }
-
-  .campaign-system-diagram > span {
-    position: absolute;
-    inset-block-start: 0;
-    inset-inline-start: 0;
-    inline-size: 9.75rem;
-    block-size: 1.125rem;
-    background: var(--color-brand-highlight);
-  }
-
-  .campaign-system-diagram > p {
-    font-size: 0.875rem;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
-
-  .campaign-system-diagram > div {
-    display: flex;
-    flex-wrap: wrap;
     gap: var(--space-4);
-    justify-content: center;
   }
 
-  .campaign-system-diagram b {
-    border-block: 1px solid rgb(4 51 79 / 32%);
-    padding: var(--space-3);
-    color: var(--color-brand-primary);
-    font-size: 0.8125rem;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+  .campaign-system-heading > div > p {
+    max-inline-size: 62ch;
+    color: var(--color-text-muted);
+    font-size: 1.125rem;
+    line-height: 1.55;
+    text-wrap: pretty;
+  }
+
+  .campaign-system-qualification {
+    max-inline-size: 72ch;
+    border-inline-start: 4px solid var(--color-brand-highlight);
+    padding-inline-start: var(--space-4);
+    color: var(--color-text-muted);
+    font-size: 1rem;
+    line-height: 1.55;
+    text-wrap: pretty;
   }
 
   .campaign-system-list dt,
   .campaign-safety-list dt {
-    display: grid;
-    gap: var(--space-2);
     color: var(--color-brand-primary);
     font-size: 1.5rem;
     font-weight: var(--font-weight-bold);
     line-height: 1.25;
   }
 
-  :is(.campaign-system-list, .campaign-safety-list) dt span {
+  .campaign-system-list > div {
+    position: relative;
+  }
+
+  .campaign-system-list > div + div::before {
+    position: absolute;
+    inset-block-start: 1.8rem;
+    inset-inline-start: 0;
+    padding-inline: var(--space-1);
     color: var(--color-accent-action);
-    font-size: 0.8125rem;
-    font-weight: 400;
-    line-height: 1.4;
+    background: var(--color-canvas);
+    content: '→';
+    font-size: 1rem;
+    line-height: 1;
+    transform: translateX(-50%);
   }
 
   .campaign-removal {
@@ -732,10 +715,6 @@ function pointDetail(text: string) {
   .campaign-removal-copy .campaign-removal-lead {
     color: var(--color-surface);
     font-size: 1.1875rem;
-  }
-
-  .campaign-removal-sources {
-    gap: var(--space-2) var(--space-3);
   }
 
   .campaign-removal-sources a,
@@ -991,6 +970,10 @@ function pointDetail(text: string) {
     :is(.campaign-record-list, .campaign-system-list, .campaign-safety-list) > div:nth-child(2) {
       padding-inline-end: 0;
     }
+
+    .campaign-system-list > div + div::before {
+      content: none;
+    }
   }
 
   @media (width <= 46rem) {
@@ -1015,6 +998,7 @@ function pointDetail(text: string) {
 
     .campaign-hero-description,
     .campaign-section-turn > p,
+    .campaign-system-heading > div > p,
     .campaign-demand-heading > div > p:first-child,
     .campaign-participation-heading > p:last-child {
       font-size: 1.0625rem;
@@ -1124,23 +1108,7 @@ function pointDetail(text: string) {
     }
 
     .campaign-case-list dt {
-      gap: 0.5625rem;
       font-size: 1.4375rem;
-    }
-
-    .campaign-case-list dt span {
-      color: var(--color-brand-accent);
-      font-family: var(--font-family-statement);
-      font-size: 1.625rem;
-      letter-spacing: 0;
-    }
-
-    .campaign-case-list > div:nth-child(2) dt span {
-      color: var(--color-brand-highlight);
-    }
-
-    .campaign-case-list > div:nth-child(3) dt span {
-      color: var(--color-brand-primary);
     }
 
     .campaign-context-link,
@@ -1155,36 +1123,9 @@ function pointDetail(text: string) {
       padding-block: 4.375rem 4.25rem;
     }
 
-    .campaign-system-diagram {
-      gap: var(--space-5);
-      min-block-size: 14.375rem;
-      padding: var(--space-5);
-    }
-
-    .campaign-system-diagram > span {
-      inline-size: 5.5rem;
-      block-size: 0.75rem;
-    }
-
-    .campaign-system-diagram > p {
-      font-size: 0.75rem;
-    }
-
-    .campaign-system-diagram > div {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      inline-size: 100%;
-    }
-
     .campaign-system-list dt,
     .campaign-safety-list dt {
-      grid-template-columns: 2.25rem minmax(0, 1fr);
-      align-items: start;
       font-size: 1.3125rem;
-    }
-
-    :is(.campaign-system-list, .campaign-safety-list) dt span {
-      padding-block-start: var(--space-1);
     }
 
     .campaign-removal-inner {
@@ -1252,10 +1193,6 @@ function pointDetail(text: string) {
   @media (width <= 22rem) {
     :is(.campaign-primary-action, .campaign-outline-action) {
       inline-size: 100%;
-    }
-
-    .campaign-system-diagram > div {
-      grid-template-columns: minmax(0, 1fr);
     }
   }
 }

@@ -56,22 +56,20 @@ function citationIdPrefix(groupId: string, itemId: string, kind: 'answer' | 'poi
 
       <div class="campaign-faq-groups">
         <section
-          v-for="(group, groupIndex) in faqGroups"
+          v-for="group in faqGroups"
           :id="group.id"
           :key="group.id"
           class="campaign-faq-group"
           :aria-labelledby="`${group.id}-title`"
         >
           <div class="campaign-faq-group-heading">
-            <p>{{ String(groupIndex + 1).padStart(2, '0') }}</p>
             <h2 :id="`${group.id}-title`">{{ group.title }}</h2>
             <p>{{ group.summary }}</p>
           </div>
 
           <div class="campaign-faq-items">
-            <details v-for="(item, itemIndex) in group.items" :key="item.id" :name="`faq-${group.id}`">
+            <details v-for="item in group.items" :key="item.id" :name="`faq-${group.id}`">
               <summary>
-                <span aria-hidden="true">{{ String(itemIndex + 1).padStart(2, '0') }}</span>
                 <span>{{ item.question }}</span>
               </summary>
               <div class="campaign-faq-answer">
@@ -220,15 +218,6 @@ function citationIdPrefix(groupId: string, itemId: string, kind: 'answer' | 'poi
     min-width: 0;
   }
 
-  .campaign-faq-group-heading > p:first-child {
-    margin: 0;
-    color: var(--color-accent-action);
-    font-family: var(--font-family-mono);
-    font-size: 0.8125rem;
-    font-weight: var(--font-weight-strong);
-    letter-spacing: 0.08em;
-  }
-
   .campaign-faq h2 {
     --font-size-heading-2: clamp(2rem, 1.6rem + 1.5vw, 3.25rem);
     --line-height-heading: 1.02;
@@ -254,14 +243,8 @@ function citationIdPrefix(groupId: string, itemId: string, kind: 'answer' | 'poi
 
   .campaign-faq-group-heading {
     display: grid;
-    grid-template-columns: minmax(3rem, 1fr) minmax(0, 5fr);
-    gap: var(--space-3) var(--space-6);
+    gap: var(--space-3);
     align-items: start;
-  }
-
-  .campaign-faq-group-heading h2,
-  .campaign-faq-group-heading > p:last-child {
-    grid-column: 2;
   }
 
   .campaign-faq-group-heading > p:last-child {
@@ -284,8 +267,7 @@ function citationIdPrefix(groupId: string, itemId: string, kind: 'answer' | 'poi
   .campaign-faq summary {
     position: relative;
     display: grid;
-    grid-template-columns: 2.5rem minmax(0, 1fr);
-    gap: var(--space-3);
+    grid-template-columns: minmax(0, 1fr);
     min-block-size: 3rem;
     padding: var(--space-5) 3rem var(--space-5) 0;
     color: var(--color-brand-primary);
@@ -299,14 +281,7 @@ function citationIdPrefix(groupId: string, itemId: string, kind: 'answer' | 'poi
     display: none;
   }
 
-  .campaign-faq summary > span:first-child {
-    color: var(--color-accent-action);
-    font-family: var(--font-family-mono);
-    font-size: 0.8125rem;
-    letter-spacing: 0.08em;
-  }
-
-  .campaign-faq summary > span:last-child {
+  .campaign-faq summary > span {
     min-width: 0;
     overflow-wrap: anywhere;
   }
@@ -339,7 +314,7 @@ function citationIdPrefix(groupId: string, itemId: string, kind: 'answer' | 'poi
   .campaign-faq-answer {
     display: grid;
     gap: var(--space-5);
-    padding: 0 var(--space-7) var(--space-6) 3.25rem;
+    padding: 0 var(--space-7) var(--space-6) 0;
   }
 
   .campaign-faq-paragraph {
@@ -397,8 +372,7 @@ function citationIdPrefix(groupId: string, itemId: string, kind: 'answer' | 'poi
       display: grid;
     }
 
-    .campaign-faq-context p,
-    .campaign-faq-group-heading > p:first-child {
+    .campaign-faq-context p {
       font-size: 1rem;
     }
 
@@ -406,23 +380,8 @@ function citationIdPrefix(groupId: string, itemId: string, kind: 'answer' | 'poi
       --font-size-heading-1: clamp(2.75rem, 13vw, 3.5rem);
     }
 
-    .campaign-faq-group-heading {
-      grid-template-columns: minmax(0, 1fr);
-      gap: var(--space-3);
-    }
-
-    .campaign-faq-group-heading h2,
-    .campaign-faq-group-heading > p:last-child {
-      grid-column: auto;
-    }
-
     .campaign-faq summary {
-      grid-template-columns: 2rem minmax(0, 1fr);
       padding-inline-end: 2.5rem;
-      font-size: 1rem;
-    }
-
-    .campaign-faq summary > span:first-child {
       font-size: 1rem;
     }
 
