@@ -148,7 +148,7 @@ test('home presents the WCU foundation and preserves client navigation', async (
   await assertMinimumTargetSize(topbar.getByRole('link', { name: 'Member Login', exact: true }))
   await assertMinimumTargetSize(topbar.getByRole('link', { name: 'Get Involved', exact: true }))
   await assertMinimumTargetSize(hero.getByRole('link', { name: 'See upcoming events', exact: true }))
-  await assertMinimumTargetSize(hero.getByRole('link', { name: 'See current work', exact: true }))
+  await expect(hero.getByRole('link', { name: 'See current work', exact: true })).toHaveCount(0)
   await assertMinimumTargetSize(updatesLink)
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.keyboard.press('Tab')

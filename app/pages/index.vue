@@ -27,6 +27,25 @@ const governanceProof = computed(() => [
   }
 ])
 
+const campaignPages = computed(() => [
+  {
+    label: t('home.currentWork.pages.overview'),
+    to: '/campaigns/remove-flock-stockton'
+  },
+  {
+    label: t('home.currentWork.pages.whatStocktonBought'),
+    to: '/campaigns/remove-flock-stockton/what-stockton-bought'
+  },
+  {
+    label: t('home.currentWork.pages.removalNotReform'),
+    to: '/campaigns/remove-flock-stockton/why-safeguards-are-not-enough'
+  },
+  {
+    label: t('home.currentWork.pages.faq'),
+    to: '/campaigns/remove-flock-stockton/faq'
+  }
+])
+
 const participationRoutes = computed(() => [
   {
     number: '01',
@@ -69,14 +88,9 @@ useHead(() => ({
 
           <div class="home-hero-invitation">
             <p>{{ t('home.introduction') }}</p>
-            <div class="home-hero-actions">
-              <AppActionLink class="home-hero-primary" to="/calendar">
-                {{ t('home.actions.events') }}
-              </AppActionLink>
-              <AppActionLink to="/#current-work" variant="text">
-                {{ t('home.actions.currentWork') }} <span aria-hidden="true">→</span>
-              </AppActionLink>
-            </div>
+            <AppActionLink class="home-hero-primary" to="/calendar">
+              {{ t('home.actions.events') }}
+            </AppActionLink>
           </div>
         </div>
 
@@ -89,17 +103,16 @@ useHead(() => ({
         <p class="home-campaign-meta">{{ t('home.currentWork.meta') }}</p>
         <h2 id="home-current-work-title">{{ t('home.currentWork.title') }}</h2>
         <p class="home-campaign-description">{{ t('home.currentWork.description') }}</p>
-        <AppActionLink class="home-campaign-link" to="/campaigns/remove-flock-stockton" variant="text-inverse">
-          {{ t('home.currentWork.campaignAction') }} <span aria-hidden="true">→</span>
-        </AppActionLink>
-        <AppActionLink
-          class="home-campaign-source"
-          to="/campaigns/remove-flock-stockton/what-stockton-bought"
-          variant="text-inverse"
-          size="compact"
-        >
-          {{ t('home.currentWork.source') }} <span aria-hidden="true">→</span>
-        </AppActionLink>
+        <nav class="home-campaign-pages" :aria-label="t('home.currentWork.navigationLabel')">
+          <ul role="list">
+            <li v-for="page in campaignPages" :key="page.to">
+              <AppActionLink :to="page.to" variant="text-inverse" size="compact">
+                <span>{{ page.label }}</span>
+                <span aria-hidden="true">→</span>
+              </AppActionLink>
+            </li>
+          </ul>
+        </nav>
         <AppActionLink
           class="home-rule-action home-campaign-petition"
           to="https://tech.workingclassunity.com/deflock-stockton"
@@ -134,7 +147,7 @@ useHead(() => ({
     <section class="home-proof" :aria-label="t('home.proofLabel')">
       <div class="home-section-inner home-proof-inner">
         <p class="home-proof-label">{{ t('home.proofLabel') }}</p>
-        <ProofStrip :items="governanceProof" />
+        <ProofStrip :items="governanceProof" :show-details="false" />
       </div>
     </section>
 
@@ -258,12 +271,11 @@ useHead(() => ({
     display: grid;
     grid-template-columns: minmax(0, 51.25rem) minmax(0, 22.25rem);
     gap: 4.5rem;
-    align-items: end;
+    align-items: start;
   }
 
   .home-hero-headline,
   .home-hero-invitation,
-  .home-hero-actions,
   .home-governance-heading,
   .home-governance-detail,
   .home-close-copy {
@@ -299,10 +311,6 @@ useHead(() => ({
     font-size: 1.25rem;
     line-height: 1.55;
     text-wrap: pretty;
-  }
-
-  .home-hero-actions {
-    gap: 0.875rem;
   }
 
   .home-hero-primary {
@@ -357,25 +365,44 @@ useHead(() => ({
     line-height: 1.55;
   }
 
-  .home-campaign-link,
+  .home-campaign-pages,
   .home-campaign-petition {
     grid-row: 3;
     margin-block-start: 1.75rem;
   }
 
-  .home-campaign-link,
-  .home-campaign-source {
+  .home-campaign-pages {
     grid-column: 1;
   }
 
-  .home-campaign-source {
-    grid-row: 4;
+  .home-campaign-pages ul {
+    display: grid;
+    padding: 0;
+    margin: 0;
+    border-block-start: var(--border-width) solid rgb(255 255 255 / 32%);
+    list-style: none;
   }
 
-  .home-campaign-source[data-size='compact'] {
-    min-block-size: 2.75rem;
-    color: rgb(255 255 255 / 78%);
-    font-size: var(--font-size-small);
+  .home-campaign-pages li {
+    border-block-end: var(--border-width) solid rgb(255 255 255 / 32%);
+  }
+
+  .home-campaign-pages :deep(.app-action-link) {
+    gap: var(--space-4);
+    inline-size: 100%;
+    justify-content: space-between;
+    border-radius: 0;
+    padding-block: var(--space-3);
+    color: var(--color-surface);
+    text-align: start;
+  }
+
+  .home-campaign-pages :deep(.app-action-link > span:first-child) {
+    min-width: 0;
+  }
+
+  .home-campaign-pages :deep(.app-action-link > span:last-child) {
+    flex: 0 0 auto;
   }
 
   .home-campaign-petition {
@@ -707,8 +734,7 @@ useHead(() => ({
     .home-campaign-meta,
     .home-campaign h2,
     .home-campaign-description,
-    .home-campaign-link,
-    .home-campaign-source,
+    .home-campaign-pages,
     .home-campaign-petition {
       grid-column: 1;
       grid-row: auto;
@@ -716,17 +742,13 @@ useHead(() => ({
 
     .home-campaign h2,
     .home-campaign-description,
-    .home-campaign-link,
+    .home-campaign-pages,
     .home-campaign-petition {
       margin-block-start: 1.375rem;
     }
 
     .home-campaign-description {
       padding-block-start: 0;
-    }
-
-    .home-campaign-source {
-      margin-block-start: var(--space-1);
     }
 
     .home-governance-inner {
@@ -820,16 +842,6 @@ useHead(() => ({
     .home-footer p,
     .home-footer a {
       font-size: 0.875rem;
-    }
-  }
-
-  @media (width <= 30rem) {
-    .home-hero-actions {
-      inline-size: 100%;
-    }
-
-    .home-hero-primary {
-      inline-size: auto;
     }
   }
 }

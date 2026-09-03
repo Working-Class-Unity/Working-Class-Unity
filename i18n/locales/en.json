@@ -476,21 +476,25 @@
     "title": "Working people need an organization of our own",
     "introduction": "WCU is a member-run organization bringing working people together across San Joaquin County to win concrete changes, develop leaders, and build lasting power.",
     "actions": {
-      "events": "See upcoming events",
-      "currentWork": "See current work"
+      "events": "See upcoming events"
     },
     "currentWork": {
-      "meta": "CAMPAIGN RIGHT NOW · STOCKTON · UPDATED AUGUST 8, 2026",
-      "source": "Read the public-record summary",
+      "meta": "Current Side-Quest · Stockton",
       "title": "Remove mass surveillance from Stockton",
       "description": "Stockton extended its Flock agreement through April 14, 2031, with a stated contract maximum of $5.4167 million. WCU is organizing for removal and meaningful public control over surveillance spending.",
-      "campaignAction": "See the campaign",
+      "navigationLabel": "Explore the Remove Flock from Stockton campaign",
+      "pages": {
+        "overview": "Campaign overview · what WCU is demanding",
+        "whatStocktonBought": "What Stockton Bought · contracts, cameras, and costs",
+        "removalNotReform": "Removal, not Reform · why safeguards are not enough",
+        "faq": "Flock FAQ · answers about safety, data, and removal"
+      },
       "petitionAction": "Sign the demand letter"
     },
     "governance": {
       "eyebrow": "HOW WCU WORKS",
       "title": "Members make the decisions",
-      "description": "General Meetings are WCU’s primary governing body. Members vote, propose business, serve on committees, hold office, and direct campaigns.",
+      "description": "General Meetings are our highest governing body. Members vote, propose new ideas, hold office, and direct campaigns.",
       "action": "Read how WCU works",
       "sourceCurrentThrough": "Bylaws updated February 12, 2026",
       "source": "Read the bylaws",

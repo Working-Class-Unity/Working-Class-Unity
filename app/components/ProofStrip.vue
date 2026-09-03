@@ -10,9 +10,15 @@ type ProofStripItem = Readonly<{
   context?: string
 }>
 
-const props = defineProps<{
-  items: readonly ProofStripItem[]
-}>()
+const props = withDefaults(
+  defineProps<{
+    items: readonly ProofStripItem[]
+    showDetails?: boolean
+  }>(),
+  {
+    showDetails: true
+  }
+)
 
 const completeItems = computed(() =>
   props.items.filter((item) => item.value && item.label && item.currentThrough && item.sourceLabel && item.sourceHref)
@@ -25,10 +31,12 @@ const completeItems = computed(() =>
       <p class="proof-value">{{ item.value }}</p>
       <p class="proof-meta">
         <span>{{ item.label }}</span>
-        <span aria-hidden="true"> · </span>
-        <span>{{ item.currentThrough }}</span>
-        <span aria-hidden="true"> · </span>
-        <a :href="item.sourceHref"><span class="visually-hidden">Source: </span>{{ item.sourceLabel }}</a>
+        <template v-if="showDetails">
+          <span aria-hidden="true"> · </span>
+          <span>{{ item.currentThrough }}</span>
+          <span aria-hidden="true"> · </span>
+          <a :href="item.sourceHref"><span class="visually-hidden">Source: </span>{{ item.sourceLabel }}</a>
+        </template>
       </p>
       <p v-if="item.context" class="proof-context">{{ item.context }}</p>
     </li>
