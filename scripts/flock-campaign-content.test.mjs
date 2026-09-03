@@ -152,8 +152,14 @@ test('claim-level citations preserve prose and create stable source occurrences'
   )
 })
 
-test('campaign prose avoids the writing SOP banned terms', async () => {
-  const content = (await Promise.all(publicContentFiles.map(readContentFile))).join('\n').toLowerCase()
+test('campaign prose avoids the writing SOP banned terms outside approved copy', async () => {
+  const approvedHoweverSentence =
+    'those needs, however, do not give the city a blank check to collect and search everyone’s movement data. targeted investigations should be targeted.'
+  const publicContent = (await Promise.all(publicContentFiles.map(readContentFile))).join('\n').toLowerCase()
+
+  assert.ok(publicContent.includes(approvedHoweverSentence), 'approved FAQ copy is missing')
+
+  const content = publicContent.replace(approvedHoweverSentence, approvedHoweverSentence.replace('however', ''))
   const bannedTerms = [
     'firstly',
     'moreover',

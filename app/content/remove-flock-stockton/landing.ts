@@ -29,7 +29,7 @@ export const campaignLandingPage = {
   eyebrow: 'A WORKING CLASS UNITY SIDE-QUEST',
   title: 'Remove Mass Surveillance from Stockton',
   description:
-    'Our tax dollars should build safety that working people decide and trust, not a private surveillance system City Council rubber-stamps and residents cannot control.',
+    'Our tax dollars should fund safety measures that working people can help shape and trust, not a private surveillance system City Council rubber-stamps and residents cannot control.',
   qualification:
     'WCU starts from a different idea of public safety. Working people should have democratic control over the institutions, budgets, and technologies that shape our lives. Safety should be built through stable homes, safe jobs, care, prevention, and public systems we can inspect and direct.',
   sections: [
@@ -97,11 +97,10 @@ export const campaignLandingPage = {
     {
       id: 'safeguards',
       title: 'Rules can reduce harm. They cannot end routine mass collection.',
-      summary:
-        'An immigration-enforcement ban and strict access rules would protect people now. The final demand remains removal.',
+      summary: 'An immigration-enforcement ban and strict access rules serve only as a temporary band-aid.',
       paragraphs: [
         {
-          text: 'A written rule does not erase the movement records, connected tools, vendor dependence, or power that the system places in police hands.'
+          text: 'A written rule does not erase the power that the system places in police hands.'
         },
         {
           text: 'Other California cities found gaps between written policy and the platform settings or network access in practice.',
