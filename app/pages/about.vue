@@ -1,30 +1,5 @@
 <script setup lang="ts">
-import heroAssets from '~/generated/hero-assets.json'
-
-type ImageVariant = Readonly<{
-  src: string
-  width: number
-}>
-
-type AboutPhoto = Readonly<{
-  id: string
-  width: number
-  height: number
-  variants: Readonly<{
-    avif: readonly ImageVariant[]
-    webp: readonly ImageVariant[]
-  }>
-}>
-
 const { t } = useI18n()
-const photos = heroAssets.photos as readonly AboutPhoto[]
-const aboutPhoto = photos.find((photo) => photo.id === 'photo-cd117022ba57b0c0')
-
-if (!aboutPhoto) throw new Error('Missing generated About page photo')
-
-function sourceSet(variants: readonly ImageVariant[]) {
-  return variants.map((variant) => `${variant.src} ${variant.width}w`).join(', ')
-}
 
 useHead(() => ({
   title: t('metadata.about.title'),
@@ -42,28 +17,7 @@ useHead(() => ({
         <p class="about-introduction">{{ t('publicPages.about.introduction') }}</p>
       </div>
 
-      <figure class="about-photo">
-        <picture>
-          <source
-            type="image/avif"
-            :srcset="sourceSet(aboutPhoto.variants.avif)"
-            sizes="(max-width: 60rem) calc(100vw - 4rem), 38vw"
-          />
-          <source
-            type="image/webp"
-            :srcset="sourceSet(aboutPhoto.variants.webp)"
-            sizes="(max-width: 60rem) calc(100vw - 4rem), 38vw"
-          />
-          <img
-            :src="aboutPhoto.variants.webp.at(-1)!.src"
-            :width="aboutPhoto.width"
-            :height="aboutPhoto.height"
-            :alt="t('publicPages.about.photoAlt')"
-            fetchpriority="high"
-          />
-        </picture>
-        <figcaption>{{ t('publicPages.about.photoCaption') }}</figcaption>
-      </figure>
+      <DocumentaryCarousel class="about-photo" variant="about" :caption="t('publicPages.about.photoCaption')" />
     </section>
 
     <div class="about-story">
@@ -161,8 +115,7 @@ useHead(() => ({
   .story-number,
   .story-copy p,
   .governance p,
-  .about-cta p,
-  .about-photo figcaption {
+  .about-cta p {
     margin: 0;
   }
 
@@ -200,32 +153,6 @@ useHead(() => ({
   .about-photo {
     min-width: 0;
     margin: 0;
-  }
-
-  .about-photo picture,
-  .about-photo img {
-    display: block;
-    inline-size: 100%;
-  }
-
-  .about-photo picture {
-    overflow: hidden;
-    border-radius: min(1vw, 0.75rem);
-    outline: var(--border-width) solid var(--color-divider);
-    outline-offset: -1px;
-  }
-
-  .about-photo img {
-    aspect-ratio: 4 / 3;
-    block-size: auto;
-    object-fit: cover;
-  }
-
-  .about-photo figcaption {
-    padding-block-start: var(--space-3);
-    color: var(--color-text-muted);
-    font-size: 0.875rem;
-    line-height: 1.5;
   }
 
   .about-story {
@@ -496,10 +423,6 @@ useHead(() => ({
 
     .about-page {
       border-radius: 0;
-    }
-
-    .about-photo picture {
-      border-radius: min(2vw, 0.75rem);
     }
 
     .mission-statement {

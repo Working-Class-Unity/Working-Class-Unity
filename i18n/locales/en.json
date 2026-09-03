@@ -6,7 +6,10 @@
     "retry": "Try again",
     "checkingSession": "Checking your session...",
     "sessionVerificationFailed": "We could not verify your session right now.",
-    "working": "Working..."
+    "working": "Working...",
+    "carousel": {
+      "label": "Working Class Unity community photos"
+    }
   },
   "metadata": {
     "defaultDescription": "Working Class Unity.",
@@ -381,8 +384,7 @@
       "eyebrow": "Our Story",
       "title": "They Have Their Parties. We Need Our Own Organization",
       "introduction": "The bosses and landlords have two political parties. The working class needs a fighting organization of its own.",
-      "photoAlt": "Working Class Unity members standing together at a community meeting.",
-      "photoCaption": "Working Class Unity members in San Joaquin County.",
+      "photoCaption": "Working Class Unity, comrades, and allies in San Joaquin County.",
       "problem": {
         "title": "The Problem",
         "bodyOne": "Across San Joaquin, rents rise while our wages stall. Bosses demand more while giving less. Both the Democratic and Republican parties answer to their donors, not to us.",
@@ -476,12 +478,6 @@
     "actions": {
       "events": "See upcoming events",
       "currentWork": "See current work"
-    },
-    "media": {
-      "placeholder": "DOCUMENTARY IMAGE PENDING APPROVAL · 16:6",
-      "mobilePlaceholder": "DOCUMENTARY IMAGE PENDING APPROVAL · 6:5",
-      "caption": "Caption · date · source · consent",
-      "endLabel": "WCU · IMAGE PENDING"
     },
     "currentWork": {
       "meta": "CAMPAIGN RIGHT NOW · STOCKTON · UPDATED AUGUST 8, 2026",

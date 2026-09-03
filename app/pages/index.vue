@@ -80,15 +80,7 @@ useHead(() => ({
           </div>
         </div>
 
-        <DocumentaryFigure
-          class="home-documentary"
-          ratio="3:2"
-          variant="assembly-home"
-          :caption="t('home.media.caption')"
-          :end-label="t('home.media.endLabel')"
-          :mobile-placeholder-label="t('home.media.mobilePlaceholder')"
-          :placeholder-label="t('home.media.placeholder')"
-        />
+        <DocumentaryCarousel class="home-documentary" variant="home" :max-photos="10" />
       </div>
     </section>
 

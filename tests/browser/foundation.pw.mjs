@@ -123,8 +123,12 @@ test('home presents the WCU foundation and preserves client navigation', async (
   await expect(page.getByRole('heading', { name: 'Members make the decisions', exact: true })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Remove mass surveillance from Stockton', exact: true })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Start by showing up', exact: true })).toBeVisible()
-  await expect(page.locator('.documentary-placeholder')).toHaveAttribute('aria-hidden', 'true')
-  await expect(page.locator('.home-documentary figcaption')).toContainText('Caption · date · source · consent')
+  await expect(page.locator('.home-documentary')).toHaveAttribute('data-photo-count', '10')
+  await expect(
+    page.locator(
+      '.home-documentary button, .home-documentary figcaption, .home-documentary .documentary-carousel-position'
+    )
+  ).toHaveCount(0)
   await expect(page.locator('.brand')).toHaveAccessibleName(`${runtimeName} home`)
   await expect(page.locator('.brand')).toHaveAttribute('aria-current', 'page')
   await expect(page).toHaveTitle('Working Class Unity')

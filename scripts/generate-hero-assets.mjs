@@ -14,8 +14,9 @@ sharp.concurrency(2)
 const SCRIPT_PATH = fileURLToPath(import.meta.url)
 const DEFAULT_ROOT = resolve(dirname(SCRIPT_PATH), '..')
 
-const PHOTO_WIDTHS = [320, 640]
+const PHOTO_WIDTHS = [320, 640, 960, 1280]
 const BACKGROUND_WIDTHS = [768, 1280, 1920]
+const PHOTO_SELECTION = 'app/assets/images/hero-wall/selection.json'
 const SOURCE_EXTENSIONS = new Set(['.avif', '.jpeg', '.jpg', '.png', '.webp'])
 const GENERATED_EXTENSIONS = new Set(['.avif', '.webp'])
 
@@ -117,6 +118,30 @@ async function listImageSources(directory) {
   return sources
 }
 
+async function selectedPhotoSources(root, sources) {
+  const selectionPath = resolveRepositoryPath(root, PHOTO_SELECTION)
+  const selectedNames = JSON.parse(await readFile(selectionPath, 'utf8'))
+  if (
+    !Array.isArray(selectedNames) ||
+    selectedNames.length === 0 ||
+    !selectedNames.every((name) => typeof name === 'string')
+  ) {
+    throw new Error(`${PHOTO_SELECTION} must contain a non-empty array of source filenames`)
+  }
+
+  const uniqueNames = new Set(selectedNames)
+  if (uniqueNames.size !== selectedNames.length) {
+    throw new Error(`${PHOTO_SELECTION} contains duplicate source filenames`)
+  }
+
+  const sourcesByName = new Map(sources.map((source) => [source.filename, source]))
+  for (const name of selectedNames) {
+    if (!sourcesByName.has(name)) throw new Error(`Selected hero-wall photo is missing: ${name}`)
+  }
+
+  return sources.filter((source) => uniqueNames.has(source.filename))
+}
+
 function effectiveWidths(sourceWidth, requestedWidths) {
   return [...new Set(requestedWidths.map((width) => Math.min(width, sourceWidth)))].sort((left, right) => left - right)
 }
@@ -194,7 +219,7 @@ async function buildExpectedAssets(root) {
     assertSafeDirectory(root, backgroundSourceDirectory)
   ])
 
-  const photoSources = await listImageSources(photoSourceDirectory)
+  const photoSources = await selectedPhotoSources(root, await listImageSources(photoSourceDirectory))
   if (photoSources.length === 0) throw new Error('At least one hero-wall photo is required')
 
   const photos = []
