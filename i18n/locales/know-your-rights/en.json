@@ -269,6 +269,10 @@
         "Record these violations: force, violence, intimidation, lies, or excessive searching.",
         "If you cannot film during the incident, record yourself describing what happened as soon as possible afterward."
       ],
+      "invalid_warrant": {
+        "title": "If the warrant fails any of these checks:",
+        "list": ["Say: “I am exercising my right to remain silent. You cannot enter.”", "Keep the door closed."]
+      },
       "remember_script": "I do not consent to any searches. I wish to remain silent. I want to speak with a lawyer."
     }
   },

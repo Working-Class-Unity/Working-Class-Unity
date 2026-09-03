@@ -58,7 +58,7 @@ describe('Know Your Rights content contract', () => {
       return leafPaths(messages.en[namespace], namespace)
     })
 
-    expect(requiredPaths).toHaveLength(256)
+    expect(requiredPaths).toHaveLength(259)
     for (const locale of localeCodes) {
       for (const path of requiredPaths) {
         expect(messageAt(messages[locale], path), `${locale}:${path}`).toEqual(expect.any(String))
@@ -66,7 +66,11 @@ describe('Know Your Rights content contract', () => {
       }
     }
 
-    expect(messageAt(messages.es, 'kyr_ice_at_home.if_enters.invalid_warrant.list.1')).toEqual(expect.any(String))
+    for (const locale of localeCodes) {
+      expect(messageAt(messages[locale], 'kyr_ice_at_home.if_enters.invalid_warrant.list.1')).toEqual(
+        expect.any(String)
+      )
+    }
   })
 
   it('keeps excluded historical service and volunteer namespaces out of the family', () => {

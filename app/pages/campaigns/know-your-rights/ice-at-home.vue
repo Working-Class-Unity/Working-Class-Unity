@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { knowYourRightsBasePath } from '~/content/know-your-rights'
 
-const { locale, rt, t, te, tm } = useI18n()
+const { rt, t, tm } = useI18n()
 
 function messageList(key: string): string[] {
   return tm(key) as string[]
@@ -13,7 +13,6 @@ const outlineItems = computed(() => [
   { id: 'home-warrant', label: t('kyr_ice_at_home.warrant.title') },
   { id: 'home-if-enters', label: t('kyr_ice_at_home.if_enters.title') }
 ])
-const hasInvalidWarrantGuidance = computed(() => te('kyr_ice_at_home.if_enters.invalid_warrant.title', locale.value))
 const canonicalPath = knowYourRightsBasePath + '/ice-at-home'
 
 useHead(() => ({
@@ -119,7 +118,7 @@ useHead(() => ({
             </ul>
           </section>
 
-          <section v-if="hasInvalidWarrantGuidance" class="kyr-subsection" aria-labelledby="home-invalid-warrant-title">
+          <section class="kyr-subsection" aria-labelledby="home-invalid-warrant-title">
             <h3 id="home-invalid-warrant-title">
               {{ t('kyr_ice_at_home.if_enters.invalid_warrant.title') }}
             </h3>
