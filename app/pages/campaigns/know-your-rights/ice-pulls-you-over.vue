@@ -210,35 +210,18 @@ useHead(() => ({
             <h3 id="car-fingerprints-title">
               {{ t('kyr_ice_pulls_you_over.compliance_searches.fingerprints.title') }}
             </h3>
-            <div class="kyr-pair">
-              <div class="kyr-detail">
-                <h4>{{ t('kyr_ice_pulls_you_over.compliance_searches.fingerprints.when.title') }}</h4>
-                <ul class="kyr-list">
-                  <li
-                    v-for="(item, index) in messageList(
-                      'kyr_ice_pulls_you_over.compliance_searches.fingerprints.when.list'
-                    )"
-                    :key="'fingerprint-when-' + index"
-                  >
-                    {{ rt(item) }}
-                  </li>
-                </ul>
-              </div>
-              <div class="kyr-detail">
-                <h4>
-                  {{ t('kyr_ice_pulls_you_over.compliance_searches.fingerprints.if_requested.title') }}
-                </h4>
-                <ul class="kyr-list">
-                  <li
-                    v-for="(item, index) in messageList(
-                      'kyr_ice_pulls_you_over.compliance_searches.fingerprints.if_requested.list'
-                    )"
-                    :key="'fingerprint-requested-' + index"
-                  >
-                    {{ rt(item) }}
-                  </li>
-                </ul>
-              </div>
+            <div class="kyr-detail">
+              <h4>{{ t('kyr_ice_pulls_you_over.compliance_searches.fingerprints.if_requested.title') }}</h4>
+              <ul class="kyr-list">
+                <li
+                  v-for="(item, index) in messageList(
+                    'kyr_ice_pulls_you_over.compliance_searches.fingerprints.if_requested.list'
+                  )"
+                  :key="'fingerprint-requested-' + index"
+                >
+                  {{ rt(item) }}
+                </li>
+              </ul>
             </div>
             <aside class="kyr-warning" data-tone="critical" :aria-label="t('kyr_ice_pulls_you_over.warnings.critical')">
               <p>{{ t('kyr_ice_pulls_you_over.compliance_searches.fingerprints.resistance') }}</p>

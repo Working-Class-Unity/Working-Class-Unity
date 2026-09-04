@@ -156,8 +156,9 @@
         "passengers": {
           "title": "Passengers",
           "list": [
-            "Cannot be forced to show ID.",
-            "Cannot be forced to give name, address, legal status or place of birth."
+            "Passengers can usually decline requests for their name or ID.",
+            "In some situations, an officer can require identification.",
+            "Passengers may refuse to answer questions about their address, immigration status, or place of birth."
           ]
         },
         "advice": [
@@ -167,7 +168,7 @@
         "all_occupants": {
           "title": "For all occupants:",
           "list": ["Decline to discuss immigration status or criminal history."],
-          "say": "Am I free to go? I do not consent to provide ID or answer questions."
+          "say": "Am I free to go? I choose to remain silent. I do not consent to a search."
         }
       }
     },
@@ -181,20 +182,16 @@
         "warning": "Officers may force removal if you delay."
       },
       "search_limitations": {
-        "title": "Search limitations",
-        "content": "ICE needs a judicial warrant or your consent to search:",
+        "title": "Do not consent to a search",
+        "content": "You can refuse consent to a search of:",
         "list": ["Your body (beyond a pat-down).", "The inside of your vehicle.", "Glove compartment or trunk."],
         "say": "I do not consent to any searches.",
-        "repeat": "Repeat this even if officers proceed anyway."
+        "repeat": "Say this even if officers search anyway. Do not physically resist."
       },
       "fingerprints": {
-        "title": "Fingerprint collection",
-        "when": {
-          "title": "ICE can take fingerprints only when:",
-          "list": ["Officers suspect immigration violations.", "You are under arrest."]
-        },
+        "title": "If ICE asks for fingerprints",
         "if_requested": {
-          "title": "If requested without a clear cause:",
+          "title": "If ICE asks:",
           "list": ["Ask: “Why am I being fingerprinted?”", "Say: “I do not consent to fingerprinting.”"]
         },
         "resistance": "Do not physically resist. Verbal objection may protect your legal rights."
@@ -242,7 +239,7 @@
     "warrant": {
       "title": "Demand to see a warrant",
       "no_warrant": {
-        "title": "If they claim to have no warrant or you see it lacks a judge’s signature:",
+        "title": "If they have no court warrant, or only show a DHS or ICE warrant:",
         "list": [
           "Say: “I exercise my right to remain silent.”",
           "Say: “You cannot enter without my consent.”",
@@ -254,24 +251,23 @@
         "list": ["Request they slide it under the door or display it at a window.", "Photograph the warrant."]
       },
       "check_items": {
-        "title": "Check these four items:",
+        "title": "Read the warrant carefully:",
         "list": [
-          "Issuing authority: Must be from a COURT, not Homeland Security or ICE.",
-          "Subject identity: Your correct name and address must appear, not someone else’s.",
-          "Expiration date: The “execute by” date must be within 14 days.",
-          "Signature: A judge or magistrate must sign it, not an immigration officer."
+          "Look for the name of a federal or state court. A warrant issued only by DHS or ICE is not a court warrant.",
+          "An arrest warrant names a person. A search warrant identifies the place or person to be searched.",
+          "Read what the warrant allows. Check any deadline printed on it."
         ]
       }
     },
     "if_enters": {
       "title": "If ICE enters your home",
       "list": [
-        "Record these violations: force, violence, intimidation, lies, or excessive searching.",
+        "Record what happens, including any force, threats, lies, or searching beyond the warrant.",
         "If you cannot film during the incident, record yourself describing what happened as soon as possible afterward."
       ],
       "invalid_warrant": {
-        "title": "If the warrant fails any of these checks:",
-        "list": ["Say: “I am exercising my right to remain silent. You cannot enter.”", "Keep the door closed."]
+        "title": "If they do not show a court warrant that allows entry:",
+        "list": ["Say: “I do not consent to entry. I choose to remain silent.”", "Keep the door closed."]
       },
       "remember_script": "I do not consent to any searches. I wish to remain silent. I want to speak with a lawyer."
     }
@@ -282,23 +278,22 @@
       "title": "Where ICE can go",
       "public_areas": {
         "title": "Public areas (no permission needed):",
-        "description": "Lobbies, dining rooms, and retail spaces. Entry alone does not grant authority to stop, question, or arrest anyone."
+        "description": "Lobbies, dining rooms, and retail spaces. Entry alone does not give ICE authority to detain, search, or arrest anyone."
       },
       "private_areas": {
         "title": "Private areas (permission required):",
-        "description": "ICE needs a judicial warrant signed by a judge—not a DHS order. If an employee or employer consents, ICE can enter without a warrant."
+        "description": "Without a court warrant, ICE needs permission from the owner or someone who controls the area to enter. California employers and their agents cannot voluntarily give that permission."
       },
       "public_areas_examples": "Lobbies, parking lots, customer areas",
       "private_areas_examples": "Offices, warehouses, employee-only areas",
-      "warrant_note": "ICE needs a warrant signed by a judge to enter private/non-public areas without consent."
+      "warrant_note": "In California, an employer must not voluntarily let ICE into a private or non-public area without a court warrant."
     },
     "rights_at_work": {
       "title": "Your rights at work",
       "intro": "All workers can:",
       "list": [
         "Remain silent.",
-        "Refuse searches.",
-        "Refuse to show documentation or ID.",
+        "Refuse consent to a search.",
         "Stand together in the center of the room. Refuse to separate by immigration status. ICE uses this tactic to isolate individuals—protect each other."
       ]
     },
@@ -316,15 +311,15 @@
     },
     "employer": {
       "title": "Employer Responsibilities",
-      "intro": "Your employer has rights and responsibilities during an ICE visit:",
+      "intro": "In California, your employer has rights and responsibilities during an ICE visit:",
       "cards": {
         "warrant": {
           "title": "Ask for Warrant",
-          "desc": "Can request to see a valid judicial warrant"
+          "desc": "Can ask to see a court warrant"
         },
         "deny": {
           "title": "Deny Access",
-          "desc": "Can refuse entry to non-public areas without warrant"
+          "desc": "Must not voluntarily allow entry to non-public areas without a court warrant"
         },
         "attorney": {
           "title": "Call Attorney",
@@ -344,10 +339,7 @@
     },
     "safety": {
       "title": "Document Safety",
-      "list": [
-        "Make copies of everything. Store originals with trusted family or friends.",
-        "Never show foreign documents (passports, birth certificates) that reveal birthplace outside the U.S. These can trigger deportation."
-      ]
+      "list": ["Make copies of everything. Keep backup copies with trusted family or friends."]
     },
     "legal_status": {
       "title": "If You Have Legal Status",
