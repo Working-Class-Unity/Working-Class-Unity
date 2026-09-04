@@ -53,6 +53,8 @@ export type CampaignSection = Readonly<{
   summary: string
   paragraphs?: readonly CitedText[]
   points?: readonly CitedText[]
+  closingParagraphs?: readonly CitedText[]
+  orderedPoints?: boolean
 }>
 
 export type CampaignPageContent = Readonly<{

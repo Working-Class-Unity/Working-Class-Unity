@@ -120,7 +120,7 @@ useHead({
                 />
               </p>
               <p v-if="entry.status === 'reported-with-gap'" class="record-gap">
-                The underlying amendment remains missing.
+                Stockton should release the missing amendment and the records that authorized it.
               </p>
             </div>
           </li>

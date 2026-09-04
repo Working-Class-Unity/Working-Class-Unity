@@ -12,6 +12,7 @@ import {
 
 const landingSections: readonly CampaignSection[] = campaignLandingPage.sections
 const sectionById = new Map<string, CampaignSection>(landingSections.map((section) => [section.id, section]))
+const verifiedFacts = sectionById.get('verified-facts')!
 const whyRemove = sectionById.get('why-remove')!
 const system = sectionById.get('system')!
 const safeguards = sectionById.get('safeguards')!
@@ -19,19 +20,11 @@ const realSafety = sectionById.get('real-safety')!
 const participate = sectionById.get('participate')!
 const petitionUrl = 'https://tech.workingclassunity.com/deflock-stockton'
 const updatesUrl = 'https://tech.workingclassunity.com/deflock-stockton-updates'
-const caseLabels = ['Safety is a public good', 'The risk is unequal', 'The public should hold power'] as const
-const systemLabels = [
-  'Movement becomes data',
-  'Records connect to response',
-  'Observation expands',
-  'One vendor ties it together'
-] as const
+const caseLabels = ['Safety is a public good', 'The risk is unequal', 'Working people should hold power'] as const
+const systemLabels = ['Collect Information', 'Connect Resources', 'Observe Us All', 'Depend on Private Vendor'] as const
 const safetyLabels = ['Stable homes', 'Safe work and public space', 'Care and prevention', 'Public control'] as const
 const recordValues = ['April 14, 2031', '$5,416,700', 'A connected system'] as const
 const sourcesById = new Map<string, CampaignSource>(campaignLandingPage.sources.map((source) => [source.id, source]))
-const systemQualification = system.paragraphs?.[0]
-
-if (!systemQualification) throw new Error('The campaign system qualification is required')
 
 function sourcesForIds(sourceIds: readonly string[]) {
   return sourceIds.map((sourceId) => {
@@ -65,6 +58,10 @@ function pointDetail(text: string) {
             Read what Stockton bought <span aria-hidden="true">→</span>
           </NuxtLink>
         </div>
+        <p class="campaign-hero-qualification">{{ campaignLandingPage.qualification }}</p>
+        <p v-if="campaignLandingPage.reviewedThrough" class="campaign-hero-reviewed">
+          Last materially updated: {{ campaignLandingPage.reviewedThrough }}.
+        </p>
       </div>
       <dl class="campaign-hero-facts">
         <div v-for="fact in campaignFacts.slice(0, 2)" :key="fact.label">
@@ -77,7 +74,7 @@ function pointDetail(text: string) {
     <section class="campaign-record" aria-labelledby="campaign-record-title">
       <div class="campaign-field campaign-record-inner">
         <div class="campaign-record-heading">
-          <h2 id="campaign-record-title">What the public record shows</h2>
+          <h2 id="campaign-record-title">{{ verifiedFacts.title }}</h2>
           <p>City of Stockton records · March 31, 2026 · reviewed May 3, 2026</p>
         </div>
         <dl class="campaign-record-list">
@@ -136,7 +133,6 @@ function pointDetail(text: string) {
             Explore the full system <span aria-hidden="true">→</span>
           </NuxtLink>
         </div>
-        <p class="campaign-system-qualification">{{ citedTextPlainText(systemQualification) }}</p>
         <dl class="campaign-system-list">
           <div v-for="(point, index) in system.points" :key="citedTextPlainText(point)">
             <dt>{{ systemLabels[index] }}</dt>
@@ -218,6 +214,13 @@ function pointDetail(text: string) {
               ><span aria-hidden="true">→</span>
             </li>
           </ol>
+          <p
+            v-for="paragraph in participate.closingParagraphs"
+            :key="citedTextPlainText(paragraph)"
+            class="campaign-participation-context"
+          >
+            {{ citedTextPlainText(paragraph) }}
+          </p>
           <div class="campaign-action-cluster campaign-participation-links">
             <a class="campaign-outline-action" :href="petitionUrl">Sign the demand letter</a>
             <NuxtLink class="campaign-inverse-link" to="/join">
@@ -314,6 +317,22 @@ function pointDetail(text: string) {
     font-size: 1.25rem;
     line-height: 1.55;
     text-wrap: pretty;
+  }
+
+  .campaign-hero-qualification {
+    max-inline-size: 43.75rem;
+    border-inline-start: var(--border-width-accent) solid var(--color-brand-highlight);
+    padding-inline-start: var(--space-4);
+    color: var(--color-text-muted);
+    font-size: 1rem;
+    line-height: 1.65;
+    text-wrap: pretty;
+  }
+
+  .campaign-hero-reviewed {
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    line-height: 1.5;
   }
 
   .campaign-action-cluster {
@@ -626,16 +645,6 @@ function pointDetail(text: string) {
     text-wrap: pretty;
   }
 
-  .campaign-system-qualification {
-    max-inline-size: 72ch;
-    border-inline-start: 4px solid var(--color-brand-highlight);
-    padding-inline-start: var(--space-4);
-    color: var(--color-text-muted);
-    font-size: 1rem;
-    line-height: 1.55;
-    text-wrap: pretty;
-  }
-
   .campaign-system-list dt,
   .campaign-safety-list dt {
     color: var(--color-brand-primary);
@@ -884,6 +893,13 @@ function pointDetail(text: string) {
 
   .campaign-participation-list li span:last-child {
     flex: 0 0 auto;
+  }
+
+  .campaign-participation-context {
+    color: var(--color-surface);
+    font-size: 1rem;
+    line-height: 1.65;
+    text-wrap: pretty;
   }
 
   .campaign-outline-action {

@@ -35,7 +35,7 @@ function citationIdPrefix(groupId: string, itemId: string, kind: 'answer' | 'poi
     <header class="campaign-faq-opening">
       <div class="campaign-faq-opening-inner">
         <div class="campaign-faq-context">
-          <p>{{ campaignFaqPage.eyebrow }}</p>
+          <p v-if="campaignFaqPage.eyebrow">{{ campaignFaqPage.eyebrow }}</p>
           <p>Last materially updated: {{ campaignFaqPage.reviewedThrough }}.</p>
         </div>
 
@@ -43,6 +43,9 @@ function citationIdPrefix(groupId: string, itemId: string, kind: 'answer' | 'poi
           <h1 id="stockton-flock-faq-title">{{ campaignFaqPage.title }}</h1>
           <div class="campaign-faq-introduction">
             <p class="campaign-faq-description">{{ campaignFaqPage.description }}</p>
+            <p v-if="campaignFaqPage.qualification" class="campaign-faq-qualification">
+              {{ campaignFaqPage.qualification }}
+            </p>
             <AppActionLink :to="petitionUrl" variant="campaign">
               {{ t('removeFlock.petitionAction') }}
             </AppActionLink>
@@ -158,7 +161,8 @@ function citationIdPrefix(groupId: string, itemId: string, kind: 'answer' | 'poi
   }
 
   .campaign-faq-context p,
-  .campaign-faq-description {
+  .campaign-faq-description,
+  .campaign-faq-qualification {
     margin: 0;
   }
 
@@ -207,6 +211,16 @@ function citationIdPrefix(groupId: string, itemId: string, kind: 'answer' | 'poi
     color: var(--color-surface);
     font-size: var(--font-size-lede);
     line-height: 1.55;
+    text-wrap: pretty;
+  }
+
+  .campaign-faq-qualification {
+    max-inline-size: 46ch;
+    border-inline-start: var(--border-width-accent) solid var(--color-brand-highlight);
+    padding-inline-start: var(--space-4);
+    color: rgb(255 255 255 / 82%);
+    font-size: 1rem;
+    line-height: 1.65;
     text-wrap: pretty;
   }
 
