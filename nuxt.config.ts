@@ -29,7 +29,19 @@ export default defineNuxtConfig({
         code: 'en',
         language: 'en-US',
         dir: 'ltr',
-        file: 'en.json'
+        files: ['en.json', 'know-your-rights/en.json']
+      },
+      {
+        code: 'es',
+        language: 'es',
+        dir: 'ltr',
+        file: 'know-your-rights/es.json'
+      },
+      {
+        code: 'pa',
+        language: 'pa',
+        dir: 'ltr',
+        file: 'know-your-rights/pa.json'
       }
     ],
     compilation: {
