@@ -1,12 +1,13 @@
 # Solidarity taxonomy and workflow contract
 
 This is the current WCU contract for data created or maintained in Solidarity. It records the
-configuration implemented on August 26, 2026 and the rules that website/database integrations and
-organizer workflows must follow.
+configuration implemented on August 26, 2026, the United Front organization-signing configuration
+reviewed on September 3, 2026, and the rules that website/database integrations and organizer
+workflows must follow.
 
 Solidarity remains disconnected from WCU account creation, Stripe, and the website join flow. The
-three Solidarity forms below are configured inside Solidarity; wiring a WCU website form to them is
-a separate change. No paid Solidarity API is assumed.
+four Solidarity forms below are configured inside Solidarity. WCU links to hosted forms rather than
+submitting personal information through the website. No paid Solidarity API is assumed.
 
 ## Authority boundaries
 
@@ -34,20 +35,21 @@ All current properties use normal WCU team visibility. They were not marked prot
 restricted. Forms must never expose internal identifiers, organizer assessments, or onboarding
 workflow state.
 
-| ID   | Internal key                  | Label                              | Type and authority                                                                                                 |
-| ---- | ----------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| 7974 | `wcu-person-id`               | WCU Person ID                      | Single-line; WCU SQLite-owned and read-only in Solidarity.                                                         |
-| 7975 | `email-subscriptions`         | Email Subscriptions                | Multiple checkboxes; explicit disclosure/direct request/approved automation.                                       |
-| 7981 | `sms-subscriptions`           | SMS Subscriptions                  | Multiple checkboxes; separate affirmative SMS choice/direct request only. Native SMS permission remains decisive.  |
-| 7976 | `preferred-contact-channel`   | Preferred Contact Channel          | Dropdown; person preference, not permission.                                                                       |
-| 7977 | `organizing-interests`        | Organizing Interests               | Multiple checkboxes; explicit choice, a clearly contextual campaign action, or direct conversation.                |
-| 7978 | `volunteer-role-interests`    | Volunteer Role Interests           | Multiple checkboxes; self-report or organizer-confirmed request.                                                   |
-| 7979 | `volunteer-skills`            | Volunteer Skills                   | Multiple checkboxes; self-report or organizer-confirmed conversation.                                              |
-| 7980 | `membership-onboarding-stage` | Membership Onboarding Stage        | Dropdown; organizer/approved automation workflow state, not membership standing.                                   |
-| 1277 | `tenant-assocaition`          | Tenant Association                 | Existing dropdown. Preserve the misspelled internal key for compatibility; do not publish its address-like values. |
-| 1009 | `tenant-engagement-level`     | Tenant Engagement Level            | Existing five-step organizer assessment from supportive/recruiting to openly hostile; forms never set it.          |
-| 1010 | `tenant-issues`               | DEPRECATED — Tenant Issues         | Read-only legacy free text; replace only through an approved dated activity/case workflow.                         |
-| 1013 | `wcu-membership`              | DEPRECATED — WCU Membership Status | Read-only legacy value; Stripe/WCU SQLite is authoritative.                                                        |
+| ID   | Internal key                     | Label                              | Type and authority                                                                                                                      |
+| ---- | -------------------------------- | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| 7974 | `wcu-person-id`                  | WCU Person ID                      | Single-line; WCU SQLite-owned and read-only in Solidarity.                                                                              |
+| 7975 | `email-subscriptions`            | Email Subscriptions                | Multiple checkboxes; explicit disclosure/direct request/approved automation.                                                            |
+| 7981 | `sms-subscriptions`              | SMS Subscriptions                  | Multiple checkboxes; separate affirmative SMS choice/direct request only. Native SMS permission remains decisive.                       |
+| 7976 | `preferred-contact-channel`      | Preferred Contact Channel          | Dropdown; person preference, not permission.                                                                                            |
+| 7977 | `organizing-interests`           | Organizing Interests               | Multiple checkboxes; explicit choice, a clearly contextual campaign action, or direct conversation.                                     |
+| 7978 | `volunteer-role-interests`       | Volunteer Role Interests           | Multiple checkboxes; self-report or organizer-confirmed request.                                                                        |
+| 7979 | `volunteer-skills`               | Volunteer Skills                   | Multiple checkboxes; self-report or organizer-confirmed conversation.                                                                   |
+| 7980 | `membership-onboarding-stage`    | Membership Onboarding Stage        | Dropdown; organizer/approved automation workflow state, not membership standing.                                                        |
+| 1277 | `tenant-assocaition`             | Tenant Association                 | Existing dropdown. Preserve the misspelled internal key for compatibility; do not publish its address-like values.                      |
+| 1009 | `tenant-engagement-level`        | Tenant Engagement Level            | Existing five-step organizer assessment from supportive/recruiting to openly hostile; forms never set it.                               |
+| 1010 | `tenant-issues`                  | DEPRECATED — Tenant Issues         | Read-only legacy free text; replace only through an approved dated activity/case workflow.                                              |
+| 1013 | `wcu-membership`                 | DEPRECATED — WCU Membership Status | Read-only legacy value; Stripe/WCU SQLite is authoritative.                                                                             |
+| 8254 | `united-front-organization-name` | United Front Organization Name     | Single-line text; organization a primary contact was authorized to represent. The dated form submission remains the endorsement record. |
 
 ### Controlled values
 
@@ -172,11 +174,12 @@ provenance; SQLite stores canonical operational tags.
 
 ## Current forms and automations
 
-| Solidarity page               | Required fields and disclosure                                                                                                                                                                              | Active automation                                                                                                                                                           |
-| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| WCU Updates (page 29900)      | Email required; phone optional; disclosed WCU email updates; native phone-field SMS consent Yes/No; submit `Sign Up`.                                                                                       | 4443 `subscription-wcu-updates`: adds `WCU organizing updates` email subscription and, only when native permission allows, its SMS subscription.                            |
-| United Front (page 4496)      | Full Name and Email required; Phone and ZIP optional; disclosed WCU plus KYR/United Front email updates; native phone-field SMS consent Yes/No; title `Sign the United Front Letter`; submit `Add My Name`. | 4444 `subscription-united-front`: adds both email subscriptions and `Immigrant defense / Know Your Rights`; conditionally adds both WCU and United Front SMS subscriptions. |
-| Deflock Stockton (page 19967) | Full Name and Email required; Phone and ZIP optional; disclosed WCU plus Deflock email updates; native phone-field SMS consent Yes/No; submit `Sign the Petition`.                                          | 4445 `subscription-deflock-stockton`: adds both email subscriptions and `Surveillance / Deflock Stockton`; conditionally adds both WCU and Deflock SMS subscriptions.       |
+| Solidarity page                        | Required fields and disclosure                                                                                                                                                                                                          | Active automation                                                                                                                                                                                                                                                                                                     |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| WCU Updates (page 29900)               | Email required; phone optional; disclosed WCU email updates; native phone-field SMS consent Yes/No; submit `Sign Up`.                                                                                                                   | 4443 `subscription-wcu-updates`: adds `WCU organizing updates` email subscription and, only when native permission allows, its SMS subscription.                                                                                                                                                                      |
+| United Front individual (page 4496)    | Full Name and contact choice required; email or phone becomes required for the selected channel; ZIP optional; disclosed WCU plus KYR/United Front updates; title `Sign the United Front Letter`; submit `Add My Name`.                 | 4444 `subscription-united-front`: adds `Immigrant defense / Know Your Rights`; an email-capable choice plus native email permission and a nonblank email adds both email subscriptions; an SMS-capable choice plus native SMS permission, WCU SMS Blast permission, and a nonblank phone adds both SMS subscriptions. |
+| United Front organization (page 31184) | Organization name, primary-contact name, role, email, and authorization required; phone, city/service area, and website optional; disclosed KYR/United Front email and separately consented SMS updates; submit `Add Our Organization`. | Shared 4444 `subscription-united-front`: adds `Immigrant defense / Know Your Rights`; its organization branches add only `Know Your Rights / United Front updates` for email and, when all native permission gates pass, SMS.                                                                                         |
+| Deflock Stockton (page 19967)          | Full Name and Email required; Phone and ZIP optional; disclosed WCU plus Deflock email updates; native phone-field SMS consent Yes/No; submit `Sign the Petition`.                                                                      | 4445 `subscription-deflock-stockton`: adds both email subscriptions and `Surveillance / Deflock Stockton`; conditionally adds both WCU and Deflock SMS subscriptions.                                                                                                                                                 |
 
 All three automations were activated and their graphs were reviewed. WCU treats SMS `Yes` as an
 affirmative grant and `No` as no new grant, not an opt-out. A person's campaign interests and topic
@@ -185,6 +188,71 @@ native chapter opt-out blocks all WCU SMS; the public opt-out path is an explici
 `STOP`, and `START` or `UNSTOP` restores chapter permission. Solidarity's effect of form `No` on a
 person who already has native SMS permission has not been verified and is not implemented by this
 repository.
+
+### United Front organization endorsement
+
+Reviewed September 3, 2026.
+
+- Page: `Sign the United Front as an Organization`, ID `31184`.
+- Canonical URL: `https://tech.workingclassunity.com/sign-the-united-front-as-an-organization`.
+  The page is published.
+- Owner: Harpreet Chima.
+- Submit label: `Add Our Organization`.
+- Required mappings:
+  - Organization name -> `United Front Organization Name` (property 8254).
+  - Primary contact full name -> native Full Name.
+  - Primary contact email -> native Email.
+  - Primary contact role or relationship -> form response `organization_role`.
+  - Authorization to endorse -> required single-choice form response
+    `organization_authorization`.
+- Optional mappings:
+  - Primary contact phone -> native Phone Number.
+  - City or service area -> form response `organization_service_area`.
+  - Organization website -> form response `organization_website`.
+- The human primary contact is the canonical Person. The single-line organization property supports
+  current lookup; the dated page submission and its answers are the endorsement evidence. Do not put
+  an organization name in Full Name and do not derive membership or supporter status.
+- Email behavior: the disclosure covers only `Know Your Rights / United Front updates`; automation
+  4444 requires global email permission and a nonblank email before adding that email subscription.
+  The organization branch does not add `WCU organizing updates`.
+- SMS behavior: phone is optional. The native phone field presents an initially unselected Yes/No
+  choice with the consent text below. A `Yes` response controls native SMS permission; a phone number
+  alone is insufficient. Automation 4444 additionally requires a nonempty phone response, global SMS
+  Blast permission, and Working Class Unity chapter SMS Blast permission before adding only the
+  `Know Your Rights / United Front updates` SMS subscription. `No` creates no new grant and is not
+  treated as a universal opt-out.
+- Organizing interest: every page 31184 submission adds
+  `Immigrant defense / Know Your Rights` through automation 4444.
+- Automation: active automation 4444 `subscription-united-front`, shared with the existing United
+  Front forms because the account's plan permits only three automations. Page 31184 is a specified
+  trigger. Its `Organization email updates` and `Organization text updates` decision branches each
+  contain one subscription action. The published page can now submit into these branches.
+- No People Tag, Campaign Tag, assessment, onboarding stage, membership state, Stripe state, or local
+  database record is created. Organization names and approved logos are added manually to the public
+  website roster after Harpreet confirms the endorsement; Solidarity does not publish or synchronize
+  that roster.
+
+Exact form disclosure:
+
+> By submitting, I confirm that I am authorized to endorse the United Front declaration for this
+> organization. Working Class Unity will use this information to record and follow up about the
+> endorsement and will send the primary contact Know Your Rights / United Front updates by email. If
+> I separately opt in to texts, WCU may send recurring automated Know Your Rights / United Front SMS
+> updates; message frequency varies and message/data rates may apply. Unsubscribe from email or reply
+> STOP to stop texts; reply HELP for help. Signing does not create WCU membership. Organization names
+> and approved logos may be displayed publicly after WCU review.
+
+Exact native SMS opt-in text:
+
+> Yes — send me recurring automated Know Your Rights / United Front SMS updates from Working Class
+> Unity. Message frequency varies; message and data rates may apply. Reply STOP to opt out or HELP for
+> help.
+
+Post-submission content:
+
+> Thank you. Working Class Unity has received your organization’s endorsement and will follow up with
+> the primary contact. Organization names and approved logos are added to the public list separately
+> after WCU review.
 
 ## Organizer workflow
 
@@ -197,6 +265,10 @@ Before publishing a form:
 5. Use one form-specific automation and retain the submission as dated evidence.
 6. Add only subscriptions/interests justified by the person's explicit action.
 7. Review the trigger, every action, both decision branches, and the exact disclosure before activation.
+
+Page 31184 is an approved exception to item 5: the account was at its three-automation plan limit,
+so Harpreet Chima authorized page-specific branches in existing automation 4444. Those branches do
+not change the subscriptions applied by the individual United Front branches.
 
 Before publishing an event:
 
