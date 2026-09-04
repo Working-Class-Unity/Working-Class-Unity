@@ -32,13 +32,16 @@ const citationOccurrences = computed(() => [
       ),
       ...(section.points ?? []).flatMap((point, pointIndex) =>
         campaignCitationOccurrences(point, citationIdPrefix(section.id, 'point', pointIndex))
+      ),
+      ...(section.closingParagraphs ?? []).flatMap((paragraph, paragraphIndex) =>
+        campaignCitationOccurrences(paragraph, citationIdPrefix(section.id, 'closing-paragraph', paragraphIndex))
       )
     ]
   })
 ])
 const citedSources = computed(() => campaignSourcesForOccurrences(props.content.sources, citationOccurrences.value))
 
-function citationIdPrefix(sectionId: string, kind: 'paragraph' | 'point', index: number) {
+function citationIdPrefix(sectionId: string, kind: 'paragraph' | 'point' | 'closing-paragraph', index: number) {
   return `${props.titleId}-${sectionId}-${kind}-${index + 1}`
 }
 
@@ -112,7 +115,13 @@ function slotCitationOccurrences(slotName: string) {
               </div>
             </div>
 
-            <ul v-if="section.points?.length" class="campaign-article-points" role="list">
+            <component
+              :is="section.orderedPoints ? 'ol' : 'ul'"
+              v-if="section.points?.length"
+              class="campaign-article-points"
+              :class="{ 'campaign-article-points--ordered': section.orderedPoints }"
+              role="list"
+            >
               <li
                 v-for="(point, pointIndex) in section.points"
                 :key="citationIdPrefix(section.id, 'point', pointIndex)"
@@ -127,7 +136,25 @@ function slotCitationOccurrences(slotName: string) {
                   />
                 </p>
               </li>
-            </ul>
+            </component>
+
+            <div v-if="section.closingParagraphs?.length" class="campaign-article-prose">
+              <div
+                v-for="(paragraph, paragraphIndex) in section.closingParagraphs"
+                :key="citationIdPrefix(section.id, 'closing-paragraph', paragraphIndex)"
+                class="campaign-cited-paragraph"
+              >
+                <p>
+                  <CampaignCitedText
+                    :citation-id-prefix="citationIdPrefix(section.id, 'closing-paragraph', paragraphIndex)"
+                    :content="paragraph"
+                    :occurrences="citationOccurrences"
+                    :source-note-id-prefix="titleId"
+                    :sources="citedSources"
+                  />
+                </p>
+              </div>
+            </div>
           </slot>
         </section>
       </div>
@@ -224,6 +251,21 @@ function slotCitationOccurrences(slotName: string) {
     gap: var(--space-2);
     border-block-start: var(--border-width) solid var(--article-divider);
     padding-block: var(--space-5);
+  }
+
+  .campaign-article-points--ordered {
+    padding-inline-start: 2rem;
+    list-style: decimal;
+  }
+
+  .campaign-article-points--ordered li {
+    display: list-item;
+    padding-inline-start: var(--space-2);
+  }
+
+  .campaign-article-points--ordered li::marker {
+    color: var(--color-accent-action);
+    font-weight: var(--font-weight-bold);
   }
 
   .campaign-article-points li:last-child {

@@ -6,7 +6,7 @@ export const faqGroups = [
   {
     id: 'basics',
     title: 'The system and the demand',
-    summary: 'What Flock sells, what Stockton authorized, and why Working Class Unity calls for removal.',
+    summary: 'What Flock sells, what Stockton authorized, and why we are calling for removal.',
     items: [
       {
         id: 'what-is-flock',
@@ -48,19 +48,19 @@ export const faqGroups = [
             sourceIds: ['stockton-mar-2026-staff-report', 'stockton-mar-2026-amendment']
           },
           {
-            text: 'These records establish what the city authorized or contracted for. They do not establish that every product has been deployed.'
+            text: 'These records show what the city authorized or contracted for. Right now, we are not claiming that every product has been deployed.'
           }
         ]
       },
       {
         id: 'why-removal',
-        question: 'Why is WCU calling for removal?',
+        question: 'Why are we calling for removal?',
         answer: [
           {
             text: 'Flock begins by recording ordinary movement. Police can search those records later. That approach gives police and a corporate vendor more power to observe the public without giving residents greater control over the conditions that make them unsafe.'
           },
           {
-            text: 'Working Class Unity calls for an end to the contracts, a stop to expansion, lawful data deletion, a public closeout record, and a ban on recreating the same mass-tracking function under another company name.'
+            text: 'We are calling for an end to the contracts, a stop to expansion, lawful data deletion, a public closeout record, and a ban on recreating the same mass-tracking function under another company name.'
           }
         ]
       }
@@ -69,12 +69,11 @@ export const faqGroups = [
   {
     id: 'safety',
     title: 'Safety and police claims',
-    summary:
-      'The campaign takes violence and theft seriously without accepting routine movement tracking as the answer.',
+    summary: 'We take violence and theft seriously without accepting routine movement tracking as the answer.',
     items: [
       {
         id: 'public-safety',
-        question: 'Does WCU take public safety seriously?',
+        question: 'Do we take public safety seriously?',
         answer: [
           {
             text: 'Yes. People deserve to live without car theft, violence, dangerous streets, slow emergency response, or fear in their neighborhoods.'
@@ -83,7 +82,7 @@ export const faqGroups = [
             text: 'Safety reaches beyond policing. It includes stable housing, safe work, dependable emergency and crisis response, youth programs, parks and libraries, protection from violence, safe streets, care, and the freedom to ask for support without exposing a family to needless police or immigration scrutiny.'
           },
           {
-            text: 'Flock’s answer is more cameras, searches, data, and police technology. WCU starts from public investment, public accountability, and working people gaining real power over the institutions responsible for our safety.'
+            text: 'Flock’s answer is more cameras, searches, data, and police technology. We start from public investment, public accountability, and working people gaining real power over the institutions responsible for our safety.'
           }
         ]
       },
@@ -96,7 +95,7 @@ export const faqGroups = [
             sourceIds: ['flock-license-plate-readers']
           },
           {
-            text: 'Those needs, however, do not give the city a blank check to collect and search everyone’s movement data. Targeted investigations should be targeted.'
+            text: 'Those harms do not give the city a blank check to collect and search everyone’s movement data. Targeted investigations should be targeted.'
           }
         ]
       },
@@ -105,11 +104,11 @@ export const faqGroups = [
         question: 'Does Flock solve crimes?',
         answer: [
           {
-            text: 'Flock and police departments say the system has produced vehicle recoveries, leads, missing-person locations, and faster responses. WCU does not need to deny every case story.',
+            text: 'Flock and police departments say the system has produced vehicle recoveries, leads, missing-person locations, and faster responses.',
             sourceIds: ['flock-license-plate-readers']
           },
           {
-            text: 'A technology may contribute to one investigation and still create a form of institutional power Stockton should reject. A case story does not decide how much data should be collected, who may search it, how the system may expand, or what public capacity loses funding and attention.'
+            text: 'Those case stories may describe real outcomes. They do not decide how much data should be collected, who may search it, how the system may expand, or what public capacity loses funding and attention. A technology may contribute to one investigation and still create a form of institutional power Stockton should reject.'
           }
         ]
       },
@@ -131,7 +130,7 @@ export const faqGroups = [
     id: 'power-and-risk',
     title: 'Power, movement, and unequal risk',
     summary:
-      'Broad collection lands inside unequal relations among police, immigration authorities, employers, landlords, and residents.',
+      'Broad collection operates within unequal relations among police, immigration authorities, employers, landlords, and residents.',
     items: [
       {
         id: 'just-a-tool',
@@ -206,7 +205,7 @@ export const faqGroups = [
         question: 'Does Stockton share Flock data with ICE or federal agencies?',
         answer: [
           {
-            text: 'WCU is not claiming that Stockton has shared Flock data with ICE.'
+            text: 'Right now, we are not claiming that Stockton has shared Flock data with ICE.'
           },
           {
             text: 'Deputy Chief Kyle Pierce said, “We have not shared any information related to immigration with our federal partners.” That statement concerns immigration-related information; it is not a claim that Stockton has never cooperated with any federal agency for another purpose.',
@@ -221,11 +220,11 @@ export const faqGroups = [
             sourceIds: ['stockton-portal-2026-08-08', 'usms-about']
           },
           {
-            text: 'A City response to PRA 10325372 says an SPD Flock administrator authorized UOP through the portal and that no written agreement was located. This raises an audit and compliance question, but it does not prove UOP accessed data.',
+            text: 'A city response to PRA 10325372 says an SPD Flock administrator authorized the University of the Pacific (UOP) through the portal and that no written agreement was located. This raises an audit and compliance question, but it does not prove UOP accessed data.',
             sourceIds: ['stockton-uop-pra']
           },
           {
-            text: 'NCRIC’s structure creates a possible indirect-sharing pathway worth auditing. The public material does not prove that a federal or immigration agency used that pathway to access Stockton data.',
+            text: 'The Northern California Regional Intelligence Center’s (NCRIC) structure creates a possible indirect-sharing pathway worth auditing. The public material does not prove that a federal or immigration agency used that pathway to access Stockton data.',
             sourceIds: ['ncric-board', 'ncric-mou']
           }
         ]
@@ -235,7 +234,7 @@ export const faqGroups = [
         question: 'Would an ICE ban help?',
         answer: [
           {
-            text: 'Yes. A clear, enforceable prohibition on immigration-enforcement use would address an urgent danger. WCU would support that protection during the removal process.'
+            text: 'Yes. A clear, enforceable prohibition on immigration-enforcement use would address an urgent danger. We would support that protection during the removal process.'
           },
           {
             text: 'An ICE restriction would not stop routine collection, other police searches, drones, vendor dependence, future policy changes, agency intermediaries, or expansion into more surveillance functions.'
@@ -309,7 +308,7 @@ export const faqGroups = [
             text: 'Not every drone use presents the same issue. A city may debate narrow fire, disaster, or search-and-rescue uses under separate operators and data rules.'
           },
           {
-            text: 'Stockton’s package concerns docked police drones tied to a private platform that connects plate readers, video, 911 information, and search software. The campaign opposes that standing police-surveillance infrastructure.'
+            text: 'Stockton’s package concerns docked police drones tied to a private platform that connects plate readers, video, 911 information, and search software. We oppose that standing police-surveillance infrastructure.'
           }
         ]
       },
@@ -346,7 +345,7 @@ export const faqGroups = [
             text: 'A grant may cover early costs and still create subscriptions, training duties, proprietary dependence, pressure for replacement funds, and resistance to dismantling the system.'
           },
           {
-            text: 'Some grant funds may be restricted. WCU will not promise that every Flock dollar can move directly to another program. Stockton should publish every funding condition and reject grants that require an unacceptable surveillance system.'
+            text: 'Some grant funds may be restricted. We will not promise that every Flock dollar can move directly to another program. Stockton should publish every funding condition and reject grants that require an unacceptable surveillance system.'
           }
         ]
       }
@@ -370,7 +369,7 @@ export const faqGroups = [
             sourceIds: ['aclu-cancellation-resolution']
           },
           {
-            text: 'WCU supports immediate protections during removal. We do not accept a regulated version of routine mass tracking as the final answer.'
+            text: 'We support immediate protections during removal. We do not accept a regulated version of routine mass tracking as the final answer.'
           }
         ]
       },
@@ -382,7 +381,7 @@ export const faqGroups = [
             text: 'Changing the company name does not change the function. A replacement that records vehicle locations, makes them searchable, and connects them to police systems recreates the same power.'
           },
           {
-            text: 'The demand targets mass tracking, regardless of vendor, brand, or funding source.'
+            text: 'Our demand targets mass tracking, regardless of vendor, brand, or funding source.'
           }
         ]
       },
@@ -444,7 +443,7 @@ export const faqGroups = [
         question: 'What does removal mean?',
         answer: [
           {
-            text: 'The petition language sets the campaign’s exact demand. It is reproduced without editorial changes.'
+            text: 'Removal means ending the contracts, stopping expansion, deleting data where law allows, publishing a complete closeout record, and preventing the same system from returning under another name.'
           }
         ],
         points: petitionDemand.demands.map((text) => ({ text }))
@@ -475,7 +474,7 @@ export const faqGroups = [
             text: 'A petition signature or council appearance starts the work. It does not end it.'
           },
           {
-            text: 'The goal is an organized public that can investigate what the city built, decide what safety should mean, win removal, and verify that the decision was carried out.'
+            text: 'Our goal is an organized public that can investigate what the city built, decide what safety should mean, win removal, and verify that the decision was carried out.'
           }
         ]
       }
@@ -485,11 +484,13 @@ export const faqGroups = [
 
 export const campaignFaqPage = {
   path: '/campaigns/remove-flock-stockton/faq',
-  eyebrow: 'QUESTIONS AND ANSWERS',
+  eyebrow: '',
   title: 'Stockton Flock FAQ',
   description:
-    'Direct answers about public safety, movement data, immigration enforcement, private police technology, public spending, and what removal requires.',
-  reviewedThrough: 'August 12, 2026',
+    'Direct answers about public safety, data, private police technology, public spending, and what removal requires.',
+  qualification:
+    'Right now, we are not claiming that Stockton shared Flock data with ICE, broke state law, or deployed every contracted product. Throughout, we separate Stockton records from vendor claims and examples from other cities.',
+  reviewedThrough: 'September 3, 2026',
   sections: faqGroups.map((group) => ({
     id: group.id,
     title: group.title,

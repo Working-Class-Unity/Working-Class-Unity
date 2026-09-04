@@ -6,7 +6,7 @@ const demands = [
   'Immediately stop new Flock purchases, tools, integrations, data-sharing arrangements, deployments, and expansions.',
   'Require deletion, to the fullest extent permitted by law, of all Flock-collected vehicle, image, video, and location data held by the city, Flock, or authorized third parties. Any data that cannot legally be deleted should be publicly identified, along with the reason it must be retained and the date it will be destroyed.',
   'Publish a complete inventory and public closeout record. This should include all Flock equipment, contracts, integrations, data-sharing relationships, and access permissions; an audit of who accessed or received Stockton data and for what stated purpose; a dated deactivation and removal schedule; and a final closeout report confirming that the system has been dismantled.',
-  'Prohibit Stockton from recreating the same mass-tracking system under another name. City funds, grants, contracts, purchasing authority, or staff resources should not be used to acquire, operate, renew, or expand Flock or any substantially similar system that routinely records and makes searchable the movements of people who are not suspected of wrongdoing—regardless of vendor, brand, or funding source.'
+  'Prohibit Stockton from recreating the same mass-tracking system under another name. City funds, grants, contracts, purchasing authority, or staff resources should not be used to acquire, operate, renew, or expand Flock or any substantially similar system that routinely records and makes searchable the movements of people who are not suspected of wrongdoing. This applies regardless of vendor, brand, or funding source.'
 ] as const
 
 export const petitionDemand = Object.freeze({

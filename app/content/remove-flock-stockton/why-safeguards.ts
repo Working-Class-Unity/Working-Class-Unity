@@ -4,25 +4,25 @@ import type { CampaignPageContent } from './types'
 
 export const whySafeguardsPage = {
   path: '/campaigns/remove-flock-stockton/why-safeguards-are-not-enough',
-  eyebrow: 'Why Safeguards Are Not Enough',
-  title: 'Removal, not Reform',
+  eyebrow: 'WHY REMOVAL',
+  title: 'Why Safeguards Are Not Enough',
   description:
-    'Rules can reduce immediate harm. They cannot solve the basic problem of recording everyone first and deciding later how that information may be used.',
-  reviewedThrough: 'August 12, 2026',
+    'Rules can reduce immediate harm. A ban on immigration-enforcement access would protect people now. It would not end routine collection or change who controls the records, police searches, vendor platform, or public money paying for it.',
+  reviewedThrough: 'September 3, 2026',
   qualification:
-    'Working Class Unity supports firm interim protections, including a ban on immigration-enforcement access. Interim protection is not the same as dismantling the system.',
+    'We support firm interim protections. We are organizing for a different outcome: remove the system and put safety spending under public control. Working people should not have to accept routine tracking as the price of safe streets, useful public services, care, prevention, or accountable emergency response.',
   sections: [
     {
       id: 'ice-ban',
-      title: 'An ICE ban would address one danger—not the system that creates it',
+      title: 'An ICE ban would address one danger, not the system that creates it',
       summary:
-        'A clear prohibition would protect people now. It would leave routine collection, police searches, drones, connected tools, and vendor dependence intact.',
+        'A clear ban on U.S. Immigration and Customs Enforcement access would protect people now. We support that ban and other firm interim protections.',
       paragraphs: [
         {
-          text: 'A rule barring immigration-enforcement use of Stockton’s Flock data would be a meaningful immediate protection, and Working Class Unity would support it.'
+          text: 'The ban would leave routine collection, police search power, drones, connected tools, vendor dependence, and public spending intact. Police would retain the ability to search records through a platform managed in part by a private company.'
         },
         {
-          text: 'The larger question remains: should the city create searchable records of ordinary travel when residents are not suspected of wrongdoing?'
+          text: 'The larger question remains: should the city use public money to create searchable records of ordinary travel when residents are not suspected of wrongdoing?'
         }
       ]
     },
@@ -44,7 +44,7 @@ export const whySafeguardsPage = {
           sourceIds: ['los-altos-community-message']
         },
         {
-          text: 'These records do not show that rules are useless. They show that rules depend on software settings, access permissions, vendor conduct, audits, enforcement, and public verification.'
+          text: "These records do not show that rules are useless. Rules can reduce harm, but they depend on software settings, access permissions, vendor conduct, audits, enforcement, and public verification. A protection on paper is only as strong as the public's ability to verify and enforce it."
         }
       ]
     },
@@ -61,10 +61,10 @@ export const whySafeguardsPage = {
           sourceIds: ['california-ag-el-cajon']
         },
         {
-          text: 'Every passing vehicle may enter the system, but the consequences are unequal. Immigrant families, workers organizing on the job, tenants facing retaliation, protesters, survivors, and people seeking sensitive healthcare face greater danger from exposure to institutions with power over their lives.'
+          text: 'Every passing vehicle may enter the system, but the consequences are unequal. Immigrant families, workers organizing on the job, tenants facing retaliation, protesters, survivors, and people seeking sensitive healthcare face greater danger when police or other institutions with power over their lives can reach those records.'
         },
         {
-          text: 'Working people should not have to surrender freedom of movement in exchange for public safety.'
+          text: "This is not only a privacy question. It is a question of who controls public money, information, and police search power. Working people should not have to surrender freedom of movement in exchange for public safety. We can fight for safety through prevention, care, useful public services, and accountable emergency response without recording everyone's routine travel."
         }
       ]
     },
@@ -89,12 +89,20 @@ export const whySafeguardsPage = {
           sourceIds: ['stockton-mar-2026-staff-report', 'stockton-mar-2026-amendment']
         },
         {
-          text: 'Available local materials reinforce the need for independent verification without establishing ICE access. An archived August 8 copy of Flock’s Stockton portal listed 320 outbound-sharing recipients and contained a 1,774-search audit whose public user IDs were all masked; 40 rows carried the stated reason “USMS case.”',
+          text: 'Available local materials support an independent review, but they do not establish ICE access. An archived August 8 copy of Flock’s Stockton portal listed 320 outbound-sharing recipients and contained a 1,774-search audit whose public user IDs were all masked. Forty rows carried the stated reason “USMS case.”',
           sourceIds: ['stockton-portal-2026-08-08']
         },
         {
-          text: 'A separate City response reported that an SPD Flock administrator authorized UOP through the portal and that no written agreement was located. Those materials justify a native historical audit of access, authorization, and re-sharing. A configured recipient and a search-reason label do not prove that ICE—or any other outside agency—accessed a Stockton record.',
+          text: 'A separate City response reported that an SPD Flock administrator authorized UOP through the portal and that no written agreement was located. Those materials justify an independent audit of original historical records covering access, authorization, and further sharing. An agency listed as a recipient and a search-reason label do not prove that ICE, or any other outside agency, accessed a Stockton record.',
           sourceIds: ['stockton-uop-pra']
+        },
+        {
+          text: 'City records describe a contracted package that includes:'
+        }
+      ],
+      closingParagraphs: [
+        {
+          text: 'Public money supports this platform. Police gain new tools and search power, and Flock manages parts of the technology, permissions, analysis, support, and subscriptions. Residents whose movements produce the records do not govern that relationship.'
         }
       ]
     },
@@ -110,12 +118,15 @@ export const whySafeguardsPage = {
           text: 'Targeted investigations should be targeted. Stockton should not build a standing pool of movement records for later police searches.'
         },
         {
-          text: 'The drone agreement places parts of public operations inside Flock’s technology, permissions, and contract terms. That relationship weakens public control.',
+          text: 'The drone agreement places parts of public operations inside Flock’s technology, permissions, and contract terms. Public money pays for the system, police gain search power, and a private vendor retains control over parts of the platform. That relationship weakens public control.',
           sourceIds: ['stockton-mar-2026-staff-report', 'stockton-mar-2026-amendment']
         },
         {
           text: 'Audit records may reveal less than readers expect. 404 Media reported that agencies were advised to be “as vague as permissible” when recording reasons for Flock searches.',
           sourceIds: ['404-vague-search-reasons']
+        },
+        {
+          text: 'Immediate limits still matter. A strong search policy, an immigration-enforcement ban, deletion rules, and public audits can reduce harm during removal. They do not justify routine collection or transfer control to the working people whose movements become records and whose public money funds the system.'
         }
       ]
     },
@@ -125,11 +136,17 @@ export const whySafeguardsPage = {
       summary: 'Interim rules should reduce harm during removal. They should not become the final settlement.',
       paragraphs: [
         {
-          text: 'The petition demand appears here without editorial changes. It calls for an end to every Flock contract, a stop to expansion, lawful data deletion, a public closeout record, and a ban on recreating the same tracking function under another name.'
+          text: 'The petition calls for an end to every Flock contract, a stop to expansion, lawful data deletion, a public closeout record, and a ban on recreating the same tracking function under another name.'
         },
         { text: petitionDemand.introduction }
       ],
-      points: petitionDemand.demands.map((text) => ({ text }))
+      points: petitionDemand.demands.map((text) => ({ text })),
+      orderedPoints: true,
+      closingParagraphs: [
+        {
+          text: 'Removal is not a refusal of public safety. It is a demand that Stockton direct public money toward stable homes, safe work, care, prevention, useful public services, and accountable emergency response instead of routine tracking. Residents and workers can sign, talk with coworkers and neighbors, press the City Council, monitor compliance, and stay organized to govern the institutions and budgets meant to keep us safe.'
+        }
+      ]
     },
     {
       id: 'sources',

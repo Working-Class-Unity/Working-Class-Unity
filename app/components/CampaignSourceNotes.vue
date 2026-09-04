@@ -63,7 +63,6 @@ function focusCitation(citationId: string) {
     role="doc-bibliography"
   >
     <div class="campaign-source-register-heading">
-      <p>SOURCE REGISTER</p>
       <h2 :id="`${idPrefix}-source-register-title`">Sources and notes</h2>
       <p>Sources are numbered by first appearance. Return links lead back to the exact cited claim.</p>
     </div>
@@ -118,15 +117,6 @@ function focusCitation(citationId: string) {
     display: grid;
     align-content: start;
     gap: var(--space-3);
-  }
-
-  .campaign-source-register-heading > p:first-child {
-    margin: 0;
-    color: var(--color-accent-action);
-    font-family: var(--font-family-mono);
-    font-size: 0.8125rem;
-    font-weight: var(--font-weight-strong);
-    letter-spacing: 0.08em;
   }
 
   .campaign-source-register-heading > p:last-child {

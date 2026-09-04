@@ -24,7 +24,7 @@ async function readContentFile(fileName) {
 }
 
 test('petition demand matches the approved copy byte for byte', () => {
-  const approvedPetitionSha256 = '9938db255e81bd3c205b2de13ea810e3c05c0eb375441fad4cdb1fe3b2ecf4b9'
+  const approvedPetitionSha256 = 'f9d2bc4599d39ff3d55f335cfa6a282e977956a6ee1035a63d1466aeeaf8590a'
   const actualSha256 = createHash('sha256').update(petitionDemandCanonicalText).digest('hex')
 
   assert.equal(actualSha256, approvedPetitionSha256)
@@ -38,26 +38,30 @@ test('public claims retain the campaign qualifications', async () => {
     readContentFile('why-safeguards.ts')
   ])
 
-  assert.match(faq, /WCU is not claiming that Stockton has shared Flock data with ICE\./)
+  assert.match(faq, /Right now, we are not claiming that Stockton has shared Flock data with ICE\./)
   assert.match(faq, /We have not shared any information related to immigration with our federal partners/)
   assert.match(faq, /A listed recipient is a sharing configuration, not proof of an actual search or disclosure\./)
   assert.match(faq, /it does not prove UOP accessed data\./)
   assert.match(faq, /Some grant funds may be restricted\./)
-  assert.match(faq, /WCU will not promise that every Flock dollar can move directly to another program\./)
+  assert.match(faq, /We will not promise that every Flock dollar can move directly to another program\./)
 
-  assert.match(whatStocktonBought, /They do not establish that every contracted product has been deployed/)
-  assert.match(whatStocktonBought, /They are not evidence of Stockton searches or sharing events\./)
-  assert.match(whatStocktonBought, /does not prove that Stockton shared data with ICE/)
+  assert.match(whatStocktonBought, /Right now, we are not claiming that every contracted product is deployed/)
+  assert.match(whatStocktonBought, /They do not show that Stockton conducted searches or shared data at that scale\./)
+  assert.match(whatStocktonBought, /Right now, we are not claiming any of the following:/)
+  assert.match(whatStocktonBought, /Stockton shared data with ICE or any other federal immigration agency\./)
   assert.match(whatStocktonBought, /Flock’s public Stockton portal reported 147 cameras on August 8, 2026/)
   assert.match(
     whatStocktonBought,
     /A listed recipient is a sharing configuration, not proof of a search or disclosure\./
   )
-  assert.match(whatStocktonBought, /does not establish that the competitive-bidding exception was unlawful/)
+  assert.match(
+    whatStocktonBought,
+    /The available records do not establish whether the competitive-bidding exception was lawful or unlawful\./
+  )
 
-  assert.match(whySafeguards, /Interim protection is not the same as dismantling the system\./)
+  assert.match(whySafeguards, /We support firm interim protections\./)
   assert.match(whySafeguards, /Written policy and actual platform access did not always match\./)
-  assert.match(whySafeguards, /A configured recipient and a search-reason label do not prove that ICE/)
+  assert.match(whySafeguards, /An agency listed as a recipient and a search-reason label do not prove that ICE/)
 })
 
 test('campaign source links are clean and unique', async () => {
@@ -153,13 +157,8 @@ test('claim-level citations preserve prose and create stable source occurrences'
 })
 
 test('campaign prose avoids the writing SOP banned terms outside approved copy', async () => {
-  const approvedHoweverSentence =
-    'those needs, however, do not give the city a blank check to collect and search everyone’s movement data. targeted investigations should be targeted.'
   const publicContent = (await Promise.all(publicContentFiles.map(readContentFile))).join('\n').toLowerCase()
-
-  assert.ok(publicContent.includes(approvedHoweverSentence), 'approved FAQ copy is missing')
-
-  const content = publicContent.replace(approvedHoweverSentence, approvedHoweverSentence.replace('however', ''))
+  const content = publicContent
   const bannedTerms = [
     'firstly',
     'moreover',
