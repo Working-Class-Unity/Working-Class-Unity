@@ -161,8 +161,9 @@
         "passengers": {
           "title": "Pasajeros",
           "list": [
-            "No pueden ser obligados a mostrar identificación.",
-            "No pueden ser obligados a dar nombre, dirección, estatus legal o lugar de nacimiento."
+            "Los pasajeros normalmente pueden negarse a dar su nombre o identificación.",
+            "En algunas situaciones, un agente puede exigir identificación.",
+            "Los pasajeros pueden negarse a responder preguntas sobre su dirección, situación migratoria o lugar de nacimiento."
           ]
         },
         "advice": [
@@ -172,7 +173,7 @@
         "all_occupants": {
           "title": "Para todos los ocupantes:",
           "list": ["Negarse a discutir estatus migratorio o historial criminal."],
-          "say": "¿Soy libre de irme? No consiento a proporcionar identificación ni responder preguntas."
+          "say": "¿Puedo irme? Elijo guardar silencio. No doy mi consentimiento para un registro."
         }
       }
     },
@@ -186,20 +187,16 @@
         "warning": "Los oficiales pueden forzar su salida si se demora."
       },
       "search_limitations": {
-        "title": "Limitaciones de registro",
-        "content": "ICE necesita una orden judicial o su consentimiento para registrar:",
+        "title": "No dé su consentimiento para un registro",
+        "content": "Puede negarse a dar su consentimiento para un registro de:",
         "list": ["Su cuerpo (más allá de un cacheo).", "El interior de su vehículo.", "Guantera o maletero."],
         "say": "No consiento a ningún registro.",
-        "repeat": "Repita esto aunque los oficiales procedan de todos modos."
+        "repeat": "Diga esto aunque los agentes hagan el registro de todos modos. No oponga resistencia física."
       },
       "fingerprints": {
-        "title": "Toma de huellas dactilares",
-        "when": {
-          "title": "ICE solo puede tomar huellas cuando:",
-          "list": ["Los oficiales sospechan violaciones de inmigración.", "Usted está bajo arresto."]
-        },
+        "title": "Si ICE pide huellas dactilares",
         "if_requested": {
-          "title": "Si se solicita sin causa clara:",
+          "title": "Si ICE se las pide:",
           "list": [
             "Pregunte: \"¿Por qué me están tomando las huellas?\"",
             "Diga: \"No consiento a que me tomen las huellas.\""
@@ -250,7 +247,7 @@
     "warrant": {
       "title": "EXIJA QUE PRESENTEN LA ORDEN JUDICIAL",
       "no_warrant": {
-        "title": "Si afirman no tener una orden judicial o si ve que no tiene la firma de un juez:",
+        "title": "Si no tienen una orden judicial, o solo muestran una orden del DHS o de ICE:",
         "list": [
           "Diga: «Ejerzo mi derecho a permanecer en silencio».",
           "Diga: «No pueden entrar sin mi consentimiento».",
@@ -265,25 +262,27 @@
         ]
       },
       "check_items": {
-        "title": "Compruebe estos cuatro puntos:",
+        "title": "Lea la orden con cuidado:",
         "list": [
-          "Autoridad emisora: Debe ser un TRIBUNAL, no el Departamento de Seguridad Nacional ni el ICE",
-          "Identidad del sujeto: Deben aparecer su nombre y dirección correcta, no los de otra persona",
-          "Fecha de caducidad: La fecha de «ejecución» debe ser dentro de los 14 días",
-          "Firma: Debe tener firma de un juez o magistrado, no por un funcionario de inmigración"
+          "Busque el nombre de un tribunal federal o estatal. Una orden emitida solo por el DHS o ICE no es una orden judicial.",
+          "Una orden de arresto nombra a una persona. Una orden de registro identifica el lugar o la persona que se puede registrar.",
+          "Lea lo que permite la orden. Revise cualquier fecha límite impresa en ella."
         ]
       }
     },
     "if_enters": {
-      "title": "Si la orden judicial pasa los cuatro puntos",
+      "title": "Si ICE entra en su hogar",
       "list": [
         "Cuando sólo aparezca su nombre en la orden: Salga solo y cierre la puerta detrás de usted",
         "Cuando la orden también incluya el registro de domicilio: Siga grabando. Los agentes deben proporcionar recibos por cualquier propiedad incautada",
         "Para cualquier orden judicial válida: No diga nada. No firme nada. No mienta. Proporcione los documentos solo cuando se le soliciten. Pida por un abogado."
       ],
       "invalid_warrant": {
-        "title": "Si la orden judicial no pasa algún punto:",
-        "list": ["Diga: «Ejerzo mi derecho a permanecer en silencio. No pueden entrar».", "Mantenga la puerta cerrada."]
+        "title": "Si no muestran una orden judicial que permita la entrada:",
+        "list": [
+          "Diga: “No doy mi consentimiento para que entren. Elijo guardar silencio.”",
+          "Mantenga la puerta cerrada."
+        ]
       },
       "remember_script": "No consiento ningún registro. Deseo permanecer en silencio. Quiero hablar con un abogado."
     }
@@ -294,23 +293,22 @@
       "title": "Dónde puede ir ICE",
       "public_areas": {
         "title": "Áreas públicas (no se necesita permiso):",
-        "description": "Vestíbulos, comedores y espacios comerciales. El solo hecho de entrar no les da autoridad para detener, interrogar o arrestar a nadie."
+        "description": "Vestíbulos, comedores y espacios comerciales. Entrar por sí solo no da a ICE autoridad para detener, registrar ni arrestar a nadie."
       },
       "private_areas": {
         "title": "Áreas privadas (se requiere permiso):",
-        "description": "ICE necesita una orden judicial firmada por un juez, no una orden del DHS. Si un empleado o empleador da su consentimiento, ICE puede entrar sin orden."
+        "description": "Sin una orden judicial, ICE necesita permiso del propietario o de alguien que controle el área para entrar. Los empleadores de California y sus agentes no pueden dar ese permiso voluntariamente."
       },
       "public_areas_examples": "Vestíbulos, estacionamientos, áreas de clientes",
       "private_areas_examples": "Oficinas, almacenes, áreas solo para empleados",
-      "warrant_note": "ICE necesita una orden firmada por un juez para entrar a áreas privadas/no públicas sin consentimiento."
+      "warrant_note": "En California, un empleador no debe permitir voluntariamente que ICE entre en un área privada o no pública sin una orden judicial."
     },
     "rights_at_work": {
       "title": "Sus derechos en el trabajo",
       "intro": "Todos los trabajadores pueden:",
       "list": [
         "Permanecer en silencio.",
-        "Rechazar registros.",
-        "Negarse a mostrar documentación o identificación.",
+        "Negarse a dar consentimiento para un registro.",
         "Permanecer juntos en el centro de la habitación. Negarse a separarse por estatus migratorio. ICE usa esta táctica para aislar a las personas—protéjanse mutuamente."
       ]
     },
@@ -328,15 +326,15 @@
     },
     "employer": {
       "title": "Responsabilidades del empleador",
-      "intro": "Su empleador tiene derechos y responsabilidades durante una visita de ICE:",
+      "intro": "En California, su empleador tiene derechos y responsabilidades durante una visita de ICE:",
       "cards": {
         "warrant": {
           "title": "Pedir la orden",
-          "desc": "Puede solicitar ver una orden judicial válida"
+          "desc": "Puede pedir ver una orden judicial"
         },
         "deny": {
           "title": "Negar acceso",
-          "desc": "Puede rechazar la entrada a áreas no públicas sin orden"
+          "desc": "No debe permitir voluntariamente la entrada a áreas no públicas sin una orden judicial"
         },
         "attorney": {
           "title": "Llamar al abogado",
@@ -356,10 +354,7 @@
     },
     "safety": {
       "title": "Seguridad de documentos",
-      "list": [
-        "Haga copias de todo. Guarde los originales con familiares o amigos de confianza.",
-        "Nunca muestre documentos extranjeros (pasaportes, actas de nacimiento) que revelen un lugar de nacimiento fuera de EE.UU. Estos pueden provocar la deportación."
-      ]
+      "list": ["Haga copias de todo. Guarde copias de respaldo con familiares o amistades de confianza."]
     },
     "legal_status": {
       "title": "Si tiene estatus legal",

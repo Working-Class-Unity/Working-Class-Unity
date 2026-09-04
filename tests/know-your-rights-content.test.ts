@@ -58,7 +58,7 @@ describe('Know Your Rights content contract', () => {
       return leafPaths(messages.en[namespace], namespace)
     })
 
-    expect(requiredPaths).toHaveLength(259)
+    expect(requiredPaths).toHaveLength(254)
     for (const locale of localeCodes) {
       for (const path of requiredPaths) {
         expect(messageAt(messages[locale], path), `${locale}:${path}`).toEqual(expect.any(String))
@@ -70,6 +70,33 @@ describe('Know Your Rights content contract', () => {
       expect(messageAt(messages[locale], 'kyr_ice_at_home.if_enters.invalid_warrant.list.1')).toEqual(
         expect.any(String)
       )
+    }
+  })
+
+  it('keeps the audited legal corrections narrow and explicit', () => {
+    const messages = localeMessages('en')
+
+    expect(messageAt(messages, 'kyr_ice_pulls_you_over.compliance_searches.search_limitations.content')).toBe(
+      'You can refuse consent to a search of:'
+    )
+    expect(messageAt(messages, 'kyr_ice_at_home.warrant.check_items.list')).toEqual([
+      'Look for the name of a federal or state court. A warrant issued only by DHS or ICE is not a court warrant.',
+      'An arrest warrant names a person. A search warrant identifies the place or person to be searched.',
+      'Read what the warrant allows. Check any deadline printed on it.'
+    ])
+    expect(messageAt(messages, 'kyr_ice_at_work.rights_at_work.list')).not.toContain(
+      'Refuse to show documentation or ID.'
+    )
+    expect(messageAt(messages, 'kyr_documents_to_keep.safety.list')).toEqual([
+      'Make copies of everything. Keep backup copies with trusted family or friends.'
+    ])
+
+    for (const locale of localeCodes) {
+      const translatedMessages = localeMessages(locale)
+      expect(
+        messageAt(translatedMessages, 'kyr_ice_pulls_you_over.compliance_searches.fingerprints')
+      ).not.toHaveProperty('when')
+      expect(messageAt(translatedMessages, 'kyr_documents_to_keep.safety.list')).toHaveLength(1)
     }
   })
 
