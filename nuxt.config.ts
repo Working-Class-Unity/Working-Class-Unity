@@ -35,13 +35,13 @@ export default defineNuxtConfig({
         code: 'es',
         language: 'es',
         dir: 'ltr',
-        file: 'know-your-rights/es.json'
+        files: ['es.json', 'know-your-rights/es.json']
       },
       {
         code: 'pa',
         language: 'pa',
         dir: 'ltr',
-        file: 'know-your-rights/pa.json'
+        files: ['pa.json', 'know-your-rights/pa.json']
       }
     ],
     compilation: {

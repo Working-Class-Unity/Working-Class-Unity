@@ -542,6 +542,90 @@
       "privacy": "Privacy"
     }
   },
+  "unitedfront": {
+    "pageTitle": "United Front",
+    "title": "A United Front of the Working Class: San Joaquin County Stands Together Against the Persecution of Immigrants and the Intimidation of Workers",
+    "subtitle": "They want us to be afraid and divided.",
+    "ui": {
+      "org_name": "Working Class Unity",
+      "sign_pledge": "Sign the pledge",
+      "region_label": "San Joaquin County",
+      "published_read_time": "Published by WCU • 3 min read",
+      "languageLabel": "Language",
+      "languages": {
+        "en": "English",
+        "es": "Español",
+        "pa": "ਪੰਜਾਬੀ"
+      },
+      "outline": {
+        "label": "United Front sections",
+        "title": "On this page",
+        "description": "Jump to a section of this declaration.",
+        "trigger": "On this page",
+        "close": "Close United Front contents"
+      }
+    },
+    "whatWeFace": {
+      "heading": "WHAT WE FACE",
+      "content": "Across the country, immigration enforcement and police surveillance disrupt daily life in neighborhoods, schools, workplaces, and churches. Our coworkers and our neighbors are questioned and detained with little regard for fairness or due process. Though we are not seeing the same level of activity as Chicago and Los Angeles, we must not let that make us complacent."
+    },
+    "whoWeAre": {
+      "heading": "WHO WE ARE",
+      "content": "We are farmworker committees, tenant unions, religious congregations, and union members in San Joaquin County. Our commitment is simple: this is our Central Valley, we will protect one another, and we will act together."
+    },
+    "ourPrinciples": {
+      "heading": "OUR PRINCIPLES",
+      "content1": "We are organizing to prevent fear from dividing the working class. Fighting each other over crumbs to cover the costs for healthcare, housing, and survival has always been a fools game. The labor movement's slogan \"an injury to one is an injury to all\" remains true. We understand when immigrant workers are targeted, the wages, well-being, and power of every worker are weakened.",
+      "content2": "But our response must not be panic. Instead, we must organize and fight in a disciplined manner. Our anger, outrage, and compassion must be transformed into deliberate and long term organizing and solidarity.",
+      "content3": "Speak the language of class. No employer or official should be able to use immigration status to silence workers, steal wages, evict families, or break unions. Immigrants' strength is part of the strength of the whole American working class."
+    },
+    "unitedFront": {
+      "heading": "A UNITED FRONT",
+      "content": "A united front brings together working-class organizations around shared goals. It is independent of the two major parties and institutions of the capitalist class. This is not a popular front that subordinates us to the program or candidates of the Democratic Party. We cooperate with those who respect our independence and the leadership of working-class organizations."
+    },
+    "whyStandTogether": {
+      "heading": "WHY WE MUST STAND TOGETHER",
+      "content": "Large corporations, and their allies in government, impose exploitation and war abroad, forcing millions to migrate to survive. The same ruling class then blames immigrants for crises caused by corporate greed, hoping to fracture the working class and keep wages low. When undocumented workers are kept in fear, employers can threaten deportation to crush organizing and drive down pay. That hurts the entirety of the working class. The answer is not to turn on each other; the answer is to unite and fight the bosses together."
+    },
+    "whyNeitherParty": {
+      "heading": "WHY NEITHER DEMOCRATS OR REPUBLICANS WILL SAVE YOU",
+      "content": "Both parties answer to big money. Republicans campaign on open attacks against immigrants and unions. Democrats offer kinder words but have presided over mass deportations and expanded enforcement, while leaving working-class cities to shoulder costs of migration without support. The result is predictable: people already struggling with housing and services are pitted against new arrivals for resources neither group should have to fight over. We reject the propaganda that our only choices are one party's cruelty or the other's empty promises. We build independent, organized working-class power."
+    },
+    "notSlogans": {
+      "heading": "NOT SLOGANS ALONE - ORGANIZING AND PERSUASION",
+      "content": "The immigrant struggle cannot be confined to viral slogans as if words alone could change reality. Outbursts of energy must be converted into patient, disciplined organizing rooted in workplaces, neighborhoods, schools, and congregations. We must explain our situation clearly, do the hard work, and persuade."
+    },
+    "longTermDemands": {
+      "heading": "OUR LONG-TERM DEMANDS",
+      "intro": "We fight to defend San Joaquin County, and a country, where every worker can live and work with dignity, safety, and equal rights.",
+      "demand1": "Due process and civil rights",
+      "demand2": "Freedom of speech and association",
+      "demand3": "Real enforcement of labor rights for all workers, regardless of status",
+      "demand4": "Citizenship for all who are already here and real pathways to citizenship for future immigrants"
+    },
+    "pledge": {
+      "heading": "OUR PLEDGE",
+      "content": "We will not abandon our neighbors. We will not be divided by papers, race, language, party, or zip code. We will build a united front of workers in San Joaquin County, one independent of the politicians and corporations that profit from our fear. We will organize where we live, work, and worship until no employer can threaten a worker into silence and no family faces these crises alone. Join us today."
+    },
+    "signing": {
+      "heading": "Choose how to sign",
+      "description": "Choose whether you are signing in your own name or as an authorized contact for an organization.",
+      "individual": {
+        "title": "Add your name",
+        "description": "Add your name and choose email, text, or both for United Front / Know Your Rights and other WCU updates. Text consent is optional.",
+        "action": "Add your name"
+      },
+      "organization": {
+        "title": "Add your organization",
+        "description": "An authorized primary contact adds the organization and receives Know Your Rights / United Front email updates. Text updates require a separate Yes. Approved names and logos may be listed here after WCU review.",
+        "action": "Add your organization"
+      }
+    },
+    "endorsers": {
+      "heading": "Organizations endorsing this declaration",
+      "description": "A public record of organizations that have endorsed this declaration."
+    }
+  },
   "personalApp": {
     "eyebrow": "Working Class Unity",
     "welcome": "Welcome back",
