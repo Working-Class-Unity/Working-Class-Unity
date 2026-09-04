@@ -1,0 +1,86 @@
+{
+  "unitedfront": {
+    "pageTitle": "Frente Unido",
+    "title": "Un Frente Unido de la Clase Obrera: El Condado de San Joaquín se une en contra de la Persecución de Inmigrantes y la Intimidación contra los Trabajadores",
+    "subtitle": "Quieren que tengamos miedo y que estemos divididos.",
+    "ui": {
+      "org_name": "Working Class Unity",
+      "sign_pledge": "Firma el compromiso",
+      "region_label": "Condado de San Joaquín",
+      "published_read_time": "Publicado por WCU • 3 min de lectura",
+      "languageLabel": "Idioma",
+      "languages": {
+        "en": "English",
+        "es": "Español",
+        "pa": "ਪੰਜਾਬੀ"
+      },
+      "outline": {
+        "label": "Secciones del Frente Unido",
+        "title": "En esta página",
+        "description": "Ir a una sección de esta declaración.",
+        "trigger": "En esta página",
+        "close": "Cerrar el contenido del Frente Unido"
+      }
+    },
+    "whatWeFace": {
+      "heading": "A QUÉ NOS ENFRENTAMOS",
+      "content": "En todo el país, la vigilancia policial y de inmigración alteran la vida cotidiana en nuestros barrios, escuelas, centros de trabajo e iglesias. Nuestros compañeros de trabajo y vecinos están siendo interrogados y detenidos sin consideración por la justicia o el proceso debido. Aunque no estamos presenciando el mismo nivel de actividad que en Chicago y Los Ángeles, no debemos permitir que eso nos haga sentir confiados."
+    },
+    "whoWeAre": {
+      "heading": "QUIÉNES SOMOS",
+      "content": "Somos comités de trabajadores agrícolas, sindicatos de inquilinos, congregaciones religiosas y sindicalistas del Condado de San Joaquín. Nuestro compromiso es simple: este es nuestro Valle Central, protegeremos unos a otros y actuaremos unidos."
+    },
+    "ourPrinciples": {
+      "heading": "NUESTROS PRINCIPIOS",
+      "content1": "Nos organizamos para evitar que el miedo divida a la clase obrera. Pelear entre nosotros por migajas para cubrir los costos de la atención médica, la vivienda y la supervivencia siempre ha sido un juego de tontos. El lema del movimiento laboral, \"un daño a uno es un daño a todos\", sigue siendo cierto. Entendemos que cuando los trabajadores inmigrantes son atacados, los salarios, el bienestar y el poder de cada trabajador se debilitan.",
+      "content2": "La respuesta no es dejarnos llevar por el pánico. Al contrario, debemos organizarnos y luchar de manera disciplinada. Nuestra ira, indignación y compasión deben transformarse en acciones de organización y solidaridad deliberadas y a largo plazo.",
+      "content3": "Nos expresamos en el lenguaje de clase. Ningún patrón o funcionario debería poder usar el estatus migratorio para callar a los trabajadores, robar salarios, desalojar familias o debilitar a los sindicatos. La fuerza de los inmigrantes forma parte de la fuerza de toda la clase obrera estadounidense."
+    },
+    "unitedFront": {
+      "heading": "UN FRENTE UNIDO",
+      "content": "Un frente unido reúne a organizaciones de la clase obrera en base a objetivos compartidos. Es independiente de los dos partidos políticos principales y de las instituciones de la clase capitalista. Este no es un frente popular que nos subordina al programa o a los candidatos del Partido Demócrata. Cooperamos con aquellos que respeten nuestra independencia y el liderazgo de las organizaciones de la clase obrera."
+    },
+    "whyStandTogether": {
+      "heading": "POR QUÉ DEBEMOS UNIRNOS",
+      "content": "Las grandes corporaciones, y sus aliados en el gobierno, imponen la explotación y la guerra en el extranjero, obligando a millones a migrar para sobrevivir. La misma clase dominante luego culpa a los inmigrantes por las crisis causadas por la codicia corporativa, con la esperanza de fracturar a la clase obrera y mantener los salarios bajos. Cuando se les infunde a los trabajadores indocumentados con miedo, los patrones pueden amenazar con la deportación para aplastar los esfuerzos de organización y bajar los salarios. Eso perjudica a toda la clase obrera. La respuesta no es atacar entre nosotros; la respuesta es unirnos y luchar juntos contra los patrones."
+    },
+    "whyNeitherParty": {
+      "heading": "POR QUÉ NI LOS DEMÓCRATAS NI LOS REPUBLICANOS TE SALVARÁN",
+      "content": "Ambos partidos responden al gran capital. Los republicanos hacen campaña con ataques abiertos contra los inmigrantes y los sindicatos. Los demócratas ofrecen palabras más amables, pero han presidido deportaciones masivas y aumentado el control migratorio, mientras dejan que las ciudades de clase obrera carguen con los costos de la migración sin ningún apoyo. El resultado es predecible: la gente que ya tiene dificultades con la vivienda y los servicios es puesta a competir contra los recién llegados por recursos por los que ningún grupo debería tener que pelear. Rechazamos la propaganda de que nuestras únicas opciones son la crueldad de un partido o las promesas vacías del otro. Construimos un poder independiente y organizado por la clase obrera."
+    },
+    "notSlogans": {
+      "heading": "NO SOLO CONSIGNAS: ORGANIZACIÓN Y PERSUASIÓN",
+      "content": "La lucha inmigrante no puede limitarse a consignas virales, como si las palabras por sí solas pudieran cambiar la realidad. Los estallidos de energía deben convertirse en una organización paciente y disciplinada, arraigada en los centros de trabajo, los barrios, las escuelas y las congregaciones. Debemos explicar nuestra situación con claridad, hacer el trabajo duro y persuadir."
+    },
+    "longTermDemands": {
+      "heading": "NUESTRAS EXIGENCIAS A LARGO PLAZO",
+      "intro": "Luchamos para defender el Condado de San Joaquín, y un país, donde cada trabajador pueda vivir y trabajar con dignidad, seguridad e igualdad de derechos.",
+      "demand1": "El respeto al proceso debido y los derechos civiles",
+      "demand2": "Libertad de expresión y de asociación",
+      "demand3": "El cumplimiento real de los derechos laborales para todos los trabajadores, sin importar su estatus migratorio",
+      "demand4": "Ciudadanía para todos que ya están aquí y caminos reales hacia la ciudadanía para los futuros inmigrantes"
+    },
+    "pledge": {
+      "heading": "NUESTRO COMPROMISO",
+      "content": "No abandonaremos a nuestros vecinos. No nos dejaremos dividir por papeles, raza, idioma, partido o código postal. Construiremos un frente unido de trabajadores en el Condado de San Joaquín, independiente de los políticos y las corporaciones que lucran con nuestro miedo. Nos organizaremos donde vivimos, trabajamos y nos congregamos, hasta que ningún patrón pueda amenazar a un trabajador para silenciarlo y ninguna familia enfrente estas crisis sola. Únase a nosotros hoy."
+    },
+    "signing": {
+      "heading": "Elige cómo firmar",
+      "description": "Elige si firmas en tu propio nombre o como contacto autorizado de una organización.",
+      "individual": {
+        "title": "Agrega tu nombre",
+        "description": "Agrega tu nombre y elige correo electrónico, mensajes de texto o ambos para recibir actualizaciones del Frente Unido / Conoce Tus Derechos y otras actualizaciones de WCU. El consentimiento para mensajes de texto es opcional.",
+        "action": "Agrega tu nombre"
+      },
+      "organization": {
+        "title": "Agrega tu organización",
+        "description": "Un contacto principal autorizado agrega la organización y recibe actualizaciones por correo electrónico de Conoce Tus Derechos / Frente Unido. Los mensajes de texto requieren un Sí por separado. Los nombres y logotipos aprobados pueden aparecer aquí después de la revisión de WCU.",
+        "action": "Agrega tu organización"
+      }
+    },
+    "endorsers": {
+      "heading": "Organizaciones que respaldan esta declaración",
+      "description": "Un registro público de las organizaciones que han respaldado esta declaración."
+    }
+  }
+}
