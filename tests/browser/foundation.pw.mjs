@@ -20,6 +20,11 @@ const runtimeStripeWebhookSecret = requiredEnvironment('BROWSER_RUNTIME_STRIPE_W
 const authEmailMarker = requiredEnvironment('BROWSER_AUTH_EMAIL_MARKER')
 const emailCaptureDirectory = requiredEnvironment('BROWSER_EMAIL_CAPTURE_DIRECTORY')
 const runtimeSentryOrigin = requiredEnvironment('BROWSER_RUNTIME_SENTRY_ORIGIN')
+const spanishMessages = readLocaleMessages('es')
+const punjabiMessages = readLocaleMessages('pa')
+const punjabiBylawsMessages = readContentMessages('bylaws', 'pa')
+const punjabiKnowYourRightsMessages = readKnowYourRightsMessages('pa')
+const punjabiRemoveFlockMessages = readContentMessages('remove-flock', 'pa')
 const turnstileOrigin = 'https://challenges.cloudflare.com'
 const turnstileScriptUrl = `${turnstileOrigin}/turnstile/v0/api.js?render=explicit`
 const forumUrl = 'https://chat.workingclassunity.com/'
@@ -213,7 +218,7 @@ test('global public navigation exposes current routes and a route-closing mobile
   request
 }) => {
   const observations = observePage(page)
-  await page.setViewportSize({ width: 1024, height: 900 })
+  await page.setViewportSize({ width: 1280, height: 900 })
   await page.context().route(forumUrl, async (route) => {
     await route.fulfill({ status: 200, contentType: 'text/html', body: '<!doctype html><title>Forum fixture</title>' })
   })
@@ -315,6 +320,112 @@ test('global public navigation exposes current routes and a route-closing mobile
   await expect(navigationPanel).toBeHidden()
   await assertAccessibleWithoutOverflow(page)
   await assertCleanPage(page, observations)
+})
+
+test.describe('localized browsing', () => {
+  test.use({ locale: 'es-MX' })
+
+  test('language detection and selection persist without changing public URLs', async ({ page, request }) => {
+    const observations = observePage(page)
+    const context = page.context()
+    await page.setViewportSize({ width: 1280, height: 900 })
+
+    const aboutResponse = await page.goto('/about')
+    expect(aboutResponse).not.toBeNull()
+    await page.waitForLoadState('networkidle')
+    expect(await aboutResponse.text()).toMatch(/<html[^>]*\blang="es"/)
+    const vary = aboutResponse.headers().vary?.toLowerCase() ?? ''
+    expect(vary).toContain('cookie')
+    expect(vary).toContain('accept-language')
+    for (const accept of ['', '*/*']) {
+      const genericDocumentResponse = await request.get('/about', { headers: { accept } })
+      const genericVary = genericDocumentResponse.headers().vary?.toLowerCase() ?? ''
+      expect(genericVary).toContain('cookie')
+      expect(genericVary).toContain('accept-language')
+    }
+    await expect(page.locator('html')).toHaveAttribute('lang', 'es')
+    await expect(page.locator('select[name="language"]')).toHaveValue('es')
+    await expect(
+      page.getByRole('heading', { name: requiredMessage(spanishMessages, 'publicPages.about.title'), exact: true })
+    ).toBeVisible()
+    await expect(page).toHaveTitle(requiredMessage(spanishMessages, 'metadata.about.title'))
+    await expect.poll(() => localeCookie(context)).toBe('es')
+    expect(new URL(page.url()).pathname).toBe('/about')
+
+    await page.locator('select[name="language"]').selectOption('pa')
+    await expect(page.locator('html')).toHaveAttribute('lang', 'pa')
+    await expect(page.locator('select[name="language"]')).toHaveValue('pa')
+    await expect(
+      page.getByRole('heading', { name: requiredMessage(punjabiMessages, 'publicPages.about.title'), exact: true })
+    ).toBeVisible()
+    await expect(page).toHaveTitle(requiredMessage(punjabiMessages, 'metadata.about.title'))
+    await expect.poll(() => localeCookie(context)).toBe('pa')
+    await page.waitForLoadState('networkidle')
+    expect(new URL(page.url()).pathname).toBe('/about')
+
+    const calendarResponse = await page.goto('/calendar')
+    expect(calendarResponse).not.toBeNull()
+    await page.waitForLoadState('networkidle')
+    expect(await calendarResponse.text()).toMatch(/<html[^>]*\blang="pa"/)
+    await expect(page.locator('html')).toHaveAttribute('lang', 'pa')
+    await expect(page.locator('select[name="language"]')).toHaveValue('pa')
+    await expect(
+      page.getByRole('heading', { name: requiredMessage(punjabiMessages, 'calendar.title'), exact: true })
+    ).toBeVisible()
+    expect(new URL(page.url()).pathname).toBe('/calendar')
+
+    await page.goto('/bylaws')
+    await page.waitForLoadState('networkidle')
+    await expect(
+      page.getByRole('heading', {
+        name: requiredMessage(punjabiBylawsMessages, 'localizedBylaws.articles.0.title'),
+        exact: true
+      })
+    ).toBeVisible()
+
+    await page.goto('/campaigns/remove-flock-stockton')
+    await page.waitForLoadState('networkidle')
+    await expect(
+      page.getByRole('heading', {
+        name: requiredMessage(punjabiRemoveFlockMessages, 'localizedRemoveFlock.campaignLandingPage.title'),
+        exact: true
+      })
+    ).toBeVisible()
+
+    await page.goto('/campaigns/know-your-rights/ice-pulls-you-over')
+    await page.waitForLoadState('networkidle')
+    await expect(
+      page.getByRole('heading', {
+        name: requiredMessage(punjabiKnowYourRightsMessages, 'kyr.car.title'),
+        exact: true
+      })
+    ).toBeVisible()
+
+    await page.setViewportSize({ width: 320, height: 800 })
+    const menuToggle = page.locator('.mobile-menu-toggle')
+    await expect(menuToggle).toHaveAttribute('aria-expanded', 'false')
+    await menuToggle.click()
+    await expect(menuToggle).toHaveAttribute('aria-expanded', 'true')
+    await expect(page.locator('select[name="language"]')).toBeVisible()
+    await assertMinimumTargetSize(page.locator('select[name="language"]'))
+    await page.locator('select[name="language"]').focus()
+    await assertVisibleFocusIndicator(page, page.locator('select[name="language"]'))
+    await assertAccessibleWithoutOverflow(page)
+    await page.evaluate(() => {
+      document.documentElement.style.fontSize = '200%'
+    })
+    await assertNoHorizontalOverflow(page)
+
+    await page.locator('select[name="language"]').selectOption('en')
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en-US')
+    await expect.poll(() => localeCookie(context)).toBe('en')
+    await page.waitForLoadState('networkidle')
+    await page.reload()
+    await page.waitForLoadState('networkidle')
+    await expect(page.locator('select[name="language"]')).toHaveValue('en')
+    expect(new URL(page.url()).pathname).toBe('/campaigns/know-your-rights/ice-pulls-you-over')
+    await assertCleanPage(page, observations)
+  })
 })
 
 test('campaign update prompt uses the hosted Deflock form without collecting contact details', async ({ page }) => {
@@ -551,11 +662,13 @@ test('session retry announces progress and failure without losing focus', async 
   })
 
   const topbar = page.getByRole('banner', { name: 'Working Class Unity site header' })
+  const menuToggle = topbar.getByRole('button', { name: 'Menu', exact: true })
+  if (await menuToggle.isVisible()) await menuToggle.click()
   await expect(topbar.getByText('Session check unavailable', { exact: true })).toBeVisible()
   await expect(topbar.getByRole('alert')).toHaveCount(0)
   await expect(topbar.getByRole('status')).toHaveCount(0)
 
-  const retryButton = topbar.getByRole('button')
+  const retryButton = topbar.locator('.topbar-session').getByRole('button')
   const requestsBeforeRetry = requestCount
   deferSessionResponses = true
   await retryButton.focus()
@@ -1397,6 +1510,33 @@ async function assertCleanPage(page, observations) {
   expect(observations.externalRequests, 'external browser requests').toEqual([])
   expect(excludedCapabilityRequests, 'AI/Files browser requests').toEqual([])
   expect(observations.crashes, 'page crashes').toBe(0)
+}
+
+function readLocaleMessages(locale) {
+  return JSON.parse(readFileSync(new URL(`../../i18n/locales/${locale}.json`, import.meta.url), 'utf8'))
+}
+
+function readContentMessages(feature, locale) {
+  return JSON.parse(
+    readFileSync(new URL(`../../i18n/locales/content/${feature}/${locale}.json`, import.meta.url), 'utf8')
+  )
+}
+
+function readKnowYourRightsMessages(locale) {
+  return JSON.parse(
+    readFileSync(new URL(`../../i18n/locales/know-your-rights/${locale}.json`, import.meta.url), 'utf8')
+  )
+}
+
+function requiredMessage(messages, path) {
+  const message = path.split('.').reduce((value, key) => value?.[key], messages)
+  if (typeof message !== 'string' || !message.trim()) throw new Error(`Missing translated browser fixture: ${path}`)
+  return message
+}
+
+async function localeCookie(context) {
+  const cookies = await context.cookies(runtimeUrl)
+  return cookies.find(({ name }) => name === 'wcu_locale')?.value
 }
 
 function requiredEnvironment(name) {

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
+const { t } = useI18n()
+
 const props = defineProps<{
   status?: string
   place?: string
@@ -18,7 +20,7 @@ const hasMetadata = computed(() => Boolean(props.status || props.place || props.
     <li v-if="props.place">{{ props.place }}</li>
     <li v-if="props.currentThrough">{{ props.currentThrough }}</li>
     <li v-if="props.sourceLabel">
-      <span class="visually-hidden">Source: </span>
+      <span class="visually-hidden">{{ t('common.source') }}: </span>
       <a v-if="props.sourceHref" :href="props.sourceHref">{{ props.sourceLabel }}</a>
       <span v-else>{{ props.sourceLabel }}</span>
     </li>

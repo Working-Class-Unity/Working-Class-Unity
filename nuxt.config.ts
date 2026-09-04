@@ -23,25 +23,35 @@ export default defineNuxtConfig({
   i18n: {
     defaultLocale: 'en',
     strategy: 'no_prefix',
-    detectBrowserLanguage: false,
+    detectBrowserLanguage: {
+      alwaysRedirect: false,
+      cookieCrossOrigin: false,
+      cookieKey: 'wcu_locale',
+      fallbackLocale: 'en',
+      redirectOn: 'all',
+      useCookie: true
+    },
     locales: [
       {
         code: 'en',
         language: 'en-US',
         dir: 'ltr',
+        name: 'English',
         files: ['en.json', 'know-your-rights/en.json']
       },
       {
         code: 'es',
         language: 'es',
         dir: 'ltr',
-        file: 'know-your-rights/es.json'
+        name: 'Español',
+        files: ['es.json', 'content/bylaws/es.json', 'content/remove-flock/es.json', 'know-your-rights/es.json']
       },
       {
         code: 'pa',
         language: 'pa',
         dir: 'ltr',
-        file: 'know-your-rights/pa.json'
+        name: 'ਪੰਜਾਬੀ',
+        files: ['pa.json', 'content/bylaws/pa.json', 'content/remove-flock/pa.json', 'know-your-rights/pa.json']
       }
     ],
     compilation: {
@@ -54,10 +64,6 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
   app: {
     head: {
-      htmlAttrs: {
-        lang: 'en-US',
-        dir: 'ltr'
-      },
       meta: [
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
         { name: 'theme-color', content: '#f7f9fc' }

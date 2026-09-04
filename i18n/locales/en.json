@@ -2,10 +2,13 @@
   "common": {
     "email": "Email",
     "emailInvalid": "Enter a valid email address.",
+    "language": "Language",
+    "opensInNewTab": "opens in a new tab",
     "required": "required",
     "retry": "Try again",
     "checkingSession": "Checking your session...",
     "sessionVerificationFailed": "We could not verify your session right now.",
+    "source": "Source",
     "working": "Working...",
     "carousel": {
       "label": "Working Class Unity community photos"
@@ -110,6 +113,92 @@
       "faq": "FAQ"
     },
     "petitionAction": "Sign Demand",
+    "reviewedThrough": "Last materially updated: {date}.",
+    "shell": {
+      "kicker": "WCU SIDE-QUEST",
+      "name": "Mass Surveillance",
+      "footerHome": "Remove Mass Surveillance from Stockton"
+    },
+    "outline": {
+      "title": "On this page",
+      "description": "Jump to a section of this page.",
+      "trigger": "On this page",
+      "close": "Close page outline",
+      "articleLabel": "{title} sections"
+    },
+    "sources": {
+      "title": "Sources and notes",
+      "description": "Sources are numbered by first appearance. Return links lead back to the exact cited claim.",
+      "published": "Published {date}",
+      "reviewed": "Reviewed {date}",
+      "citedHere": "Cited in this page",
+      "returnNavigation": "Return to citations for source {number}",
+      "returnToCitation": "Return to citation {citation}",
+      "returnToCitationAt": "{citationLabel}, {locator}",
+      "types": {
+        "stocktonRecord": "Stockton record",
+        "archivedPortal": "Archived Flock portal",
+        "thirdPartyAnalysis": "Third-party analysis",
+        "officialSource": "Official legal/policy source",
+        "vendorSource": "Vendor source",
+        "pressReport": "Press report",
+        "recordsRequested": "Records requested",
+        "wcuAnalysis": "WCU analysis"
+      }
+    },
+    "citation": {
+      "label": "Source {occurrence}: {title}",
+      "shortLabel": "SOURCE {occurrence}",
+      "location": "Location: {locator}",
+      "viewSource": "View source",
+      "goToNote": "Go to source note"
+    },
+    "landing": {
+      "location": "STOCKTON",
+      "signDemand": "Sign the demand letter",
+      "readWhatBought": "Read what Stockton bought",
+      "recordProvenance": "City of Stockton records · March 31, 2026 · reviewed May 3, 2026",
+      "sources": "Sources",
+      "claimContext": "Claim source and context",
+      "exploreSystem": "Explore the full system",
+      "whyRemoval": "Why removal",
+      "readRemovalCase": "Read the full case for removal",
+      "organize": "Organize",
+      "joinWcu": "Join Working Class Unity",
+      "updatesTitle": "Get Deflock Stockton updates by email or text.",
+      "stayInformed": "Stay informed",
+      "updatesDescription": "Sign up for updates about this campaign and other WCU updates.",
+      "caseLabels": {
+        "safety": "Safety is a public good",
+        "risk": "The risk is unequal",
+        "power": "Working people should hold power"
+      },
+      "systemLabels": {
+        "movement": "Collect Information",
+        "response": "Connect Resources",
+        "observation": "Observe Us All",
+        "vendor": "Depend on Private Vendor"
+      },
+      "safetyLabels": {
+        "homes": "Stable homes",
+        "work": "Safe work and public space",
+        "care": "Care and prevention",
+        "control": "Public control"
+      },
+      "recordValues": {
+        "term": "April 14, 2031",
+        "system": "A connected system"
+      }
+    },
+    "faq": {
+      "groupsLabel": "FAQ groups"
+    },
+    "record": {
+      "missingAmendment": "Stockton should release the missing amendment and the records that authorized it.",
+      "continueLabel": "Continue with the Remove Flock from Stockton campaign",
+      "continue": "Continue with the campaign",
+      "overview": "See the campaign overview"
+    },
     "footer": {
       "description": "A Working Class Unity side-quest to remove Stockton's private mass-tracking system.",
       "campaign": "Side-quest",
@@ -416,6 +505,8 @@
       "sourceAction": "View the source document",
       "sourceUpdated": "Last updated February 12, 2026.",
       "documentLabel": "Working Class Unity bylaws",
+      "articleLabel": "Article {number}",
+      "sectionLabel": "Section {number}",
       "outline": {
         "label": "Bylaws contents",
         "title": "On This Page",
@@ -540,6 +631,109 @@
       "boundary": "Automatic acknowledgement now; a human response within one week. No emergency response, legal representation, or guaranteed casework.",
       "navigationLabel": "Footer",
       "privacy": "Privacy"
+    }
+  },
+  "calendar": {
+    "eyebrow": "WCU calendar",
+    "title": "Find your place in the work",
+    "description": "Come to an organizing meeting, take action with your neighbors, or meet people at a community gathering. Public events are open to newcomers. Signed-in members may also see member meetings.",
+    "view": {
+      "label": "Calendar view",
+      "agenda": "Agenda",
+      "month": "Month"
+    },
+    "loading": "Loading upcoming events…",
+    "loadError": "We couldn’t load the calendar.",
+    "empty": "No upcoming events are published yet.",
+    "upcomingDates": "{count} upcoming date | {count} upcoming dates",
+    "showingFrom": "Showing events from {date}.",
+    "delivery": {
+      "virtual": "Online",
+      "hybrid": "In person and online",
+      "in_person": "Location shared by organizer"
+    },
+    "kinds": {
+      "meeting": "Meeting",
+      "action": "Action",
+      "learning": "Learning",
+      "social": "Social"
+    },
+    "details": {
+      "time": "Time",
+      "meetAt": "Meet at"
+    },
+    "filters": {
+      "label": "Filter upcoming events",
+      "everything": "All",
+      "meeting": "Meeting",
+      "action": "Actions",
+      "learning": "Learning",
+      "social": "Social"
+    },
+    "agenda": {
+      "title": "Upcoming events",
+      "description": "Each dated occurrence appears here, including every upcoming date in a recurring series.",
+      "noMatches": "No events match this filter yet.",
+      "upNext": "Up next",
+      "series": "Series",
+      "noAdditional": "No additional events in this view.",
+      "recurring": "Recurring events",
+      "moreDates": "More dates"
+    },
+    "month": {
+      "title": "Month view",
+      "description": "Select an event—not just a day—to see its full details.",
+      "previous": "Previous month",
+      "next": "Next month",
+      "eventsLabel": "{month} events",
+      "noEvents": "No events this month",
+      "browse": "Use Previous or Next to browse another month."
+    },
+    "picker": {
+      "jump": "Jump to date",
+      "label": "Choose an agenda date"
+    },
+    "actions": {
+      "rsvp": "RSVP",
+      "details": "Event details"
+    },
+    "directions": {
+      "title": "Directions",
+      "copy": "Copy address",
+      "copied": "Address copied",
+      "copiedAnnouncement": "Address copied."
+    }
+  },
+  "join": {
+    "title": "Join Working Class Unity",
+    "chooseTier": "Choose your tier",
+    "tiers": {
+      "supporter": {
+        "name": "Supporter",
+        "price": "$0/month"
+      },
+      "member": {
+        "name": "Member",
+        "price": "$10/month"
+      },
+      "solidarity": {
+        "name": "Solidarity Member",
+        "price": "$27/month"
+      }
+    },
+    "tierExplanation": "Supporter is account-only. Both paid tiers include the same member rights.",
+    "continueToStripe": "Continue to Stripe",
+    "codeOfConduct": "Joining means accepting WCU’s Code of Conduct.",
+    "errors": {
+      "invalidLink": "That membership link is invalid or no longer available.",
+      "checkoutUnavailable": "Checkout is temporarily unavailable. Please try again."
+    },
+    "complete": {
+      "title": "Check your email",
+      "pending": "Validating your Stripe enrollment…",
+      "sent": "We sent an account link to the email used in Stripe Checkout. Use it within five minutes to finish.",
+      "error": "We could not validate this Checkout.",
+      "return": "Return to Join"
     }
   },
   "personalApp": {

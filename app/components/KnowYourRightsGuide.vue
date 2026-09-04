@@ -124,6 +124,7 @@ const relatedTitleId = computed(() => props.titleId + '-related-title')
 
   .kyr-guide-body :deep(.kyr-section-heading h2) {
     max-inline-size: 24ch;
+    min-width: 0;
     margin: 0;
     color: var(--color-brand-primary);
     font-family: var(--font-family-heading);
@@ -131,6 +132,7 @@ const relatedTitleId = computed(() => props.titleId + '-related-title')
     font-weight: var(--font-weight-bold);
     letter-spacing: -0.035em;
     line-height: 1.08;
+    overflow-wrap: anywhere;
     text-wrap: balance;
   }
 
@@ -165,6 +167,7 @@ const relatedTitleId = computed(() => props.titleId + '-related-title')
     font-size: 1.125rem;
     font-weight: var(--font-weight-bold);
     line-height: 1.35;
+    overflow-wrap: anywhere;
     text-wrap: balance;
   }
 

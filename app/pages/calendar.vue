@@ -9,11 +9,11 @@ import {
   type CalendarViewId
 } from '~/content/calendar'
 
-const { t } = useI18n()
+const { locale, localeProperties, t } = useI18n()
+const languageTag = computed(() => localeProperties.value.language ?? locale.value)
 const activeView = ref<CalendarViewId>('agenda')
 const activeFilter = ref<CalendarFilter>('Everything')
 const selectedMonthEventId = ref('')
-const jumpMessage = ref('')
 const jumpDate = ref<string | null>(null)
 const { data, error, refresh, status } = await useFetch<CalendarApiResponse>('/api/events')
 
@@ -28,7 +28,8 @@ const calendarEvents = computed<readonly CalendarEvent[]>(() =>
       id: `${event.id}:${session.id}`,
       kind: eventKindByCategory[event.category],
       place: session.locationName ?? deliveryLabel(session.deliveryMode),
-      recurring: index === 0 && event.sessions.length > 1 ? `${event.sessions.length} upcoming dates` : undefined,
+      recurring:
+        index === 0 && event.sessions.length > 1 ? t('calendar.upcomingDates', event.sessions.length) : undefined,
       rsvpUrl: session.rsvpUrl ?? event.eventPageUrl,
       startsAt: session.startsAt,
       time: formatTimeRange(session.startsAt, session.endsAt, session.timezone),
@@ -42,30 +43,37 @@ const visibleEvents = computed(() =>
     ? calendarEvents.value.filter((event) => eventDateKey(event.startsAt, event.timezone) >= jumpDate.value!)
     : calendarEvents.value
 )
+const jumpMessage = computed(() => {
+  if (!jumpDate.value) return ''
+  const displayDate = new Intl.DateTimeFormat(languageTag.value, { dateStyle: 'long', timeZone: 'UTC' }).format(
+    new Date(`${jumpDate.value}T12:00:00Z`)
+  )
+  return t('calendar.showingFrom', { date: displayDate })
+})
 function jumpToDate(date: string) {
   jumpDate.value = date
-  jumpMessage.value = `Showing events from ${date}.`
 }
 
 function formatDate(value: string, timeZone: string) {
-  return new Intl.DateTimeFormat('en-US', { day: 'numeric', month: 'short', timeZone, weekday: 'short' }).format(
-    new Date(value)
-  )
+  return new Intl.DateTimeFormat(languageTag.value, {
+    day: 'numeric',
+    month: 'short',
+    timeZone,
+    weekday: 'short'
+  }).format(new Date(value))
 }
 
 function formatTimeRange(startsAt: string, endsAt: string | null, timeZone: string) {
-  const formatter = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit', timeZone })
+  const formatter = new Intl.DateTimeFormat(languageTag.value, { hour: 'numeric', minute: '2-digit', timeZone })
   return endsAt ? formatter.formatRange(new Date(startsAt), new Date(endsAt)) : formatter.format(new Date(startsAt))
 }
 
 function deliveryLabel(deliveryMode: 'hybrid' | 'in_person' | 'virtual') {
-  if (deliveryMode === 'virtual') return 'Online'
-  if (deliveryMode === 'hybrid') return 'In person and online'
-  return 'Location shared by organizer'
+  return t(`calendar.delivery.${deliveryMode}`)
 }
 
 function eventDateKey(value: string, timeZone: string) {
-  const parts = new Intl.DateTimeFormat('en-US', {
+  const parts = new Intl.DateTimeFormat('en-CA', {
     day: '2-digit',
     month: '2-digit',
     timeZone,
@@ -85,17 +93,14 @@ useHead(() => ({
   <section class="calendar-page" aria-labelledby="calendar-title">
     <header class="calendar-heading">
       <div class="heading-copy">
-        <p class="calendar-eyebrow">WCU calendar</p>
-        <h1 id="calendar-title">Find your place in the work</h1>
-        <p>
-          Come to an organizing meeting, take action with your neighbors, or meet people at a community gathering.
-          Public events are open to newcomers. Signed-in members may also see member meetings.
-        </p>
+        <p class="calendar-eyebrow">{{ t('calendar.eyebrow') }}</p>
+        <h1 id="calendar-title">{{ t('calendar.title') }}</h1>
+        <p>{{ t('calendar.description') }}</p>
       </div>
     </header>
 
     <div class="calendar-controls">
-      <div class="view-tabs" role="group" aria-label="Calendar view">
+      <div class="view-tabs" role="group" :aria-label="t('calendar.view.label')">
         <AppButton
           class="view-action"
           size="compact"
@@ -103,7 +108,7 @@ useHead(() => ({
           :aria-pressed="activeView === 'agenda'"
           @click="activeView = 'agenda'"
         >
-          Agenda
+          {{ t('calendar.view.agenda') }}
         </AppButton>
         <AppButton
           class="view-action"
@@ -112,17 +117,17 @@ useHead(() => ({
           :aria-pressed="activeView === 'month'"
           @click="activeView = 'month'"
         >
-          Month
+          {{ t('calendar.view.month') }}
         </AppButton>
       </div>
     </div>
 
-    <div v-if="status === 'pending'" class="calendar-state" aria-live="polite">Loading upcoming events…</div>
+    <div v-if="status === 'pending'" class="calendar-state" aria-live="polite">{{ t('calendar.loading') }}</div>
     <div v-else-if="error" class="calendar-state" role="alert">
-      <p>We couldn’t load the calendar.</p>
-      <AppButton size="compact" variant="secondary" @click="refresh()">Try again</AppButton>
+      <p>{{ t('calendar.loadError') }}</p>
+      <AppButton size="compact" variant="secondary" @click="refresh()">{{ t('common.retry') }}</AppButton>
     </div>
-    <div v-else-if="visibleEvents.length === 0" class="calendar-state">No upcoming events are published yet.</div>
+    <div v-else-if="visibleEvents.length === 0" class="calendar-state">{{ t('calendar.empty') }}</div>
     <CalendarAgendaView
       v-else-if="activeView === 'agenda'"
       v-model:active-filter="activeFilter"

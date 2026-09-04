@@ -39,7 +39,7 @@ async function saveProfile() {
   try {
     const result = await authClient.updateUser(profile)
     if (result.error) {
-      formError.value = t('account.profile.saveError')
+      formError.value = 'account.profile.saveError'
       return
     }
 
@@ -48,9 +48,9 @@ async function saveProfile() {
     displayName.value = profile.displayName ?? ''
     emit('updated', profile)
     await nextTick()
-    formSuccess.value = t('account.profile.saved')
+    formSuccess.value = 'account.profile.saved'
   } catch {
-    formError.value = t('account.profile.saveError')
+    formError.value = 'account.profile.saveError'
   } finally {
     isSubmitting.value = false
   }
@@ -120,8 +120,8 @@ function normalizeProfileValue(value: string): string | null {
         </template>
       </AppField>
 
-      <AppNotice v-if="formError" tone="error" announce="assertive">{{ formError }}</AppNotice>
-      <AppNotice v-else-if="formSuccess" tone="success" announce="polite">{{ formSuccess }}</AppNotice>
+      <AppNotice v-if="formError" tone="error" announce="assertive">{{ t(formError) }}</AppNotice>
+      <AppNotice v-else-if="formSuccess" tone="success" announce="polite">{{ t(formSuccess) }}</AppNotice>
 
       <AppButton class="profile-submit" type="submit" :pending="isSubmitting">
         {{ isSubmitting ? t('account.profile.saving') : t('account.profile.save') }}

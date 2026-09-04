@@ -1,4 +1,6 @@
 <script setup lang="ts">
+const { t } = useI18n()
+
 defineProps<{
   titleId: string
   eyebrow: string
@@ -15,7 +17,9 @@ defineProps<{
     <h1 :id="titleId">{{ title }}</h1>
     <p class="campaign-editorial-description">{{ description }}</p>
     <p v-if="qualification" class="campaign-editorial-qualification">{{ qualification }}</p>
-    <p v-if="reviewedThrough" class="campaign-editorial-reviewed">Last materially updated: {{ reviewedThrough }}.</p>
+    <p v-if="reviewedThrough" class="campaign-editorial-reviewed">
+      {{ t('removeFlock.reviewedThrough', { date: reviewedThrough }) }}
+    </p>
     <slot />
   </header>
 </template>

@@ -15,10 +15,11 @@ const props = defineProps<{
 }>()
 
 const slots = useSlots()
+const { t } = useI18n()
 const articleSections = computed(() => props.content.sections.filter((section) => section.id !== 'sources'))
 const outlineItems = computed(() => [
   ...articleSections.value.map((section) => ({ id: section.id, label: section.title })),
-  { id: `${props.titleId}-source-register-title`, label: 'Sources and notes' }
+  { id: `${props.titleId}-source-register-title`, label: t('removeFlock.sources.title') }
 ])
 const citationOccurrences = computed(() => [
   ...slotCitationOccurrences('after-header'),
@@ -75,7 +76,11 @@ function slotCitationOccurrences(slotName: string) {
     </CampaignEditorialHeader>
 
     <div class="campaign-article-layout">
-      <CampaignPageOutline :items="outlineItems" :label="`${content.title} sections`" :show-markers="false" />
+      <CampaignPageOutline
+        :items="outlineItems"
+        :label="t('removeFlock.outline.articleLabel', { title: content.title })"
+        :show-markers="false"
+      />
 
       <div class="campaign-article-body">
         <section

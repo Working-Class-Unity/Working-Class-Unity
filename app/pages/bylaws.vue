@@ -2,17 +2,20 @@
 import { bylawsArticles, bylawsSource } from '~/content/bylaws'
 
 const { t } = useI18n()
+const localizedArticles = useLocalizedContent(bylawsArticles, 'localizedBylaws.articles')
 
-const outlineItems = bylawsArticles.map((article) => ({
-  id: article.id,
-  label: article.title,
-  marker: article.number,
-  children: article.sections.map((section) => ({
-    id: section.id,
-    label: section.title,
-    marker: section.number
+const outlineItems = computed(() =>
+  localizedArticles.value.map((article) => ({
+    id: article.id,
+    label: article.title,
+    marker: article.number,
+    children: article.sections.map((section) => ({
+      id: section.id,
+      label: section.title,
+      marker: section.number
+    }))
   }))
-}))
+)
 
 useHead(() => ({
   title: t('metadata.bylaws.title'),
@@ -46,14 +49,14 @@ useHead(() => ({
 
       <article class="bylaws-document" :aria-label="t('publicPages.bylaws.documentLabel')">
         <section
-          v-for="article in bylawsArticles"
+          v-for="article in localizedArticles"
           :id="article.id"
           :key="article.id"
           class="bylaws-article"
           :aria-labelledby="`${article.id}-title`"
         >
           <header class="bylaws-article-heading">
-            <p>Article {{ article.number }}</p>
+            <p>{{ t('publicPages.bylaws.articleLabel', { number: article.number }) }}</p>
             <h2 :id="`${article.id}-title`">{{ article.title }}</h2>
           </header>
 
@@ -68,7 +71,7 @@ useHead(() => ({
               :aria-labelledby="`${section.id}-title`"
             >
               <header class="bylaws-section-heading">
-                <p>Section {{ section.number }}</p>
+                <p>{{ t('publicPages.bylaws.sectionLabel', { number: section.number }) }}</p>
                 <h3 :id="`${section.id}-title`">{{ section.title }}</h3>
               </header>
               <BylawsContentBlocks :blocks="section.blocks" />

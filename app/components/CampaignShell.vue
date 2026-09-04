@@ -20,8 +20,8 @@ function currentPage(path: string) {
   <div class="campaign-shell">
     <div class="campaign-bar">
       <NuxtLink class="campaign-name" :to="campaignBase" :aria-label="t('removeFlock.campaignHome')">
-        <span class="campaign-name-kicker">WCU SIDE-QUEST</span>
-        <span>Mass Surveillance</span>
+        <span class="campaign-name-kicker">{{ t('removeFlock.shell.kicker') }}</span>
+        <span>{{ t('removeFlock.shell.name') }}</span>
       </NuxtLink>
 
       <nav class="campaign-navigation" :aria-label="t('removeFlock.navigationLabel')">
@@ -45,7 +45,7 @@ function currentPage(path: string) {
 
     <footer class="campaign-footer" :aria-label="t('removeFlock.campaignLabel')">
       <div class="campaign-footer-intro">
-        <NuxtLink class="campaign-footer-home" :to="campaignBase">Remove Mass Surveillance from Stockton</NuxtLink>
+        <NuxtLink class="campaign-footer-home" :to="campaignBase">{{ t('removeFlock.shell.footerHome') }}</NuxtLink>
         <p>{{ t('removeFlock.footer.description') }}</p>
         <p class="campaign-footer-source-note">{{ t('removeFlock.footer.sourceNote') }}</p>
       </div>
@@ -221,6 +221,10 @@ function currentPage(path: string) {
     margin: 0;
   }
 
+  .campaign-footer :is(h2, p, a, span) {
+    overflow-wrap: anywhere;
+  }
+
   .campaign-footer-intro {
     display: grid;
     align-content: start;
@@ -352,6 +356,28 @@ function currentPage(path: string) {
 
     .campaign-footer-intro {
       grid-column: auto;
+    }
+  }
+
+  @media (width <= 24rem) {
+    .campaign-bar {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .campaign-name {
+      min-inline-size: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .campaign-petition-link {
+      grid-row: 2;
+      justify-self: start;
+      max-inline-size: 100%;
+      overflow-wrap: anywhere;
+    }
+
+    .campaign-navigation {
+      grid-row: 3;
     }
   }
 }

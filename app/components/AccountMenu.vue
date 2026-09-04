@@ -51,7 +51,7 @@ async function signOut(event: Event) {
     const result = await authClient.signOut()
 
     if (result.error) {
-      signOutError.value = t('account.menu.signOutError')
+      signOutError.value = 'account.menu.signOutError'
       return
     }
 
@@ -59,7 +59,7 @@ async function signOut(event: Event) {
     emit('signedOut')
     await navigateTo({ path: '/login', query: { status: 'signed-out' } })
   } catch {
-    signOutError.value = t('account.menu.signOutError')
+    signOutError.value = 'account.menu.signOutError'
   } finally {
     isSigningOut.value = false
   }
@@ -109,7 +109,7 @@ async function signOut(event: Event) {
           </DropdownMenuItem>
 
           <DropdownMenuLabel v-if="signOutError" class="account-menu-error" role="alert">
-            {{ signOutError }}
+            {{ t(signOutError) }}
           </DropdownMenuLabel>
         </DropdownMenuContent>
       </DropdownMenuPortal>

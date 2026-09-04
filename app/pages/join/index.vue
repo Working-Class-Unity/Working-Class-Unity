@@ -1,21 +1,18 @@
 <script setup lang="ts">
 type Tier = 'supporter' | 'member' | 'solidarity'
 
-const tiers = [
-  { id: 'supporter', name: 'Supporter', price: '$0/month' },
-  { id: 'member', name: 'Member', price: '$10/month' },
-  { id: 'solidarity', name: 'Solidarity Member', price: '$27/month' }
-] as const satisfies ReadonlyArray<{ id: Tier; name: string; price: string }>
+const tiers = ['supporter', 'member', 'solidarity'] as const satisfies readonly Tier[]
 
 const route = useRoute()
+const { t } = useI18n()
 const tier = ref<Tier>('member')
 const pending = ref(false)
-const error = ref(route.query.error ? 'That membership link is invalid or no longer available.' : '')
+const errorKey = ref(route.query.error ? 'join.errors.invalidLink' : '')
 
-useHead({ title: 'Join Working Class Unity' })
+useHead(() => ({ title: t('join.title') }))
 
 async function startCheckout() {
-  error.value = ''
+  errorKey.value = ''
   pending.value = true
   try {
     const result = await $fetch<{ url: string }>('/api/join/checkout', {
@@ -25,7 +22,7 @@ async function startCheckout() {
     if (!result.url.startsWith('https://')) throw new Error('Unexpected Checkout URL')
     await navigateTo(result.url, { external: true })
   } catch {
-    error.value = 'Checkout is temporarily unavailable. Please try again.'
+    errorKey.value = 'join.errors.checkoutUnavailable'
   } finally {
     pending.value = false
   }
@@ -34,26 +31,26 @@ async function startCheckout() {
 
 <template>
   <section class="flow" aria-labelledby="join-title">
-    <h1 id="join-title">Join Working Class Unity</h1>
+    <h1 id="join-title">{{ t('join.title') }}</h1>
 
     <form class="flow" @submit.prevent="startCheckout">
       <fieldset class="grid">
-        <legend>Choose your tier</legend>
-        <label v-for="option in tiers" :key="option.id" class="cluster">
-          <input v-model="tier" type="radio" name="tier" :value="option.id" />
+        <legend>{{ t('join.chooseTier') }}</legend>
+        <label v-for="option in tiers" :key="option" class="cluster">
+          <input v-model="tier" type="radio" name="tier" :value="option" />
           <span class="grid">
-            <strong>{{ option.name }}</strong>
-            <b>{{ option.price }}</b>
+            <strong>{{ t(`join.tiers.${option}.name`) }}</strong>
+            <b>{{ t(`join.tiers.${option}.price`) }}</b>
           </span>
         </label>
       </fieldset>
-      <p>Supporter is account-only. Both paid tiers include the same member rights.</p>
+      <p>{{ t('join.tierExplanation') }}</p>
 
-      <AppNotice v-if="error" tone="error" announce="assertive">{{ error }}</AppNotice>
+      <AppNotice v-if="errorKey" tone="error" announce="assertive">{{ t(errorKey) }}</AppNotice>
       <div class="flow">
-        <AppButton type="submit" :pending="pending">Continue to Stripe</AppButton>
+        <AppButton type="submit" :pending="pending">{{ t('join.continueToStripe') }}</AppButton>
         <p>
-          <a href="https://chat.workingclassunity.com/docs?topic=186">Joining means accepting WCU’s Code of Conduct.</a>
+          <a href="https://chat.workingclassunity.com/docs?topic=186">{{ t('join.codeOfConduct') }}</a>
         </p>
       </div>
     </form>

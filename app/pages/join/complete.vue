@@ -1,8 +1,9 @@
 <script setup lang="ts">
 const route = useRoute()
+const { t } = useI18n()
 const state = ref<'pending' | 'sent' | 'error'>('pending')
 
-useHead({ title: 'Check your email' })
+useHead(() => ({ title: t('join.complete.title') }))
 
 onMounted(async () => {
   const sessionId = typeof route.query.session_id === 'string' ? route.query.session_id : ''
@@ -17,13 +18,14 @@ onMounted(async () => {
 
 <template>
   <section class="flow" aria-labelledby="join-complete-title">
-    <h1 id="join-complete-title">Check your email</h1>
-    <AppNotice v-if="state === 'pending'" tone="info">Validating your Stripe enrollment…</AppNotice>
+    <h1 id="join-complete-title">{{ t('join.complete.title') }}</h1>
+    <AppNotice v-if="state === 'pending'" tone="info">{{ t('join.complete.pending') }}</AppNotice>
     <AppNotice v-else-if="state === 'sent'" tone="success" announce="polite">
-      We sent an account link to the email used in Stripe Checkout. Use it within five minutes to finish.
+      {{ t('join.complete.sent') }}
     </AppNotice>
     <AppNotice v-else tone="error" announce="assertive">
-      We could not validate this Checkout. <NuxtLink to="/join">Return to Join</NuxtLink>.
+      {{ t('join.complete.error') }} <NuxtLink to="/join">{{ t('join.complete.return') }}</NuxtLink
+      >.
     </AppNotice>
   </section>
 </template>

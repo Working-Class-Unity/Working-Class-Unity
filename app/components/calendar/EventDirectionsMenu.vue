@@ -10,6 +10,7 @@ import {
 } from 'reka-ui'
 
 const props = defineProps<{ address: string; googleUrl?: string; appleUrl?: string }>()
+const { t } = useI18n()
 const copied = ref(false)
 const googleMapsUrl = computed(
   () => props.googleUrl ?? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(props.address)}`
@@ -29,7 +30,7 @@ async function copyAddress() {
     <DropdownMenuRoot>
       <DropdownMenuTrigger as-child>
         <AppButton class="wcu-directions-trigger" size="compact" variant="secondary">
-          <span>Directions</span>
+          <span>{{ t('calendar.directions.title') }}</span>
           <span class="wcu-directions-chevron" aria-hidden="true" />
         </AppButton>
       </DropdownMenuTrigger>
@@ -52,13 +53,15 @@ async function copyAddress() {
           <DropdownMenuSeparator class="wcu-directions-separator" />
           <DropdownMenuItem as-child @select="copyAddress">
             <AppButton class="wcu-directions-item" size="compact" variant="secondary">
-              {{ copied ? 'Address copied' : 'Copy address' }}
+              {{ copied ? t('calendar.directions.copied') : t('calendar.directions.copy') }}
             </AppButton>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenuPortal>
     </DropdownMenuRoot>
-    <span class="visually-hidden" aria-live="polite">{{ copied ? 'Address copied.' : '' }}</span>
+    <span class="visually-hidden" aria-live="polite">{{
+      copied ? t('calendar.directions.copiedAnnouncement') : ''
+    }}</span>
   </div>
 </template>
 

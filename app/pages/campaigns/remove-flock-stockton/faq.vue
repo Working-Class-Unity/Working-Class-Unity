@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { campaignFaqPage } from '~/content/remove-flock-stockton'
+const { campaignFaqPage } = useRemoveFlockContent()
 
-useHead({
-  title: campaignFaqPage.title,
-  meta: [{ name: 'description', content: campaignFaqPage.description }]
-})
+useHead(() => ({
+  title: campaignFaqPage.value.title,
+  meta: [{ name: 'description', content: campaignFaqPage.value.description }]
+}))
 </script>
 
 <template>

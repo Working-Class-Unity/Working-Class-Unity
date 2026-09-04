@@ -2,12 +2,13 @@
 import type { CalendarEventKind } from '~/content/calendar'
 
 const props = defineProps<{ kind: CalendarEventKind }>()
+const { t } = useI18n()
 
 const kindClass = computed(() => `type-${props.kind.toLowerCase()}`)
 </script>
 
 <template>
-  <span class="type-badge" :class="kindClass">{{ kind }}</span>
+  <span class="type-badge" :class="kindClass">{{ t(`calendar.kinds.${kind.toLowerCase()}`) }}</span>
 </template>
 
 <style scoped>

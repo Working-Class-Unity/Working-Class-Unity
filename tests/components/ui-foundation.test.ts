@@ -2,7 +2,7 @@
 
 import { mount } from '@vue/test-utils'
 import { h } from 'vue'
-import { describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import AppActionLink from '../../app/components/AppActionLink.vue'
 import AppButton from '../../app/components/AppButton.vue'
 import DocumentaryFigure from '../../app/components/DocumentaryFigure.vue'
@@ -16,6 +16,20 @@ const NuxtLinkStub = {
   props: ['to'],
   template: '<a :href="to"><slot /></a>'
 }
+
+beforeAll(() => {
+  vi.stubGlobal('useI18n', () => ({
+    t: (key: string) =>
+      ({
+        'common.opensInNewTab': 'opens in a new tab',
+        'common.source': 'Source'
+      })[key] ?? key
+  }))
+})
+
+afterAll(() => {
+  vi.unstubAllGlobals()
+})
 
 describe('the shared UI foundation', () => {
   it('keeps navigational actions separate from command buttons', () => {

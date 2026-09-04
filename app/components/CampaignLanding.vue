@@ -1,34 +1,60 @@
 <script setup lang="ts">
 import {
-  campaignFacts,
-  campaignLandingPage,
   citedTextParts,
   citedTextPlainText,
-  petitionDemand,
   type CampaignSection,
   type CampaignSource,
   type CitedText
 } from '~/content/remove-flock-stockton'
 
-const landingSections: readonly CampaignSection[] = campaignLandingPage.sections
-const sectionById = new Map<string, CampaignSection>(landingSections.map((section) => [section.id, section]))
-const verifiedFacts = sectionById.get('verified-facts')!
-const whyRemove = sectionById.get('why-remove')!
-const system = sectionById.get('system')!
-const safeguards = sectionById.get('safeguards')!
-const realSafety = sectionById.get('real-safety')!
-const participate = sectionById.get('participate')!
+const { t } = useI18n()
+const { campaignFacts, campaignLandingPage, petitionDemand } = useRemoveFlockContent()
+
+function localizedSection(id: string) {
+  return computed(() => {
+    const section = campaignLandingPage.value.sections.find((item) => item.id === id)
+    if (!section) throw new Error(`Missing campaign section: ${id}`)
+    return section as CampaignSection
+  })
+}
+
+const verifiedFacts = localizedSection('verified-facts')
+const whyRemove = localizedSection('why-remove')
+const system = localizedSection('system')
+const safeguards = localizedSection('safeguards')
+const realSafety = localizedSection('real-safety')
+const participate = localizedSection('participate')
 const petitionUrl = 'https://tech.workingclassunity.com/deflock-stockton'
 const updatesUrl = 'https://tech.workingclassunity.com/deflock-stockton-updates'
-const caseLabels = ['Safety is a public good', 'The risk is unequal', 'Working people should hold power'] as const
-const systemLabels = ['Collect Information', 'Connect Resources', 'Observe Us All', 'Depend on Private Vendor'] as const
-const safetyLabels = ['Stable homes', 'Safe work and public space', 'Care and prevention', 'Public control'] as const
-const recordValues = ['April 14, 2031', '$5,416,700', 'A connected system'] as const
-const sourcesById = new Map<string, CampaignSource>(campaignLandingPage.sources.map((source) => [source.id, source]))
+const caseLabels = computed(() => [
+  t('removeFlock.landing.caseLabels.safety'),
+  t('removeFlock.landing.caseLabels.risk'),
+  t('removeFlock.landing.caseLabels.power')
+])
+const systemLabels = computed(() => [
+  t('removeFlock.landing.systemLabels.movement'),
+  t('removeFlock.landing.systemLabels.response'),
+  t('removeFlock.landing.systemLabels.observation'),
+  t('removeFlock.landing.systemLabels.vendor')
+])
+const safetyLabels = computed(() => [
+  t('removeFlock.landing.safetyLabels.homes'),
+  t('removeFlock.landing.safetyLabels.work'),
+  t('removeFlock.landing.safetyLabels.care'),
+  t('removeFlock.landing.safetyLabels.control')
+])
+const recordValues = computed(() => [
+  t('removeFlock.landing.recordValues.term'),
+  '$5,416,700',
+  t('removeFlock.landing.recordValues.system')
+])
+const sourcesById = computed(
+  () => new Map<string, CampaignSource>(campaignLandingPage.value.sources.map((source) => [source.id, source]))
+)
 
 function sourcesForIds(sourceIds: readonly string[]) {
   return sourceIds.map((sourceId) => {
-    const source = sourcesById.get(sourceId)
+    const source = sourcesById.value.get(sourceId)
     if (!source) throw new Error(`Unknown campaign source: ${sourceId}`)
     return source
   })
@@ -49,18 +75,18 @@ function pointDetail(text: string) {
   <article class="campaign-landing" aria-labelledby="remove-flock-title">
     <section class="campaign-hero" aria-labelledby="remove-flock-title">
       <div class="campaign-hero-copy">
-        <p class="campaign-eyebrow">{{ campaignLandingPage.eyebrow }} · STOCKTON</p>
+        <p class="campaign-eyebrow">{{ campaignLandingPage.eyebrow }} · {{ t('removeFlock.landing.location') }}</p>
         <h1 id="remove-flock-title">{{ campaignLandingPage.title }}</h1>
         <p class="campaign-hero-description">{{ campaignLandingPage.description }}</p>
         <div class="campaign-action-cluster">
-          <a class="campaign-primary-action" :href="petitionUrl">Sign the demand letter</a>
+          <a class="campaign-primary-action" :href="petitionUrl">{{ t('removeFlock.landing.signDemand') }}</a>
           <NuxtLink class="campaign-text-action" to="/campaigns/remove-flock-stockton/what-stockton-bought">
-            Read what Stockton bought <span aria-hidden="true">→</span>
+            {{ t('removeFlock.landing.readWhatBought') }} <span aria-hidden="true">→</span>
           </NuxtLink>
         </div>
         <p class="campaign-hero-qualification">{{ campaignLandingPage.qualification }}</p>
         <p v-if="campaignLandingPage.reviewedThrough" class="campaign-hero-reviewed">
-          Last materially updated: {{ campaignLandingPage.reviewedThrough }}.
+          {{ t('removeFlock.reviewedThrough', { date: campaignLandingPage.reviewedThrough }) }}
         </p>
       </div>
       <dl class="campaign-hero-facts">
@@ -75,14 +101,14 @@ function pointDetail(text: string) {
       <div class="campaign-field campaign-record-inner">
         <div class="campaign-record-heading">
           <h2 id="campaign-record-title">{{ verifiedFacts.title }}</h2>
-          <p>City of Stockton records · March 31, 2026 · reviewed May 3, 2026</p>
+          <p>{{ t('removeFlock.landing.recordProvenance') }}</p>
         </div>
         <dl class="campaign-record-list">
           <div v-for="(fact, index) in campaignFacts" :key="fact.label">
             <dt>{{ recordValues[index] }}</dt>
             <dd>{{ fact.detail }}</dd>
             <dd class="campaign-source-line">
-              <span>Sources:</span>
+              <span>{{ t('removeFlock.landing.sources') }}:</span>
               <span class="campaign-source-links">
                 <a
                   v-for="source in sourcesForIds(fact.sourceIds)"
@@ -90,7 +116,7 @@ function pointDetail(text: string) {
                   :href="source.url"
                   target="_blank"
                   rel="noopener noreferrer"
-                  >{{ source.title }}</a
+                  ><span lang="en">{{ source.title }}</span></a
                 >
               </span>
             </dd>
@@ -114,7 +140,7 @@ function pointDetail(text: string) {
                 class="campaign-context-link"
                 to="/campaigns/remove-flock-stockton/why-safeguards-are-not-enough"
               >
-                Claim source and context <span aria-hidden="true">→</span>
+                {{ t('removeFlock.landing.claimContext') }} <span aria-hidden="true">→</span>
               </NuxtLink>
             </dd>
           </div>
@@ -130,7 +156,7 @@ function pointDetail(text: string) {
             <p>{{ system.summary }}</p>
           </div>
           <NuxtLink class="campaign-text-action" to="/campaigns/remove-flock-stockton/what-stockton-bought">
-            Explore the full system <span aria-hidden="true">→</span>
+            {{ t('removeFlock.landing.exploreSystem') }} <span aria-hidden="true">→</span>
           </NuxtLink>
         </div>
         <dl class="campaign-system-list">
@@ -145,7 +171,7 @@ function pointDetail(text: string) {
     <section class="campaign-removal" aria-labelledby="campaign-safeguards-title">
       <div class="campaign-field campaign-removal-inner">
         <div>
-          <p class="campaign-eyebrow">Why removal</p>
+          <p class="campaign-eyebrow">{{ t('removeFlock.landing.whyRemoval') }}</p>
           <h2 id="campaign-safeguards-title">{{ safeguards.title }}</h2>
         </div>
         <div class="campaign-removal-copy">
@@ -159,12 +185,12 @@ function pointDetail(text: string) {
                 :href="source.url"
                 target="_blank"
                 rel="noopener noreferrer"
-                >{{ source.title }}</a
+                ><span lang="en">{{ source.title }}</span></a
               >
             </p>
           </div>
           <NuxtLink class="campaign-inverse-link" to="/campaigns/remove-flock-stockton/why-safeguards-are-not-enough">
-            Read the full case for removal <span aria-hidden="true">→</span>
+            {{ t('removeFlock.landing.readRemovalCase') }} <span aria-hidden="true">→</span>
           </NuxtLink>
         </div>
       </div>
@@ -203,7 +229,7 @@ function pointDetail(text: string) {
     <section class="campaign-participation" aria-labelledby="campaign-participate-title">
       <div class="campaign-field campaign-participation-inner">
         <div class="campaign-participation-heading">
-          <p class="campaign-eyebrow">Organize</p>
+          <p class="campaign-eyebrow">{{ t('removeFlock.landing.organize') }}</p>
           <h2 id="campaign-participate-title">{{ participate.title }}</h2>
           <p>{{ participate.summary }}</p>
         </div>
@@ -222,17 +248,17 @@ function pointDetail(text: string) {
             {{ citedTextPlainText(paragraph) }}
           </p>
           <div class="campaign-action-cluster campaign-participation-links">
-            <a class="campaign-outline-action" :href="petitionUrl">Sign the demand letter</a>
+            <a class="campaign-outline-action" :href="petitionUrl">{{ t('removeFlock.landing.signDemand') }}</a>
             <NuxtLink class="campaign-inverse-link" to="/join">
-              Join Working Class Unity <span aria-hidden="true">→</span>
+              {{ t('removeFlock.landing.joinWcu') }} <span aria-hidden="true">→</span>
             </NuxtLink>
           </div>
           <div class="campaign-newsletter campaign-updates">
-            <h3>Get Deflock Stockton updates by email or text.</h3>
+            <h3>{{ t('removeFlock.landing.updatesTitle') }}</h3>
             <a class="campaign-inverse-link" :href="updatesUrl" aria-describedby="campaign-updates-note">
-              Stay informed <span aria-hidden="true">→</span>
+              {{ t('removeFlock.landing.stayInformed') }} <span aria-hidden="true">→</span>
             </a>
-            <p id="campaign-updates-note">Sign up for updates about this campaign and other WCU updates.</p>
+            <p id="campaign-updates-note">{{ t('removeFlock.landing.updatesDescription') }}</p>
           </div>
         </div>
       </div>
@@ -262,6 +288,10 @@ function pointDetail(text: string) {
     margin: 0;
   }
 
+  .campaign-landing :is(h1, h2, h3, p, dd, a) {
+    overflow-wrap: anywhere;
+  }
+
   .campaign-field {
     inline-size: min(var(--content-max-width), calc(100% - (2 * var(--campaign-gutter))));
     margin-inline: auto;
@@ -289,6 +319,7 @@ function pointDetail(text: string) {
 
   .campaign-hero-copy {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     align-content: center;
     justify-items: start;
     gap: 1.625rem;
@@ -297,11 +328,17 @@ function pointDetail(text: string) {
     padding-inline: max(var(--campaign-gutter), calc((100vw - var(--content-max-width)) / 2)) 5rem;
   }
 
+  .campaign-hero-copy > * {
+    min-width: 0;
+    max-inline-size: 100%;
+  }
+
   .campaign-hero h1 {
     --font-size-heading-1: clamp(3.5rem, 5vw, 4.5rem);
     --line-height-heading: 1.03;
 
     max-inline-size: 11ch;
+    overflow-wrap: anywhere;
     margin: 0;
     color: var(--color-brand-primary);
     font-family: var(--font-family-heading);

@@ -20,6 +20,8 @@ import {
 } from 'reka-ui'
 
 const emit = defineEmits<{ select: [date: string] }>()
+const { locale, localeProperties, t } = useI18n()
+const languageTag = computed(() => localeProperties.value.language ?? locale.value)
 const open = ref(false)
 const selectedDate = shallowRef<DateValue>(new CalendarDate(2026, 8, 20))
 
@@ -34,7 +36,7 @@ function selectDate(date: DateValue | undefined) {
 <template>
   <PopoverRoot v-model:open="open">
     <PopoverTrigger as-child>
-      <AppButton class="wcu-date-trigger" size="compact" variant="secondary">Jump to date</AppButton>
+      <AppButton class="wcu-date-trigger" size="compact" variant="secondary">{{ t('calendar.picker.jump') }}</AppButton>
     </PopoverTrigger>
     <PopoverPortal>
       <PopoverContent
@@ -48,16 +50,17 @@ function selectDate(date: DateValue | undefined) {
           v-slot="{ weekDays, grid }"
           :model-value="selectedDate"
           :default-placeholder="selectedDate"
-          calendar-label="Choose an agenda date"
+          :calendar-label="t('calendar.picker.label')"
+          :locale="languageTag"
           fixed-weeks
           @update:model-value="selectDate"
         >
           <CalendarHeader class="wcu-date-header">
-            <CalendarPrev class="wcu-date-nav" aria-label="Previous month">
+            <CalendarPrev class="wcu-date-nav" :aria-label="t('calendar.month.previous')">
               <span class="wcu-date-chevron wcu-date-chevron--previous" aria-hidden="true" />
             </CalendarPrev>
             <CalendarHeading class="wcu-date-heading" />
-            <CalendarNext class="wcu-date-nav" aria-label="Next month">
+            <CalendarNext class="wcu-date-nav" :aria-label="t('calendar.month.next')">
               <span class="wcu-date-chevron wcu-date-chevron--next" aria-hidden="true" />
             </CalendarNext>
           </CalendarHeader>

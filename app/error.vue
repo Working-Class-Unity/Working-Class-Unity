@@ -10,7 +10,9 @@ const { t } = useI18n()
 const errorKind = computed(() => (props.error.statusCode === 404 ? 'notFound' : 'unexpected'))
 const heading = computed(() => t(`errors.${errorKind.value}.heading`))
 const isRecovering = ref(false)
-const recoveryError = ref('')
+const recoveryFailed = ref(false)
+
+useDocumentLocale()
 
 useHead(() => ({
   title: t('metadata.errorTitle', { heading: heading.value, appName: config.public.appName })
@@ -20,12 +22,12 @@ async function recover() {
   if (isRecovering.value) return
 
   isRecovering.value = true
-  recoveryError.value = ''
+  recoveryFailed.value = false
 
   try {
     await clearError({ redirect: '/' })
   } catch {
-    recoveryError.value = t('errors.recoveryFailed')
+    recoveryFailed.value = true
   } finally {
     isRecovering.value = false
   }
@@ -34,11 +36,12 @@ async function recover() {
 
 <template>
   <main id="main-content" class="page-shell error-page" tabindex="-1">
+    <LanguageSelector class="error-language-selector" />
     <section class="error-panel" aria-labelledby="error-title">
       <p class="eyebrow">{{ t('errors.status', { statusCode: props.error.statusCode }) }}</p>
       <h1 id="error-title">{{ heading }}</h1>
       <p class="error-description">{{ t(`errors.${errorKind}.description`) }}</p>
-      <AppNotice v-if="recoveryError" tone="error" announce="assertive">{{ recoveryError }}</AppNotice>
+      <AppNotice v-if="recoveryFailed" tone="error" announce="assertive">{{ t('errors.recoveryFailed') }}</AppNotice>
       <AppButton class="error-home-link" variant="secondary" :pending="isRecovering" @click="recover">
         {{ isRecovering ? t('errors.returningHome') : t('errors.returnHome') }}
       </AppButton>
@@ -53,6 +56,12 @@ async function recover() {
     min-height: 100vh;
     place-items: center;
     padding: var(--space-6) 0;
+  }
+
+  .error-language-selector {
+    position: absolute;
+    inset-block-start: var(--space-5);
+    inset-inline-end: var(--space-5);
   }
 
   .error-panel {
@@ -83,6 +92,19 @@ async function recover() {
     display: inline-flex;
     width: fit-content;
     align-items: center;
+  }
+
+  @media (width <= 32rem) {
+    .error-page {
+      align-content: start;
+      gap: var(--space-6);
+    }
+
+    .error-language-selector {
+      position: static;
+      justify-self: stretch;
+      inline-size: 100%;
+    }
   }
 }
 </style>

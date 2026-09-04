@@ -6,14 +6,14 @@ const emit = defineEmits<{
 const { t } = useI18n()
 const deletionConfirmation = 'DELETE'
 const confirmation = ref('')
-const deletionError = ref('')
+const deletionErrorKey = ref('')
 const isDeleting = ref(false)
 const confirmationMatches = computed(() => confirmation.value === deletionConfirmation)
 
 async function deleteAccount() {
   if (!confirmationMatches.value || isDeleting.value) return
 
-  deletionError.value = ''
+  deletionErrorKey.value = ''
   isDeleting.value = true
 
   try {
@@ -25,11 +25,11 @@ async function deleteAccount() {
       throw new Error('Unexpected account-deletion response')
     }
   } catch (error) {
-    deletionError.value = isFreshSessionError(error)
-      ? t('account.deletion.sessionTooOld')
+    deletionErrorKey.value = isFreshSessionError(error)
+      ? 'account.deletion.sessionTooOld'
       : isAccountDeletionBillingPendingError(error)
-        ? t('account.deletion.billingPending')
-        : t('account.deletion.unknownResult')
+        ? 'account.deletion.billingPending'
+        : 'account.deletion.unknownResult'
     return
   } finally {
     isDeleting.value = false
@@ -65,7 +65,7 @@ function errorValues(error: unknown): unknown[] {
       <p>{{ t('account.deletion.billingWarning') }}</p>
     </div>
 
-    <AppNotice v-if="deletionError" tone="error" announce="assertive">{{ deletionError }}</AppNotice>
+    <AppNotice v-if="deletionErrorKey" tone="error" announce="assertive">{{ t(deletionErrorKey) }}</AppNotice>
 
     <form class="deletion-form" @submit.prevent="deleteAccount">
       <AppField

@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { whySafeguardsPage } from '~/content/remove-flock-stockton'
+const { whySafeguardsPage } = useRemoveFlockContent()
 
-useHead({
-  title: whySafeguardsPage.title,
-  meta: [{ name: 'description', content: whySafeguardsPage.description }]
-})
+useHead(() => ({
+  title: whySafeguardsPage.value.title,
+  meta: [{ name: 'description', content: whySafeguardsPage.value.description }]
+}))
 </script>
 
 <template>

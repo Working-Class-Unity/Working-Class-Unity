@@ -33,15 +33,15 @@ const phoneInput = ref<AppInputHandle | null>(null)
 const codeInput = ref<AppInputHandle | null>(null)
 const turnstileChallenge = ref<TurnstileChallengeHandle | null>(null)
 const turnstileToken = ref('')
-const fieldError = ref('')
-const formError = ref(authCallbackError(route.query.error))
-const formSuccess = ref(
+const fieldErrorKey = ref('')
+const formErrorKey = ref(authCallbackErrorKey(route.query.error))
+const formSuccessKey = ref(
   route.query.status === 'signed-out'
-    ? t('auth.status.signedOut')
+    ? 'auth.status.signedOut'
     : route.query.status === 'billing-email-checked'
-      ? t('auth.status.billingEmailChecked')
+      ? 'auth.status.billingEmailChecked'
       : route.query.status === 'activation-complete'
-        ? t('auth.status.activationComplete')
+        ? 'auth.status.activationComplete'
         : ''
 )
 const isSubmitting = ref(false)
@@ -88,7 +88,7 @@ const submitLabel = computed(() => {
 })
 
 watch([email, phoneNumber, verificationCode], () => {
-  fieldError.value = ''
+  fieldErrorKey.value = ''
 })
 
 function chooseMethod(nextMethod: AuthMethod) {
@@ -111,25 +111,25 @@ function editPhoneNumber() {
 }
 
 function clearStatus() {
-  formError.value = ''
-  formSuccess.value = ''
-  fieldError.value = ''
+  formErrorKey.value = ''
+  formSuccessKey.value = ''
+  fieldErrorKey.value = ''
   turnstileToken.value = ''
 }
 
 async function submitAuth() {
-  formError.value = ''
-  formSuccess.value = ''
-  fieldError.value = ''
+  formErrorKey.value = ''
+  formSuccessKey.value = ''
+  fieldErrorKey.value = ''
 
   if (!validateAuthForm()) {
-    formError.value = t('auth.errors.formInvalid')
+    formErrorKey.value = 'auth.errors.formInvalid'
     await focusFirstInvalidControl()
     return
   }
 
   if (requiresTurnstile.value && !turnstileToken.value) {
-    formError.value = t('auth.errors.securityRequired')
+    formErrorKey.value = 'auth.errors.securityRequired'
     return
   }
 
@@ -144,12 +144,12 @@ async function submitAuth() {
       await verifyPhoneCode()
     }
   } catch {
-    formError.value =
+    formErrorKey.value =
       props.intent === 'activate'
-        ? t('activation.error')
+        ? 'activation.error'
         : method.value === 'email'
-          ? t('auth.errors.emailLink')
-          : t('auth.errors.phoneUnavailable')
+          ? 'auth.errors.emailLink'
+          : 'auth.errors.phoneUnavailable'
   } finally {
     if (requiresTurnstile.value) turnstileChallenge.value?.reset()
     isSubmitting.value = false
@@ -163,7 +163,7 @@ async function submitEmail() {
       headers: { [turnstileHeaderName]: turnstileToken.value },
       body: { email: email.value }
     })
-    formSuccess.value = t('activation.status')
+    formSuccessKey.value = 'activation.status'
     email.value = ''
     return
   }
@@ -172,10 +172,10 @@ async function submitEmail() {
     { headers: { [turnstileHeaderName]: turnstileToken.value } }
   )
   if (result.error) {
-    formError.value = t('auth.errors.emailLink')
+    formErrorKey.value = 'auth.errors.emailLink'
     return
   }
-  formSuccess.value = t('auth.status.emailLinkSent')
+  formSuccessKey.value = 'auth.status.emailLinkSent'
   email.value = ''
 }
 
@@ -185,12 +185,12 @@ async function sendPhoneCode() {
     { headers: { [turnstileHeaderName]: turnstileToken.value } }
   )
   if (result.error) {
-    formError.value = t('auth.errors.phoneCode')
+    formErrorKey.value = 'auth.errors.phoneCode'
     return
   }
   verificationPhoneNumber.value = phoneNumber.value.trim()
   phoneStep.value = 'code'
-  formSuccess.value = t('auth.status.phoneCodeSent')
+  formSuccessKey.value = 'auth.status.phoneCodeSent'
   await nextTick()
   codeInput.value?.focus()
 }
@@ -201,7 +201,7 @@ async function verifyPhoneCode() {
     code: verificationCode.value
   })
   if (result.error || !result.data?.status) {
-    formError.value = t('auth.errors.phoneVerification')
+    formErrorKey.value = 'auth.errors.phoneVerification'
     return
   }
   await navigateTo('/app')
@@ -216,29 +216,29 @@ async function focusFirstInvalidControl() {
 
 function validateAuthForm() {
   if (method.value === 'email' && !email.value.trim()) {
-    fieldError.value = t('auth.email.required')
+    fieldErrorKey.value = 'auth.email.required'
   } else if (method.value === 'email' && emailInput.value && !emailInput.value.isValid()) {
-    fieldError.value = t('common.emailInvalid')
+    fieldErrorKey.value = 'common.emailInvalid'
   } else if (method.value === 'phone' && phoneStep.value === 'number' && !phoneNumber.value.trim()) {
-    fieldError.value = t('auth.phone.required')
+    fieldErrorKey.value = 'auth.phone.required'
   } else if (method.value === 'phone' && phoneStep.value === 'number' && !phoneInput.value?.isValid()) {
-    fieldError.value = t('auth.phone.invalid')
+    fieldErrorKey.value = 'auth.phone.invalid'
   } else if (method.value === 'phone' && phoneStep.value === 'code' && !verificationCode.value.trim()) {
-    fieldError.value = t('auth.phone.codeRequired')
+    fieldErrorKey.value = 'auth.phone.codeRequired'
   } else if (method.value === 'phone' && phoneStep.value === 'code' && !codeInput.value?.isValid()) {
-    fieldError.value = t('auth.phone.codeInvalid')
+    fieldErrorKey.value = 'auth.phone.codeInvalid'
   }
 
-  return !fieldError.value
+  return !fieldErrorKey.value
 }
 
-function authCallbackError(value: unknown): string {
+function authCallbackErrorKey(value: unknown): string {
   const error = Array.isArray(value) ? value[0] : value
   if (error === undefined) return ''
-  if (error === 'new_user_signup_disabled') return t('auth.errors.accountNotActivated')
-  if (error === 'INVALID_TOKEN') return t('auth.errors.loginLinkUnavailable')
-  if (error === 'adoption') return t('auth.errors.activationLinkUnavailable')
-  return t('auth.errors.authenticationFailed')
+  if (error === 'new_user_signup_disabled') return 'auth.errors.accountNotActivated'
+  if (error === 'INVALID_TOKEN') return 'auth.errors.loginLinkUnavailable'
+  if (error === 'adoption') return 'auth.errors.activationLinkUnavailable'
+  return 'auth.errors.authenticationFailed'
 }
 </script>
 
@@ -286,7 +286,7 @@ function authCallbackError(value: unknown): string {
 
     <form
       class="auth-form"
-      :aria-describedby="formError || formSuccess ? `${formStatusId} auth-legal` : 'auth-legal'"
+      :aria-describedby="formErrorKey || formSuccessKey ? `${formStatusId} auth-legal` : 'auth-legal'"
       novalidate
       @submit.prevent="submitAuth"
     >
@@ -295,7 +295,7 @@ function authCallbackError(value: unknown): string {
         :id="inputId"
         :label="t('common.email')"
         :hint="intent === 'activate' ? t('activation.emailHelp') : undefined"
-        :error="fieldError"
+        :error="fieldErrorKey ? t(fieldErrorKey) : ''"
         required
         :required-label="t('common.required')"
       >
@@ -319,7 +319,7 @@ function authCallbackError(value: unknown): string {
         v-else-if="phoneStep === 'number'"
         :id="inputId"
         :label="t('auth.phone.label')"
-        :error="fieldError"
+        :error="fieldErrorKey ? t(fieldErrorKey) : ''"
         required
         :required-label="t('common.required')"
       >
@@ -345,7 +345,7 @@ function authCallbackError(value: unknown): string {
         v-else
         :id="inputId"
         :label="t('auth.phone.codeLabel')"
-        :error="fieldError"
+        :error="fieldErrorKey ? t(fieldErrorKey) : ''"
         required
         :required-label="t('common.required')"
       >
@@ -390,11 +390,11 @@ function authCallbackError(value: unknown): string {
         :action="turnstileAction"
       />
 
-      <AppNotice v-if="formError" :id="formStatusId" tone="error" announce="assertive">
-        {{ formError }}
+      <AppNotice v-if="formErrorKey" :id="formStatusId" tone="error" announce="assertive">
+        {{ t(formErrorKey) }}
       </AppNotice>
-      <AppNotice v-else-if="formSuccess" :id="formStatusId" tone="success" announce="polite">
-        {{ formSuccess }}
+      <AppNotice v-else-if="formSuccessKey" :id="formStatusId" tone="success" announce="polite">
+        {{ t(formSuccessKey) }}
       </AppNotice>
 
       <i18n-t id="auth-legal" keypath="auth.legal.acknowledgment" tag="p" class="legal-acknowledgment">

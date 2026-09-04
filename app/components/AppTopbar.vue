@@ -182,6 +182,7 @@ function currentParticipationLocation() {
         </nav>
 
         <div class="topbar-actions">
+          <LanguageSelector />
           <a
             class="topbar-link topbar-link--utility"
             href="https://chat.workingclassunity.com/"
@@ -190,7 +191,7 @@ function currentParticipationLocation() {
             @click="closeMobileMenu"
           >
             {{ t('navigation.forum') }}
-            <span class="visually-hidden"> (opens in a new tab)</span>
+            <span class="visually-hidden"> ({{ t('common.opensInNewTab') }})</span>
           </a>
           <AppNotice
             v-if="sessionError"
@@ -399,7 +400,7 @@ function currentParticipationLocation() {
     background: var(--color-brand-primary);
   }
 
-  @media (width <= 60rem) {
+  @media (width <= 77rem) {
     .topbar-row {
       grid-template-columns: minmax(0, 1fr) auto auto;
       gap: 0 0.625rem;
