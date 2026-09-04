@@ -8,12 +8,6 @@
       "sign_pledge": "Firma el compromiso",
       "region_label": "Condado de San Joaquín",
       "published_read_time": "Publicado por WCU • 3 min de lectura",
-      "languageLabel": "Idioma",
-      "languages": {
-        "en": "English",
-        "es": "Español",
-        "pa": "ਪੰਜਾਬੀ"
-      },
       "outline": {
         "label": "Secciones del Frente Unido",
         "title": "En esta página",
@@ -82,5 +76,758 @@
       "heading": "Organizaciones que respaldan esta declaración",
       "description": "Un registro público de las organizaciones que han respaldado esta declaración."
     }
+  },
+  "common": {
+    "email": "Correo electrónico",
+    "emailInvalid": "Ingrese una dirección de correo electrónico válida.",
+    "language": "Idioma",
+    "opensInNewTab": "se abre en una nueva pestaña",
+    "required": "requerido",
+    "retry": "Intentar otra vez",
+    "checkingSession": "Comprobando su sesión...",
+    "sessionVerificationFailed": "No pudimos verificar su sesión en este momento.",
+    "source": "Fuente",
+    "working": "Procesando...",
+    "carousel": {
+      "label": "Fotos de la comunidad Working Class Unity."
+    }
+  },
+  "metadata": {
+    "defaultDescription": "Working Class Unity.",
+    "home": {
+      "title": "Working Class Unity",
+      "description": "Trabajadores que se organizan juntos en San Joaquin County."
+    },
+    "about": {
+      "title": "Acerca de",
+      "description": "Conozca por qué Working Class Unity está construyendo en San Joaquin County una organización de la clase trabajadora dirigida por sus miembros."
+    },
+    "bylaws": {
+      "title": "Estatutos",
+      "description": "Lea los estatutos que rigen la membresía, las decisiones democráticas, los líderes electos, las campañas y los comités de Working Class Unity."
+    },
+    "calendar": {
+      "title": "Calendario",
+      "description": "Encuentre los próximos eventos y reuniones de Working Class Unity."
+    },
+    "links": {
+      "title": "Enlaces",
+      "description": "Encuentre la campaña actual de Working Class Unity, los próximos eventos y las formas de participar."
+    },
+    "forum": {
+      "title": "Foro",
+      "description": "Visite el foro de la comunidad Working Class Unity."
+    },
+    "removeFlock": {
+      "overview": {
+        "title": "Eliminar la vigilancia masiva de Stockton",
+        "description": "La misión secundaria de Working Class Unity para eliminar el sistema privado de seguimiento masivo de Stockton."
+      },
+      "whatStocktonBought": {
+        "title": "Lo que compró Stockton",
+        "description": "Un relato basado en fuentes sobre los contratos, costos, herramientas y preguntas sin resolver de Flock en Stockton."
+      },
+      "whySafeguards": {
+        "title": "Por qué las salvaguardias no son suficientes",
+        "description": "Por qué las restricciones inmediatas pueden reducir el daño pero no pueden reemplazar la eliminación del sistema Flock de Stockton."
+      },
+      "faq": {
+        "title": "FAQ de Flock en Stockton",
+        "description": "Respuestas sobre seguridad, datos de movimiento, tecnología policial, gasto público y eliminación."
+      }
+    },
+    "login": {
+      "title": "Iniciar sesión"
+    },
+    "activate": {
+      "title": "Active su cuenta"
+    },
+    "signup": {
+      "title": "Crear cuenta"
+    },
+    "app": {
+      "title": "Aplicación"
+    },
+    "account": {
+      "title": "Cuenta"
+    },
+    "observability": {
+      "title": "Prueba de observabilidad"
+    },
+    "privacy": {
+      "title": "Política de privacidad",
+      "description": "Plantilla de política de privacidad para Working Class Unity."
+    },
+    "terms": {
+      "title": "Términos",
+      "description": "Plantilla de términos para Working Class Unity."
+    },
+    "errorTitle": "{heading} {'|'} {appName}"
+  },
+  "navigation": {
+    "skipToMain": "Saltar al contenido principal",
+    "applicationLabel": "Encabezado del sitio de Working Class Unity",
+    "brandHome": "Inicio de {appName}",
+    "primaryLabel": "Principal",
+    "sessionUnavailable": "Verificación de sesión no disponible",
+    "about": "Quiénes somos",
+    "currentWork": "Trabajo actual",
+    "calendar": "Eventos",
+    "forum": "Foro de miembros",
+    "menu": "Menú",
+    "app": "Aplicación",
+    "login": "Inicio de sesión de miembro",
+    "signup": "Únase a WCU",
+    "getInvolved": "Participe"
+  },
+  "removeFlock": {
+    "campaignLabel": "Misión secundaria para eliminar la vigilancia masiva de Stockton",
+    "campaignHome": "Resumen de Eliminar la vigilancia masiva de Stockton",
+    "navigationLabel": "Misión secundaria",
+    "navigation": {
+      "overview": "Descripción general",
+      "whatStocktonBought": "Lo que compró Stockton",
+      "whySafeguards": "Eliminación, no reforma",
+      "faq": "FAQ"
+    },
+    "petitionAction": "Firmar la petición",
+    "reviewedThrough": "Última actualización material: {date}.",
+    "shell": {
+      "kicker": "MISIÓN SECUNDARIA DE WCU",
+      "name": "Vigilancia masiva",
+      "footerHome": "Eliminar la vigilancia masiva de Stockton"
+    },
+    "outline": {
+      "title": "En esta pagina",
+      "description": "Saltar a una sección de esta página.",
+      "trigger": "En esta pagina",
+      "close": "Cerrar esquema de página",
+      "articleLabel": "secciones {title}"
+    },
+    "sources": {
+      "title": "Fuentes y notas",
+      "description": "Las fuentes están numeradas por primera aparición. Los enlaces de retorno conducen al reclamo exacto citado.",
+      "published": "Publicado {date}",
+      "reviewed": "Revisado {date}",
+      "citedHere": "Citado en esta página",
+      "returnNavigation": "Volver a citas de la fuente {number}",
+      "returnToCitation": "Volver a la cita {citation}",
+      "returnToCitationAt": "{citationLabel}, {locator}",
+      "types": {
+        "stocktonRecord": "registro Stockton",
+        "archivedPortal": "Portal archivado de Flock",
+        "thirdPartyAnalysis": "Análisis de terceros",
+        "officialSource": "Fuente oficial legal/política",
+        "vendorSource": "Fuente del proveedor",
+        "pressReport": "Informe de prensa",
+        "recordsRequested": "Registros solicitados",
+        "wcuAnalysis": "análisis WCU"
+      }
+    },
+    "citation": {
+      "label": "Fuente {occurrence}: {title}",
+      "shortLabel": "FUENTE {occurrence}",
+      "location": "Ubicación: {locator}",
+      "viewSource": "Ver fuente",
+      "goToNote": "Ir a la nota de la fuente"
+    },
+    "landing": {
+      "location": "STOCKTON",
+      "signDemand": "Firmar la carta de demanda",
+      "readWhatBought": "Lea lo que compró Stockton",
+      "recordProvenance": "Registros de la ciudad de Stockton · 31 de marzo de 2026 · revisado el 3 de mayo de 2026",
+      "sources": "Fuentes",
+      "claimContext": "Fuente y contexto de la afirmación",
+      "exploreSystem": "Explore el sistema completo",
+      "whyRemoval": "¿Por qué la eliminación?",
+      "readRemovalCase": "Lea el caso completo para la eliminación",
+      "organize": "Organícese",
+      "joinWcu": "Únase a Working Class Unity",
+      "updatesTitle": "Obtenga actualizaciones de Deflock Stockton por correo electrónico o mensaje de texto.",
+      "stayInformed": "Manténgase informado",
+      "updatesDescription": "Regístrese para recibir actualizaciones sobre esta campaña y otras actualizaciones de WCU.",
+      "caseLabels": {
+        "safety": "La seguridad es un bien público.",
+        "risk": "El riesgo es desigual.",
+        "power": "La clase trabajadora debe tener el poder"
+      },
+      "systemLabels": {
+        "movement": "Recopilar información",
+        "response": "Conectar recursos",
+        "observation": "Vigilarnos a todos",
+        "vendor": "Depender de un proveedor privado"
+      },
+      "safetyLabels": {
+        "homes": "Hogares estables",
+        "work": "Trabajo seguro y espacio público",
+        "care": "Cuidado y prevención",
+        "control": "Control público"
+      },
+      "recordValues": {
+        "term": "14 de abril de 2031",
+        "system": "Un sistema conectado"
+      }
+    },
+    "faq": {
+      "groupsLabel": "grupos FAQ"
+    },
+    "record": {
+      "missingAmendment": "Stockton debe publicar la enmienda faltante y los registros que la autorizaron.",
+      "continueLabel": "Continuar con la campaña Eliminar Flock de Stockton",
+      "continue": "Continuar con la campaña",
+      "overview": "Ver el resumen de la campaña"
+    },
+    "footer": {
+      "description": "Una misión secundaria de Working Class Unity para eliminar el sistema privado de seguimiento masivo de Stockton.",
+      "campaign": "misión secundaria",
+      "wcu": "Working Class Unity",
+      "accountability": "Responsabilidad",
+      "sourceNote": "Los reclamos están vinculados a registros públicos o fuentes nombradas. Las preguntas abiertas permanecen marcadas como desconocidas.",
+      "privacy": "Política de privacidad",
+      "terms": "Términos"
+    }
+  },
+  "account": {
+    "eyebrow": "Configuraciones personales",
+    "title": "Cuenta",
+    "sessionUnavailable": {
+      "title": "Cuenta no disponible"
+    },
+    "loginRequired": {
+      "title": "Continuar iniciando sesión",
+      "description": "Se requiere una sesión iniciada para ver esta página."
+    },
+    "profile": {
+      "title": "Configuración de perfil",
+      "description": "Agregue estos detalles cuando esté listo. No son obligatorios para usar su cuenta.",
+      "help": "Los nombres y apellidos permanecen en la configuración de la cuenta. Solo se utiliza un nombre para mostrar explícito en otras partes de su cuenta WCU.",
+      "firstName": "Nombre de pila",
+      "lastName": "Apellido",
+      "displayName": "Nombre para mostrar",
+      "optional": "Opcional",
+      "displayNameHelp": "Opcional. Su correo electrónico o número de teléfono se utiliza en su panel de control y en el menú de su cuenta cuando está en blanco.",
+      "save": "Guardar perfil",
+      "saving": "Guardando perfil...",
+      "saved": "Perfil guardado.",
+      "saveError": "No pudimos guardar su perfil en este momento. Por favor inténtalo de nuevo."
+    },
+    "identity": {
+      "title": "Detalles de inicio de sesión",
+      "avatar": "Avatar",
+      "avatarAlt": "Avatar para {identity}",
+      "noAvatar": "Sin avatar",
+      "phone": "Número de teléfono",
+      "notAdded": "No agregado"
+    },
+    "email": {
+      "title": "Inicio de sesión por correo electrónico",
+      "description": "Un correo electrónico verificado le brinda otra forma de iniciar sesión en esta misma cuenta.",
+      "current": "Dirección de correo electrónico",
+      "status": "Estado del correo electrónico",
+      "verified": "Verificado",
+      "notVerified": "No verificado",
+      "addEmail": "Agregar una dirección de correo electrónico",
+      "newEmail": "Nueva dirección de correo electrónico",
+      "help": "Le enviaremos un enlace de verificación WCU. Su correo electrónico se convierte en un inicio de sesión solo después de hacer clic en él.",
+      "required": "Se requiere correo electrónico.",
+      "unchanged": "Ingrese una dirección de correo electrónico diferente.",
+      "sending": "Enviando enlace de verificación...",
+      "send": "Enviar enlace de verificación",
+      "requested": "Si se puede utilizar esa dirección, un enlace de verificación WCU está en camino.",
+      "requestError": "No pudimos enviar el enlace de verificación. Inténtelo de nuevo o comuníquese con WCU."
+    },
+    "membership": {
+      "title": "membresía WCU",
+      "description": "El monto de su contribución no cambia sus derechos de membresía.",
+      "loading": "Cargando su estado de membresía...",
+      "loadError": "No pudimos cargar su estado de membresía en este momento.",
+      "accountType": "Tipo de cuenta",
+      "supporter": "Colaborador",
+      "member": "Miembro",
+      "contribution": "Contribución actual",
+      "amountMonthly": "${amount} por mes",
+      "equalRights": "Las contribuciones $10 y $27 tienen derechos de membresía idénticos.",
+      "currentContribution": "Contribución actual",
+      "scheduledContribution": "Contribución programada",
+      "identityReviewTitle": "Es necesario revisar la coincidencia de membresía",
+      "identityReview": "No pudimos relacionar de manera segura esta cuenta con una membresía existente. Póngase en contacto con WCU antes de iniciar otra suscripción.",
+      "joinContribution": "Conviértete en miembro por ${amount}/mes",
+      "changeContribution": "Cambiar a ${amount}/mes",
+      "changeSaved": "Su cambio de contribución está programado para su próxima renovación.",
+      "paymentProblemTitle": "El pago necesita atención",
+      "paymentProblem": "Conserva todos los derechos de membresía hasta {deadline}. Corrija el pago antes de esa fecha para seguir siendo miembro.",
+      "fixPayment": "Arreglar pago",
+      "managePayment": "Gestionar pago",
+      "cancellationTitle": "Cancelación de membresía programada",
+      "cancellation": "Sus derechos de membresía continúan hasta {deadline}.",
+      "changePendingTitle": "Cambio de contribución programado",
+      "changePending": "Su contribución cambia a ${amount}/mes el {deadline}. No hay prorrateo.",
+      "checkoutCancelled": "El proceso de pago se canceló. No se hizo ningún cargo a su cuenta.",
+      "refresh": "Actualizar el estado de Stripe",
+      "refreshed": "Su estado Stripe está actualizado.",
+      "commandError": "No pudimos completar esa acción Stripe. Inténtelo de nuevo o comuníquese con WCU.",
+      "dateUnavailable": "la fecha que se muestra en Stripe"
+    },
+    "menu": {
+      "triggerLabel": "Menú de cuenta para {identity}",
+      "account": "Cuenta",
+      "signingOut": "Cerrando sesión...",
+      "signOut": "Cerrar sesión",
+      "signOutError": "No pudimos confirmar que cerró la sesión. Es posible que su sesión aún esté activa. Inténtelo de nuevo."
+    },
+    "deletion": {
+      "title": "Eliminar cuenta",
+      "description": "Al eliminar la cuenta, se borran su acceso y el contenido privado de la aplicación.",
+      "billingWarning": "Si posee una suscripción Stripe, la eliminación espera hasta que se confirme la cancelación. Su cuenta permanece disponible mientras ese resultado sea incierto; posteriormente, podremos conservar solo las referencias de facturación mínimas necesarias para la conciliación.",
+      "confirmationLabel": "Escriba {confirmation} para confirmar",
+      "help": "Una vez confirmada cualquier cancelación requerida de Stripe, esta acción no tiene período de gracia.",
+      "deleting": "Eliminando cuenta...",
+      "submit": "Eliminar cuenta",
+      "sessionTooOld": "Su sesión es demasiado antigua para esta acción. Cierre sesión, inicie sesión nuevamente y luego vuelva a intentar la eliminación.",
+      "billingPending": "La cancelación de Stripe no está confirmada, por lo que su cuenta no fue eliminada. Espere brevemente y vuelva a intentarlo.",
+      "unknownResult": "No pudimos confirmar si se completó la eliminación. Intente iniciar sesión de nuevo. Si esta cuenta todavía se abre, puede volver a intentarlo."
+    }
+  },
+  "security": {
+    "check": {
+      "label": "control de seguridad",
+      "complete": "Control de seguridad completo.",
+      "failure": "No se pudo completar el control de seguridad.",
+      "progress": "Control de seguridad en curso.",
+      "retry": "Reintentar control de seguridad"
+    }
+  },
+  "auth": {
+    "login": {
+      "eyebrow": "Bienvenido de nuevo",
+      "title": "Iniciar sesión",
+      "introduction": "Utilice su dirección de correo electrónico o número de teléfono de EE. UU. para iniciar sesión sin contraseña.",
+      "needAccount": "¿Necesita una nueva cuenta?",
+      "join": "Únase a WCU.",
+      "alreadyPay": "¿Ya pagas cuotas mensuales?",
+      "activate": "Active su cuenta."
+    },
+    "signup": {
+      "eyebrow": "Comenzar",
+      "title": "Cree su cuenta",
+      "introduction": "Cree una cuenta de colaborador con correo electrónico o un número de teléfono de EE. UU., o regrese a su cuenta WCU existente."
+    },
+    "method": {
+      "label": "Elija cómo continuar",
+      "email": "Usar correo electrónico",
+      "phone": "Usar teléfono"
+    },
+    "errors": {
+      "authenticationFailed": "No pudimos completar la autenticación. Solicite un nuevo enlace de correo electrónico.",
+      "accountNotActivated": "Este correo electrónico no tiene una cuenta del sitio web WCU activada. Utilice Únase a WCU o Active su cuenta a continuación.",
+      "loginLinkUnavailable": "Este enlace de inicio de sesión expiró o ya se utilizó. Solicite un nuevo enlace de correo electrónico.",
+      "activationLinkUnavailable": "Este enlace de activación ya no está disponible. Solicite otro enlace de activación o comuníquese con WCU.",
+      "formInvalid": "Verifique el campo resaltado e inténtelo nuevamente.",
+      "securityRequired": "Complete el control de seguridad antes de continuar.",
+      "emailLink": "No pudimos enviar un enlace de correo electrónico en este momento. Por favor inténtalo de nuevo.",
+      "phoneCode": "No pudimos enviar un texto de verificación. Verifique el número de teléfono de EE. UU. e inténtelo nuevamente.",
+      "phoneVerification": "Ese código de verificación no funcionó. Revise el código o solicite uno nuevo.",
+      "phoneUnavailable": "La verificación telefónica no está disponible en este momento. Por favor inténtalo de nuevo."
+    },
+    "status": {
+      "signedOut": "Has cerrado sesión.",
+      "billingEmailChecked": "Si se pudo verificar este correo electrónico de facturación, ahora estará listo para iniciar sesión por correo electrónico. Solicite un enlace de inicio de sesión a continuación.",
+      "activationComplete": "Su cuenta fue activada, pero el inicio de sesión automático no se completó. Solicite un enlace de inicio de sesión a continuación.",
+      "emailLinkSent": "Si puede recibir correo electrónico en esa dirección, un enlace de inicio de sesión está en camino.",
+      "phoneCodeSent": "Un código de verificación único está en camino."
+    },
+    "sessionUnavailable": {
+      "title": "Verificación de sesión no disponible",
+      "description": "No pudimos verificar su sesión actual. Aún puede solicitar un nuevo enlace por correo electrónico."
+    },
+    "email": {
+      "required": "Se requiere correo electrónico.",
+      "sending": "Envío...",
+      "submit": "Enviar enlace de correo electrónico"
+    },
+    "phone": {
+      "label": "número de teléfono de EE. UU.",
+      "required": "Se requiere número de teléfono.",
+      "invalid": "Ingrese un número de teléfono válido de EE. UU.",
+      "help": "Le enviaremos un mensaje de texto a este número con un código de verificación único. Es posible que se apliquen tarifas de mensajes y datos.",
+      "sending": "Enviando código...",
+      "send": "Envíame un código",
+      "codeLabel": "Código de verificación",
+      "codeRequired": "Se requiere código de verificación.",
+      "codeInvalid": "Ingrese el código numérico del mensaje de texto.",
+      "codeHelp": "Ingrese el código enviado a {phone}.",
+      "verifying": "Verificando...",
+      "verify": "Verificar y continuar",
+      "change": "Use otro número"
+    },
+    "legal": {
+      "acknowledgment": "Al continuar, reconoces {terms} y {privacy}.",
+      "terms": "Términos",
+      "privacy": "Política de privacidad"
+    }
+  },
+  "activation": {
+    "eyebrow": "Miembros pagos existentes",
+    "title": "Active su cuenta",
+    "introduction": "Si ya paga las cuotas mensuales de WCU a través de Stripe, utilice el correo electrónico de esa membresía de Stripe para activar su cuenta del sitio web.",
+    "emailHelp": "Enviaremos el enlace únicamente al correo electrónico actual de la membresía Stripe elegible.",
+    "submit": "Enviar enlace de activación",
+    "sending": "Comprobando...",
+    "error": "No pudimos solicitar la activación de la cuenta en este momento. Por favor inténtalo de nuevo.",
+    "status": "Si este correo electrónico es elegible, se enviará un enlace de activación al correo electrónico que actualmente tiene Stripe. De lo contrario, comuníquese con WCU.",
+    "existingAccount": "¿La cuenta ya está activada?",
+    "login": "Iniciar sesión.",
+    "newAccount": "¿Necesita una nueva membresía?",
+    "join": "Únase a WCU.",
+    "support": "Contacto WCU"
+  },
+  "errors": {
+    "notFound": {
+      "heading": "Página no encontrada",
+      "description": "No se pudo encontrar la página solicitada."
+    },
+    "unexpected": {
+      "heading": "algo salió mal",
+      "description": "La aplicación no pudo completar esta solicitud."
+    },
+    "status": "Estado {statusCode}",
+    "recoveryFailed": "No pudimos regresar a casa. Vuelva a cargar la página e inténtelo de nuevo.",
+    "returningHome": "Volviendo al inicio...",
+    "returnHome": "Volver al inicio"
+  },
+  "observability": {
+    "eyebrow": "Observabilidad",
+    "title": "Prueba de evento del cliente",
+    "preparing": "Preparando prueba de evento del cliente.",
+    "missingToken": "Falta el hash del token.",
+    "validating": "Validando el token de prueba.",
+    "sent": "Evento de prueba del cliente enviado.",
+    "sentWithId": "Evento de prueba del cliente enviado: {eventId}",
+    "failed": "La validación de la prueba del cliente falló."
+  },
+  "legal": {
+    "eyebrow": "Plantilla legal",
+    "privacy": {
+      "title": "Política de privacidad",
+      "notice": "Este texto es un aviso de personalización, no una política de privacidad de producción ni un consejo legal. Reemplácelo antes del lanzamiento.",
+      "information": {
+        "title": "Información y finalidad",
+        "description": "Describa la información que recopila Working Class Unity, por qué se necesita, si es obligatoria y cómo pueden las personas revisarla o corregirla."
+      },
+      "providers": {
+        "title": "Proveedores y datos compartidos",
+        "description": "Enumere todos los proveedores de autenticación, pago, infraestructura, análisis, correo electrónico y defensa contra abusos junto con la información que recibe cada proveedor."
+      },
+      "abuseDefense": {
+        "title": "Defensa contra abuso",
+        "description": "Las páginas de enlace mágico cargan el script y el marco del desafío Turnstile de Cloudflare, que permiten a Cloudflare procesar las señales del navegador y de la red para distinguir a las personas de los robots. La aplicación envía el token opaco resultante a Cloudflare Siteverify, pero no agrega el campo de visitante opcional IP, no habilita la retroalimentación de falla del widget, no retiene el token o la respuesta del proveedor en los datos de la aplicación o en los registros ordinarios, ni muestra los códigos de error del proveedor. Describa la retención real de la implementación y enlace a {addendum} de Cloudflare.",
+        "addendum": "Anexo de privacidad de Turnstile"
+      },
+      "retention": {
+        "title": "Retención y opciones",
+        "description": "Indique los períodos de retención reales, el comportamiento de eliminación de cuentas, las excepciones del historial de facturación, los controles de seguridad y un método de contacto funcional para preguntas sobre privacidad."
+      }
+    },
+    "terms": {
+      "title": "Términos",
+      "notice": "Este texto es un aviso de personalización, no términos de producción ni asesoramiento legal. Reemplácelo antes del lanzamiento.",
+      "service": {
+        "title": "el servicio",
+        "description": "Describa qué proporciona Working Class Unity, quién puede usarlo y cualquier requisito de elegibilidad o cuenta."
+      },
+      "conduct": {
+        "title": "Uso aceptable",
+        "description": "Documente las reglas de conducta, contenido, automatización y abuso adecuadas para el servicio."
+      },
+      "payments": {
+        "title": "Pagos y finalización del acceso",
+        "description": "Explique el precio real, renovación, cancelación, reembolso, eliminación de cuenta y comportamiento de acceso."
+      }
+    }
+  },
+  "publicPages": {
+    "eyebrow": "Sitio público",
+    "about": {
+      "eyebrow": "Nuestra historia",
+      "title": "Ellos tienen sus partidos. Nosotros necesitamos nuestra propia organización",
+      "introduction": "Los patrones y terratenientes tienen dos partidos políticos. La clase trabajadora necesita una organización de lucha propia.",
+      "photoCaption": "Working Class Unity, camaradas y aliados en San Joaquin County.",
+      "problem": {
+        "title": "El problema",
+        "bodyOne": "En todo San Joaquín, los alquileres aumentan mientras nuestros salarios se estancan. Los patrones exigen más y dan menos. Tanto el partido Demócrata como el Republicano responden ante sus donantes, no ante nosotros.",
+        "bodyTwo": "Nuestro sistema político y económico no está roto; está funcionando exactamente como fue diseñado para proteger las ganancias de los ricos manteniéndonos al resto de nosotros divididos e impotentes. Nos hace demasiado pobres para vivir y ser dueños de las casas que hemos construido, demasiado pobres para comer los alimentos que hemos cultivado y servido, demasiado pobres para beneficiarnos de los frutos de nuestro trabajo."
+      },
+      "solution": {
+        "title": "Nuestra solución",
+        "bodyOne": "Nos negamos a aceptar esto. Estamos organizando un movimiento masivo de la clase trabajadora para construir la democracia genuina que merecemos, una en la que los trabajadores tengamos control real sobre nuestras vidas, nuestras comunidades y nuestra economía. No somos un partido político. Nos organizamos colectivamente a través de una membresía masiva. No tenemos que seguir dependiendo de los políticos, ejerciendo presión sobre ellos y esperando que se pongan de nuestro lado por encima de sus donantes.",
+        "bodyTwo": "Working Class Unity es tal como su nombre lo indica, una organización que lucha para unir a la clase trabajadora, para darle a las personas de San Joaquín control sobre sus vidas. Exigimos viviendas verdaderamente asequibles y seguras, autonomía en el lugar de trabajo, protección de nuestras comunidades de la opresión policial y responsabilidad de nuestros funcionarios electos. Nuestra misión es fortalecer el poder de la clase trabajadora forjando alianzas entre sindicatos de trabajadores e inquilinos y movimientos sociales a través de la educación, la promoción y la acción directa.",
+        "bodyThree": "Luchamos por nuestras familias. Por la prosperidad futura de nuestros hijos. Cualquiera que sea su raza, su credo, su lugar de nacimiento, no se quede quieto y permita que los ricos derriben este país que cada uno de nosotros ha ayudado a construir."
+      },
+      "governance": {
+        "eyebrow": "Dirigido por miembros por diseño",
+        "title": "Cómo nos gobernamos a nosotros mismos",
+        "description": "Nuestros estatutos establecen las reglas sobre cómo los miembros gobiernan Working Class Unity, toman decisiones colectivas y hacen responsable a la organización.",
+        "action": "Lea nuestros estatutos"
+      },
+      "cta": {
+        "eyebrow": "Construir poder duradero",
+        "title": "Organícese con nosotros",
+        "description": "Juntos, podemos construir un movimiento dirigido por sus miembros en San Joaquin County que obtenga victorias concretas, sin los compromisos y traiciones de los políticos y sus donantes ricos.",
+        "action": "ÚNASE A WCU"
+      }
+    },
+    "bylaws": {
+      "eyebrow": "Gobernado por miembros",
+      "title": "Working Class Unity Estatutos",
+      "introduction": "Estos estatutos describen cómo los miembros gobiernan Working Class Unity: quién puede participar, cómo se toman las decisiones y cómo nuestros órganos electos, campañas y comités son responsables.",
+      "sourceAction": "Ver el documento fuente",
+      "sourceUpdated": "Última actualización el 12 de febrero de 2026.",
+      "documentLabel": "estatutos Working Class Unity",
+      "articleLabel": "Artículo {number}",
+      "sectionLabel": "Sección {number}",
+      "outline": {
+        "label": "Contenido de los estatutos",
+        "title": "En esta página",
+        "description": "Saltar a un artículo o sección.",
+        "trigger": "En esta pagina",
+        "close": "Cerrar contenidos estatutos"
+      }
+    },
+    "calendar": {
+      "title": "Calendario",
+      "description": "Nuestras reuniones públicas, eventos y acciones aparecerán aquí pronto."
+    },
+    "links": {
+      "eyebrow": "WCU · Enlaces rápidos",
+      "title": "Working Class Unity",
+      "introduction": "Una organización dirigida por sus miembros que reúne a trabajadores de San Joaquin County para lograr cambios concretos, desarrollar líderes y construir un poder duradero.",
+      "campaign": {
+        "eyebrow": "Campaña actual · Stockton",
+        "title": "Eliminar la vigilancia masiva de Stockton",
+        "description": "Vea lo que compró Stockton, por qué las salvaguardias no son suficientes y cómo los residentes pueden ayudar a eliminar el sistema de seguimiento masivo de Flock.",
+        "action": "Abra la descripción general de la campaña de Deflock"
+      },
+      "events": {
+        "eyebrow": "Conozca a WCU",
+        "title": "Próximos eventos",
+        "all": "Calendario completo",
+        "loading": "Cargando próximos eventos…",
+        "error": "Los próximos eventos no están disponibles temporalmente.",
+        "empty": "No se publican próximos eventos en este momento. Consulte el calendario completo para obtener actualizaciones.",
+        "rsvp": "RSVP o detalles",
+        "virtual": "En línea",
+        "hybrid": "En persona y en línea",
+        "locationPending": "Ubicación compartida por el organizador"
+      },
+      "more": {
+        "title": "Más formas de conectarse",
+        "getInvolved": {
+          "title": "Participe",
+          "description": "Encuentre un primer paso de baja presión en el trabajo."
+        },
+        "join": {
+          "title": "Únase a WCU",
+          "description": "Obtenga más información sobre la membresía en una organización dirigida por miembros."
+        },
+        "about": {
+          "title": "Quiénes somos",
+          "description": "Lea por qué existe WCU y cómo lo gobiernan los miembros."
+        }
+      }
+    },
+    "forum": {
+      "title": "Foro",
+      "description": "Se está preparando el espacio de discusión comunitaria."
+    }
+  },
+  "home": {
+    "eyebrow": "WORKING CLASS UNITY · CONDADO DE SAN JOAQUIN",
+    "title": "Los trabajadores necesitamos una organización propia",
+    "introduction": "WCU es una organización dirigida por sus miembros que reúne a trabajadores de todo San Joaquin County para lograr cambios concretos, desarrollar líderes y construir un poder duradero.",
+    "actions": {
+      "events": "Ver próximos eventos"
+    },
+    "currentWork": {
+      "meta": "Misión secundaria actual · Stockton",
+      "title": "Eliminar la vigilancia masiva de Stockton",
+      "description": "Stockton extendió su acuerdo Flock hasta el 14 de abril de 2031, con un contrato máximo declarado de $5.4167 millones. WCU se está organizando para la eliminación y un control público significativo sobre el gasto en vigilancia.",
+      "navigationLabel": "Explore la campaña para eliminar Flock de Stockton",
+      "pages": {
+        "overview": "Descripción general de la campaña · lo que exige WCU",
+        "whatStocktonBought": "Lo que compró Stockton · contratos, cámaras y costos",
+        "removalNotReform": "Eliminación, no reforma · por qué las salvaguardias no son suficientes",
+        "faq": "Flock FAQ · respuestas sobre seguridad, datos y eliminación"
+      },
+      "petitionAction": "Firme la carta de demanda."
+    },
+    "governance": {
+      "eyebrow": "CÓMO FUNCIONA WCU",
+      "title": "Los miembros toman las decisiones.",
+      "description": "Las Asambleas Generales son nuestro máximo órgano de gobierno. Los miembros votan, proponen nuevas ideas, ocupan cargos y dirigen campañas.",
+      "action": "Lea cómo funciona WCU",
+      "sourceCurrentThrough": "Estatutos actualizados el 12 de febrero de 2026",
+      "source": "leer los estatutos",
+      "generalMeetings": {
+        "value": "ASAMBLEAS GENERALES",
+        "label": "Órgano de gobierno primario"
+      },
+      "campaignVote": {
+        "value": "DOS TERCIOS",
+        "label": "Vote para adoptar una campaña de enfoque"
+      },
+      "campaignReview": {
+        "value": "6 MESES",
+        "label": "Ciclo de reaprobación de campaña"
+      }
+    },
+    "proofLabel": "NORMAS PÚBLICAS · VERIFICADAS EN LOS ESTATUTOS",
+    "participation": {
+      "title": "Empiece por presentarse",
+      "description": "No es necesario que se convierta en miembro antes de conocer a WCU. Comience con un evento público, una campaña o una tarea delimitada.",
+      "routes": {
+        "events": {
+          "title": "Venga a un evento",
+          "description": "Conozca a los miembros y aprenda qué está haciendo WCU ahora.",
+          "action": "Ver próximos eventos"
+        },
+        "campaign": {
+          "title": "Únase a una acción de campaña",
+          "description": "Firme, comparta, haga visitas puerta a puerta, instale una mesa o ayude con la investigación.",
+          "action": "Ver trabajo actual"
+        },
+        "updates": {
+          "title": "Manténgase informado",
+          "description": "Reciba invitaciones a reuniones, acciones y eventos sociales.",
+          "action": "Obtenga actualizaciones de WCU"
+        }
+      },
+      "closingTitle": "El primer paso es participar",
+      "closingDescription": "No hay ningún evento próximo publicado en este momento. Reciba actualizaciones para conocer la próxima forma de conocernos.",
+      "closingAction": "Participe"
+    },
+    "footer": {
+      "boundary": "Confirmación automática inmediata; respuesta de una persona en una semana. No ofrecemos respuesta de emergencia, representación legal ni gestión garantizada de casos.",
+      "navigationLabel": "Pie de página",
+      "privacy": "Privacidad"
+    }
+  },
+  "calendar": {
+    "eyebrow": "calendario WCU",
+    "title": "Encuentre cómo participar",
+    "description": "Asista a una reunión de organización, actúe con sus vecinos o conozca gente en una reunión comunitaria. Los eventos públicos están abiertos a los recién llegados. Los miembros que hayan iniciado sesión también pueden ver las reuniones de miembros.",
+    "view": {
+      "label": "Vista de calendario",
+      "agenda": "Orden del día",
+      "month": "Mes"
+    },
+    "loading": "Cargando próximos eventos…",
+    "loadError": "No pudimos cargar el calendario.",
+    "empty": "Aún no se han publicado próximos eventos.",
+    "upcomingDates": "{count} próxima fecha | {count} próximas fechas",
+    "showingFrom": "Mostrando eventos de {date}.",
+    "delivery": {
+      "virtual": "En línea",
+      "hybrid": "En persona y en línea",
+      "in_person": "Ubicación compartida por el organizador"
+    },
+    "kinds": {
+      "meeting": "Reunión",
+      "action": "Acción",
+      "learning": "Aprendizaje",
+      "social": "Social"
+    },
+    "details": {
+      "time": "Hora",
+      "meetAt": "Punto de encuentro"
+    },
+    "filters": {
+      "label": "Filtrar próximos eventos",
+      "everything": "Todos",
+      "meeting": "Reunión",
+      "action": "Acciones",
+      "learning": "Aprendizaje",
+      "social": "Social"
+    },
+    "agenda": {
+      "title": "Próximos eventos",
+      "description": "Aquí aparece cada acontecimiento fechado, incluidas todas las fechas próximas en una serie recurrente.",
+      "noMatches": "Ningún evento coincide con este filtro todavía.",
+      "upNext": "A continuación",
+      "series": "Serie",
+      "noAdditional": "No hay eventos adicionales en esta vista.",
+      "recurring": "Eventos recurrentes",
+      "moreDates": "Más fechas"
+    },
+    "month": {
+      "title": "Vista mensual",
+      "description": "Seleccione un evento, no solo un día, para ver todos sus detalles.",
+      "previous": "Mes anterior",
+      "next": "Mes siguiente",
+      "eventsLabel": "Eventos de {month}",
+      "noEvents": "No hay eventos este mes",
+      "browse": "Utilice Anterior o Siguiente para buscar otro mes."
+    },
+    "picker": {
+      "jump": "Saltar a la fecha",
+      "label": "Elija una fecha de la agenda"
+    },
+    "actions": {
+      "rsvp": "RSVP",
+      "details": "Detalles del evento"
+    },
+    "directions": {
+      "title": "Cómo llegar",
+      "copy": "Copiar dirección",
+      "copied": "Dirección copiada",
+      "copiedAnnouncement": "Dirección copiada."
+    }
+  },
+  "join": {
+    "title": "Únase a Working Class Unity",
+    "chooseTier": "Elija su nivel",
+    "tiers": {
+      "supporter": {
+        "name": "Colaborador",
+        "price": "$0/mes"
+      },
+      "member": {
+        "name": "Miembro",
+        "price": "$10/mes"
+      },
+      "solidarity": {
+        "name": "Socio Solidario",
+        "price": "$27/mes"
+      }
+    },
+    "tierExplanation": "El nivel Colaborador solo incluye una cuenta. Ambos niveles de pago incluyen los mismos derechos de membresía.",
+    "continueToStripe": "Continuar a Stripe",
+    "codeOfConduct": "Unirse significa aceptar el Código de Conducta de WCU.",
+    "errors": {
+      "invalidLink": "Ese enlace de membresía no es válido o ya no está disponible.",
+      "checkoutUnavailable": "El pago no está disponible temporalmente. Por favor inténtalo de nuevo."
+    },
+    "complete": {
+      "title": "Revise su correo electrónico",
+      "pending": "Validando su inscripción Stripe…",
+      "sent": "Enviamos un enlace de cuenta al correo electrónico utilizado en Stripe Checkout. Úselo dentro de cinco minutos para terminar.",
+      "error": "No pudimos validar este proceso de pago.",
+      "return": "Volver a la página para unirse"
+    }
+  },
+  "personalApp": {
+    "eyebrow": "Working Class Unity",
+    "welcome": "Bienvenido de nuevo",
+    "welcomeNamed": "Bienvenido de nuevo, {name}",
+    "loading": {
+      "title": "Cargando su cuenta",
+      "description": "Recuperando la sesión de su cuenta."
+    },
+    "unavailable": {
+      "title": "Aplicación no disponible",
+      "description": "No pudimos cargar su cuenta en este momento."
+    },
+    "ready": "Su cuenta WCU está lista.",
+    "signedInAs": "Iniciado sesión como {identity}",
+    "manageAccount": "Administrar cuenta"
   }
 }

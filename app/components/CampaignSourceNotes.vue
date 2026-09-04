@@ -10,6 +10,18 @@ const props = defineProps<{
   idPrefix: string
   sources: readonly CampaignSource[]
 }>()
+const { t } = useI18n()
+
+const sourceTypeKeys = {
+  'Stockton record': 'stocktonRecord',
+  'Archived Flock portal': 'archivedPortal',
+  'Third-party analysis': 'thirdPartyAnalysis',
+  'Official legal/policy source': 'officialSource',
+  'Vendor source': 'vendorSource',
+  'Press report': 'pressReport',
+  'Records requested': 'recordsRequested',
+  'WCU analysis': 'wcuAnalysis'
+} as const satisfies Record<NonNullable<CampaignSource['sourceType']>, string>
 
 const citationsBySource = computed(() => {
   const grouped = new Map<string, CampaignCitationOccurrence[]>()
@@ -28,11 +40,12 @@ function noteId(source: CampaignSource) {
 }
 
 function sourceTypeFor(source: CampaignSource) {
-  if (source.sourceType) return source.sourceType
-  if (source.publisher === 'City of Stockton') return 'Stockton record'
-  if (source.publisher === 'Flock Safety') return 'Vendor source'
-  if (source.publisher === 'Stocktonia' || source.publisher === '404 Media') return 'Press report'
-  return 'Official legal/policy source'
+  let sourceType: NonNullable<CampaignSource['sourceType']> = 'Official legal/policy source'
+  if (source.sourceType) sourceType = source.sourceType
+  else if (source.publisher === 'City of Stockton') sourceType = 'Stockton record'
+  else if (source.publisher === 'Flock Safety') sourceType = 'Vendor source'
+  else if (source.publisher === 'Stocktonia' || source.publisher === '404 Media') sourceType = 'Press report'
+  return t(`removeFlock.sources.types.${sourceTypeKeys[sourceType]}`)
 }
 
 function citationsFor(sourceId: string) {
@@ -44,9 +57,13 @@ function occurrenceLabel(sourceNumber: number, occurrence: CampaignCitationOccur
 }
 
 function backlinkAccessibleName(sourceNumber: number, occurrence: CampaignCitationOccurrence) {
-  const citationLabel = `Return to citation ${occurrenceLabel(sourceNumber, occurrence)}`
+  const citationLabel = t('removeFlock.sources.returnToCitation', {
+    citation: occurrenceLabel(sourceNumber, occurrence)
+  })
 
-  return occurrence.locator ? `${citationLabel}, ${occurrence.locator}` : citationLabel
+  return occurrence.locator
+    ? t('removeFlock.sources.returnToCitationAt', { citationLabel, locator: occurrence.locator })
+    : citationLabel
 }
 
 function focusCitation(citationId: string) {
@@ -63,28 +80,32 @@ function focusCitation(citationId: string) {
     role="doc-bibliography"
   >
     <div class="campaign-source-register-heading">
-      <h2 :id="`${idPrefix}-source-register-title`">Sources and notes</h2>
-      <p>Sources are numbered by first appearance. Return links lead back to the exact cited claim.</p>
+      <h2 :id="`${idPrefix}-source-register-title`">{{ t('removeFlock.sources.title') }}</h2>
+      <p>{{ t('removeFlock.sources.description') }}</p>
     </div>
     <ol role="list">
       <li v-for="(source, sourceIndex) in sources" :id="noteId(source)" :key="source.id" tabindex="-1">
         <span class="campaign-source-type">{{ sourceTypeFor(source) }}</span>
-        <cite>
+        <cite lang="en">
           <a class="campaign-source-title" :href="source.url" target="_blank" rel="noopener noreferrer">
             {{ source.title }}
           </a>
         </cite>
         <p class="campaign-source-metadata">
-          {{ source.publisher }}<template v-if="source.published"> · Published {{ source.published }}</template
-          ><template v-if="source.reviewed"> · Reviewed {{ source.reviewed }}</template>
+          {{ source.publisher
+          }}<template v-if="source.published">
+            · {{ t('removeFlock.sources.published', { date: source.published }) }}</template
+          ><template v-if="source.reviewed">
+            · {{ t('removeFlock.sources.reviewed', { date: source.reviewed }) }}</template
+          >
         </p>
         <p v-if="source.note" class="campaign-source-note">{{ source.note }}</p>
         <nav
           v-if="citationsFor(source.id).length"
           class="campaign-source-backlinks"
-          :aria-label="`Return to citations for source ${sourceIndex + 1}`"
+          :aria-label="t('removeFlock.sources.returnNavigation', { number: sourceIndex + 1 })"
         >
-          <span>Cited in this page</span>
+          <span>{{ t('removeFlock.sources.citedHere') }}</span>
           <span class="campaign-source-backlink-list">
             <a
               v-for="citation in citationsFor(source.id)"
@@ -95,7 +116,9 @@ function focusCitation(citationId: string) {
               @click="focusCitation(citation.id)"
             >
               ↑ {{ occurrenceLabel(sourceIndex + 1, citation)
-              }}<template v-if="citation.locator"> · {{ citation.locator }}</template>
+              }}<template v-if="citation.locator">
+                · <span lang="en">{{ citation.locator }}</span></template
+              >
             </a>
           </span>
         </nav>

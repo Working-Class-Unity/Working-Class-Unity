@@ -4,7 +4,8 @@ import { isStripeMembershipCancellationScheduled, type AccountMembershipState } 
 
 type BillingOperation = 'change' | 'checkout' | 'portal' | 'reconcile'
 
-const { t } = useI18n()
+const { locale, localeProperties, t } = useI18n()
+const languageTag = computed(() => localeProperties.value.language ?? locale.value)
 const route = useRoute()
 const {
   data: state,
@@ -40,7 +41,7 @@ function formatDate(value: string | null): string {
   if (!value) return t('account.membership.dateUnavailable')
   const date = new Date(value)
   if (!Number.isFinite(date.getTime())) return t('account.membership.dateUnavailable')
-  return new Intl.DateTimeFormat('en-US', { dateStyle: 'long', timeStyle: 'short' }).format(date)
+  return new Intl.DateTimeFormat(languageTag.value, { dateStyle: 'long', timeStyle: 'short' }).format(date)
 }
 
 function actionFor(offering: MembershipDuesOfferingKey): 'change' | 'checkout' | 'current' | 'scheduled' | null {
@@ -78,9 +79,9 @@ async function chooseOffering(offering: MembershipDuesOfferingKey) {
     }
     await $fetch('/api/account/billing/change', { method: 'POST', body: { offering } })
     await refresh()
-    commandSuccess.value = t('account.membership.changeSaved')
+    commandSuccess.value = 'account.membership.changeSaved'
   } catch {
-    commandError.value = t('account.membership.commandError')
+    commandError.value = 'account.membership.commandError'
   } finally {
     operation.value = null
   }
@@ -95,7 +96,7 @@ async function openPortal() {
     if (!result.url.startsWith('https://')) throw new Error('Unexpected Portal URL')
     await navigateTo(result.url, { external: true })
   } catch {
-    commandError.value = t('account.membership.commandError')
+    commandError.value = 'account.membership.commandError'
   } finally {
     operation.value = null
   }
@@ -108,9 +109,9 @@ async function reconcile(quiet = false) {
   try {
     await $fetch('/api/account/billing/reconcile', { method: 'POST', body: {} })
     await refresh()
-    if (!quiet) commandSuccess.value = t('account.membership.refreshed')
+    if (!quiet) commandSuccess.value = 'account.membership.refreshed'
   } catch {
-    commandError.value = t('account.membership.commandError')
+    commandError.value = 'account.membership.commandError'
   } finally {
     operation.value = null
   }
@@ -178,10 +179,10 @@ function clearCommandStatus() {
       </AppNotice>
 
       <AppNotice v-if="commandError" tone="error" announce="assertive">
-        <p>{{ commandError }}</p>
+        <p>{{ t(commandError) }}</p>
         <p><a href="mailto:info@workingclassunity.com">info@workingclassunity.com</a></p>
       </AppNotice>
-      <AppNotice v-else-if="commandSuccess" tone="success" announce="polite">{{ commandSuccess }}</AppNotice>
+      <AppNotice v-else-if="commandSuccess" tone="success" announce="polite">{{ t(commandSuccess) }}</AppNotice>
 
       <div v-if="hasOfferingAction" class="contribution-grid">
         <article v-for="offering in offerings" :key="offering.key" class="contribution-option">

@@ -12,6 +12,7 @@ withDefaults(
     showMarkers: false
   }
 )
+const { t } = useI18n()
 </script>
 
 <template>
@@ -19,10 +20,10 @@ withDefaults(
     class="campaign-page-outline"
     :items="items"
     :label="label"
-    title="On this page"
-    description="Jump to a section of this page."
-    trigger-label="On this page"
-    close-label="Close page outline"
+    :title="t('removeFlock.outline.title')"
+    :description="t('removeFlock.outline.description')"
+    :trigger-label="t('removeFlock.outline.trigger')"
+    :close-label="t('removeFlock.outline.close')"
     trigger-variant="primary"
     :show-markers="showMarkers"
     show-trigger-indicator

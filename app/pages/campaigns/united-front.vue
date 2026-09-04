@@ -3,21 +3,7 @@ import { unitedFrontEndorsers } from '~/content/united-front'
 
 const individualSigningUrl = 'https://tech.workingclassunity.com/united-front-for-immigrants-workers'
 const organizationSigningUrl = 'https://tech.workingclassunity.com/sign-the-united-front-as-an-organization'
-type UnitedFrontLocale = 'en' | 'es' | 'pa'
-
-const localeLanguages: Record<UnitedFrontLocale, string> = {
-  en: 'en-US',
-  es: 'es-ES',
-  pa: 'pa-IN'
-}
-
-const { locale, setLocale, t } = useI18n()
-
-const languageOptions = computed(() => [
-  { code: 'en', label: t('unitedfront.ui.languages.en') },
-  { code: 'es', label: t('unitedfront.ui.languages.es') },
-  { code: 'pa', label: t('unitedfront.ui.languages.pa') }
-])
+const { t } = useI18n()
 
 const outlineItems = computed(() => [
   { id: 'united-front-what-we-face', label: t('unitedfront.whatWeFace.heading') },
@@ -46,17 +32,7 @@ const demands = computed(() => [
   t('unitedfront.longTermDemands.demand4')
 ])
 
-async function changeLanguage(event: Event) {
-  const nextLocale = (event.target as HTMLSelectElement | null)?.value
-  if (!nextLocale || nextLocale === locale.value) return
-  await setLocale(nextLocale as UnitedFrontLocale)
-}
-
 useHead(() => ({
-  htmlAttrs: {
-    lang: localeLanguages[locale.value as UnitedFrontLocale] ?? localeLanguages.en,
-    dir: 'ltr'
-  },
   title: `${t('unitedfront.pageTitle')} | ${t('unitedfront.ui.org_name')}`,
   meta: [{ name: 'description', content: t('unitedfront.subtitle') }]
 }))
@@ -66,14 +42,6 @@ useHead(() => ({
   <article class="united-front-page" aria-labelledby="united-front-title">
     <header class="united-front-page-meta">
       <p class="united-front-region">{{ t('unitedfront.ui.region_label') }}</p>
-      <label class="united-front-language">
-        <span>{{ t('unitedfront.ui.languageLabel') }}</span>
-        <select :value="locale" @change="changeLanguage">
-          <option v-for="option in languageOptions" :key="option.code" :value="option.code">
-            {{ option.label }}
-          </option>
-        </select>
-      </label>
     </header>
 
     <CampaignEditorialHeader
@@ -254,16 +222,12 @@ useHead(() => ({
   }
 
   .united-front-page-meta {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-5);
     min-width: 0;
     padding-block: var(--space-5) var(--space-3);
   }
 
-  .united-front-region,
-  .united-front-language {
+  .united-front-region {
+    min-width: 0;
     margin: 0;
     color: var(--color-accent-action);
     font-family: var(--font-family-mono);
@@ -272,31 +236,7 @@ useHead(() => ({
     letter-spacing: 0.08em;
     line-height: 1.4;
     text-transform: uppercase;
-  }
-
-  .united-front-region {
-    min-width: 0;
     text-wrap: pretty;
-  }
-
-  .united-front-language {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2);
-    flex: 0 0 auto;
-    color: var(--color-text-muted);
-    letter-spacing: 0.04em;
-  }
-
-  .united-front-language select {
-    inline-size: auto;
-    min-inline-size: 7rem;
-    padding-inline: var(--space-2) var(--space-6);
-    color: var(--color-brand-primary);
-    background: var(--color-surface);
-    font: inherit;
-    letter-spacing: normal;
-    text-transform: none;
   }
 
   .united-front-editorial-header {
@@ -482,17 +422,6 @@ useHead(() => ({
   }
 
   @media (width <= 40rem) {
-    .united-front-page-meta {
-      align-items: flex-start;
-      flex-direction: column;
-      gap: var(--space-3);
-    }
-
-    .united-front-language {
-      align-items: flex-start;
-      flex-wrap: wrap;
-    }
-
     .united-front-signing-paths {
       grid-template-columns: minmax(0, 1fr);
     }

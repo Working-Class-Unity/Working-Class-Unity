@@ -1,21 +1,30 @@
 <script setup lang="ts">
 import CalendarEventActions from '~/components/calendar/CalendarEventActions.vue'
 import CalendarEventBadge from '~/components/calendar/CalendarEventBadge.vue'
-import { calendarWeekdays, type CalendarEvent, type CalendarMonthCell } from '~/content/calendar'
+import type { CalendarEvent, CalendarMonthCell } from '~/content/calendar'
 
 const props = defineProps<{
   events: readonly CalendarEvent[]
 }>()
 
 const selectedEventId = defineModel<string>('selectedEventId', { required: true })
+const { locale, localeProperties, t } = useI18n()
+const languageTag = computed(() => localeProperties.value.language ?? locale.value)
 const selectedEvent = computed(() => eventById(selectedEventId.value))
 const visibleMonth = ref(monthKey(props.events[0] ?? null))
 const monthLabel = computed(() => {
   const [year, month] = visibleMonth.value.split('-').map(Number)
-  return new Intl.DateTimeFormat('en-US', { month: 'long', timeZone: 'UTC', year: 'numeric' }).format(
+  return new Intl.DateTimeFormat(languageTag.value, { month: 'long', timeZone: 'UTC', year: 'numeric' }).format(
     new Date(Date.UTC(year!, month! - 1, 1))
   )
 })
+const weekdays = computed(() =>
+  Array.from({ length: 7 }, (_, index) =>
+    new Intl.DateTimeFormat(languageTag.value, { timeZone: 'UTC', weekday: 'short' }).format(
+      new Date(Date.UTC(2024, 0, 7 + index))
+    )
+  )
+)
 const cells = computed<readonly CalendarMonthCell[]>(() => {
   const [year, month] = visibleMonth.value.split('-').map(Number)
   const first = new Date(Date.UTC(year!, month! - 1, 1))
@@ -61,7 +70,7 @@ function monthKey(event: CalendarEvent | null) {
 }
 
 function eventDateKey(event: CalendarEvent) {
-  const parts = new Intl.DateTimeFormat('en-US', {
+  const parts = new Intl.DateTimeFormat('en-CA', {
     day: '2-digit',
     month: '2-digit',
     timeZone: event.timezone,
@@ -76,19 +85,23 @@ function eventDateKey(event: CalendarEvent) {
   <section class="month-view" aria-labelledby="month-title">
     <div class="view-heading">
       <div>
-        <h2 id="month-title">Month view</h2>
-        <p>Select an event—not just a day—to see its full details.</p>
+        <h2 id="month-title">{{ t('calendar.month.title') }}</h2>
+        <p>{{ t('calendar.month.description') }}</p>
       </div>
     </div>
     <div class="month-toolbar">
-      <AppButton class="month-action" size="compact" variant="secondary" @click="changeMonth(-1)">Previous</AppButton>
+      <AppButton class="month-action" size="compact" variant="secondary" @click="changeMonth(-1)">
+        {{ t('calendar.month.previous') }}
+      </AppButton>
       <h3>{{ monthLabel }}</h3>
-      <AppButton class="month-action" size="compact" variant="secondary" @click="changeMonth(1)">Next</AppButton>
+      <AppButton class="month-action" size="compact" variant="secondary" @click="changeMonth(1)">
+        {{ t('calendar.month.next') }}
+      </AppButton>
     </div>
     <div class="month-layout">
       <div class="month-grid-wrap">
-        <div class="month-grid" :aria-label="`${monthLabel} events`">
-          <div v-for="day in calendarWeekdays" :key="day" class="weekday">
+        <div class="month-grid" :aria-label="t('calendar.month.eventsLabel', { month: monthLabel })">
+          <div v-for="day in weekdays" :key="day" class="weekday">
             {{ day }}
           </div>
           <div
@@ -125,8 +138,8 @@ function eventDateKey(event: CalendarEvent) {
         <CalendarEventActions class="inspector-actions" :event="selectedEvent" show-directions />
       </aside>
       <aside v-else class="event-inspector" aria-live="polite">
-        <h3>No events this month</h3>
-        <p>Use Previous or Next to browse another month.</p>
+        <h3>{{ t('calendar.month.noEvents') }}</h3>
+        <p>{{ t('calendar.month.browse') }}</p>
       </aside>
     </div>
   </section>

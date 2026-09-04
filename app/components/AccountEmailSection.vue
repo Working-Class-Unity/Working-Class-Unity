@@ -34,11 +34,11 @@ async function requestEmailVerification() {
 
   const normalizedEmail = newEmail.value.trim().toLowerCase()
   if (!normalizedEmail) {
-    fieldError.value = t('account.email.required')
+    fieldError.value = 'account.email.required'
   } else if (!emailInput.value?.isValid()) {
-    fieldError.value = t('common.emailInvalid')
+    fieldError.value = 'common.emailInvalid'
   } else if (normalizedEmail === props.email?.toLowerCase()) {
-    fieldError.value = t('account.email.unchanged')
+    fieldError.value = 'account.email.unchanged'
   }
 
   if (fieldError.value) {
@@ -51,13 +51,13 @@ async function requestEmailVerification() {
   try {
     const result = await authClient.changeEmail({ newEmail: normalizedEmail, callbackURL: '/account' })
     if (result.error) {
-      formError.value = t('account.email.requestError')
+      formError.value = 'account.email.requestError'
       return
     }
     newEmail.value = ''
-    formSuccess.value = t('account.email.requested')
+    formSuccess.value = 'account.email.requested'
   } catch {
-    formError.value = t('account.email.requestError')
+    formError.value = 'account.email.requestError'
   } finally {
     isSubmitting.value = false
   }
@@ -87,7 +87,7 @@ async function requestEmailVerification() {
         id="account-email"
         :label="props.email ? t('account.email.newEmail') : t('account.email.addEmail')"
         :hint="t('account.email.help')"
-        :error="fieldError"
+        :error="fieldError ? t(fieldError) : ''"
         required
         :required-label="t('common.required')"
       >
@@ -108,8 +108,8 @@ async function requestEmailVerification() {
         </template>
       </AppField>
 
-      <AppNotice v-if="formError" tone="error" announce="assertive">{{ formError }}</AppNotice>
-      <AppNotice v-else-if="formSuccess" tone="success" announce="polite">{{ formSuccess }}</AppNotice>
+      <AppNotice v-if="formError" tone="error" announce="assertive">{{ t(formError) }}</AppNotice>
+      <AppNotice v-else-if="formSuccess" tone="success" announce="polite">{{ t(formSuccess) }}</AppNotice>
 
       <AppButton class="email-submit" type="submit" :pending="isSubmitting">
         {{ isSubmitting ? t('account.email.sending') : t('account.email.send') }}

@@ -16,6 +16,7 @@ const props = withDefaults(
 )
 
 const attrs = useAttrs()
+const { t } = useI18n()
 const external = computed(() => /^(?:https?:|mailto:|tel:)/.test(props.to))
 const opensNewContext = computed(() => attrs.target === '_blank')
 </script>
@@ -30,7 +31,7 @@ const opensNewContext = computed(() => attrs.target === '_blank')
     :href="props.to"
   >
     <slot />
-    <span v-if="opensNewContext" class="visually-hidden"> (opens in a new tab)</span>
+    <span v-if="opensNewContext" class="visually-hidden"> ({{ t('common.opensInNewTab') }})</span>
   </a>
   <NuxtLink
     v-else

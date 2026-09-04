@@ -11,6 +11,8 @@ const props = defineProps<{
 
 const activeFilter = defineModel<CalendarFilter>('activeFilter', { required: true })
 const emit = defineEmits<{ jump: [date: string] }>()
+const { locale, localeProperties, t } = useI18n()
+const languageTag = computed(() => localeProperties.value.language ?? locale.value)
 
 const filteredEvents = computed(() => {
   if (activeFilter.value === 'Everything') return props.events
@@ -25,21 +27,25 @@ const featuredDate = computed(() => {
   const date = new Date(event.startsAt)
   const options = { timeZone: event.timezone } as const
   return {
-    day: new Intl.DateTimeFormat('en-US', { ...options, day: 'numeric' }).format(date),
-    month: new Intl.DateTimeFormat('en-US', { ...options, month: 'short' }).format(date),
-    weekday: new Intl.DateTimeFormat('en-US', { ...options, weekday: 'long' }).format(date)
+    day: new Intl.DateTimeFormat(languageTag.value, { ...options, day: 'numeric' }).format(date),
+    month: new Intl.DateTimeFormat(languageTag.value, { ...options, month: 'short' }).format(date),
+    weekday: new Intl.DateTimeFormat(languageTag.value, { ...options, weekday: 'long' }).format(date)
   }
 })
 const agendaMonth = computed(() => {
   const event = agendaEvents.value[0] ?? featuredEvent.value
   if (!event) return ''
-  return new Intl.DateTimeFormat('en-US', { month: 'long', timeZone: event.timezone }).format(new Date(event.startsAt))
+  return new Intl.DateTimeFormat(languageTag.value, { month: 'long', timeZone: event.timezone }).format(
+    new Date(event.startsAt)
+  )
 })
 
-function eventStartTime(time: string) {
-  const [start = time, end = ''] = time.split('–')
-  const suffix = end.match(/\b(?:AM|PM)\b/)?.[0]
-  return /\b(?:AM|PM)\b/.test(start) || !suffix ? start : `${start} ${suffix}`
+function eventStartTime(event: CalendarEvent) {
+  return new Intl.DateTimeFormat(languageTag.value, {
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZone: event.timezone
+  }).format(new Date(event.startsAt))
 }
 
 function recurrenceSchedule(event: CalendarEvent) {
@@ -51,8 +57,8 @@ function recurrenceSchedule(event: CalendarEvent) {
   <section class="agenda-view" aria-labelledby="agenda-title">
     <div class="view-heading">
       <div>
-        <h2 id="agenda-title">Upcoming events</h2>
-        <p>Each dated occurrence appears here, including every upcoming date in a recurring series.</p>
+        <h2 id="agenda-title">{{ t('calendar.agenda.title') }}</h2>
+        <p>{{ t('calendar.agenda.description') }}</p>
       </div>
       <CalendarDatePicker @select="emit('jump', $event)" />
     </div>
@@ -72,11 +78,11 @@ function recurrenceSchedule(event: CalendarEvent) {
         <p>{{ featuredEvent.description }}</p>
         <dl class="event-details">
           <div>
-            <dt>Time</dt>
+            <dt>{{ t('calendar.details.time') }}</dt>
             <dd>{{ featuredEvent.time }}</dd>
           </div>
           <div>
-            <dt>Meet at</dt>
+            <dt>{{ t('calendar.details.meetAt') }}</dt>
             <dd>{{ featuredEvent.place }}</dd>
           </div>
         </dl>
@@ -85,8 +91,8 @@ function recurrenceSchedule(event: CalendarEvent) {
     </article>
 
     <div class="agenda-filter-row">
-      <p>Filter upcoming events</p>
-      <div class="event-filters" role="group" aria-label="Filter upcoming events">
+      <p>{{ t('calendar.filters.label') }}</p>
+      <div class="event-filters" role="group" :aria-label="t('calendar.filters.label')">
         <AppButton
           v-for="filter in calendarFilters"
           :key="filter"
@@ -96,17 +102,17 @@ function recurrenceSchedule(event: CalendarEvent) {
           :aria-pressed="activeFilter === filter"
           @click="activeFilter = filter"
         >
-          {{ filter === 'Everything' ? 'All' : filter === 'Action' ? 'Actions' : filter }}
+          {{ t(`calendar.filters.${filter.toLowerCase()}`) }}
         </AppButton>
       </div>
     </div>
 
-    <p v-if="!featuredEvent" class="empty-state">No events match this filter yet.</p>
+    <p v-if="!featuredEvent" class="empty-state">{{ t('calendar.agenda.noMatches') }}</p>
     <div v-else class="agenda-layout">
       <section aria-labelledby="up-next-title">
         <div class="section-heading-row">
           <div>
-            <p class="section-label">Up next</p>
+            <p class="section-label">{{ t('calendar.agenda.upNext') }}</p>
             <h3 id="up-next-title">{{ agendaMonth }}</h3>
           </div>
         </div>
@@ -114,12 +120,12 @@ function recurrenceSchedule(event: CalendarEvent) {
           <li v-for="event in agendaEvents" :key="event.id" class="event-row">
             <time :datetime="event.startsAt"
               ><strong>{{ event.dateLabel.replace(',', '') }}</strong
-              ><span>{{ eventStartTime(event.time) }}</span></time
+              ><span>{{ eventStartTime(event) }}</span></time
             >
             <div class="event-row-copy">
               <div class="event-labels">
                 <CalendarEventBadge :kind="event.kind" />
-                <span v-if="event.recurring" class="series-badge">Series</span>
+                <span v-if="event.recurring" class="series-badge">{{ t('calendar.agenda.series') }}</span>
               </div>
               <h4>{{ event.title }}</h4>
               <p>{{ event.description }}</p>
@@ -127,17 +133,17 @@ function recurrenceSchedule(event: CalendarEvent) {
             </div>
             <CalendarEventActions class="row-actions" :event="event" rsvp-variant="secondary" />
           </li>
-          <li v-if="agendaEvents.length === 0" class="empty-state">No additional events in this view.</li>
+          <li v-if="agendaEvents.length === 0" class="empty-state">{{ t('calendar.agenda.noAdditional') }}</li>
         </ol>
       </section>
 
       <aside class="series-panel" aria-labelledby="series-title">
-        <p class="section-label">Recurring events</p>
-        <h3 id="series-title">More dates</h3>
+        <p class="section-label">{{ t('calendar.agenda.recurring') }}</p>
+        <h3 id="series-title">{{ t('calendar.agenda.moreDates') }}</h3>
         <div v-for="event in recurringEvents" :key="event.id" class="series-item">
           <CalendarEventBadge :kind="event.kind" />
           <h4>{{ event.title }}</h4>
-          <p>{{ recurrenceSchedule(event) }} · {{ eventStartTime(event.time) }}</p>
+          <p>{{ recurrenceSchedule(event) }} · {{ eventStartTime(event) }}</p>
         </div>
       </aside>
     </div>

@@ -23,18 +23,22 @@ const props = defineProps<{
   reference: CampaignCitationReference
   source: CampaignSource
 }>()
+const { t } = useI18n()
 
 const sourceMetadata = computed(() =>
   [
     props.source.publisher,
-    props.source.published ? `Published ${props.source.published}` : undefined,
-    props.source.reviewed ? `Reviewed ${props.source.reviewed}` : undefined
+    props.source.published ? t('removeFlock.sources.published', { date: props.source.published }) : undefined,
+    props.source.reviewed ? t('removeFlock.sources.reviewed', { date: props.source.reviewed }) : undefined
   ]
     .filter((value) => Boolean(value))
     .join(' · ')
 )
 const citationLabel = computed(() =>
-  [`Source ${props.occurrenceLabel}: ${props.source.title}`, props.reference.locator]
+  [
+    t('removeFlock.citation.label', { occurrence: props.occurrenceLabel, title: props.source.title }),
+    props.reference.locator
+  ]
     .filter((value) => Boolean(value))
     .join(', ')
 )
@@ -107,10 +111,14 @@ function onDrawerCloseAutoFocus(event: Event) {
           :collision-padding="16"
         >
           <HoverCardArrow class="campaign-citation-card-arrow" :width="14" :height="7" />
-          <p class="campaign-citation-label">SOURCE {{ occurrenceLabel }}</p>
-          <p class="campaign-citation-title">{{ source.title }}</p>
+          <p class="campaign-citation-label">
+            {{ t('removeFlock.citation.shortLabel', { occurrence: occurrenceLabel }) }}
+          </p>
+          <p class="campaign-citation-title" lang="en">{{ source.title }}</p>
           <p class="campaign-citation-meta">{{ sourceMetadata }}</p>
-          <p v-if="reference.locator" class="campaign-citation-locator">Location: {{ reference.locator }}</p>
+          <p v-if="reference.locator" class="campaign-citation-locator">
+            {{ t('removeFlock.citation.location', { locator: reference.locator }) }}
+          </p>
           <p v-if="reference.note" class="campaign-citation-note">{{ reference.note }}</p>
           <p v-if="source.note" class="campaign-citation-note">{{ source.note }}</p>
         </HoverCardContent>
@@ -123,17 +131,23 @@ function onDrawerCloseAutoFocus(event: Event) {
         <DrawerContent class="campaign-citation-drawer" @close-auto-focus="onDrawerCloseAutoFocus">
           <DrawerHandle class="campaign-citation-drawer-handle" />
           <div class="campaign-citation-drawer-content">
-            <p class="campaign-citation-label">SOURCE {{ occurrenceLabel }}</p>
-            <DrawerTitle class="campaign-citation-title">{{ source.title }}</DrawerTitle>
+            <p class="campaign-citation-label">
+              {{ t('removeFlock.citation.shortLabel', { occurrence: occurrenceLabel }) }}
+            </p>
+            <DrawerTitle class="campaign-citation-title" lang="en">{{ source.title }}</DrawerTitle>
             <DrawerDescription class="campaign-citation-meta">{{ sourceMetadata }}</DrawerDescription>
-            <p v-if="reference.locator" class="campaign-citation-locator">Location: {{ reference.locator }}</p>
+            <p v-if="reference.locator" class="campaign-citation-locator">
+              {{ t('removeFlock.citation.location', { locator: reference.locator }) }}
+            </p>
             <p v-if="reference.note" class="campaign-citation-note">{{ reference.note }}</p>
             <p v-if="source.note" class="campaign-citation-note">{{ source.note }}</p>
             <div class="campaign-citation-drawer-actions">
               <a class="campaign-citation-source-link" :href="source.url" target="_blank" rel="noopener noreferrer">
-                View source
+                {{ t('removeFlock.citation.viewSource') }}
               </a>
-              <button class="campaign-citation-note-link" type="button" @click="readFullNote">Go to source note</button>
+              <button class="campaign-citation-note-link" type="button" @click="readFullNote">
+                {{ t('removeFlock.citation.goToNote') }}
+              </button>
             </div>
           </div>
         </DrawerContent>

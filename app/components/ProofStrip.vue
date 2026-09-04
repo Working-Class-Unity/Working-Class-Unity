@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
+const { t } = useI18n()
+
 type ProofStripItem = Readonly<{
   value: string
   label: string
@@ -35,7 +37,9 @@ const completeItems = computed(() =>
           <span aria-hidden="true"> · </span>
           <span>{{ item.currentThrough }}</span>
           <span aria-hidden="true"> · </span>
-          <a :href="item.sourceHref"><span class="visually-hidden">Source: </span>{{ item.sourceLabel }}</a>
+          <a :href="item.sourceHref"
+            ><span class="visually-hidden">{{ t('common.source') }}: </span>{{ item.sourceLabel }}</a
+          >
         </template>
       </p>
       <p v-if="item.context" class="proof-context">{{ item.context }}</p>

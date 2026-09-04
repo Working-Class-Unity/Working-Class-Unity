@@ -4,7 +4,8 @@ type TestStatus = 'idle' | 'validating' | 'captured' | 'missing-token' | 'failed
 const { t } = useI18n()
 
 const status = ref<TestStatus>('idle')
-const detail = ref(t('observability.preparing'))
+const detailKey = ref('observability.preparing')
+const detailParameters = ref<Record<string, string>>({})
 const noticeTone = computed(() => {
   if (status.value === 'captured') return 'success'
   if (status.value === 'missing-token') return 'warning'
@@ -29,12 +30,12 @@ async function runClientTest() {
 
   if (!token) {
     status.value = 'missing-token'
-    detail.value = t('observability.missingToken')
+    detailKey.value = 'observability.missingToken'
     return
   }
 
   status.value = 'validating'
-  detail.value = t('observability.validating')
+  detailKey.value = 'observability.validating'
 
   try {
     await $fetch('/api/observability/client-test', {
@@ -58,10 +59,11 @@ async function runClientTest() {
     })
 
     status.value = 'captured'
-    detail.value = eventId ? t('observability.sentWithId', { eventId }) : t('observability.sent')
+    detailKey.value = eventId ? 'observability.sentWithId' : 'observability.sent'
+    detailParameters.value = eventId ? { eventId } : {}
   } catch {
     status.value = 'failed'
-    detail.value = t('observability.failed')
+    detailKey.value = 'observability.failed'
   }
 }
 </script>
@@ -75,7 +77,7 @@ async function runClientTest() {
       </div>
 
       <AppNotice :tone="noticeTone" :announce="noticeAnnouncement">
-        {{ detail }}
+        {{ t(detailKey, detailParameters) }}
       </AppNotice>
     </section>
   </div>

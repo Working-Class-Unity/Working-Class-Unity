@@ -2,6 +2,8 @@
 const config = useRuntimeConfig()
 const { t } = useI18n()
 
+useDocumentLocale()
+
 useHead(() => ({
   title: config.public.appName,
   meta: [{ name: 'description', content: t('metadata.defaultDescription') }]

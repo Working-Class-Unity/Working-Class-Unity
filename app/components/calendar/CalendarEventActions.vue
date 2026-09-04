@@ -13,6 +13,7 @@ const props = withDefaults(
     showDirections: false
   }
 )
+const { t } = useI18n()
 </script>
 
 <template>
@@ -24,7 +25,7 @@ const props = withDefaults(
       target="_blank"
       rel="noreferrer"
     >
-      RSVP
+      {{ t('calendar.actions.rsvp') }}
     </a>
     <a
       v-if="event.eventPageUrl && event.eventPageUrl !== event.rsvpUrl"
@@ -33,7 +34,7 @@ const props = withDefaults(
       target="_blank"
       rel="noreferrer"
     >
-      Event details
+      {{ t('calendar.actions.details') }}
     </a>
     <EventDirectionsMenu v-if="props.showDirections && event.address" :address="event.address" />
   </div>

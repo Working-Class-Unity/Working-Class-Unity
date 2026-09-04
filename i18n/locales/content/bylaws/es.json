@@ -1,0 +1,1134 @@
+{
+  "localizedBylaws": {
+    "articles": [
+      {
+        "title": "NOMBRE",
+        "blocks": [
+          {
+            "parts": [
+              {
+                "text": "El nombre de esta organización será Working Class Unity (WCU), una corporación sin fines de lucro registrada en el estado de California."
+              }
+            ]
+          }
+        ],
+        "sections": []
+      },
+      {
+        "title": "MISIÓN",
+        "blocks": [
+          {
+            "parts": [
+              {
+                "text": "Working Class Unity es una organización democrática impulsada por sus miembros y comprometida con el avance abierto del socialismo. Damos prioridad al reclutamiento, la educación y el apoyo de personas comprometidas con la defensa del poder de la clase trabajadora. Nuestra misión es forjar alianzas entre los movimientos laborales, comunitarios y sociales. Reconocemos que nuestros objetivos no se alcanzarán rápida ni fácilmente. Estamos dedicados al camino que tenemos por delante, confiados en que a través de la solidaridad y la acción colectiva, podemos construir un movimiento sólido por el socialismo y crear un mundo mejor para todos."
+              }
+            ]
+          }
+        ],
+        "sections": []
+      },
+      {
+        "title": "MEMBRESÍA",
+        "blocks": [],
+        "sections": [
+          {
+            "title": "ELEGIBILIDAD",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "Los miembros de Working Class Unity serán las personas que estén al corriente."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "BUENA CONDICIÓN",
+            "blocks": [
+              {
+                "items": [
+                  [
+                    {
+                      "text": "Cuotas: Se considerará que los miembros están al corriente si han pagado todas sus cuotas. Se permite un período de gracia de 30 días por retraso."
+                    }
+                  ],
+                  [
+                    {
+                      "text": "Asistencia: Los miembros comienzan al corriente. Los miembros al corriente de sus obligaciones deben asistir al menos a una reunión ordinaria al año."
+                    }
+                  ],
+                  [
+                    {
+                      "text": "Conducta: Los miembros al corriente deben adherirse a los valores y la misión de WCU, absteniéndose de cualquier comportamiento que viole el Código de conducta de WCU."
+                    }
+                  ],
+                  [
+                    {
+                      "text": "Residencia: Los miembros al corriente deben vivir, trabajar, estudiar o asistir a un lugar de culto en San Joaquin County, California."
+                    }
+                  ]
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "Los miembros al corriente tendrán pleno derecho de voto, podrán ocupar cualquier cargo o participar en cualquier comité y podrán proponer asuntos a los miembros en cualquier momento."
+                  }
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "Los miembros del público que apoyan la misión y el propósito de WCU son bienvenidos a participar en las actividades de la organización, pero no tendrán derecho a voto ni serán elegibles para ocupar cargos o presidir un comité."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "CUOTA DE SOCIO",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "La Membresía determinará las cuotas o promesas locales. El pago de cuotas o promesas locales no otorgará a los miembros derechos o privilegios adicionales, ni se establecerán clases separadas de membresía."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "CENSURA Y RETIRADA DE MIEMBROS",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "En caso de que se descubra que un miembro infringe significativamente el Código de conducta de WCU, cualquier miembro o el Comité Directivo puede presentar una recomendación de censura o expulsión, citando delitos específicos como se describe en el Código de conducta (consulte "
+                  },
+                  {
+                    "text": "Código de Conducta Artículo VI: Comportamiento Prohibido"
+                  },
+                  {
+                    "text": "). Dicha recomendación debe ser ratificada por una mayoría de dos tercios de los votos de los miembros elegibles en una Asamblea General. Además, cualquier Miembro o miembro del Comité Directivo puede iniciar un voto de censura o expulsión en la Asamblea General posterior si se determina que un miembro está en desacuerdo sustancial con los principios o políticas de la organización, participa en un comportamiento entrista o actúa bajo la disciplina de otra organización."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "DIVULGACIONES",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "Todos los miembros deben revelar cualquier empleo como agente del orden, autoridad supervisora ​​según lo define la Ley Nacional de Relaciones Laborales en su lugar de trabajo, o como personal de recursos humanos, debido a la posibilidad de participación directa en la disciplina de la clase trabajadora. Además, los miembros deben revelar si son propietarios, específicamente si obtienen la mayor parte de sus ingresos del alquiler residencial de propiedades que poseen pero que no ocupan personalmente. Los miembros también deben revelar si ocupan un puesto en la Junta o cualquier función de liderazgo en una organización sin fines de lucro que recibe más de $50,000 en subvenciones y contribuciones anualmente. El Secretario tiene la tarea de recopilar estas divulgaciones y mantener un registro que esté disponible para su revisión por cualquier miembro al corriente, sin necesidad de solicitarlo al Comité Directivo."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "POLÍTICA DE NO DISCRIMINACIÓN",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "WCU no discriminará a ningún miembro o miembro potencial por motivos de raza, religión, género, origen nacional, edad, orientación sexual, discapacidad o cualquier otra característica protegida por la ley aplicable en cualquiera de sus actividades, incluida la membresía, la gobernanza y las operaciones."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "GOBERNANZA",
+        "blocks": [],
+        "sections": [
+          {
+            "title": "ESTRUCTURA ORGANIZATIVA",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "Working Class Unity se regirá y dirigirá por la participación democrática de sus miembros. Las Asambleas Generales sirven como el principal órgano de gobierno de la organización, mientras que otras reuniones facilitan la ejecución del trabajo de la organización."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "ASAMBLEAS GENERALES",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "Las Asambleas Generales se convocarán al menos trimestralmente y podrán ser pospuestas o aplazadas por los miembros por razones imperiosas. Se puede convocar una reunión o convención anual a petición de los miembros."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "QUÓRUM",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "3.1 Determinación del Quórum:"
+                  },
+                  {
+                    "text": " El quórum para todas las Asambleas Generales se determinará calculando el número promedio de miembros presentes al inicio de cada reunión y en el momento de cada votación realizada durante esa reunión. A continuación se registrará esta asistencia media a una única reunión. El quórum para futuras Asambleas Generales se establecerá promediando estos promedios individuales de las seis Asambleas Generales más recientes."
+                  }
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "3.2 Cálculo de la asistencia promedio:"
+                  },
+                  {
+                    "text": " A los efectos de determinar el quórum, se definirá “asistencia promedio” como la suma total de miembros al corriente de sus obligaciones presentes en cada una de las seis Asambleas Generales más recientes, dividida por el número de dichas asambleas. Sólo se incluirán en este cálculo las reuniones en las que se registraron actas oficiales y se tomó asistencia."
+                  }
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "3.3 Redondeo:"
+                  },
+                  {
+                    "text": " Si del cómputo del cincuenta por ciento (50%) del promedio de asistencia resulta un número fraccionario, el quórum se redondeará al número entero más cercano."
+                  }
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "3.4 Mantenimiento de registros y notificación:"
+                  },
+                  {
+                    "text": " El Secretario será responsable de mantener registros precisos de asistencia a todas las Asambleas Generales y calculará e informará a los miembros de los requisitos de quórum actuales en el acta de la última Asamblea General, así como al inicio de la próxima Asamblea General."
+                  }
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "3.5 Mantenimiento del Quórum:"
+                  },
+                  {
+                    "text": " Para garantizar que se mantenga el quórum, el quórum se volverá a evaluar inmediatamente antes de que se lleve a cabo cualquier votación, pero solo si hay un cambio en el número de miembros presentes en comparación con el inicio de la reunión o con el momento de la votación anterior cuando se confirmó el quórum. Si en algún momento el número de miembros presentes y acreditados cae por debajo del quórum requerido debido a cambios en la asistencia, no se realizará ninguna votación hasta que se restablezca el quórum."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "NOTIFICACIÓN DE REUNIONES",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "Los miembros recibirán un aviso de al menos una semana sobre las próximas Asambleas Generales. El Comité Directivo establecerá la agenda de las reuniones públicas y la comunicará junto con las notificaciones de cualquier nuevo asunto a los miembros. Los miembros pueden solicitar agregar puntos a la agenda comunicándose con un miembro del Comité Directivo o introduciendo una enmienda a la agenda durante la propia reunión. Las notificaciones de reuniones, nuevos asuntos, actas de reuniones y elecciones se difundirán a través de cualquier canal de comunicación autorizado por los miembros."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "ORDEN DEL DÍA",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "El orden del día por defecto de las Asambleas Generales será el siguiente:"
+                  }
+                ]
+              },
+              {
+                "items": [
+                  [
+                    {
+                      "text": "Llamar al orden"
+                    }
+                  ],
+                  [
+                    {
+                      "text": "pasar lista"
+                    }
+                  ],
+                  [
+                    {
+                      "text": "Introducciones"
+                    }
+                  ],
+                  [
+                    {
+                      "text": "Acta de la reunión anterior"
+                    }
+                  ],
+                  [
+                    {
+                      "text": "Informes de miembros enfermos o en apuros"
+                    }
+                  ],
+                  [
+                    {
+                      "text": "Informes de funcionarios y comités"
+                    }
+                  ],
+                  [
+                    {
+                      "text": "Asuntos pendientes"
+                    }
+                  ],
+                  [
+                    {
+                      "text": "Nuevos asuntos + puntos adicionales de la agenda"
+                    }
+                  ],
+                  [
+                    {
+                      "text": "Informe financiero"
+                    }
+                  ],
+                  [
+                    {
+                      "text": "Anuncios"
+                    }
+                  ],
+                  [
+                    {
+                      "text": "Aplazamiento"
+                    }
+                  ]
+                ]
+              }
+            ]
+          },
+          {
+            "title": "AUTORIDAD PARLAMENTARIA",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "Robert’s Rules of Order, Newly Revised, regirá Working Class Unity en todos los casos aplicables y en los casos en que no sean incompatibles con estos estatutos y cualesquiera reglas especiales de orden que WCU adopte."
+                  }
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "Una moción no puede ser presentada y apoyada únicamente por los miembros del Comité Directivo."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "CONFLICTOS DE INTERÉS",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "Todos los Miembros deberán adherirse a la Política de Conflicto de Intereses."
+                  }
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "Anualmente, los miembros del Comité Directivo deben completar, firmar y presentar un Formulario de divulgación de conflictos de intereses a los miembros para su aprobación durante una Asamblea General."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "VOTACIONES Y ELECCIONES",
+        "blocks": [],
+        "sections": [
+          {
+            "title": "POSICIONES",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "Se llevarán a cabo elecciones para funcionarios y cualquier otro cargo creado por los miembros. Todos y cada uno de los miembros que estén al día con sus obligaciones son elegibles para votar, nominar candidatos o ocupar cargos públicos."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "COMITÉ DE NOMINACIONES",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "Se establecerá un Comité de Nominaciones, compuesto por dos miembros, mediante votación de los miembros. Esta votación deberá tener lugar al menos dos Asambleas Generales antes de cada elección. Este comité tiene la tarea de supervisar el proceso de nominación para puestos electos dentro de la organización."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "VOTACIÓN",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "El Comité Directivo tomará todas las medidas necesarias para garantizar la máxima participación de los miembros."
+                  }
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "3.1 Sistema de Voto Mayoritario:"
+                  },
+                  {
+                    "text": " Las elecciones se llevarán a cabo utilizando un sistema de votación por mayoría. En este sistema, el candidato que obtiene la mayoría de votos es declarado ganador."
+                  }
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "3.2 Determinación de la mayoría:"
+                  },
+                  {
+                    "text": " Una mayoría simple se define como más de la mitad de los votos válidos emitidos. Las abstenciones no se tendrán en cuenta para determinar la mayoría. Si ningún candidato obtiene una mayoría simple, se llevará a cabo una segunda vuelta entre los candidatos mejor empatados durante la misma Asamblea General."
+                  }
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "3.3 Transparencia de las votaciones:"
+                  },
+                  {
+                    "text": " Todos los votos emitidos en las elecciones se registrarán por nombre y estarán disponibles para su inspección por todos los miembros al día."
+                  }
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "3.4: Acceso a los Registros de Votación:"
+                  },
+                  {
+                    "text": " Los registros de votación, incluidos los nombres de sus respectivos votos, serán mantenidos por el Secretario y serán accesibles a los miembros al día cuando lo soliciten."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "COMITÉ DIRECTIVO",
+        "blocks": [],
+        "sections": [
+          {
+            "title": "PAPEL Y COMPOSICIÓN",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "El Comité Directivo será elegido por los Miembros para ejecutar las decisiones de los Miembros y realizar las tareas administrativas necesarias para el funcionamiento de WCU. El Comité Directivo estará compuesto por el Tesorero, el Secretario, el Coordinador de Membresía, el Coordinador de Educación y el Coordinador de Campaña. Todos los miembros del Comité Directivo son responsables de coordinar las campañas en curso, asistir a las reuniones del Comité Directivo y, en general, implementar la voluntad de los Miembros expresada en las Asambleas Generales. Las elecciones para el Comité Directivo se realizarán en diciembre, iniciándose y terminando los períodos correspondientes al ejercicio económico."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "DELEGACIÓN Y REUNIONES",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "Excepto cuando existan problemas genuinos de confidencialidad, seguridad, acceso u otras barreras prácticas insuperables, todos los miembros del Comité Directivo trabajarán para delegar responsabilidades a los miembros de base como parte del sistema de Membresía. La dirección puede delegar nuevas responsabilidades a sus miembros según surja la necesidad. El Comité Directivo celebrará reuniones periódicas abiertas a los miembros."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "QUÓRUM Y COMUNICACIÓN",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "El quórum para llevar a cabo los asuntos del Comité Directivo estará formado por dos tercios de sus miembros. El Comité Directivo se reunirá al menos una vez al mes y las reuniones se anunciarán y estarán abiertas a la asistencia de todos los miembros acreditados."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "COMUNICACIÓN",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "4.1 Documentación de la reunión:"
+                  },
+                  {
+                    "text": " Todas las reuniones del Comité Directivo deberán documentarse y las grabaciones y actas de las reuniones estarán fácilmente accesibles a los miembros acreditados para su revisión y comentarios."
+                  }
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "4.2 Canales de Comunicación:"
+                  },
+                  {
+                    "text": " Los miembros del Comité Directivo utilizarán los canales de comunicación aprobados por los miembros para discutir asuntos WCU. Estos canales deben ser accesibles para todos los miembros acreditados con el fin de ver y comentar las comunicaciones del Comité Directivo."
+                  }
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "4.3 Transparencia:"
+                  },
+                  {
+                    "text": " Los miembros del Comité Directivo se esforzarán por mantener la transparencia en su proceso de toma de decisiones, evitando cualquier apariencia de que las decisiones se toman en canales cerrados. Las justificaciones y razonamientos de las decisiones deben proporcionarse a los miembros en general, según corresponda."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "PRESUPUESTO",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "El Comité Directivo tendrá la autoridad, por mayoría de votos, para asignar hasta el 10% de los fondos no asignados del capítulo por mes, y el monto será determinado por el saldo posterior a la Asamblea General anterior. Cualquier decisión de este tipo debe comunicarse de inmediato a los miembros, acompañada de una justificación que explique la necesidad de gastar los fondos antes de obtener la aprobación en una Asamblea General programada regularmente."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "TESORERO",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "El Tesorero gestionará los asuntos financieros de Working Class Unity, incluido el cuidado y custodia de los fondos generales, valores, propiedades y activos."
+                  }
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "4.1 Gestión Financiera:"
+                  },
+                  {
+                    "text": " El Tesorero se asegurará de que los fondos y valores estén depositados en bancos, compañías fiduciarias o depositarios designados por el Comité Directivo. Por indicación del Comité Directivo, el Tesorero velará por el desembolso y disposición de los mismos, llevando los comprobantes correspondientes a dichos desembolsos. El Tesorero tendrá la discreción de reembolsar gastos hasta treinta dólares ($30)."
+                  }
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "4.2 Mantenimiento de registros:"
+                  },
+                  {
+                    "text": " El Tesorero mantendrá libros de contabilidad precisos de acuerdo con los principios de contabilidad comúnmente aceptados. Estos registros incluirán el monto de todos los dineros, fondos, valores, propiedades y activos bajo la custodia del Tesorero, así como el monto de los desembolsos realizados y la disposición de los bienes. El Tesorero exhibirá estos libros y registros cuando lo requiera el Comité Directivo o la agencia gubernamental de jurisdicción regulatoria apropiada de conformidad con la ley y pondrá esta información a disposición de los Miembros, sin exigirles que realicen una solicitud."
+                  }
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "4.3 Cobro de cuotas:"
+                  },
+                  {
+                    "text": " El Tesorero será responsable del cobro de las cuotas o promesas locales."
+                  }
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "4.4 Informes Financieros:"
+                  },
+                  {
+                    "text": " El Tesorero preparará y presentará un informe financiero anual."
+                  }
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "4.5 Cumplimiento:"
+                  },
+                  {
+                    "text": " El Tesorero firmará o refrendará todos los certificados, contratos u otros instrumentos de Working Class Unity con la aprobación del Comité Directivo, salvo que se indique lo contrario en estos estatutos. El Tesorero proporcionará informes según sea necesario para garantizar la finalización de todos los informes apropiados a las agencias locales, estatales o federales."
+                  }
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "4.6 Recaudación de fondos:"
+                  },
+                  {
+                    "text": " El Tesorero puede iniciar esfuerzos de recaudación de fondos u ofrecer asesoramiento con respecto a esfuerzos de recaudación de fondos iniciados en otras partes de la organización."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "SECRETARIO",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "El Secretario supervisará el mantenimiento de los documentos, actas y otros registros de la organización, gestionará el proceso de creación de la agenda para las Asambleas Generales y las Reuniones del Comité Directivo, programará reuniones, actualizará el calendario y gestionará el acceso a las cuentas de la organización."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "COORDINADOR DE MEMBRESÍA",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "El Coordinador de Membresía será responsable de formar un equipo de mentores, implementar el proceso de membresía y facilitar el trabajo destinado a educar políticamente a los miembros del capítulo."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "COORDINADOR DE CAMPAÑAS",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "El Coordinador de Campañas representará al Comité Directivo en las reuniones de la Campaña y del Grupo de Trabajo de Desarrollo de Campañas, facilitará la creación de propuestas de Campaña y el proceso de desarrollo de la campaña, y organizará eventos de educación política relacionados con las campañas."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "DESTITUCIÓN Y REMOCIÓN",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "Cualquier miembro puede solicitar que cualquier funcionario o miembro del Comité Directivo sea destituido por dos tercios de los votos, con o sin causa. Esta votación deberá tener lugar en la Asamblea General. Se considerará que un miembro del Comité Directivo ha renunciado si no asiste al 50% de las reuniones del Comité Directivo durante un período de tres meses, a menos que proporcione una explicación por escrito y sea aceptada por mayoría de votos del Comité Directivo."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "VACANTES",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "En caso de vacantes entre funcionarios o miembros del Comité Directivo debido a muerte, renuncia u otras circunstancias, el Comité Directivo podrá nombrar reemplazos temporales hasta que se celebre una votación en la Asamblea General para ratificar el nombramiento o celebrar elecciones para un nuevo miembro. Este miembro reemplazante no tendrá voto en el Comité Directivo hasta que se ratifique el nombramiento o se celebre una elección."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "MANTENIMIENTO DE REGISTROS",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "La organización deberá mantener registros precisos y completos de sus reuniones, transacciones financieras, información de membresía y cualquier otro documento relevante. El Secretario será responsable de mantener las actas de las reuniones y velar por su debido almacenamiento. El Tesorero será responsable de mantener los registros financieros y garantizar su almacenamiento adecuado. El Coordinador de Membresía será responsable de mantener la información de la membresía y garantizar su almacenamiento adecuado. Todos los registros se conservarán durante un período no inferior a siete (7) años o según lo exija la ley aplicable."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "DOCUMENTOS LEGALES",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "En los documentos regulatorios locales, estatales, federales y de otro tipo, el Coordinador de Campaña tendrá el título de Presidente y el Coordinador de Membresía tendrá el de Vicepresidente. Estas designaciones son solo para fines documentales y no implican funciones ni privilegios adicionales dentro de la organización."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "CAMPAÑAS",
+        "blocks": [],
+        "sections": [
+          {
+            "title": "CAMPAÑAS DE ENFOQUE",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "El trabajo principal en curso de Working Class Unity se llevará a cabo a través de campañas focalizadas dirigidas por miembros y elegidas democráticamente, en lo sucesivo denominadas \"campañas\"."
+                  }
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "Las campañas deberán estar enfocadas estratégicamente, con objetivos específicos para promover el socialismo y construir poder para la clase trabajadora. Deberían implicar la organización por el poder y la movilización masiva de los miembros de WCU y de la clase trabajadora en general en San Joaquin County. Las campañas representan importantes compromisos de tiempo y recursos a largo plazo por parte de WCU. En un momento dado, WCU mantendrá no más de dos campañas prioritarias activas."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "FORMACIÓN DE CAMPAÑA",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "Los miembros votarán sobre las campañas. Se necesita una mayoría de dos tercios para adoptar una campaña. La votación se hará en una Asamblea General y deberá anunciarse al menos una Asamblea General antes."
+                  }
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "Si hay más propuestas de campañas prioritarias que espacios disponibles, se harán varias rondas de votación. En cada ronda se eliminará la propuesta con menos votos hasta que el número de propuestas coincida con los espacios disponibles. Después, cada propuesta restante tendrá una votación final y necesitará una mayoría de dos tercios para ser adoptada."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "OPERACIÓN DE CAMPAÑA",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "Tras la aprobación de una nueva campaña, se abrirán las nominaciones para Liderazgo de Campaña. Las campañas funcionarán sin un liderazgo formal durante su primer mes. El liderazgo de campaña estará compuesto por al menos un miembro, pero los miembros podrán ampliarlo durante el proceso de formación de la campaña."
+                  }
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "3.1. Responsabilidades iniciales del liderazgo:"
+                  },
+                  {
+                    "text": " Durante el primer mes, el Coordinador de Campañas será responsable de gestionar las tareas administrativas básicas del funcionamiento de la campaña."
+                  }
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "3.2. Elección del liderazgo de campaña:"
+                  },
+                  {
+                    "text": " El liderazgo de la campaña será elegido por mayoría simple de los Miembros acreditados que asistan a la Asamblea General un mes después de la aprobación de la Campaña. Este liderazgo será responsable de supervisar las operaciones en curso de la campaña."
+                  }
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "3.3. Elegibilidad para liderazgo de campaña:"
+                  },
+                  {
+                    "text": " Cualquier Miembro al corriente es elegible para postularse para Liderazgo de Campaña una vez que se haya autorizado una Campaña."
+                  }
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "3.4. Reaprobación y Elección de Liderazgo:"
+                  },
+                  {
+                    "text": " Cada seis meses, una campaña debe ser reaprobada por mayoría simple de votos y se deben elegir nuevos líderes de campaña. Esta votación deberá tener lugar en Asamblea General. No hay límites de mandato para el liderazgo de campaña. Una campaña puede volver a aprobarse con cambios significativos en las operaciones o la estructura de la campaña; Estos cambios deben comunicarse claramente a los miembros generales al menos dos semanas antes de la votación."
+                  }
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "3.5. Reautorización y transición de liderazgo:"
+                  },
+                  {
+                    "text": " Las Campañas Reautorizadas elegirán sus líderes en la misma reunión en la que se lleve a cabo la reautorización. El Coordinador de Membresía y el Liderazgo de Campaña saliente comparten la responsabilidad de encontrar candidatos durante el mes anterior y son responsables de ayudar al nuevo liderazgo con la transición durante el primer mes posterior a la reautorización."
+                  }
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "3.6. Aprobación del Presupuesto:"
+                  },
+                  {
+                    "text": " Los miembros votarán un presupuesto inicial cuando se adopte una campaña. El presupuesto se aprobará por mayoría de votos. Esta votación deberá tener lugar en Asamblea General. Los miembros pueden aprobar solicitudes de presupuesto adicionales en las Asambleas Generales de la misma manera."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "PRIVILEGIOS DE CAMPAÑA",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "Una campaña adoptada significa una prioridad acordada democráticamente por los miembros de WCU. Representa un compromiso colectivo con objetivos y estrategias específicas."
+                  }
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "4.1. Autonomía de campaña"
+                  },
+                  {
+                    "text": ": El liderazgo de la campaña está autorizado a planificar y ejecutar acciones, movilizar a los miembros, emitir declaraciones y tomar otras medidas necesarias para lograr las metas y objetivos aprobados por los miembros tras la adopción de la campaña. Estas decisiones deberán ser aprobadas por el Coordinador de Campaña."
+                  }
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "4.2. Modificaciones a los planes de campaña:"
+                  },
+                  {
+                    "text": " Si una campaña desea desviarse significativamente del plan inicialmente propuesto y aprobado por los miembros, los cambios propuestos deben presentarse en una Asamblea General. Luego, los miembros votarán sobre los cambios propuestos mediante una mayoría de votos para aprobar o rechazar las enmiendas, asegurando que la desviación se alinee con el proceso de toma de decisiones colectiva del grupo."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "CIERRE DE CAMPAÑA",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "Una campaña finalizará al completar sus objetivos establecidos o al vencimiento de su autorización de seis meses, a menos que la membresía la renueve."
+                  }
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "5.1. Propuesta de rescisión a medio plazo:"
+                  },
+                  {
+                    "text": " Cualquier miembro puede presentar al Comité Directivo una propuesta para terminar una campaña a mitad de período, con las firmas de al menos el quórum más un miembro. El Comité Directivo avisará a los miembros al menos dos semanas antes de la Asamblea General. La propuesta se presentará en la siguiente Asamblea General y necesitará una mayoría de dos tercios para aprobarse."
+                  }
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "5.2. Suspensión de campaña:"
+                  },
+                  {
+                    "text": " Una campaña puede suspenderse mediante el voto de dos tercios tanto del liderazgo de la campaña combinado como del comité directivo."
+                  }
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "5.3. Reanudación o Terminación de Campañas Suspendidas:"
+                  },
+                  {
+                    "text": " Una campaña que haya sido suspendida según el proceso descrito anteriormente podrá reanudarse o finalizarse con el voto de dos tercios. La votación deberá tener lugar en la siguiente Asamblea General."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "MISIONES SECUNDARIAS",
+        "blocks": [
+          {
+            "parts": [
+              {
+                "text": "WCU puede realizar actividades llamadas “misiones secundarias”, que no están sujetas al límite de campañas prioritarias. Estas actividades tendrán un alcance y un uso de recursos limitados en comparación con las campañas prioritarias. El Comité Directivo será responsable de coordinar y completar cada misión secundaria, respetando las palabras y la intención de la propuesta original al llevarla a cabo."
+              }
+            ]
+          }
+        ],
+        "sections": [
+          {
+            "title": "PROPUESTA DE MISIONES SECUNDARIAS",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "Cualquier miembro puede proponer, defender o iniciar una misión secundaria que cumpla con los criterios anteriores en cualquier momento. Los miembros son responsables de juzgar si la actividad es más adecuada para una campaña y, en este caso, deben votar en una Asamblea General para comenzar un grupo de trabajo de desarrollo de campaña, que estará compuesto por dos miembros, con el objetivo de convertir la actividad en una campaña, o votar para poner fin a la actividad que no es de campaña. Además, las misiones secundarias que no estén aprobadas democráticamente por el Comité Directivo o los miembros no pueden presentarse ante grupos externos como una actividad de WCU."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "APROBACIÓN DEMOCRÁTICA DE MISIONES SECUNDARIAS",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "Una misión secundaria puede obtener aprobación democrática si se presenta como propuesta a los miembros en una Asamblea General. La propuesta necesitará la mayoría simple de quienes asistan a esa Asamblea General."
+                  }
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "Para acciones urgentes entre Asambleas Generales, cualquier miembro puede presentar una propuesta a los miembros. La acción se puede aprobar con el quórum más un voto, o con tres votos de miembros al corriente, lo que sea mayor. Los miembros del Comité Directivo no pueden constituir la mitad ni la mayoría de esos votos."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "COMITÉS",
+        "blocks": [],
+        "sections": [
+          {
+            "title": "EL COMITÉ DE EDUCACIÓN",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "El Comité de Educación funcionará bajo la supervisión del Coordinador de Membresía. Sus responsabilidades incluyen la supervisión de las actividades educativas y políticas del capítulo."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "EL COMITÉ DE MEMBRESÍA",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "El Comité de Membresía será administrado por el Coordinador de Membresía. El comité es responsable de la extensión a miembros y no miembros, así como del desarrollo y capacitación de los miembros."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "GRUPOS DE TRABAJO TEMPORALES",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "Los miembros podrán autorizar grupos de trabajo temporales en una Asamblea General. Estos grupos no deberían requerir un compromiso significativo y continuo de recursos por parte de sus miembros."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "MEMBRESÍA DEL COMITÉ",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "A excepción del Comité Directivo y los Comités de Liderazgo de Campaña, que son entidades enteramente elegidas, los miembros pueden unirse a otros comités asistiendo a las reuniones del comité respectivo."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "MISCELÁNEAS",
+        "blocks": [],
+        "sections": [
+          {
+            "title": "NOMBRAMIENTO DE AGENTES O CARGOS ESPECIALES",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "El Comité Directivo puede nombrar agentes, funcionarios u otras funciones específicas según sea necesario, sujeto a la aprobación de los Miembros. Los nombramientos sólo se realizarán después de la ratificación de dos tercios de la Asamblea General."
+                  }
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "Los agentes, funcionarios u otros roles designados informarán al Comité Directivo y no tendrán ningún derecho de voto ni otros privilegios en el Comité Directivo más allá de los que tienen los Miembros. Desempeñarán sus funciones según las indicaciones del Comité Directivo y de acuerdo con las metas y objetivos de la organización."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "INDEMNIZACIÓN",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "WCU indemnizará, en la medida legalmente permitida, a cada persona que pueda servir o haya servido como funcionario, director o empleado de la corporación contra todos los gastos y responsabilidades incurridos en relación con cualquier acción, demanda o procedimiento amenazado, pendiente o completado que surja de su servicio en tal capacidad."
+                  }
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "No se proporcionará ninguna indemnización a ninguna persona con respecto a cualquier asunto en el que se haya determinado que actuó de mala fe o en contra del mejor interés de la organización. Cualquier pago de compromiso o acuerdo debe ser aprobado por el voto de dos tercios del Comité Directivo que no sean partes en el procedimiento."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "CAMBIOS A LOS ESTATUTOS",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "Los miembros tendrán el poder de aprobar cambios a los Estatutos. Las enmiendas a los Estatutos se anunciarán a los miembros una reunión antes de cualquier votación. Los cambios podrán adoptarse por el voto de las dos terceras partes de los miembros presentes."
+                  }
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "3.1. Enmiendas a los cambios propuestos en los estatutos: una vez que se ha anunciado un cambio en los estatutos, cualquier miembro puede presentar enmiendas a esa propuesta. Las enmiendas deben anunciarse a los miembros dos semanas antes de la votación para adoptar la propuesta. Los miembros individuales presentarán sus enmiendas al Comité Directivo, quien será responsable de anunciarlas a los miembros en general. El Comité Directivo también puede determinar mediante votación que una enmienda propuesta es en realidad un cambio de estatuto separado y, por lo tanto, debe pasar por el proceso estándar de enmienda de estatuto. Los miembros pueden anular dicha decisión del Comité Directivo por mayoría simple de votos en una Asamblea General antes de que se lleve a cabo la votación final."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "CUMPLIMIENTO DE LOS LINEAMIENTOS DEL IRS Y LAS NORMAS ESTATALES",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "WCU no participará en actividades prohibidas por las pautas de IRS establecidas para organizaciones 501(c)(4) o reglas similares establecidas por el estado de California."
+                  }
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "El año fiscal de la organización comenzará el primer día de enero y finalizará el último día de diciembre de cada año."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "DISOLUCIÓN",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "WCU podrá disolverse mediante moción aprobada por dos tercios del Comité Directivo y confirmada por dos tercios de los votos. Ambas votaciones deberán tener lugar en Asamblea General. Tras la confirmación de la disolución, el Comité Directivo designará un agente apropiado para completar la disolución de la organización. El agente designado será responsable de garantizar que todas las cuestiones financieras y legales se resuelvan adecuadamente y que los activos restantes de la organización se distribuyan de acuerdo con las leyes y regulaciones aplicables."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "ACCESO A LISTAS DE MIEMBROS",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "El acceso a listas de miembros o bases de datos que contengan información de identificación se restringirá de las siguientes maneras:"
+                  }
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "6.1. Acceso al Comité Directivo: El Comité Directivo tendrá acceso completo a los datos de los miembros."
+                  }
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "6.2. Acceso para otros miembros: A otros miembros de WCU se les puede otorgar acceso a los datos de los miembros a discreción del Comité Directivo, solo si se cumple uno o más de los criterios:"
+                  }
+                ]
+              },
+              {
+                "items": [
+                  [
+                    {
+                      "text": "El miembro ha sido miembro de WCU durante más de un (1) año."
+                    }
+                  ],
+                  [
+                    {
+                      "text": "El miembro ha asistido a no menos de cuatro (4) reuniones en los últimos seis (6) meses, incluidas Asambleas de Campaña, de Comité y Generales."
+                    }
+                  ],
+                  [
+                    {
+                      "text": "La lista de miembros proporcionada contiene como máximo 50 entradas."
+                    }
+                  ]
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "Cuando a los miembros se les conceda acceso a la información de los miembros, se les limitará a la información necesaria para llevar a cabo las tareas asignadas."
+                  }
+                ]
+              },
+              {
+                "parts": [
+                  {
+                    "text": "6.3. Solicitudes de información de los miembros: Las solicitudes de información de los miembros deben tener un propósito político explícito, y el propósito de la solicitud debe ser registrado por el Comité Directivo y puesto a disposición de los miembros."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "REVISIÓN DEL ESTATUTO",
+            "blocks": [
+              {
+                "parts": [
+                  {
+                    "text": "Cada seis meses, el Comité Directivo revisará los Estatutos, recomendará cambios y recomendará cambios en la cartera de miembros para aclarar los conocimientos y habilidades que deben transferirse y delegarse."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,29 +1,25 @@
 <script setup lang="ts">
-import {
-  campaignCitationOccurrences,
-  campaignFaqPage,
-  campaignSourcesForOccurrences,
-  faqGroups as campaignFaqGroups,
-  type CampaignFaqGroup,
-  type CampaignSource
-} from '~/content/remove-flock-stockton'
+import { campaignCitationOccurrences, campaignSourcesForOccurrences } from '~/content/remove-flock-stockton'
 
-const faqGroups: readonly CampaignFaqGroup[] = campaignFaqGroups
-const faqSources: readonly CampaignSource[] = campaignFaqPage.sources
 const { t } = useI18n()
+const { campaignFaqPage, faqGroups } = useRemoveFlockContent()
 const petitionUrl = 'https://tech.workingclassunity.com/deflock-stockton'
-const outlineItems = faqGroups.map((group) => ({ id: group.id, label: group.title }))
-const citationOccurrences = faqGroups.flatMap((group) =>
-  group.items.flatMap((item) => [
-    ...item.answer.flatMap((paragraph, paragraphIndex) =>
-      campaignCitationOccurrences(paragraph, citationIdPrefix(group.id, item.id, 'answer', paragraphIndex))
-    ),
-    ...(item.points ?? []).flatMap((point, pointIndex) =>
-      campaignCitationOccurrences(point, citationIdPrefix(group.id, item.id, 'point', pointIndex))
-    )
-  ])
+const outlineItems = computed(() => faqGroups.value.map((group) => ({ id: group.id, label: group.title })))
+const citationOccurrences = computed(() =>
+  faqGroups.value.flatMap((group) =>
+    group.items.flatMap((item) => [
+      ...item.answer.flatMap((paragraph, paragraphIndex) =>
+        campaignCitationOccurrences(paragraph, citationIdPrefix(group.id, item.id, 'answer', paragraphIndex))
+      ),
+      ...(item.points ?? []).flatMap((point, pointIndex) =>
+        campaignCitationOccurrences(point, citationIdPrefix(group.id, item.id, 'point', pointIndex))
+      )
+    ])
+  )
 )
-const citedSources = campaignSourcesForOccurrences(faqSources, citationOccurrences)
+const citedSources = computed(() =>
+  campaignSourcesForOccurrences(campaignFaqPage.value.sources, citationOccurrences.value)
+)
 
 function citationIdPrefix(groupId: string, itemId: string, kind: 'answer' | 'point', index: number) {
   return `stockton-flock-faq-title-${groupId}-${itemId}-${kind}-${index + 1}`
@@ -36,7 +32,7 @@ function citationIdPrefix(groupId: string, itemId: string, kind: 'answer' | 'poi
       <div class="campaign-faq-opening-inner">
         <div class="campaign-faq-context">
           <p v-if="campaignFaqPage.eyebrow">{{ campaignFaqPage.eyebrow }}</p>
-          <p>Last materially updated: {{ campaignFaqPage.reviewedThrough }}.</p>
+          <p>{{ t('removeFlock.reviewedThrough', { date: campaignFaqPage.reviewedThrough }) }}</p>
         </div>
 
         <div class="campaign-faq-claim">
@@ -55,7 +51,7 @@ function citationIdPrefix(groupId: string, itemId: string, kind: 'answer' | 'poi
     </header>
 
     <div class="campaign-faq-layout">
-      <CampaignPageOutline :items="outlineItems" label="FAQ groups" />
+      <CampaignPageOutline :items="outlineItems" :label="t('removeFlock.faq.groupsLabel')" />
 
       <div class="campaign-faq-groups">
         <section

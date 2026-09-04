@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { eventKindByCategory, type CalendarApiResponse } from '~/content/calendar'
 
-const { t } = useI18n()
+const { locale, localeProperties, t } = useI18n()
+const languageTag = computed(() => localeProperties.value.language ?? locale.value)
 const { data, error, refresh, status } = await useFetch<CalendarApiResponse>('/api/events', {
   query: { limit: 3 }
 })
@@ -11,7 +12,7 @@ const upcomingEvents = computed(() =>
     .flatMap((event) =>
       event.sessions.map((session) => ({
         actionUrl: session.rsvpUrl ?? event.eventPageUrl,
-        category: eventKindByCategory[event.category],
+        category: t(`calendar.kinds.${eventKindByCategory[event.category].toLowerCase()}`),
         dateLabel: formatDate(session.startsAt, session.timezone),
         id: `${event.id}:${session.id}`,
         place: session.locationName ?? deliveryLabel(session.deliveryMode),
@@ -43,7 +44,7 @@ const quickLinks = computed(() => [
 ])
 
 function formatDate(value: string, timeZone: string) {
-  return new Intl.DateTimeFormat('en-US', {
+  return new Intl.DateTimeFormat(languageTag.value, {
     day: 'numeric',
     month: 'short',
     timeZone,
@@ -52,7 +53,7 @@ function formatDate(value: string, timeZone: string) {
 }
 
 function formatTimeRange(startsAt: string, endsAt: string | null, timeZone: string) {
-  const formatter = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit', timeZone })
+  const formatter = new Intl.DateTimeFormat(languageTag.value, { hour: 'numeric', minute: '2-digit', timeZone })
   return endsAt ? formatter.formatRange(new Date(startsAt), new Date(endsAt)) : formatter.format(new Date(startsAt))
 }
 

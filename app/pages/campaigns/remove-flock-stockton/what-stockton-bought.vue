@@ -1,12 +1,8 @@
 <script setup lang="ts">
-import {
-  stocktonContractFacts,
-  stocktonCostStack,
-  stocktonTimeline,
-  whatStocktonBoughtPage,
-  type CampaignCitationEntry,
-  type CampaignCitationSlotMap
-} from '~/content/remove-flock-stockton'
+import type { CampaignCitationEntry } from '~/content/remove-flock-stockton'
+
+const { t } = useI18n()
+const { stocktonContractFacts, stocktonCostStack, stocktonTimeline, whatStocktonBoughtPage } = useRemoveFlockContent()
 
 const citationLocators: Readonly<Record<string, Readonly<Record<string, string>>>> = {
   'contract-fact-1': {
@@ -45,37 +41,40 @@ function citationEntry(id: string, text: string, sourceIds: readonly string[]): 
   }
 }
 
-const contractFacts = stocktonContractFacts.map((fact, index) => ({
-  ...fact,
-  citation: citationEntry(`contract-fact-${index + 1}`, fact.detail, fact.sourceIds)
-}))
-const timeline = stocktonTimeline.map((entry, index) => ({
-  ...entry,
-  citation: citationEntry(`timeline-${index + 1}`, entry.description, entry.sourceIds)
-}))
-const costs = stocktonCostStack.map((cost, index) => ({
-  ...cost,
-  citation: citationEntry(`cost-${index + 1}`, cost.detail, cost.sourceIds)
-}))
-const costSection = whatStocktonBoughtPage.sections.find((section) => section.id === 'costs')
-const costSummaryContent = costSection?.paragraphs?.[0]
-
-if (!costSummaryContent) throw new Error('The campaign cost summary is required')
-
-const costSummary = {
-  id: 'cost-summary',
-  content: costSummaryContent
-} satisfies CampaignCitationEntry
-const slotCitations = {
-  'after-header': contractFacts.map((fact) => fact.citation),
-  'section-timeline': timeline.map((entry) => entry.citation),
-  'section-costs': [...costs.map((cost) => cost.citation), costSummary]
-} satisfies CampaignCitationSlotMap
-
-useHead({
-  title: whatStocktonBoughtPage.title,
-  meta: [{ name: 'description', content: whatStocktonBoughtPage.description }]
+const contractFacts = computed(() =>
+  stocktonContractFacts.value.map((fact, index) => ({
+    ...fact,
+    citation: citationEntry(`contract-fact-${index + 1}`, fact.detail, fact.sourceIds)
+  }))
+)
+const timeline = computed(() =>
+  stocktonTimeline.value.map((entry, index) => ({
+    ...entry,
+    citation: citationEntry(`timeline-${index + 1}`, entry.description, entry.sourceIds)
+  }))
+)
+const costs = computed(() =>
+  stocktonCostStack.value.map((cost, index) => ({
+    ...cost,
+    citation: citationEntry(`cost-${index + 1}`, cost.detail, cost.sourceIds)
+  }))
+)
+const costSummary = computed<CampaignCitationEntry>(() => {
+  const costSection = whatStocktonBoughtPage.value.sections.find((section) => section.id === 'costs')
+  const content = costSection?.paragraphs?.[0]
+  if (!content) throw new Error('The campaign cost summary is required')
+  return { id: 'cost-summary', content }
 })
+const slotCitations = computed(() => ({
+  'after-header': contractFacts.value.map((fact) => fact.citation),
+  'section-timeline': timeline.value.map((entry) => entry.citation),
+  'section-costs': [...costs.value.map((cost) => cost.citation), costSummary.value]
+}))
+
+useHead(() => ({
+  title: whatStocktonBoughtPage.value.title,
+  meta: [{ name: 'description', content: whatStocktonBoughtPage.value.description }]
+}))
 </script>
 
 <template>
@@ -120,7 +119,7 @@ useHead({
                 />
               </p>
               <p v-if="entry.status === 'reported-with-gap'" class="record-gap">
-                Stockton should release the missing amendment and the records that authorized it.
+                {{ t('removeFlock.record.missingAmendment') }}
               </p>
             </div>
           </li>
@@ -157,10 +156,10 @@ useHead({
       </template>
     </CampaignArticle>
 
-    <nav class="record-next" aria-label="Continue with the Remove Flock from Stockton campaign">
-      <p>Continue with the campaign</p>
+    <nav class="record-next" :aria-label="t('removeFlock.record.continueLabel')">
+      <p>{{ t('removeFlock.record.continue') }}</p>
       <AppActionLink to="/campaigns/remove-flock-stockton" variant="text">
-        See the campaign overview <span aria-hidden="true">→</span>
+        {{ t('removeFlock.record.overview') }} <span aria-hidden="true">→</span>
       </AppActionLink>
     </nav>
   </div>
