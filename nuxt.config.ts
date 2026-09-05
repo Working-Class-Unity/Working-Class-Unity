@@ -14,6 +14,10 @@ export default defineNuxtConfig({
   future: {
     compatibilityVersion: 5
   },
+  features: {
+    // Keep the global @layer declaration ahead of component styles in SSR output.
+    inlineStyles: false
+  },
   experimental: {
     // The application and installed modules use Nitro's supported server
     // autoimport engine; keep that explicit while adopting the other v5 defaults.

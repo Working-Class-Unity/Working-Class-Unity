@@ -32,13 +32,6 @@ const featuredDate = computed(() => {
     weekday: new Intl.DateTimeFormat(languageTag.value, { ...options, weekday: 'long' }).format(date)
   }
 })
-const agendaMonth = computed(() => {
-  const event = agendaEvents.value[0] ?? featuredEvent.value
-  if (!event) return ''
-  return new Intl.DateTimeFormat(languageTag.value, { month: 'long', timeZone: event.timezone }).format(
-    new Date(event.startsAt)
-  )
-})
 
 function eventStartTime(event: CalendarEvent) {
   return new Intl.DateTimeFormat(languageTag.value, {
@@ -111,10 +104,7 @@ function recurrenceSchedule(event: CalendarEvent) {
     <div v-else class="agenda-layout">
       <section aria-labelledby="up-next-title">
         <div class="section-heading-row">
-          <div>
-            <p class="section-label">{{ t('calendar.agenda.upNext') }}</p>
-            <h3 id="up-next-title">{{ agendaMonth }}</h3>
-          </div>
+          <h3 id="up-next-title">{{ t('calendar.agenda.upNext') }}</h3>
         </div>
         <ol class="event-list" role="list">
           <li v-for="event in agendaEvents" :key="event.id" class="event-row">

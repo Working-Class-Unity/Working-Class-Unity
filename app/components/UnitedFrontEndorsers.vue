@@ -38,8 +38,8 @@ defineProps<{
 
   .united-front-endorsers-inner {
     display: grid;
-    grid-template-columns: minmax(12rem, 4fr) minmax(0, 8fr);
-    gap: clamp(2rem, 5vw, 5rem);
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-6);
     align-items: start;
   }
 
@@ -87,16 +87,14 @@ defineProps<{
   }
 
   .united-front-endorser-logo {
-    display: grid;
     inline-size: 100%;
     block-size: 5.5rem;
-    place-items: center;
   }
 
   .united-front-endorser-logo img {
     display: block;
-    max-inline-size: 100%;
-    max-block-size: 100%;
+    inline-size: 100%;
+    block-size: 100%;
     object-fit: contain;
   }
 
@@ -105,17 +103,6 @@ defineProps<{
     font-size: 1.125rem;
     font-weight: var(--font-weight-bold);
     text-wrap: pretty;
-  }
-
-  @media (width <= 56rem) {
-    .united-front-endorsers-inner {
-      grid-template-columns: minmax(0, 1fr);
-      gap: var(--space-7);
-    }
-
-    .united-front-endorsers-heading p {
-      max-inline-size: 60ch;
-    }
   }
 
   @media (width <= 22rem) {
