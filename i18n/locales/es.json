@@ -59,16 +59,16 @@
       "content": "No abandonaremos a nuestros vecinos. No nos dejaremos dividir por papeles, raza, idioma, partido o código postal. Construiremos un frente unido de trabajadores en el Condado de San Joaquín, independiente de los políticos y las corporaciones que lucran con nuestro miedo. Nos organizaremos donde vivimos, trabajamos y nos congregamos, hasta que ningún patrón pueda amenazar a un trabajador para silenciarlo y ninguna familia enfrente estas crisis sola. Únase a nosotros hoy."
     },
     "signing": {
-      "heading": "Elige cómo firmar",
-      "description": "Elige si firmas en tu propio nombre o como contacto autorizado de una organización.",
+      "heading": "Agrega tu nombre",
+      "description": "Agrega tu nombre a título individual o como representante autorizado de una organización.",
       "individual": {
         "title": "Agrega tu nombre",
-        "description": "Agrega tu nombre y elige correo electrónico, mensajes de texto o ambos para recibir actualizaciones del Frente Unido / Conoce Tus Derechos y otras actualizaciones de WCU. El consentimiento para mensajes de texto es opcional.",
+        "description": "Firma la declaración y recibe noticias del Frente Unido, Conoce Tus Derechos y nuestro trabajo. Elige correo electrónico, mensajes de texto o ambos.",
         "action": "Agrega tu nombre"
       },
       "organization": {
         "title": "Agrega tu organización",
-        "description": "Un contacto principal autorizado agrega la organización y recibe actualizaciones por correo electrónico de Conoce Tus Derechos / Frente Unido. Los mensajes de texto requieren un Sí por separado. Los nombres y logotipos aprobados pueden aparecer aquí después de la revisión de WCU.",
+        "description": "¿Firmas en nombre de una organización? Serás nuestro contacto para recibir por correo las novedades del Frente Unido y Conoce Tus Derechos. También puedes optar por recibir mensajes de texto. Después de revisar tu solicitud, podremos incluir aquí el nombre y el logotipo de tu organización.",
         "action": "Agrega tu organización"
       }
     },

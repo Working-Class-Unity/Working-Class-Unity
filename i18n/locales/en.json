@@ -59,16 +59,16 @@
       "content": "We will not abandon our neighbors. We will not be divided by papers, race, language, party, or zip code. We will build a united front of workers in San Joaquin County, one independent of the politicians and corporations that profit from our fear. We will organize where we live, work, and worship until no employer can threaten a worker into silence and no family faces these crises alone. Join us today."
     },
     "signing": {
-      "heading": "Choose how to sign",
-      "description": "Choose whether you are signing in your own name or as an authorized contact for an organization.",
+      "heading": "Add your name",
+      "description": "Add your name as an individual or as an authorized representative of an organization.",
       "individual": {
         "title": "Add your name",
-        "description": "Add your name and choose email, text, or both for United Front / Know Your Rights and other WCU updates. Text consent is optional.",
+        "description": "Sign the declaration and get updates on United Front, Know Your Rights, and our other work. Choose email, texts, or both.",
         "action": "Add your name"
       },
       "organization": {
         "title": "Add your organization",
-        "description": "An authorized primary contact adds the organization and receives Know Your Rights / United Front email updates. Text updates require a separate Yes. Approved names and logos may be listed here after WCU review.",
+        "description": "Signing on behalf of an organization? You’ll be our contact for United Front and Know Your Rights updates by email. You can also opt into texts. After reviewing your submission, we may list your organization’s name and logo here.",
         "action": "Add your organization"
       }
     },
