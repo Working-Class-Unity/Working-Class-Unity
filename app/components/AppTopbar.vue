@@ -1,5 +1,13 @@
 <script setup lang="ts">
-import { ConfigProvider, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuRoot } from 'reka-ui'
+import {
+  ConfigProvider,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuRoot,
+  NavigationMenuTrigger
+} from 'reka-ui'
 import { toAppSession } from '~/composables/useAppSession'
 import { authClient } from '~/lib/auth-client'
 
@@ -11,7 +19,12 @@ const clientSession = import.meta.client ? authClient.useSession() : null
 const { data: session, error: sessionError, status: sessionStatus, refresh: refreshSession } = await useAppSession()
 const retryState = ref<'idle' | 'pending' | 'failed'>('idle')
 const mobileMenuOpen = ref(false)
+const desktopMenuValue = ref('')
 const mobileMenuToggle = ref<HTMLButtonElement | null>(null)
+const campaignLinks = [
+  { path: '/campaigns/remove-flock-stockton', label: 'navigation.removeFlock' },
+  { path: '/campaigns/united-front', label: 'unitedfront.pageTitle' }
+]
 const retrying = computed(() => retryState.value === 'pending')
 const nuxtUseId = () => useId()
 const retryAnnouncement = computed<'polite' | 'assertive' | undefined>(() => {
@@ -46,6 +59,7 @@ watch(
   () => route.fullPath,
   () => {
     mobileMenuOpen.value = false
+    desktopMenuValue.value = ''
   },
   { flush: 'sync' }
 )
@@ -122,10 +136,14 @@ function currentParticipationLocation() {
         id="primary-navigation-panel"
         class="topbar-panel"
         :class="{ 'topbar-panel--open': mobileMenuOpen }"
-        @keydown.esc.prevent.stop="closeMobileMenu"
+        @keydown.esc="closeMobileMenu"
       >
         <ConfigProvider :use-id="nuxtUseId">
-          <NavigationMenuRoot class="desktop-navigation" :aria-label="t('navigation.primaryLabel')">
+          <NavigationMenuRoot
+            v-model="desktopMenuValue"
+            class="desktop-navigation"
+            :aria-label="t('navigation.primaryLabel')"
+          >
             <NavigationMenuList class="desktop-navigation-list">
               <NavigationMenuItem>
                 <NavigationMenuLink as-child :active="route.path === '/about'">
@@ -134,16 +152,42 @@ function currentParticipationLocation() {
                   </NuxtLink>
                 </NavigationMenuLink>
               </NavigationMenuItem>
-              <NavigationMenuItem>
-                <NavigationMenuLink as-child :active="Boolean(currentWorkLocation())">
-                  <NuxtLink
-                    class="topbar-link topbar-link--public"
-                    to="/#current-work"
-                    :aria-current="currentWorkLocation()"
+              <NavigationMenuItem value="current-work" class="topbar-work-item">
+                <NavigationMenuTrigger as-child>
+                  <button
+                    type="button"
+                    class="topbar-link topbar-link--public topbar-work-trigger"
+                    :data-active="
+                      currentWorkLocation() || campaignLinks.some((link) => route.path.startsWith(link.path))
+                        ? ''
+                        : undefined
+                    "
                   >
                     {{ t('navigation.currentWork') }}
-                  </NuxtLink>
-                </NavigationMenuLink>
+                  </button>
+                </NavigationMenuTrigger>
+                <NavigationMenuContent class="topbar-work-menu">
+                  <ul class="topbar-work-links" role="list">
+                    <li>
+                      <NavigationMenuLink as-child :active="Boolean(currentWorkLocation())">
+                        <NuxtLink
+                          class="topbar-link topbar-work-link"
+                          to="/#current-work"
+                          :aria-current="currentWorkLocation()"
+                        >
+                          {{ t('navigation.allCurrentWork') }}
+                        </NuxtLink>
+                      </NavigationMenuLink>
+                    </li>
+                    <li v-for="link in campaignLinks" :key="link.path">
+                      <NavigationMenuLink as-child :active="route.path === link.path">
+                        <NuxtLink class="topbar-link topbar-work-link" :to="link.path">
+                          {{ t(link.label) }}
+                        </NuxtLink>
+                      </NavigationMenuLink>
+                    </li>
+                  </ul>
+                </NavigationMenuContent>
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <NavigationMenuLink as-child :active="route.path === '/calendar'">
@@ -172,6 +216,18 @@ function currentParticipationLocation() {
               >
                 {{ t('navigation.currentWork') }}
               </NuxtLink>
+              <ul class="mobile-work-links" role="list">
+                <li v-for="link in campaignLinks" :key="link.path">
+                  <NuxtLink
+                    class="topbar-link topbar-work-link"
+                    :to="link.path"
+                    :aria-current="currentPage(link.path)"
+                    @click="closeMobileMenu"
+                  >
+                    {{ t(link.label) }}
+                  </NuxtLink>
+                </li>
+              </ul>
             </li>
             <li>
               <NuxtLink class="topbar-link topbar-link--public" to="/calendar" :aria-current="currentPage('/calendar')">
@@ -286,8 +342,11 @@ function currentParticipationLocation() {
   }
 
   .desktop-navigation {
+    position: relative;
+    z-index: var(--z-menu);
     justify-self: start;
     min-width: 0;
+    font-weight: var(--font-weight-strong);
   }
 
   :deep(.desktop-navigation-list),
@@ -350,6 +409,61 @@ function currentParticipationLocation() {
   .topbar-link--public[data-active],
   .topbar-link--public[aria-current] {
     border-block-end-color: var(--color-brand-primary);
+  }
+
+  :deep(.topbar-work-item) {
+    position: relative;
+  }
+
+  .topbar-work-trigger {
+    gap: var(--space-2);
+    background: transparent;
+    font-family: inherit;
+  }
+
+  .topbar-work-trigger::after {
+    inline-size: 0.375rem;
+    block-size: 0.375rem;
+    flex: 0 0 auto;
+    border-inline-end: 2px solid currentcolor;
+    border-block-end: 2px solid currentcolor;
+    content: '';
+    transform: rotate(45deg);
+  }
+
+  .topbar-work-trigger[data-state='open']::after {
+    transform: rotate(225deg);
+  }
+
+  :deep(.topbar-work-menu) {
+    position: absolute;
+    inset-block-start: 100%;
+    inset-inline-start: 0;
+    inline-size: 18rem;
+    border: var(--border-width) solid rgb(4 51 79 / 12%);
+    border-radius: var(--radius-1);
+    padding: var(--space-2);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-panel);
+  }
+
+  .topbar-work-links,
+  .mobile-work-links {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .topbar-work-link {
+    inline-size: 100%;
+    justify-content: flex-start;
+    text-align: start;
+  }
+
+  .topbar-work-link:hover,
+  .topbar-work-link:focus-visible,
+  .topbar-work-link[aria-current] {
+    background: var(--color-action-soft);
   }
 
   .topbar-link--utility,
@@ -478,8 +592,15 @@ function currentParticipationLocation() {
       list-style: none;
     }
 
-    .mobile-navigation-list li {
+    .mobile-navigation-list > li {
       border-block-end: var(--border-width) solid var(--color-border);
+    }
+
+    .mobile-work-links {
+      border-inline-start: var(--border-width) solid var(--color-border);
+      padding-inline-start: var(--space-3);
+      margin-inline-start: var(--space-3);
+      margin-block-end: var(--space-3);
     }
 
     .topbar-actions {
