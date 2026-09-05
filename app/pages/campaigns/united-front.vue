@@ -240,7 +240,14 @@ useHead(() => ({
   }
 
   .united-front-editorial-header {
+    padding-block: clamp(3rem, 6vw, 5rem);
     margin-block-end: clamp(3rem, 6vw, 5rem);
+  }
+
+  .united-front-editorial-header :deep(h1) {
+    max-inline-size: 36ch;
+    font-size: var(--font-size-heading-1);
+    line-height: var(--line-height-heading);
   }
 
   .united-front-header-action {
@@ -271,8 +278,8 @@ useHead(() => ({
 
   .united-front-section-grid {
     display: grid;
-    grid-template-columns: minmax(12rem, 4fr) minmax(0, 8fr);
-    gap: clamp(2rem, 5vw, 5rem);
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-5);
     align-items: start;
     min-width: 0;
   }
@@ -301,8 +308,12 @@ useHead(() => ({
   }
 
   .united-front-copy,
-  .united-front-signing-content {
+  .united-front-signing-description {
     max-inline-size: 68ch;
+  }
+
+  .united-front-signing-content {
+    container-type: inline-size;
   }
 
   .united-front-copy p,
@@ -323,10 +334,6 @@ useHead(() => ({
     color: var(--color-brand-primary);
     font-size: 1.25rem;
     line-height: 1.2;
-  }
-
-  .united-front-signing-path p {
-    margin-block-start: var(--space-3);
   }
 
   .united-front-demand-list {
@@ -383,7 +390,7 @@ useHead(() => ({
 
   .united-front-signing-path {
     display: grid;
-    align-content: start;
+    grid-template-rows: auto 1fr auto;
     justify-items: start;
     gap: var(--space-3);
     min-width: 0;
@@ -403,13 +410,6 @@ useHead(() => ({
     max-inline-size: 100%;
   }
 
-  @media (width <= 72rem) {
-    .united-front-section-grid {
-      grid-template-columns: minmax(0, 1fr);
-      gap: var(--space-5);
-    }
-  }
-
   @media (width <= 56rem) {
     .united-front-record {
       grid-template-columns: minmax(0, 1fr);
@@ -421,7 +421,7 @@ useHead(() => ({
     }
   }
 
-  @media (width <= 40rem) {
+  @container (width <= 34rem) {
     .united-front-signing-paths {
       grid-template-columns: minmax(0, 1fr);
     }

@@ -18,25 +18,27 @@ const jumpDate = ref<string | null>(null)
 const { data, error, refresh, status } = await useFetch<CalendarApiResponse>('/api/events')
 
 const calendarEvents = computed<readonly CalendarEvent[]>(() =>
-  (data.value?.events ?? []).flatMap((event) =>
-    event.sessions.map((session, index) => ({
-      address: session.locationAddress ?? '',
-      dateLabel: formatDate(session.startsAt, session.timezone),
-      description: event.description ?? '',
-      endsAt: session.endsAt,
-      eventPageUrl: event.eventPageUrl,
-      id: `${event.id}:${session.id}`,
-      kind: eventKindByCategory[event.category],
-      place: session.locationName ?? deliveryLabel(session.deliveryMode),
-      recurring:
-        index === 0 && event.sessions.length > 1 ? t('calendar.upcomingDates', event.sessions.length) : undefined,
-      rsvpUrl: session.rsvpUrl ?? event.eventPageUrl,
-      startsAt: session.startsAt,
-      time: formatTimeRange(session.startsAt, session.endsAt, session.timezone),
-      timezone: session.timezone,
-      title: event.title
-    }))
-  )
+  (data.value?.events ?? [])
+    .flatMap((event) =>
+      event.sessions.map((session, index) => ({
+        address: session.locationAddress ?? '',
+        dateLabel: formatDate(session.startsAt, session.timezone),
+        description: event.description ?? '',
+        endsAt: session.endsAt,
+        eventPageUrl: event.eventPageUrl,
+        id: `${event.id}:${session.id}`,
+        kind: eventKindByCategory[event.category],
+        place: session.locationName ?? deliveryLabel(session.deliveryMode),
+        recurring:
+          index === 0 && event.sessions.length > 1 ? t('calendar.upcomingDates', event.sessions.length) : undefined,
+        rsvpUrl: session.rsvpUrl ?? event.eventPageUrl,
+        startsAt: session.startsAt,
+        time: formatTimeRange(session.startsAt, session.endsAt, session.timezone),
+        timezone: session.timezone,
+        title: event.title
+      }))
+    )
+    .sort((first, second) => Date.parse(first.startsAt) - Date.parse(second.startsAt))
 )
 const visibleEvents = computed(() =>
   jumpDate.value
