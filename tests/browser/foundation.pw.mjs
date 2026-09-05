@@ -447,7 +447,12 @@ test.describe('localized browsing', () => {
     await expect(menuToggle).toHaveAttribute('aria-expanded', 'false')
     await menuToggle.click()
     await expect(menuToggle).toHaveAttribute('aria-expanded', 'true')
-    await expect(page.locator('select[name="language"]')).toBeVisible()
+    const languagePicker = page.getByRole('combobox', {
+      name: requiredMessage(punjabiMessages, 'common.language'),
+      exact: true
+    })
+    await expect(languagePicker).toBeVisible()
+    expect((await languagePicker.boundingBox()).width).toBeLessThan(160)
     await assertMinimumTargetSize(page.locator('select[name="language"]'))
     await page.locator('select[name="language"]').focus()
     await assertVisibleFocusIndicator(page, page.locator('select[name="language"]'))

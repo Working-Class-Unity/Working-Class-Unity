@@ -31,6 +31,7 @@ The root [`AGENTS.md`](../AGENTS.md) governs all work. The normative interface a
 - `AppNotice`: persistent visual feedback with explicit, opt-in announcement behavior.
 - `AppTopbar`: application-shell header, Reka desktop primary navigation with a Current Work campaign
   submenu, and native mobile disclosure with directly accessible campaign links.
+- `LanguageSelector`: compact native select with a globe label, localized accessible name, and full language names.
 - `AccountMenu`: feature-owned Reka dropdown for identity, account navigation, and sign-out.
 - `calendar/CalendarDatePicker`: feature-owned Reka calendar and popover for agenda date navigation.
 - `calendar/EventDirectionsMenu`: feature-owned Reka dropdown for map and address actions.
