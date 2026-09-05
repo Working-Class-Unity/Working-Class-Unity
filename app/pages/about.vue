@@ -232,7 +232,7 @@ useHead(() => ({
 
   .governance-copy > p:last-child {
     max-inline-size: 62ch;
-    color: var(--color-text-muted);
+    color: var(--color-text);
     font-size: 1.0625rem;
     line-height: 1.7;
     text-wrap: pretty;
