@@ -8,6 +8,8 @@ useHead(() => ({
   title: config.public.appName,
   meta: [{ name: 'description', content: t('metadata.defaultDescription') }]
 }))
+
+useSiteSeo()
 </script>
 
 <template>

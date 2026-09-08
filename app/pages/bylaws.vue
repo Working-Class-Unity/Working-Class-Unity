@@ -16,11 +16,6 @@ const outlineItems = computed(() =>
     }))
   }))
 )
-
-useHead(() => ({
-  title: t('metadata.bylaws.title'),
-  meta: [{ name: 'description', content: t('metadata.bylaws.description') }]
-}))
 </script>
 
 <template>

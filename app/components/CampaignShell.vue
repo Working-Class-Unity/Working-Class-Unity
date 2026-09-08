@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import { unlocalizedPublicPath } from '#shared/public-site'
 import { flockNavigation } from '~/content/navigation'
 
 const route = useRoute()
+const publicPath = computed(() => unlocalizedPublicPath(route.path))
 const { t } = useI18n()
 
 const campaignBase = flockNavigation.path
@@ -9,19 +11,21 @@ const petitionUrl = 'https://tech.workingclassunity.com/deflock-stockton'
 const campaignLinks = computed(() => flockNavigation.links.map((link) => ({ path: link.path, label: t(link.label) })))
 
 function currentPage(path: string) {
-  return route.path === path ? 'page' : undefined
+  return publicPath.value === path ? 'page' : undefined
 }
 </script>
 
 <template>
   <div class="campaign-shell">
-    <div class="campaign-page-slot" :class="{ 'campaign-page-slot--overview': route.path === campaignBase }">
+    <div class="campaign-page-slot" :class="{ 'campaign-page-slot--overview': publicPath === campaignBase }">
       <slot />
     </div>
 
     <footer class="campaign-footer" :aria-label="t('removeFlock.campaignLabel')">
       <div class="campaign-footer-intro">
-        <NuxtLink class="campaign-footer-home" :to="campaignBase">{{ t('removeFlock.shell.footerHome') }}</NuxtLink>
+        <NuxtLinkLocale class="campaign-footer-home" :to="campaignBase">{{
+          t('removeFlock.shell.footerHome')
+        }}</NuxtLinkLocale>
         <p>{{ t('removeFlock.footer.description') }}</p>
         <p class="campaign-footer-source-note">{{ t('removeFlock.footer.sourceNote') }}</p>
       </div>
@@ -30,7 +34,7 @@ function currentPage(path: string) {
         <h2>{{ t('removeFlock.footer.campaign') }}</h2>
         <ul role="list">
           <li v-for="link in campaignLinks" :key="`footer-${link.path}`">
-            <NuxtLink :to="link.path" :aria-current="currentPage(link.path)">{{ link.label }}</NuxtLink>
+            <NuxtLinkLocale :to="link.path" :aria-current="currentPage(link.path)">{{ link.label }}</NuxtLinkLocale>
           </li>
         </ul>
       </div>
@@ -39,13 +43,13 @@ function currentPage(path: string) {
         <h2>{{ t('removeFlock.footer.wcu') }}</h2>
         <ul role="list">
           <li>
-            <NuxtLink to="/about">{{ t('navigation.about') }}</NuxtLink>
+            <NuxtLinkLocale to="/about">{{ t('navigation.about') }}</NuxtLinkLocale>
           </li>
           <li>
-            <NuxtLink to="/calendar">{{ t('navigation.calendar') }}</NuxtLink>
+            <NuxtLinkLocale to="/calendar">{{ t('navigation.calendar') }}</NuxtLinkLocale>
           </li>
           <li>
-            <NuxtLink to="/join">{{ t('navigation.signup') }}</NuxtLink>
+            <NuxtLinkLocale to="/join">{{ t('navigation.signup') }}</NuxtLinkLocale>
           </li>
         </ul>
       </div>
@@ -54,10 +58,10 @@ function currentPage(path: string) {
         <h2>{{ t('removeFlock.footer.accountability') }}</h2>
         <ul role="list">
           <li>
-            <NuxtLink to="/legal/privacy">{{ t('removeFlock.footer.privacy') }}</NuxtLink>
+            <NuxtLinkLocale to="/legal/privacy">{{ t('removeFlock.footer.privacy') }}</NuxtLinkLocale>
           </li>
           <li>
-            <NuxtLink to="/legal/terms">{{ t('removeFlock.footer.terms') }}</NuxtLink>
+            <NuxtLinkLocale to="/legal/terms">{{ t('removeFlock.footer.terms') }}</NuxtLinkLocale>
           </li>
           <li>
             <a :href="petitionUrl">{{ t('removeFlock.petitionAction') }}</a>

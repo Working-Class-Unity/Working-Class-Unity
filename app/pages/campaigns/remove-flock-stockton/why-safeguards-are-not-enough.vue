@@ -3,11 +3,6 @@ import { citedTextPlainText } from '~/content/remove-flock-stockton'
 
 const { t } = useI18n()
 const { whySafeguardsPage } = useRemoveFlockContent()
-
-useHead(() => ({
-  title: whySafeguardsPage.value.title,
-  meta: [{ name: 'description', content: whySafeguardsPage.value.description }]
-}))
 </script>
 
 <template>

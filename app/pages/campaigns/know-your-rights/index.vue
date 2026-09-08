@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { knowYourRightsBasePath, knowYourRightsGuides } from '~/content/know-your-rights'
+import { knowYourRightsGuides } from '~/content/know-your-rights'
 
 const { t } = useI18n()
 const guides = computed(() =>
@@ -9,12 +9,6 @@ const guides = computed(() =>
     description: t(guide.descriptionKey)
   }))
 )
-
-useHead(() => ({
-  title: t('kyr_home.hero.title'),
-  meta: [{ name: 'description', content: t('kyr_home.hero.description') }],
-  link: [{ rel: 'canonical', href: 'https://workingclassunity.com' + knowYourRightsBasePath }]
-}))
 </script>
 
 <template>
@@ -47,10 +41,10 @@ useHead(() => ({
         <ul role="list">
           <li v-for="guide in guides" :key="guide.slug">
             <h3>
-              <NuxtLink class="kyr-hub-guide-link" :to="guide.path">
+              <NuxtLinkLocale class="kyr-hub-guide-link" :to="guide.path">
                 {{ guide.title }}
                 <span aria-hidden="true">→</span>
-              </NuxtLink>
+              </NuxtLinkLocale>
             </h3>
             <p>{{ guide.description }}</p>
           </li>

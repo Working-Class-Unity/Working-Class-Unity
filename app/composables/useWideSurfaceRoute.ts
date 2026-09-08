@@ -1,5 +1,10 @@
+import { unlocalizedPublicPath } from '#shared/public-site'
+
 export function useWideSurfaceRoute() {
   const route = useRoute()
 
-  return computed(() => route.path === '/' || route.path.startsWith('/campaigns/remove-flock-stockton'))
+  return computed(() => {
+    const path = unlocalizedPublicPath(route.path)
+    return path === '/' || path.startsWith('/campaigns/remove-flock-stockton')
+  })
 }

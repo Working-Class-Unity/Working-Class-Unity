@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { unlocalizedPublicPath } from '#shared/public-site'
 import {
   ConfigProvider,
   NavigationMenuContent,
@@ -13,6 +14,7 @@ import { currentWorkNavigation } from '~/content/navigation'
 import { authClient } from '~/lib/auth-client'
 
 const route = useRoute()
+const publicPath = computed(() => unlocalizedPublicPath(route.path))
 const { t } = useI18n()
 const usesWideSurface = useWideSurfaceRoute()
 const responseCacheControl = useResponseHeader('cache-control')
@@ -32,7 +34,7 @@ const workGroups = computed(() =>
     }))
   }))
 )
-const mobileWorkOpen = ref(route.path.startsWith('/campaigns/'))
+const mobileWorkOpen = ref(publicPath.value.startsWith('/campaigns/'))
 const mobileEventsOpen = ref(false)
 const {
   entries: upcomingEvents,
@@ -81,7 +83,7 @@ watch(
   () => {
     mobileMenuOpen.value = false
     desktopMenuValue.value = ''
-    mobileWorkOpen.value = route.path.startsWith('/campaigns/')
+    mobileWorkOpen.value = publicPath.value.startsWith('/campaigns/')
   },
   { flush: 'sync' }
 )
@@ -122,15 +124,15 @@ async function retrySession() {
 }
 
 function currentPage(path: string) {
-  return route.path === path ? 'page' : undefined
+  return publicPath.value === path ? 'page' : undefined
 }
 
 function currentWorkLocation() {
-  return route.path === '/' && route.hash === '#current-work' ? 'location' : undefined
+  return publicPath.value === '/' && route.hash === '#current-work' ? 'location' : undefined
 }
 
 function currentParticipationLocation() {
-  return route.path === '/' && route.hash === '#get-involved' ? 'location' : undefined
+  return publicPath.value === '/' && route.hash === '#get-involved' ? 'location' : undefined
 }
 </script>
 
@@ -138,7 +140,7 @@ function currentParticipationLocation() {
   <header class="topbar" :class="{ 'topbar--wide': usesWideSurface }" :aria-label="t('navigation.applicationLabel')">
     <div class="topbar-row">
       <div class="topbar-brand-area">
-        <NuxtLink
+        <NuxtLinkLocale
           class="brand"
           to="/"
           :aria-current="currentPage('/')"
@@ -146,7 +148,7 @@ function currentParticipationLocation() {
         >
           <!-- eslint-disable-next-line vue/html-self-closing -->
           <img src="/images/wcu-logo-dark.png" alt="" class="brand-mark" width="2000" height="2000" />
-        </NuxtLink>
+        </NuxtLinkLocale>
       </div>
 
       <button
@@ -175,10 +177,10 @@ function currentParticipationLocation() {
           >
             <NavigationMenuList class="desktop-navigation-list">
               <NavigationMenuItem>
-                <NavigationMenuLink as-child :active="route.path === '/about'">
-                  <NuxtLink class="topbar-link topbar-link--public" to="/about">
+                <NavigationMenuLink as-child :active="publicPath === '/about'">
+                  <NuxtLinkLocale class="topbar-link topbar-link--public" to="/about">
                     {{ t('navigation.about') }}
-                  </NuxtLink>
+                  </NuxtLinkLocale>
                 </NavigationMenuLink>
               </NavigationMenuItem>
               <NavigationMenuItem value="current-work" class="topbar-work-item">
@@ -186,7 +188,7 @@ function currentParticipationLocation() {
                   <button
                     type="button"
                     class="topbar-link topbar-link--public topbar-work-trigger"
-                    :data-active="currentWorkLocation() || route.path.startsWith('/campaigns/') ? '' : undefined"
+                    :data-active="currentWorkLocation() || publicPath.startsWith('/campaigns/') ? '' : undefined"
                   >
                     {{ t('navigation.currentWork') }}
                   </button>
@@ -198,23 +200,23 @@ function currentParticipationLocation() {
                       :key="group.label"
                       :label="group.label"
                       :links="group.links"
-                      :current-path="route.path"
+                      :current-path="publicPath"
                     >
                       <template #entry="{ entry }">
-                        <NavigationMenuLink as-child :active="route.path === entry.path">
-                          <NavigationEntry :entry="entry" :current="route.path === entry.path" />
+                        <NavigationMenuLink as-child :active="publicPath === entry.path">
+                          <NavigationEntry :entry="entry" :current="publicPath === entry.path" />
                         </NavigationMenuLink>
                       </template>
                     </ContextNavigation>
                   </div>
                   <NavigationMenuLink as-child :active="Boolean(currentWorkLocation())">
-                    <NuxtLink
+                    <NuxtLinkLocale
                       class="topbar-link topbar-panel-footer"
                       to="/#current-work"
                       :aria-current="currentWorkLocation()"
                     >
                       {{ t('navigation.allCurrentWork') }}
-                    </NuxtLink>
+                    </NuxtLinkLocale>
                   </NavigationMenuLink>
                 </NavigationMenuContent>
               </NavigationMenuItem>
@@ -223,7 +225,7 @@ function currentParticipationLocation() {
                   <button
                     type="button"
                     class="topbar-link topbar-link--public topbar-work-trigger"
-                    :data-active="route.path === '/calendar' ? '' : undefined"
+                    :data-active="publicPath === '/calendar' ? '' : undefined"
                   >
                     {{ t('navigation.calendar') }}
                   </button>
@@ -247,14 +249,14 @@ function currentParticipationLocation() {
                       </NavigationMenuLink>
                     </li>
                   </ul>
-                  <NavigationMenuLink as-child :active="route.path === '/calendar'">
-                    <NuxtLink
+                  <NavigationMenuLink as-child :active="publicPath === '/calendar'">
+                    <NuxtLinkLocale
                       class="topbar-link topbar-panel-footer"
                       to="/calendar"
                       :aria-current="currentPage('/calendar')"
                     >
                       {{ t('navigation.allEvents') }}
-                    </NuxtLink>
+                    </NuxtLinkLocale>
                   </NavigationMenuLink>
                 </NavigationMenuContent>
               </NavigationMenuItem>
@@ -265,9 +267,9 @@ function currentParticipationLocation() {
         <nav class="mobile-navigation" :aria-label="t('navigation.primaryLabel')">
           <ul class="mobile-navigation-list" role="list">
             <li>
-              <NuxtLink class="topbar-link topbar-link--public" to="/about" :aria-current="currentPage('/about')">
+              <NuxtLinkLocale class="topbar-link topbar-link--public" to="/about" :aria-current="currentPage('/about')">
                 {{ t('navigation.about') }}
-              </NuxtLink>
+              </NuxtLinkLocale>
             </li>
             <li>
               <button
@@ -285,15 +287,15 @@ function currentParticipationLocation() {
                   :key="group.label"
                   :label="group.label"
                   :links="group.links"
-                  :current-path="route.path"
+                  :current-path="publicPath"
                 />
-                <NuxtLink
+                <NuxtLinkLocale
                   class="topbar-link topbar-panel-footer"
                   to="/#current-work"
                   :aria-current="currentWorkLocation()"
                 >
                   {{ t('navigation.allCurrentWork') }}
-                </NuxtLink>
+                </NuxtLinkLocale>
               </div>
             </li>
             <li>
@@ -321,13 +323,13 @@ function currentParticipationLocation() {
                 <ul v-else class="topbar-event-list" role="list">
                   <li v-for="entry in upcomingEvents" :key="entry.id"><NavigationEntry :entry="entry" /></li>
                 </ul>
-                <NuxtLink
+                <NuxtLinkLocale
                   class="topbar-link topbar-panel-footer"
                   to="/calendar"
                   :aria-current="currentPage('/calendar')"
                 >
                   {{ t('navigation.allEvents') }}
-                </NuxtLink>
+                </NuxtLinkLocale>
               </div>
             </li>
           </ul>
@@ -379,14 +381,14 @@ function currentParticipationLocation() {
         </div>
       </div>
 
-      <NuxtLink
+      <NuxtLinkLocale
         class="topbar-link topbar-link--involved"
         to="/#get-involved"
         :aria-current="currentParticipationLocation()"
         @click="closeMobileMenu"
       >
         {{ t('navigation.getInvolved') }}
-      </NuxtLink>
+      </NuxtLinkLocale>
     </div>
   </header>
 </template>

@@ -59,11 +59,11 @@ const relatedTitleId = computed(() => props.titleId + '-related-title')
 
       <ul role="list">
         <li v-for="guide in relatedGuides" :key="guide.slug">
-          <NuxtLink :to="guide.path">
+          <NuxtLinkLocale :to="guide.path">
             <span>{{ t(guide.titleKey) }}</span>
             <span>{{ t(guide.descriptionKey) }}</span>
             <span aria-hidden="true">→</span>
-          </NuxtLink>
+          </NuxtLinkLocale>
         </li>
       </ul>
     </nav>

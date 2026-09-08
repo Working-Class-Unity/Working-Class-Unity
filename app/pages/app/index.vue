@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { appUserIdentity } from '~/composables/useAppSession'
 
+defineI18nRoute(false)
+
 const { t } = useI18n()
 const { data: session, error: sessionError, status: sessionStatus, refresh: refreshSession } = await useAppSession()
 

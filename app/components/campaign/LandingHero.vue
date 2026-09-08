@@ -25,7 +25,7 @@ const detailLinks = flockNavigation.links.filter((link) => link.path !== flockNa
       <nav class="landing-hero-links" :aria-label="t('removeFlock.navigationLabel')">
         <ul role="list">
           <li v-for="link in detailLinks" :key="link.path">
-            <NuxtLink :to="link.path">{{ t(link.label) }}</NuxtLink>
+            <NuxtLinkLocale :to="link.path">{{ t(link.label) }}</NuxtLinkLocale>
           </li>
         </ul>
       </nav>

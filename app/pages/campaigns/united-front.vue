@@ -31,11 +31,6 @@ const demands = computed(() => [
   t('unitedfront.longTermDemands.demand3'),
   t('unitedfront.longTermDemands.demand4')
 ])
-
-useHead(() => ({
-  title: `${t('unitedfront.pageTitle')} | ${t('unitedfront.ui.org_name')}`,
-  meta: [{ name: 'description', content: t('unitedfront.subtitle') }]
-}))
 </script>
 
 <template>

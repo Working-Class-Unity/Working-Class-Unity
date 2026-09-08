@@ -2,6 +2,8 @@
 import type { AccountProfile } from '#shared/profile'
 import { appUserIdentity, type AppSessionUser } from '~/composables/useAppSession'
 
+defineI18nRoute(false)
+
 type AccountSettingsUser = AppSessionUser & AccountProfile
 
 const { t } = useI18n()

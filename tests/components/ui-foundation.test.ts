@@ -18,6 +18,9 @@ const NuxtLinkStub = {
 }
 
 beforeAll(() => {
+  // This component-only harness has no Nuxt router; real locale routing is
+  // exercised by the production browser suite.
+  vi.stubGlobal('useLocalePath', () => (path: string) => path)
   vi.stubGlobal('useI18n', () => ({
     t: (key: string) =>
       ({

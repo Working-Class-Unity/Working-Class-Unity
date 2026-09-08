@@ -1,6 +1,8 @@
 <script setup lang="ts">
 type TestStatus = 'idle' | 'validating' | 'captured' | 'missing-token' | 'failed'
 
+defineI18nRoute(false)
+
 const { t } = useI18n()
 
 const status = ref<TestStatus>('idle')

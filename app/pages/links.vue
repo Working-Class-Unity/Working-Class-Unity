@@ -62,20 +62,19 @@ function deliveryLabel(deliveryMode: 'hybrid' | 'in_person' | 'virtual') {
   if (deliveryMode === 'hybrid') return t('publicPages.links.events.hybrid')
   return t('publicPages.links.events.locationPending')
 }
-
-useHead(() => ({
-  title: t('metadata.links.title'),
-  meta: [{ name: 'description', content: t('metadata.links.description') }]
-}))
 </script>
 
 <template>
   <article class="links-page" aria-labelledby="links-title">
     <header class="links-identity">
-      <NuxtLink class="links-logo" to="/" :aria-label="t('navigation.brandHome', { appName: 'Working Class Unity' })">
+      <NuxtLinkLocale
+        class="links-logo"
+        to="/"
+        :aria-label="t('navigation.brandHome', { appName: 'Working Class Unity' })"
+      >
         <!-- eslint-disable-next-line vue/html-self-closing -->
         <img src="/images/wcu-logo-dark.png" alt="" width="2000" height="2000" />
-      </NuxtLink>
+      </NuxtLinkLocale>
       <div class="links-heading">
         <p class="links-eyebrow">{{ t('publicPages.links.eyebrow') }}</p>
         <h1 id="links-title">{{ t('publicPages.links.title') }}</h1>
@@ -144,13 +143,13 @@ useHead(() => ({
       <h2 id="links-more-title">{{ t('publicPages.links.more.title') }}</h2>
       <ul role="list">
         <li v-for="link in quickLinks" :key="link.to">
-          <NuxtLink :to="link.to">
+          <NuxtLinkLocale :to="link.to">
             <span class="links-more-copy">
               <strong class="links-more-title">{{ link.title }}</strong>
               <span class="links-more-description">{{ link.description }}</span>
             </span>
             <span class="links-more-arrow" aria-hidden="true">→</span>
-          </NuxtLink>
+          </NuxtLinkLocale>
         </li>
       </ul>
     </nav>

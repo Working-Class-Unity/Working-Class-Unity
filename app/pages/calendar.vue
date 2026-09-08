@@ -84,11 +84,6 @@ function eventDateKey(value: string, timeZone: string) {
   const values = Object.fromEntries(parts.map((part) => [part.type, part.value]))
   return `${values.year}-${values.month}-${values.day}`
 }
-
-useHead(() => ({
-  title: t('metadata.calendar.title'),
-  meta: [{ name: 'description', content: t('metadata.calendar.description') }]
-}))
 </script>
 
 <template>

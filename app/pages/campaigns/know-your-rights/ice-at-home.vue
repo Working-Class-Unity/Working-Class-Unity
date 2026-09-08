@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { knowYourRightsBasePath } from '~/content/know-your-rights'
-
 const { rt, t, tm } = useI18n()
 
 function messageList(key: string): string[] {
@@ -13,13 +11,6 @@ const outlineItems = computed(() => [
   { id: 'home-warrant', label: t('kyr_ice_at_home.warrant.title') },
   { id: 'home-if-enters', label: t('kyr_ice_at_home.if_enters.title') }
 ])
-const canonicalPath = knowYourRightsBasePath + '/ice-at-home'
-
-useHead(() => ({
-  title: t('kyr.home.title'),
-  meta: [{ name: 'description', content: t('kyr.home.description') }],
-  link: [{ rel: 'canonical', href: 'https://workingclassunity.com' + canonicalPath }]
-}))
 </script>
 
 <template>
