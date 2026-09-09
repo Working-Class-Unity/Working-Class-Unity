@@ -2,6 +2,8 @@
 const { t } = useI18n()
 const { data: session, error: sessionError } = await useAppSession()
 
+defineI18nRoute(false)
+
 if (!sessionError.value && session.value?.user) {
   await navigateTo('/app', { redirectCode: 302 })
 }

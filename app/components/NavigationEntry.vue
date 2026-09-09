@@ -7,7 +7,7 @@ const descriptionId = useId()
 </script>
 
 <template>
-  <NuxtLink
+  <NuxtLinkLocale
     class="navigation-entry"
     :to="entry.path"
     :aria-current="current ? 'page' : undefined"
@@ -21,7 +21,7 @@ const descriptionId = useId()
     <span v-else-if="entry.description" :id="descriptionId" class="navigation-entry-description">{{
       entry.description
     }}</span>
-  </NuxtLink>
+  </NuxtLinkLocale>
 </template>
 
 <style scoped>

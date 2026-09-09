@@ -1,4 +1,6 @@
 <script setup lang="ts">
+defineI18nRoute(false)
+
 const { t } = useI18n()
 useHead(() => ({ title: t('metadata.activate.title') }))
 </script>

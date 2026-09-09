@@ -66,11 +66,6 @@ const participationRoutes = computed(() => [
     to: 'https://tech.workingclassunity.com/wcu-updates'
   }
 ])
-
-useHead(() => ({
-  title: t('metadata.home.title'),
-  meta: [{ name: 'description', content: t('metadata.home.description') }]
-}))
 </script>
 
 <template>
@@ -182,25 +177,25 @@ useHead(() => ({
 
     <footer class="home-footer">
       <div class="home-section-inner home-footer-inner">
-        <NuxtLink
+        <NuxtLinkLocale
           class="home-footer-brand"
           to="/"
           :aria-label="t('navigation.brandHome', { appName: 'Working Class Unity' })"
         >
           <!-- eslint-disable-next-line vue/html-self-closing -->
           <img src="/images/wcu-logo-light.png" alt="" width="2000" height="2000" />
-        </NuxtLink>
+        </NuxtLinkLocale>
         <p>{{ t('home.footer.boundary') }}</p>
         <nav :aria-label="t('home.footer.navigationLabel')">
           <ul role="list">
             <li>
-              <NuxtLink to="/#get-involved">{{ t('navigation.getInvolved') }}</NuxtLink>
+              <NuxtLinkLocale to="/#get-involved">{{ t('navigation.getInvolved') }}</NuxtLinkLocale>
             </li>
             <li>
-              <NuxtLink to="/legal/privacy">{{ t('home.footer.privacy') }}</NuxtLink>
+              <NuxtLinkLocale to="/legal/privacy">{{ t('home.footer.privacy') }}</NuxtLinkLocale>
             </li>
             <li>
-              <NuxtLink to="/login">{{ t('navigation.login') }}</NuxtLink>
+              <NuxtLinkLocale to="/login">{{ t('navigation.login') }}</NuxtLinkLocale>
             </li>
           </ul>
         </nav>

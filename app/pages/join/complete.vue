@@ -1,4 +1,6 @@
 <script setup lang="ts">
+defineI18nRoute(false)
+
 const route = useRoute()
 const { t } = useI18n()
 const state = ref<'pending' | 'sent' | 'error'>('pending')
@@ -24,7 +26,7 @@ onMounted(async () => {
       {{ t('join.complete.sent') }}
     </AppNotice>
     <AppNotice v-else tone="error" announce="assertive">
-      {{ t('join.complete.error') }} <NuxtLink to="/join">{{ t('join.complete.return') }}</NuxtLink
+      {{ t('join.complete.error') }} <NuxtLinkLocale to="/join">{{ t('join.complete.return') }}</NuxtLinkLocale
       >.
     </AppNotice>
   </section>

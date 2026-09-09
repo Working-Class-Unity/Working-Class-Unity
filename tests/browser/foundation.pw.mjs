@@ -330,12 +330,19 @@ test('global public navigation exposes current routes and a route-closing mobile
 test.describe('localized browsing', () => {
   test.use({ locale: 'es-MX' })
 
-  test('language detection and selection persist without changing public URLs', async ({ page, request }) => {
+  test('language detection and selection use stable public URLs while preserving English paths', async ({
+    page,
+    request
+  }) => {
     const observations = observePage(page)
     const context = page.context()
     await page.setViewportSize({ width: 1280, height: 900 })
 
-    const aboutResponse = await page.goto('/about')
+    await page.goto('/')
+    await expect(page).toHaveURL(/\/es$/)
+    await page.waitForLoadState('networkidle')
+    const manifestUrl = await nuxtManifestUrl(page)
+    const aboutResponse = await gotoForInitialResponse(page, '/es/about', manifestUrl)
     expect(aboutResponse).not.toBeNull()
     await page.waitForLoadState('networkidle')
     expect(await aboutResponse.text()).toMatch(/<html[^>]*\blang="es"/)
@@ -355,7 +362,7 @@ test.describe('localized browsing', () => {
     ).toBeVisible()
     await expect(page).toHaveTitle(requiredMessage(spanishMessages, 'metadata.about.title'))
     await expect.poll(() => localeCookie(context)).toBe('es')
-    expect(new URL(page.url()).pathname).toBe('/about')
+    expect(new URL(page.url()).pathname).toBe('/es/about')
 
     await page.locator('select[name="language"]').selectOption('pa')
     await expect(page.locator('html')).toHaveAttribute('lang', 'pa')
@@ -366,9 +373,9 @@ test.describe('localized browsing', () => {
     await expect(page).toHaveTitle(requiredMessage(punjabiMessages, 'metadata.about.title'))
     await expect.poll(() => localeCookie(context)).toBe('pa')
     await page.waitForLoadState('networkidle')
-    expect(new URL(page.url()).pathname).toBe('/about')
+    expect(new URL(page.url()).pathname).toBe('/pa/about')
 
-    const calendarResponse = await page.goto('/calendar')
+    const calendarResponse = await gotoForInitialResponse(page, '/pa/calendar', manifestUrl)
     expect(calendarResponse).not.toBeNull()
     await page.waitForLoadState('networkidle')
     expect(await calendarResponse.text()).toMatch(/<html[^>]*\blang="pa"/)
@@ -377,7 +384,7 @@ test.describe('localized browsing', () => {
     await expect(
       page.getByRole('heading', { name: requiredMessage(punjabiMessages, 'calendar.title'), exact: true })
     ).toBeVisible()
-    expect(new URL(page.url()).pathname).toBe('/calendar')
+    expect(new URL(page.url()).pathname).toBe('/pa/calendar')
 
     await page.setViewportSize({ width: 320, height: 800 })
     const menuToggle = page.locator('.mobile-menu-toggle')
@@ -399,10 +406,16 @@ test.describe('localized browsing', () => {
     await assertNoHorizontalOverflow(page)
 
     await page.locator('select[name="language"]').selectOption('en')
+    await expect(page).toHaveURL(`${runtimeUrl}/calendar`)
     await expect(page.locator('html')).toHaveAttribute('lang', 'en-US')
     await expect.poll(() => localeCookie(context)).toBe('en')
     await page.waitForLoadState('networkidle')
-    await page.reload()
+    intentionalManifestNavigations.set(page, manifestUrl)
+    try {
+      await page.reload()
+    } finally {
+      intentionalManifestNavigations.delete(page)
+    }
     await page.waitForLoadState('networkidle')
     await expect(page.locator('select[name="language"]')).toHaveValue('en')
     expect(new URL(page.url()).pathname).toBe('/calendar')

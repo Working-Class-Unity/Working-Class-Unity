@@ -249,13 +249,13 @@ function authCallbackErrorKey(value: unknown): string {
       <h1 :id="`${intent}-title`">{{ copy.title }}</h1>
       <p class="auth-intro">{{ copy.intro }}</p>
       <p v-if="intent === 'login'" class="account-help">
-        {{ t('auth.login.needAccount') }} <NuxtLink to="/join">{{ t('auth.login.join') }}</NuxtLink>
+        {{ t('auth.login.needAccount') }} <NuxtLinkLocale to="/join">{{ t('auth.login.join') }}</NuxtLinkLocale>
         {{ t('auth.login.alreadyPay') }}
         <NuxtLink to="/activate">{{ t('auth.login.activate') }}</NuxtLink>
       </p>
       <p v-else-if="intent === 'activate'" class="account-help">
         {{ t('activation.existingAccount') }} <NuxtLink to="/login">{{ t('activation.login') }}</NuxtLink>
-        {{ t('activation.newAccount') }} <NuxtLink to="/join">{{ t('activation.join') }}</NuxtLink>
+        {{ t('activation.newAccount') }} <NuxtLinkLocale to="/join">{{ t('activation.join') }}</NuxtLinkLocale>
         <a href="mailto:info@workingclassunity.com">{{ t('activation.support') }}</a
         >.
       </p>
@@ -399,10 +399,10 @@ function authCallbackErrorKey(value: unknown): string {
 
       <i18n-t id="auth-legal" keypath="auth.legal.acknowledgment" tag="p" class="legal-acknowledgment">
         <template #terms>
-          <NuxtLink to="/legal/terms">{{ t('auth.legal.terms') }}</NuxtLink>
+          <NuxtLinkLocale to="/legal/terms">{{ t('auth.legal.terms') }}</NuxtLinkLocale>
         </template>
         <template #privacy>
-          <NuxtLink to="/legal/privacy">{{ t('auth.legal.privacy') }}</NuxtLink>
+          <NuxtLinkLocale to="/legal/privacy">{{ t('auth.legal.privacy') }}</NuxtLinkLocale>
         </template>
       </i18n-t>
 

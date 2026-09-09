@@ -1,10 +1,5 @@
 <script setup lang="ts">
 const { t } = useI18n()
-
-useHead(() => ({
-  title: t('metadata.about.title'),
-  meta: [{ name: 'description', content: t('metadata.about.description') }]
-}))
 </script>
 
 <template>
@@ -49,7 +44,7 @@ useHead(() => ({
         <h2 id="governance-title">{{ t('publicPages.about.governance.title') }}</h2>
         <p>{{ t('publicPages.about.governance.description') }}</p>
       </div>
-      <NuxtLink class="bylaws-link" to="/bylaws">{{ t('publicPages.about.governance.action') }}</NuxtLink>
+      <NuxtLinkLocale class="bylaws-link" to="/bylaws">{{ t('publicPages.about.governance.action') }}</NuxtLinkLocale>
     </section>
 
     <section class="about-cta" aria-labelledby="about-cta-title">
@@ -58,7 +53,7 @@ useHead(() => ({
         <h2 id="about-cta-title">{{ t('publicPages.about.cta.title') }}</h2>
         <p>{{ t('publicPages.about.cta.description') }}</p>
       </div>
-      <NuxtLink class="about-cta-action" to="/join">{{ t('publicPages.about.cta.action') }}</NuxtLink>
+      <NuxtLinkLocale class="about-cta-action" to="/join">{{ t('publicPages.about.cta.action') }}</NuxtLinkLocale>
     </section>
   </article>
 </template>

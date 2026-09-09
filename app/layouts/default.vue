@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import { unlocalizedPublicPath } from '#shared/public-site'
+
 const { t } = useI18n()
 const route = useRoute()
 const usesWideSurface = useWideSurfaceRoute()
 const wideContainerClass = computed(() => ({
   'container--wide': usesWideSurface.value,
-  'page-shell--campaign-overview': route.path === '/campaigns/remove-flock-stockton'
+  'page-shell--campaign-overview': unlocalizedPublicPath(route.path) === '/campaigns/remove-flock-stockton'
 }))
 </script>
 

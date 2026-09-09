@@ -9,8 +9,6 @@ const tier = ref<Tier>('member')
 const pending = ref(false)
 const errorKey = ref(route.query.error ? 'join.errors.invalidLink' : '')
 
-useHead(() => ({ title: t('join.title') }))
-
 async function startCheckout() {
   errorKey.value = ''
   pending.value = true

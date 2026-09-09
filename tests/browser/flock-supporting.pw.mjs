@@ -8,11 +8,10 @@ for (const [slug, locale] of [
   ['why-safeguards-are-not-enough', 'es'],
   ['faq', 'pa']
 ]) {
-  test(`Flock supporting layout ${slug} is accessible in ${locale}`, async ({ page, context, baseURL }) => {
-    await context.addCookies([{ name: 'wcu_locale', value: locale, url: baseURL }])
+  test(`Flock supporting layout ${slug} is accessible in ${locale}`, async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 900 })
     await page.emulateMedia({ reducedMotion: 'reduce' })
-    await page.goto(`/campaigns/remove-flock-stockton/${slug}`)
+    await page.goto(`${locale === 'en' ? '' : `/${locale}`}/campaigns/remove-flock-stockton/${slug}`)
     await page.waitForFunction(() => window.useNuxtApp?.().isHydrating === false)
     const article = page.locator('main article')
     await expect(article.getByRole('heading', { level: 1 })).toBeVisible()

@@ -70,11 +70,6 @@ const slotCitations = computed(() => ({
   'section-timeline': timeline.value.map((entry) => entry.citation),
   'section-costs': [...costs.value.map((cost) => cost.citation), costSummary.value]
 }))
-
-useHead(() => ({
-  title: whatStocktonBoughtPage.value.title,
-  meta: [{ name: 'description', content: whatStocktonBoughtPage.value.description }]
-}))
 </script>
 
 <template>

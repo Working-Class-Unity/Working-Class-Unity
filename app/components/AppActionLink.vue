@@ -17,6 +17,7 @@ const props = withDefaults(
 
 const attrs = useAttrs()
 const { t } = useI18n()
+const localePath = useLocalePath()
 const external = computed(() => /^(?:https?:|mailto:|tel:)/.test(props.to))
 const opensNewContext = computed(() => attrs.target === '_blank')
 </script>
@@ -39,7 +40,7 @@ const opensNewContext = computed(() => attrs.target === '_blank')
     class="app-action-link"
     :data-size="props.size"
     :data-variant="props.variant"
-    :to="props.to"
+    :to="props.to.startsWith('/') ? localePath(props.to) : props.to"
   >
     <slot />
   </NuxtLink>

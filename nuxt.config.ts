@@ -26,13 +26,13 @@ export default defineNuxtConfig({
   modules: ['@nuxt/eslint', '@nuxtjs/i18n', '@sentry/nuxt/module', 'nuxt-security'],
   i18n: {
     defaultLocale: 'en',
-    strategy: 'no_prefix',
+    strategy: 'prefix_except_default',
     detectBrowserLanguage: {
       alwaysRedirect: false,
       cookieCrossOrigin: false,
       cookieKey: 'wcu_locale',
       fallbackLocale: 'en',
-      redirectOn: 'all',
+      redirectOn: 'root',
       useCookie: true
     },
     locales: [

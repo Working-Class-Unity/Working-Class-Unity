@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import { unlocalizedPublicPath } from '#shared/public-site'
 import { knowYourRightsBasePath, knowYourRightsGuides } from '~/content/know-your-rights'
 
 const route = useRoute()
+const publicPath = computed(() => unlocalizedPublicPath(route.path))
 const { t } = useI18n()
 const familyLinks = computed(() => [
   { path: knowYourRightsBasePath, label: t('kyr.overview.title') },
@@ -20,9 +22,9 @@ const familyLinks = computed(() => [
         <div class="kyr-family-navigation-scroll">
           <ul role="list">
             <li v-for="link in familyLinks" :key="link.path">
-              <NuxtLink :to="link.path" :aria-current="route.path === link.path ? 'page' : undefined">
+              <NuxtLinkLocale :to="link.path" :aria-current="publicPath === link.path ? 'page' : undefined">
                 {{ link.label }}
-              </NuxtLink>
+              </NuxtLinkLocale>
             </li>
           </ul>
         </div>

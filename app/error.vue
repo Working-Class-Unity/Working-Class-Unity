@@ -15,7 +15,8 @@ const recoveryFailed = ref(false)
 useDocumentLocale()
 
 useHead(() => ({
-  title: t('metadata.errorTitle', { heading: heading.value, appName: config.public.appName })
+  title: t('metadata.errorTitle', { heading: heading.value, appName: config.public.appName }),
+  meta: [{ name: 'robots', content: 'noindex, nofollow' }]
 }))
 
 async function recover() {
