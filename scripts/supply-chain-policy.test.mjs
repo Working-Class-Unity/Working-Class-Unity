@@ -1,19 +1,16 @@
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
-import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
+import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import test from 'node:test'
-import { inspectPnpmLockfile } from './pnpm-lock-preinstall.mjs'
 import {
   evaluateOsvReport,
-  loadRepositoryLockContract,
   loadSupplyChainPolicy,
   validateLockfile,
   validateManifestVersions,
   validatePolicy,
-  validatePreinstallRepository,
   validateRepositorySupplyChain,
   validateScannerBypassFiles
 } from './supply-chain-policy.mjs'
@@ -31,15 +28,6 @@ const referenceNow = new Date('2026-07-27T00:00:00.000Z')
 
 test('repository manifests, lockfile, scanner pins, and exceptions satisfy the policy', async () => {
   assert.deepEqual(await validateRepositorySupplyChain(root, { now: referenceNow }), [])
-
-  const { manifests, lockfile } = await loadRepositoryLockContract(root)
-  assert.equal(manifests.length, 1)
-
-  const lockSource = await readFile(join(root, 'pnpm-lock.yaml'), 'utf8')
-  assert.deepEqual(inspectPnpmLockfile(lockSource, manifests), {
-    errors: [],
-    packageCount: Object.keys(lockfile.packages).length
-  })
 })
 
 test('installable dependency ranges, tags, URLs, and workspace wildcards are rejected', () => {
@@ -120,69 +108,70 @@ test('lock importer drift, weak integrity, custom tarballs, and unsafe overrides
   assert(broadRemovalErrors.some((error) => error.includes('override unused')))
 })
 
-test('dependency-free preinstall lock inspection fails before unsafe resolutions can install', async () => {
-  const { manifests } = await loadRepositoryLockContract(root)
-  const source = await readFile(join(root, 'pnpm-lock.yaml'), 'utf8')
-  const weakIntegrity = source.replace('resolution: {integrity: sha512-', 'resolution: {integrity: sha256-')
-  const customTarball = source.replace(
-    /resolution: \{integrity: (sha512-[^}]+)\}/,
-    'resolution: {integrity: $1, tarball: https://example.test/archive.tgz}'
-  )
-  const importerDrift = source.replace(
-    'specifier: 3.9.5\n        version: 3.9.5',
-    'specifier: 3.9.5\n        version: 9.9.9'
-  )
-  const commentedPackageHeader = source.replace(
-    "\n  '@antfu/install-pkg@1.1.0':\n",
-    "\n  '@antfu/install-pkg@1.1.0': # noncanonical header\n"
-  )
-  const duplicateImporterSection = source.replace(
-    '  .:\n    dependencies:',
-    '  .:\n    dependencies:\n    dependencies:'
-  )
-  const duplicatePackages = source.replace(
-    '\nsnapshots:\n',
-    '\npackages:\n\n  evil@1.0.0:\n    resolution: {integrity: sha256-weak}\n\nsnapshots:\n'
-  )
+test('pinned pnpm validates committed patches and rejects drift and malformed lockfiles', async (t) => {
+  const { parse, stringify } = await import('yaml')
+  const workspace = parse(await readFile(join(root, 'pnpm-workspace.yaml'), 'utf8'))
+  const lockSource = await readFile(join(root, 'pnpm-lock.yaml'), 'utf8')
+  const patchPath = workspace.patchedDependencies['reka-ui@2.10.1']
+  assert.equal(typeof patchPath, 'string')
 
-  assert(inspectPnpmLockfile(weakIntegrity, manifests).errors.some((error) => error.includes('SHA-512')))
-  assert(inspectPnpmLockfile(customTarball, manifests).errors.some((error) => error.includes('custom tarballs')))
-  assert(inspectPnpmLockfile(importerDrift, manifests).errors.some((error) => error.includes('resolution drift')))
-  assert(
-    inspectPnpmLockfile(commentedPackageHeader, manifests).errors.some((error) =>
-      error.includes('package headers must use the canonical')
-    )
-  )
-  assert(
-    inspectPnpmLockfile(duplicateImporterSection, manifests).errors.some((error) =>
-      error.includes('dependency sections must not be duplicated')
-    )
-  )
-  assert(
-    inspectPnpmLockfile(duplicatePackages, manifests).errors.some((error) =>
-      error.includes('exactly one canonical packages entry')
-    )
-  )
-  assert(
-    validatePreinstallRepository(root, loadSupplyChainPolicy(root), {
-      manifests,
-      trackedFiles: [],
-      lockSource: weakIntegrity
-    }).some((error) => error.includes('SHA-512'))
-  )
+  for (const scenario of ['committed', 'changed patch', 'undeclared patch', 'duplicate patch section']) {
+    await t.test(scenario, async () => {
+      const directory = await mkdtemp(join(tmpdir(), 'wcu-frozen-patches-'))
+      try {
+        await mkdir(join(directory, 'scripts'))
+        for (const path of [
+          'package.json',
+          'pnpm-lock.yaml',
+          'pnpm-workspace.yaml',
+          'patches',
+          'scripts/run-pnpm.mjs',
+          'scripts/toolchain-contract.mjs'
+        ]) {
+          await cp(join(root, path), join(directory, path), { recursive: true })
+        }
+
+        if (scenario === 'changed patch') {
+          await writeFile(join(directory, patchPath), `${await readFile(join(root, patchPath), 'utf8')}\n`)
+        } else if (scenario === 'undeclared patch') {
+          const changedWorkspace = structuredClone(workspace)
+          delete changedWorkspace.patchedDependencies
+          await writeFile(join(directory, 'pnpm-workspace.yaml'), stringify(changedWorkspace))
+        } else if (scenario === 'duplicate patch section') {
+          await writeFile(join(directory, 'pnpm-lock.yaml'), `${lockSource}\npatchedDependencies: {}\n`)
+        }
+
+        // pnpm's lockfile-only path may write the lockfile, so run it only in the disposable copy.
+        const result = spawnSync(
+          process.execPath,
+          ['scripts/run-pnpm.mjs', 'install', '--frozen-lockfile', '--lockfile-only', '--ignore-scripts', '--offline'],
+          { cwd: directory, encoding: 'utf8', timeout: 60_000 }
+        )
+        assert.ifError(result.error)
+        const output = `${result.stdout}\n${result.stderr}`
+        if (scenario === 'committed') {
+          assert.equal(result.status, 0, output)
+        } else {
+          assert.notEqual(result.status, 0, output)
+          assert.match(
+            output,
+            scenario === 'duplicate patch section' ? /ERR_PNPM_BROKEN_LOCKFILE/ : /ERR_PNPM_LOCKFILE_CONFIG_MISMATCH/
+          )
+        }
+      } finally {
+        await rm(directory, { recursive: true, force: true })
+      }
+    })
+  }
 })
 
-test('clean-checkout preinstall production path rejects a weak lock before scanner download', async () => {
+test('clean-checkout preinstall production path rejects dependency ranges before scanner download', async () => {
   const directory = await mkdtemp(join(tmpdir(), 'swl-preinstall-fail-closed-'))
   try {
     await mkdir(join(directory, 'security'), { recursive: true })
     await writeFile(
       join(directory, 'package.json'),
-      `${JSON.stringify({ name: 'fixture', version: '1.0.0', dependencies: { example: '1.0.0' } }, null, 2)}\n`
-    )
-    await writeFile(
-      join(directory, 'pnpm-lock.yaml'),
-      "lockfileVersion: '9.0'\n\nimporters:\n\n  .:\n    dependencies:\n      example:\n        specifier: 1.0.0\n        version: 1.0.0\n\npackages:\n\n  example@1.0.0:\n    resolution: {integrity: sha256-not-allowed}\n\nsnapshots:\n\n  example@1.0.0: {}\n"
+      `${JSON.stringify({ name: 'fixture', version: '1.0.0', dependencies: { example: '^1.0.0' } }, null, 2)}\n`
     )
     await writeFile(
       join(directory, 'security/supply-chain-policy.json'),
@@ -194,7 +183,7 @@ test('clean-checkout preinstall production path rejects a weak lock before scann
     const stateDirectory = join(directory, 'ci-reports/supply-chain-state')
     await mkdir(stateDirectory, { recursive: true })
     await writeFile(join(stateDirectory, 'osv-package-count.json'), '{"osvPackageCount":999}')
-    await assert.rejects(runPreinstallScan({ root: directory, stateDirectory }), /SHA-512/)
+    await assert.rejects(runPreinstallScan({ root: directory, stateDirectory }), /exact semantic version/)
     await assert.rejects(readFile(join(stateDirectory, 'osv-package-count.json')), /ENOENT/)
   } finally {
     await rm(directory, { recursive: true, force: true })

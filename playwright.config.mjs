@@ -53,8 +53,8 @@ export default defineConfig({
     headless: true,
     navigationTimeout: 10_000,
     serviceWorkers: 'block',
-    screenshot: 'only-on-failure',
-    trace: 'retain-on-failure',
+    screenshot: 'off',
+    trace: 'off',
     video: 'off'
   },
   projects: [

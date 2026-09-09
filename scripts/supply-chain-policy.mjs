@@ -2,7 +2,6 @@ import { spawnSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 import { dirname, join, relative, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { inspectPnpmLockfile } from './pnpm-lock-preinstall.mjs'
 
 export const INSTALLABLE_DEPENDENCY_SECTIONS = ['dependencies', 'devDependencies', 'optionalDependencies']
 
@@ -64,12 +63,10 @@ export function readTrackedManifests(root) {
 export function validatePreinstallRepository(root, policy, options = {}) {
   const manifests = options.manifests ?? readTrackedManifests(root)
   const trackedFiles = options.trackedFiles ?? listTrackedFiles(root)
-  const lockSource = options.lockSource ?? readFileSync(join(root, 'pnpm-lock.yaml'), 'utf8')
   return [
     ...validatePolicy(policy, options),
     ...validateManifestVersions(manifests),
-    ...validateScannerBypassFiles(trackedFiles),
-    ...inspectPnpmLockfile(lockSource, manifests).errors
+    ...validateScannerBypassFiles(trackedFiles)
   ]
 }
 
