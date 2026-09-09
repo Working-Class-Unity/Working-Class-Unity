@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
+import { createOutputMonitor, reportBrowserDiagnostics, scanArtifactTree } from './ci-browser-diagnostics.mjs'
 import {
   cleanupDisposableState,
   createCleanupCoordinator,
@@ -49,8 +50,18 @@ const maxCaptureTotalBytes = 1_048_576
 const maxRawServerOutputBytes = 1_048_576
 const activeChildren = new Set()
 const childClosePromises = new WeakMap()
-const playwrightOutputMonitor = createOutputMonitor('Playwright')
-const rawServerOutputMonitor = createOutputMonitor('raw built browser server')
+const forbiddenValues = [
+  buildReadinessCanary,
+  runtimeSecret,
+  runtimeReadinessToken,
+  runtimeStripeSecret,
+  runtimeStripeWebhookSecret,
+  ...Object.values(runtimeStripeCatalog),
+  browserAuthEmailMarker,
+  emailCaptureDirectory
+]
+const playwrightOutputMonitor = createOutputMonitor('Playwright', forbiddenValues)
+const rawServerOutputMonitor = createOutputMonitor('raw built browser server', forbiddenValues)
 let browserDiagnosticsSafe = true
 
 const inheritedEnvironment = selectEnvironment(process.env, [
@@ -176,17 +187,7 @@ await coordinator.run(async () => {
 
     console.log('Browser smoke passed: every discovered Playwright case completed against disposable runtime state.')
   } catch (error) {
-    if (browserDiagnosticsSafe) {
-      for (const monitor of [playwrightOutputMonitor, rawServerOutputMonitor]) {
-        const diagnostic = monitor.redactedDiagnostic().trim()
-        if (diagnostic) {
-          console.error(`${monitor.label} output (redacted):`)
-          console.error(diagnostic)
-        }
-      }
-    } else {
-      console.error('Browser diagnostics withheld because private capture registration did not complete safely.')
-    }
+    reportBrowserDiagnostics([playwrightOutputMonitor, rawServerOutputMonitor], browserDiagnosticsSafe)
     throw error
   }
 })
@@ -345,59 +346,6 @@ async function waitForChildClose(child) {
   if (outcome !== 'closed') throw new Error(`Child output did not drain within ${timeoutMs}ms`)
 }
 
-function createOutputMonitor(label) {
-  const forbiddenValues = [
-    buildReadinessCanary,
-    runtimeSecret,
-    runtimeReadinessToken,
-    runtimeStripeSecret,
-    runtimeStripeWebhookSecret,
-    ...Object.values(runtimeStripeCatalog),
-    browserAuthEmailMarker,
-    emailCaptureDirectory
-  ]
-  let forbiddenBuffers = forbiddenValues.map((value) => Buffer.from(value))
-  let detected = false
-  let overflow = false
-  let output = Buffer.alloc(0)
-
-  function inspect(bytes) {
-    if (forbiddenBuffers.some((value) => bytes.includes(value))) detected = true
-  }
-
-  return {
-    label,
-    consume(chunk) {
-      if (overflow) return
-      const bytes = Buffer.from(chunk)
-      const remaining = 1_048_576 - output.length
-      output = Buffer.concat([output, bytes.subarray(0, Math.max(0, remaining))])
-      if (bytes.length > remaining) overflow = true
-      inspect(output)
-    },
-    inspect,
-    registerForbidden(values) {
-      const additions = values.filter(Boolean).map((value) => Buffer.from(value))
-      forbiddenValues.push(...values.filter(Boolean))
-      forbiddenBuffers = [...forbiddenBuffers, ...additions]
-      inspect(output)
-    },
-    assertNoForbidden() {
-      if (overflow) throw new Error(`${label} exceeded the bounded private-output observation limit`)
-      if (detected) throw new Error(`${label} contained a forbidden private value`)
-    },
-    redactedDiagnostic() {
-      if (overflow) return `${label} output omitted after bounded observation overflow`
-      const redactionOverlap = Math.max(...forbiddenValues.map((value) => Buffer.byteLength(value)))
-      let diagnostic = output.subarray(-(32_768 + redactionOverlap)).toString()
-      for (const value of [...forbiddenValues].sort((left, right) => right.length - left.length)) {
-        diagnostic = diagnostic.replaceAll(value, '[redacted]')
-      }
-      return diagnostic.slice(-32_768)
-    }
-  }
-}
-
 function capturedBrowserSecrets({ allowEmpty = false } = {}) {
   try {
     const secrets = []
@@ -474,30 +422,5 @@ function scanRawServerOutput(outputMonitor) {
     }
   } catch {
     throw new Error('Raw built-server output secrecy scan failed closed')
-  }
-}
-
-function scanArtifactTree(directory, outputMonitor) {
-  try {
-    const pending = [directory]
-    let observedBytes = 0
-    while (pending.length) {
-      const current = pending.pop()
-      for (const entry of readdirSync(current, { withFileTypes: true })) {
-        const path = join(current, entry.name)
-        outputMonitor.inspect(Buffer.from(path))
-        if (entry.isDirectory()) pending.push(path)
-        else if (entry.isFile()) {
-          const expectedSize = statSync(path).size
-          observedBytes += expectedSize
-          if (observedBytes > 16_777_216) throw new Error()
-          const bytes = readFileSync(path)
-          if (bytes.length !== expectedSize) throw new Error()
-          outputMonitor.inspect(bytes)
-        } else throw new Error()
-      }
-    }
-  } catch {
-    throw new Error('Playwright artifact secrecy scan failed closed')
   }
 }
