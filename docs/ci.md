@@ -42,6 +42,25 @@ containers and remove the state they own. `api:smoke` is loopback-only and must
 not be aimed at a deployment. Use `ops:smoke` for credential-free read-only
 checks against a deployed target.
 
+## Browser suite maintenance
+
+Choose representative viewport, layout, and language coverage according to risk.
+Avoid blanket project duplication: a journey that already exercises desktop and
+mobile widths does not need to run again solely for another viewport. Keep heavy
+scans at representative boundaries rather than repeating them throughout every
+journey. Assertions should protect meaningful user interactions and observable
+behavior, not incidental copy, CSS classes, or pixel snapshots.
+
+Preserve critical authentication, private-data, Content Security Policy (CSP), and
+runtime-secrecy integration coverage, alongside representative keyboard, focus,
+and accessibility checks. A smaller suite still requires the complete standard
+gate and all privacy inspection, complete-case, and cleanup requirements below.
+
+Background static-asset cancellation from a replaced document may be diagnostic
+when the observer identifies the expected navigation abort. This does not make
+every cancellation harmless: unexpected API failures, HTTP errors, and failures
+of critical behavior remain gate failures.
+
 ## Browser failure diagnostics
 
 `pnpm run test:browser` builds once and runs the browser suite with zero retries.

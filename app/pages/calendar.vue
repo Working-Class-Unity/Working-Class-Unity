@@ -176,7 +176,7 @@ useHead(() => ({
 
   .calendar-eyebrow {
     margin: 0 0 var(--space-2);
-    color: var(--color-brand-accent);
+    color: var(--color-text);
     font-family: var(--font-family-mono);
     font-size: 0.8125rem;
     font-weight: 700;

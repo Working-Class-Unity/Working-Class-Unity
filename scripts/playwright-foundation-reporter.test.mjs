@@ -57,6 +57,10 @@ test('actual Playwright config retains completion wiring and required viewports'
     )
     assertRequiredChromiumViewport(config, 1280, 900)
     assertRequiredChromiumViewport(config, 390, 844)
+    assert.equal(config.projects.length, 2)
+    assert.equal(config.projects[0].testIgnore, '**/public-layout.pw.mjs')
+    assert.equal(config.projects[1].testMatch, config.projects[0].testIgnore)
+    assert.equal(config.testMatch, '**/*.pw.mjs')
   } finally {
     for (const [name, value] of Object.entries(previous)) {
       if (value === undefined) delete process.env[name]
