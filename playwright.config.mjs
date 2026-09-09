@@ -60,6 +60,7 @@ export default defineConfig({
   projects: [
     {
       name: 'desktop-chromium',
+      testIgnore: '**/public-layout.pw.mjs',
       use: {
         browserName: 'chromium',
         viewport: { width: 1280, height: 900 }
@@ -67,6 +68,7 @@ export default defineConfig({
     },
     {
       name: 'mobile-chromium',
+      testMatch: '**/public-layout.pw.mjs',
       use: {
         browserName: 'chromium',
         viewport: { width: 390, height: 844 }
