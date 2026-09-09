@@ -30,12 +30,11 @@ This baseline assumes the project can move from local development to a small pro
 Run the local prerequisite and project checks with:
 
 ```bash
-node scripts/supply-chain-scan.mjs all
 npm run bootstrap
 npm run verify:pinned
 ```
 
-Run the live supply-chain gate before the first application dependency install. It uses Node built-ins plus checksum-pinned scanner binaries, so a clean checkout does not need `node_modules` first.
+Bootstrap uses pinned pnpm's frozen installation to validate lockfile and patch consistency. Verification then checks project-specific dependency policy before running the live supply-chain scans. See [the dependency-policy boundary](ai-guardrails.md#stable-commands).
 
 `npm run bootstrap` and `npm run verify:pinned` both use
 `scripts/run-pnpm.mjs`. The runner reads `packageManager` and uses
@@ -43,7 +42,7 @@ Run the live supply-chain gate before the first application dependency install. 
 Corepack or a global pnpm install. If pnpm 11.1.2 is already on `PATH`, direct
 `pnpm run ...` commands are also supported.
 
-Local verification reads `.nvmrc`, runs the dependency, secret, and signature scanners before application dependency installation, bootstraps through the exact pnpm runner, and then runs the deterministic gates. Use `pnpm run check` during ordinary development and `pnpm run verify` before a release or handoff. The runner's own exact-version `pnpm@11.1.2` download through npm is the documented bootstrap trust root and is not covered by pnpm's later registry-signature audit.
+Use the supported Node line in `.nvmrc`, bootstrap through the exact pnpm runner, then run `pnpm run check` during ordinary development and `pnpm run verify` before a release or handoff. The runner's own exact-version `pnpm@11.1.2` download through npm is the documented bootstrap trust root and is not covered by pnpm's later registry-signature audit.
 
 ## Knowledge
 
