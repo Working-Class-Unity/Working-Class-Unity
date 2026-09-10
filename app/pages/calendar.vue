@@ -35,7 +35,7 @@ const calendarEvents = computed<readonly CalendarEvent[]>(() =>
         startsAt: session.startsAt,
         time: formatTimeRange(session.startsAt, session.endsAt, session.timezone),
         timezone: session.timezone,
-        title: event.title
+        title: session.title ?? event.title
       }))
     )
     .sort((first, second) => Date.parse(first.startsAt) - Date.parse(second.startsAt))

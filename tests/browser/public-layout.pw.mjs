@@ -167,9 +167,16 @@ test('Events navigation keeps the calendar reachable when the public feed fails'
   )
 })
 
-test('Calendar interleaves recurring series chronologically without a false month label', async ({ page }) => {
+test('Calendar preserves occurrence titles and chronology in agenda and month views', async ({ page }) => {
   const sqlite = new Database(process.env.BROWSER_RUNTIME_DATABASE_PATH, { fileMustExist: true })
   const starts = [7, 14, 21, 28].map((days) => new Date(Date.now() + days * 86_400_000).toISOString())
+  const titles = [
+    'Special: Deflock Stockton Organizing Meeting',
+    'Deflock outreach: first session',
+    'Deflock outreach: second session',
+    null
+  ]
+  const displayedTitles = titles.map((title) => title ?? 'Layout series B')
   try {
     sqlite
       .prepare(
@@ -179,10 +186,15 @@ test('Calendar interleaves recurring series chronologically without a false mont
       )
       .run()
     const insert = sqlite.prepare(`insert into event_sessions
-      (id, event_id, status, delivery_mode, starts_at, timezone)
-      values (?, ?, 'scheduled', 'in_person', ?, 'America/Los_Angeles')`)
+      (id, event_id, status, delivery_mode, starts_at, timezone, title)
+      values (?, ?, 'scheduled', 'hybrid', ?, 'America/Los_Angeles', ?)`)
     for (const [index, startsAt] of starts.entries()) {
-      insert.run(`layout-session-${index}`, index % 2 === 0 ? 'layout-series-a' : 'layout-series-b', startsAt)
+      insert.run(
+        `layout-session-${index}`,
+        index % 2 === 0 ? 'layout-series-a' : 'layout-series-b',
+        startsAt,
+        titles[index]
+      )
     }
     await page.goto('/calendar')
     await expect(page.locator('.featured-event time')).toHaveAttribute('datetime', starts[0])
@@ -191,6 +203,19 @@ test('Calendar interleaves recurring series chronologically without a false mont
       .locator('.event-list time')
       .evaluateAll((elements) => elements.map((element) => element.getAttribute('datetime')))
     expect(dates).toEqual(starts.slice(1))
+    await expect(page.locator('.featured-event h3')).toHaveText(displayedTitles[0])
+    await expect(page.locator('.event-list h4')).toHaveText(displayedTitles.slice(1))
+    await expect(page.locator('.series-item h4')).toHaveText(displayedTitles.slice(0, 2))
+    await page.getByRole('button', { name: 'Month', exact: true }).click()
+    for (const title of displayedTitles) {
+      const occurrence = page.locator('.calendar-event').filter({ hasText: title })
+      if ((await occurrence.count()) === 0) {
+        await page.getByRole('button', { name: 'Next month', exact: true }).click()
+      }
+      await expect(occurrence).toHaveText(title)
+      await occurrence.click()
+      await expect(page.locator('#selected-event-title')).toHaveText(title)
+    }
   } finally {
     sqlite.prepare("delete from event_sessions where event_id in ('layout-series-a', 'layout-series-b')").run()
     sqlite.prepare("delete from events where id in ('layout-series-a', 'layout-series-b')").run()
