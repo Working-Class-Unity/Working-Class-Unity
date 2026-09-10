@@ -1,6 +1,8 @@
 # syntax=docker/dockerfile:1
 
-FROM node:24-bookworm-slim AS deps
+# Node >=24.19 headers introduce a native ObjectWrap cleanup crash (nodejs/node#65446).
+# Compile the addon here too: a downloaded prebuild may contain the affected header code.
+FROM node:24.18.1-bookworm-slim AS deps
 WORKDIR /app
 RUN apt-get update \
   && apt-get install -y --no-install-recommends python3 make g++ ca-certificates \
@@ -8,9 +10,9 @@ RUN apt-get update \
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY patches ./patches
 COPY scripts/run-pnpm.mjs scripts/toolchain-contract.mjs scripts/
-RUN npm run bootstrap
+RUN npm_config_build_from_source=true npm run bootstrap
 
-FROM node:24-bookworm-slim AS build
+FROM node:24.18.1-bookworm-slim AS build
 WORKDIR /app
 ARG SENTRY_ORG
 ARG SENTRY_PROJECT
@@ -53,7 +55,7 @@ RUN mkdir -p /app/.output/server/db \
   && cp /app/node_modules/drizzle-orm/better-sqlite3/migrator.js /app/.output/server/node_modules/drizzle-orm/better-sqlite3/migrator.js \
   && cp /app/node_modules/drizzle-orm/migrator.js /app/.output/server/node_modules/drizzle-orm/migrator.js
 
-FROM node:24-bookworm-slim AS runtime
+FROM node:24.18.1-bookworm-slim AS runtime
 WORKDIR /app
 ENV NODE_ENV=production
 ENV NUXT_DATABASE_URL=file:/app/data/app.db
