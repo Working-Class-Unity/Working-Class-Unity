@@ -20,6 +20,7 @@ scripts/**
 !scripts/sync-stripe-membership-links.ts
 !scripts/adopt-stripe-membership-account.ts
 !scripts/import-solidarity-events.ts
+!scripts/solidarity-event-operator.ts
 !scripts/normalize-solidarity-events.ts
 
 !nuxt.config.ts
