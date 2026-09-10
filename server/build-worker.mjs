@@ -126,3 +126,17 @@ await build({
   platform: 'node',
   target: 'node24'
 })
+
+await build({
+  entryPoints: [resolve(webRoot, 'scripts/solidarity-event-operator.ts')],
+  outfile: resolve(webRoot, '.output/server/solidarity-event-operator.mjs'),
+  banner: {
+    js: "import { createRequire as __swlCreateRequire } from 'node:module'; const require = __swlCreateRequire(import.meta.url);"
+  },
+  bundle: true,
+  external: ['better-sqlite3'],
+  format: 'esm',
+  logLevel: 'info',
+  platform: 'node',
+  target: 'node24'
+})

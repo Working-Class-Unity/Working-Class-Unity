@@ -48,7 +48,14 @@ Missing or conflicting classification tags make the local event `hidden` and cre
 
 The category names shown to website visitors are Meeting, Action, Learning, and Social. They are intentionally based on useful browsing filters rather than every internal organizing activity recorded in old minutes.
 
-## Import operation
+## Event metadata updates
+
+For ordinary event updates, use the [on-demand browser-assisted sync](solidarity-event-sync.md): collect,
+review one change preview, approve, and apply through the existing importer. No People or RSVP exports
+are needed. The process preserves provider IDs and hybrid pairs and retires missing occurrences only
+when explicitly selected. Production use requires the packaged operator from that release.
+
+## Report and activity import
 
 First normalize one People JSON export and one or more aligned event-metadata/RSVP report pairs:
 
@@ -127,6 +134,10 @@ The command logs only aggregate counts, the local batch ID, and issue-code count
 
 ## Current synchronization boundary
 
-The paid Solidarity API is not used. Dashboard People and RSVP exports plus operator-reviewed event metadata are the supported import boundary. Solidarity's official calendar subscription is promising for automatic event updates, but it includes only future events marked for web calendars and does not document a complete event/session/tag payload. Do not schedule it as the authoritative importer until WCU generates one feed, inspects its stable identifiers and fields, and proves the tag-filter behavior on representative public, member, recurring, and hybrid events.
+The paid Solidarity API is not used. Event-only updates use the documented on-demand browser-assisted
+connector; this is not a claim of vendor API support. Dashboard People and RSVP exports plus reviewed
+metadata remain the separate activity-import boundary. Neither route expands consent, profile, or
+membership synchronization. Failed or incomplete reads never authorize removal; missing event sessions
+require explicit retirement review. No unattended calendar-feed or dashboard synchronization is configured.
 
 Native WCU RSVP forms are a later change. They must store a local receipt and reliably create the corresponding Solidarity action so Solidarity confirmations and engagement ladders remain deterministic. Until that contract is available, RSVP links go to Solidarity.
