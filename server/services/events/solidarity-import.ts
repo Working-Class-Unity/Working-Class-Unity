@@ -607,6 +607,161 @@ function countSnapshotChanges(
   return { changed, unchanged }
 }
 
+function eventProjection(plan: EventPlan) {
+  return {
+    id: plan.localId,
+    title: plan.event.title.trim(),
+    description: normalizedText(plan.event.description, 10_000),
+    category: plan.category,
+    visibility: plan.visibility,
+    status: plan.event.status,
+    timezone: plan.event.timezone.trim(),
+    eventPageUrl: normalizedText(plan.event.eventPageUrl, 2_000),
+    eventTags: uniqueTags(plan.event.eventTags),
+    campaignTags: uniqueTags(plan.event.campaignTags)
+  }
+}
+
+function sessionProjection(plan: SessionPlan) {
+  const inPerson = plan.externalSessions.find(({ eventType }) => eventType === 'in_person')
+  const virtual = plan.externalSessions.find(({ eventType }) => eventType === 'virtual')
+  return {
+    id: plan.localId,
+    eventId: plan.eventPlan.localId,
+    title: normalizedText(plan.session.title, 255),
+    status: combinedSessionStatus(plan.externalSessions),
+    deliveryMode: plan.deliveryMode,
+    startsAt: plan.session.startsAt,
+    endsAt: plan.session.endsAt ?? null,
+    timezone: plan.session.timezone.trim(),
+    locationName: normalizedText(inPerson?.locationName ?? plan.session.locationName, 255),
+    locationAddress: normalizedText(inPerson?.locationAddress ?? plan.session.locationAddress, 500),
+    virtualUrl: normalizedText(virtual?.virtualUrl ?? plan.session.virtualUrl, 2_000),
+    rsvpUrl: normalizedText(plan.externalSessions.find(({ rsvpUrl }) => rsvpUrl)?.rsvpUrl, 2_000),
+    meetingKind: plan.eventPlan.meetingKind
+  }
+}
+
+export type SolidarityEventProjection = ReturnType<typeof eventProjection>
+export type SolidaritySessionProjection = ReturnType<typeof sessionProjection>
+export type SolidarityEventProjectionLink = {
+  externalId: string
+  primaryExternalId: string | null
+  sourceUrl: string | null
+}
+export type SolidaritySessionProjectionLink = {
+  externalId: string
+  primaryExternalId: string | null
+  pairedExternalId: string | null
+}
+
+export function readSolidarityEventImportState(
+  connection: DatabaseConnection,
+  ids: Readonly<{ eventIds: readonly string[]; sessionIds: readonly string[] }>
+) {
+  const sqlite = connection.sqlite
+  const events = [...new Set(ids.eventIds)].sort().map((id) => {
+    const row = sqlite
+      .prepare(
+        `select id, title, description, kind as category, visibility, status,
+      default_timezone as timezone, event_page_url as eventPageUrl from events where id = ?`
+      )
+      .get(id) as Omit<SolidarityEventProjection, 'eventTags' | 'campaignTags'> | undefined
+    const tags = sqlite
+      .prepare('select kind, value from event_tags where event_id = ? order by value')
+      .all(id) as Array<{ kind: string; value: string }>
+    const projection: SolidarityEventProjection | null = row
+      ? {
+          ...row,
+          eventTags: tags.filter(({ kind }) => kind === 'event').map(({ value }) => value),
+          campaignTags: tags.filter(({ kind }) => kind === 'campaign').map(({ value }) => value)
+        }
+      : null
+    const links = sqlite
+      .prepare(
+        `select external_id as externalId, primary_external_id as primaryExternalId,
+      source_url as sourceUrl from event_provider_links where provider = 'solidarity' and event_id = ?
+      order by external_id`
+      )
+      .all(id) as SolidarityEventProjectionLink[]
+    return { id, projection, links }
+  })
+  const sessions = [...new Set(ids.sessionIds)].sort().map((id) => {
+    const projection = sqlite
+      .prepare(
+        `select s.id, s.event_id as eventId, s.title, s.status,
+      s.delivery_mode as deliveryMode, s.starts_at as startsAt, s.ends_at as endsAt, s.timezone,
+      s.location_name as locationName, s.location as locationAddress, s.virtual_url as virtualUrl,
+      s.rsvp_url as rsvpUrl, m.kind as meetingKind from event_sessions s
+      left join meetings m on m.event_session_id = s.id where s.id = ?`
+      )
+      .get(id) as SolidaritySessionProjection | undefined
+    const links = sqlite
+      .prepare(
+        `select external_id as externalId, primary_external_id as primaryExternalId,
+      paired_external_id as pairedExternalId from event_session_provider_links
+      where provider = 'solidarity' and event_session_id = ? order by external_id`
+      )
+      .all(id) as SolidaritySessionProjectionLink[]
+    return { id, projection: projection ?? null, links }
+  })
+  return { events, sessions }
+}
+
+// Preview and persistence deliberately share both identity planning and field projection.
+export function previewSolidarityEventImport(connection: DatabaseConnection, input: SolidarityEventImportDataset) {
+  assertEventSchema(connection.sqlite)
+  const prepared = prepareImport(connection.sqlite, normalizeDataset(input))
+  const before = readSolidarityEventImportState(connection, {
+    eventIds: prepared.eventPlans.map(({ localId }) => localId),
+    sessionIds: prepared.sessionPlans.map(({ localId }) => localId)
+  })
+  const mergeLinks = <T extends { externalId: string }>(stored: readonly T[], incoming: readonly T[]): T[] =>
+    [...new Map([...stored, ...incoming].map((link) => [link.externalId, link])).values()].sort((left, right) =>
+      left.externalId < right.externalId ? -1 : left.externalId > right.externalId ? 1 : 0
+    )
+  return {
+    issues: prepared.issues,
+    events: prepared.eventPlans.map((plan) => {
+      const stored = before.events.find(({ id }) => id === plan.localId)!
+      return {
+        before: stored.projection,
+        after: eventProjection(plan),
+        externalIds: plan.externalEvents.map(({ id }) => id),
+        linksBefore: stored.links,
+        linksAfter: mergeLinks(
+          stored.links,
+          plan.externalEvents.map((event) => ({
+            externalId: event.id,
+            primaryExternalId: event.primaryEventId ?? event.id,
+            sourceUrl: normalizedText(event.eventPageUrl, 2_000)
+          }))
+        )
+      }
+    }),
+    sessions: prepared.sessionPlans.map((plan) => {
+      const stored = before.sessions.find(({ id }) => id === plan.localId)!
+      if (stored.projection && stored.projection.eventId !== plan.eventPlan.localId) {
+        throw new Error('An existing event session cannot be reassigned to another event')
+      }
+      return {
+        before: stored.projection,
+        after: sessionProjection(plan),
+        externalIds: plan.externalSessions.map(({ id }) => id),
+        linksBefore: stored.links,
+        linksAfter: mergeLinks(
+          stored.links,
+          plan.externalSessions.map((session) => ({
+            externalId: session.id,
+            primaryExternalId: session.primarySessionId ?? session.id,
+            pairedExternalId: session.pairedSessionId
+          }))
+        )
+      }
+    })
+  }
+}
+
 function applyImport(
   sqlite: Sqlite,
   prepared: PreparedImport,
@@ -722,25 +877,26 @@ function persistEvents(
        source_snapshot_id = excluded.source_snapshot_id, updated_at = excluded.updated_at`
   )
   for (const plan of plans) {
+    const projection = eventProjection(plan)
     const eventSnapshotId = snapshotId(snapshotIds, 'solidarity.event', plan.event.id)
     upsertEvent.run(
-      plan.localId,
-      plan.event.title.trim(),
-      normalizedText(plan.event.description, 10_000),
-      plan.category,
-      plan.visibility,
-      plan.event.status,
-      plan.event.timezone.trim(),
-      normalizedText(plan.event.eventPageUrl, 2_000),
+      projection.id,
+      projection.title,
+      projection.description,
+      projection.category,
+      projection.visibility,
+      projection.status,
+      projection.timezone,
+      projection.eventPageUrl,
       eventSnapshotId,
       observedAt,
       observedAt
     )
     clearTags.run(plan.localId)
-    for (const value of uniqueTags(plan.event.eventTags)) {
+    for (const value of projection.eventTags) {
       insertTag.run(plan.localId, 'event', value, eventSnapshotId, observedAt, observedAt)
     }
-    for (const value of uniqueTags(plan.event.campaignTags)) {
+    for (const value of projection.campaignTags) {
       insertTag.run(plan.localId, 'campaign', value, eventSnapshotId, observedAt, observedAt)
     }
     for (const externalEvent of plan.externalEvents) {
@@ -807,28 +963,27 @@ function persistSessions(
     if (previous && previous.eventId !== plan.eventPlan.localId) {
       throw new Error('An existing event session cannot be reassigned to another event')
     }
-    const inPerson = plan.externalSessions.find(({ eventType }) => eventType === 'in_person')
-    const virtual = plan.externalSessions.find(({ eventType }) => eventType === 'virtual')
+    const projection = sessionProjection(plan)
     const sourceSnapshotId = snapshotId(snapshotIds, 'solidarity.session', plan.session.id)
     upsertSession.run(
-      plan.localId,
-      plan.eventPlan.localId,
-      normalizedText(plan.session.title, 255),
-      combinedSessionStatus(plan.externalSessions),
-      plan.deliveryMode,
-      plan.session.startsAt,
-      plan.session.endsAt ?? null,
-      plan.session.timezone.trim(),
-      normalizedText(inPerson?.locationName ?? plan.session.locationName, 255),
-      normalizedText(inPerson?.locationAddress ?? plan.session.locationAddress, 500),
-      normalizedText(virtual?.virtualUrl ?? plan.session.virtualUrl, 2_000),
-      normalizedText(plan.externalSessions.find(({ rsvpUrl }) => rsvpUrl)?.rsvpUrl, 2_000),
+      projection.id,
+      projection.eventId,
+      projection.title,
+      projection.status,
+      projection.deliveryMode,
+      projection.startsAt,
+      projection.endsAt,
+      projection.timezone,
+      projection.locationName,
+      projection.locationAddress,
+      projection.virtualUrl,
+      projection.rsvpUrl,
       sourceSnapshotId,
       observedAt,
       observedAt
     )
-    if (plan.eventPlan.meetingKind) {
-      upsertMeeting.run(plan.localId, plan.eventPlan.meetingKind, sourceSnapshotId, observedAt, observedAt)
+    if (projection.meetingKind) {
+      upsertMeeting.run(plan.localId, projection.meetingKind, sourceSnapshotId, observedAt, observedAt)
     } else {
       deleteMeeting.run(plan.localId)
     }

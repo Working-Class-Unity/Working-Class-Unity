@@ -286,17 +286,22 @@ or follow-up state.
 - Preserve Solidarity provider IDs, source timestamps, and private source hashes.
 - Use an existing provider identity first; otherwise match only a unique verified normalized email or
   phone. Never merge by name and leave ambiguous identifiers unlinked.
-- Keep imports dry-run by default, transactional, idempotent, and count-only in logs.
+- Keep imports preview/dry-run by default, transactional, and idempotent. Report/activity logs remain count-only;
+  private organizer event previews may show event titles, dates, formats, classification, and changed-field names.
 - Store canonical taxonomy keys rather than mutable display labels. Reject unregistered Event Tags
   and require Campaign Tags to follow the shared convention.
 - The current executable importer covers events, sessions, RSVP, attendance, and only the
   identity/contact fields needed from the People export. Synchronizing permissions, forms,
   subscriptions, properties, or other profile/activity data remains unimplemented and requires a
   separate reviewed contract.
+- The [on-demand browser-assisted event sync](solidarity-event-sync.md) is metadata-only and reuses that
+  importer. Keep full provider inventories and explicit pairs, preserve IDs during rescheduling, and retire
+  missing sessions only after explicit review. Failed/incomplete reads never mean deletion. It does not
+  read or synchronize People, RSVP, attendance, permissions, or memberships, and is not a vendor-supported API.
 - Never write Stripe payment or membership facts from Solidarity. Compute standing and attendance
   recency in WCU SQLite.
-- Keep exports, normalized bundles, snapshots, and backups outside Git and shared logs. Receipts may
-  contain aggregate counts and issue codes only.
+- Keep exports, captures, private previews, normalized bundles, snapshots, backups, and detailed receipts
+  outside Git and shared logs. Public logs may contain aggregate counts and issue codes only.
 
 ## Changing the taxonomy
 
