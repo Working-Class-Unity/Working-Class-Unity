@@ -1,22 +1,5 @@
 <script setup lang="ts">
 defineI18nRoute(false)
 
-const { t } = useI18n()
-useHead(() => ({ title: t('metadata.activate.title') }))
+await navigateTo('/join', { redirectCode: 302 })
 </script>
-
-<template>
-  <div class="auth-entry-page">
-    <AuthEntryForm intent="activate" />
-  </div>
-</template>
-
-<style scoped>
-@layer components {
-  .auth-entry-page {
-    display: grid;
-    place-items: start center;
-    padding-bottom: var(--space-6);
-  }
-}
-</style>

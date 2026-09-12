@@ -20,8 +20,12 @@ const issues = [...platformIssues, ...evaluation.issues]
 console.log('\nBuild and platform controls')
 printIssues(platformIssues, platformIssues.length ? 'invalid' : 'ok', 'NODE_ENV and NITRO_PRESET are configured')
 
-console.log('\nApp runtime')
-printIssues(evaluation.issues, evaluation.issues.length ? 'invalid' : 'ok', 'runtime config is complete')
+console.log('\nPublic website runtime')
+printIssues(
+  evaluation.issues,
+  evaluation.issues.length ? 'invalid' : 'ok',
+  'event database, readiness token, and public URL are configured'
+)
 
 console.log('\nOptional build-only Sentry controls')
 const sentryUploadKeys = ['SENTRY_AUTH_TOKEN', 'SENTRY_ORG', 'SENTRY_PROJECT'] as const
@@ -41,7 +45,7 @@ if (issues.length) {
   console.log(`\nProduction readiness: ${issues.length} required checks need attention.`)
   if (strict) process.exit(1)
 } else {
-  console.log('\nProduction readiness: required environment contract is satisfied.')
+  console.log('\nProduction readiness: public-site environment contract is satisfied.')
 }
 
 function validatePlatformEnvironment(source: Record<string, string | undefined>): RuntimeConfigIssue[] {

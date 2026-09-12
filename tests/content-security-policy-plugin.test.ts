@@ -22,16 +22,8 @@ describe('browser provider CSP plugin', () => {
     runtimeMocks.getAppRuntimeConfig.mockReset()
   })
 
-  it('registers the documented hook without widening CSP for stale user-file R2 configuration', async () => {
+  it('registers the documented hook and grants only the configured Sentry connection origin', async () => {
     runtimeMocks.getAppRuntimeConfig.mockReturnValue({
-      files: { driver: 'r2' },
-      cloudflare: {
-        accountId: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-        r2: {
-          bucket: 'private-files',
-          endpoint: 'https://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.r2.cloudflarestorage.com'
-        }
-      },
       public: { sentryDsn: 'https://public-key@o123.ingest.sentry.io/456' }
     })
     vi.stubGlobal('defineNitroPlugin', (plugin: NitroPlugin) => plugin)
@@ -56,9 +48,7 @@ describe('browser provider CSP plugin', () => {
 
     expect(routeRules['/**']?.headers?.contentSecurityPolicy).toEqual({
       ...base,
-      'connect-src': ["'self'", 'https://o123.ingest.sentry.io'],
-      'frame-src': ['https://challenges.cloudflare.com'],
-      'script-src': ["'self'", "'strict-dynamic'", "'nonce-{{nonce}}'", 'https://challenges.cloudflare.com']
+      'connect-src': ["'self'", 'https://o123.ingest.sentry.io']
     })
   })
 })

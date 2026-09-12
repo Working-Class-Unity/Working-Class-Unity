@@ -1,7 +1,5 @@
 import type { DatabaseConnection } from '../../db/connect'
 import type { EventCategory } from '../../db/schema/events'
-import type { BillingStripePriceConfiguration } from '../payments/stripe/configuration'
-import { readWebsiteMembershipAccess } from '../membership/member-access'
 
 export type CalendarEvent = Readonly<{
   category: EventCategory
@@ -18,7 +16,6 @@ export type CalendarEventSession = Readonly<{
   id: string
   locationAddress: string | null
   locationName: string | null
-  meetingKind: 'general' | 'steering' | null
   rsvpUrl: string | null
   startsAt: string
   status: 'completed' | 'scheduled'
@@ -36,7 +33,6 @@ type CalendarRow = Readonly<{
   eventTitle: string
   locationAddress: string | null
   locationName: string | null
-  meetingKind: CalendarEventSession['meetingKind']
   rsvpUrl: string | null
   sessionId: string
   sessionTitle: string | null
@@ -50,10 +46,7 @@ export function listVisibleCalendarEvents(
   input: Readonly<{
     from: string
     limit: number
-    now: Date
-    prices: BillingStripePriceConfiguration
     to: string
-    userId: string | null
   }>
 ): Readonly<{ events: readonly CalendarEvent[] }> {
   const from = canonicalUtcTimestamp(input.from, 'Calendar from')
@@ -62,26 +55,26 @@ export function listVisibleCalendarEvents(
   if (!Number.isInteger(input.limit) || input.limit < 1 || input.limit > 200) {
     throw new TypeError('Calendar limit must be an integer from 1 to 200')
   }
-  const canViewMemberEvents = input.userId
-    ? readWebsiteMembershipAccess(connection, input.userId, input.prices, input.now).granted
-    : false
   const rows = connection.sqlite
     .prepare(
       `select e.id as eventId, e.title as eventTitle, e.description, e.kind as category,
               e.event_page_url as eventPageUrl, s.id as sessionId, s.title as sessionTitle,
               s.status, s.delivery_mode as deliveryMode, s.starts_at as startsAt,
               s.ends_at as endsAt, s.timezone, s.location_name as locationName,
-              s.location as locationAddress, s.rsvp_url as rsvpUrl, m.kind as meetingKind
+              s.location as locationAddress, s.rsvp_url as rsvpUrl
        from events e
        join event_sessions s on s.event_id = e.id
-       left join meetings m on m.event_session_id = s.id
        where e.status = 'active' and s.status in ('scheduled', 'completed')
          and s.starts_at >= ? and s.starts_at < ?
-         and (e.visibility = 'public' or (? = 1 and e.visibility = 'members'))
+         and e.visibility = 'public'
+         and not exists (
+           select 1 from event_tags tags
+           where tags.event_id = e.id and tags.kind = 'event' and tags.value = 'audience-members'
+         )
        order by s.starts_at, e.title, s.id
        limit ?`
     )
-    .all(from, to, canViewMemberEvents ? 1 : 0, input.limit) as CalendarRow[]
+    .all(from, to, input.limit) as CalendarRow[]
 
   const events = new Map<string, CalendarEvent & { sessions: CalendarEventSession[] }>()
   for (const row of rows) {
@@ -103,7 +96,6 @@ export function listVisibleCalendarEvents(
         id: row.sessionId,
         locationAddress: row.locationAddress,
         locationName: row.locationName,
-        meetingKind: row.meetingKind,
         rsvpUrl: row.rsvpUrl,
         startsAt: row.startsAt,
         status: row.status,

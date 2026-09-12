@@ -1,6 +1,6 @@
 # On-demand Solidarity event sync
 
-Use this process for event metadata, not People, RSVP, attendance, consent, or membership data.
+Use this process for event metadata only. People, RSVP, attendance, consent, and membership data stay outside the website database.
 Solidarity remains the authoring system; the WCU website reads SQLite. This is a WCU browser-assisted
 connector to an undocumented dashboard interface, not the paid or officially supported Solidarity API.
 It runs on demand. Do not schedule unattended synchronization or store Solidarity credentials on the server.
@@ -11,7 +11,7 @@ It runs on demand. Do not schedule unattended synchronization or store Solidarit
 - Sign into `https://dashboard.solidarity.tech` yourself in Agent Browser. The command reuses that session;
   it never exports cookies, passwords, or two-factor codes. Use `--session NAME` for a named browser session.
 - Deploy the version containing `.output/server/solidarity-event-operator.mjs` through the normal approved
-  release process before production use. No database migration, new port, public write endpoint, or cron task is needed.
+  release process before production use. Routine event updates need no new port, public write endpoint, or cron task. Deploying the events-only release requires the separately approved database cutover first.
 - Keep an SSH connection file outside Git. The server must already be in `known_hosts`; SSH uses batch
   authentication and strict host-key verification. Its account needs access to Docker on the intended server.
 
@@ -60,7 +60,7 @@ The command writes `september-preview.json` and `september-preview.json.capture.
 refuses existing outputs, and refuses output inside a Git worktree. The private preview retains the exact
 capture, proposed state, database baseline, and approval digest. Console previews show event metadata,
 not descriptions, locations, signed meeting URLs, raw HTML, authentication, or personal records. Keep
-these organizer previews private; the report/activity importer's public logging remains count-only.
+these organizer previews private; public importer logs remain count-only.
 
 If server preview fails after collection, reuse the saved capture instead of collecting again:
 
@@ -78,7 +78,7 @@ pnpm events:sync apply --preview /private/events/september-preview.json \
 
 To retire an explicitly reviewed missing occurrence, append `--retire LOCAL_SESSION_ID` from the preview.
 Repeat that option for multiple candidates. No retirement option means no retirement. The importer marks
-selected occurrences canceled, retaining their IDs, source metadata, RSVP, and attendance history.
+selected occurrences canceled, retaining their IDs and allowed event metadata.
 It does not hard-delete records or guess replacements by title.
 
 Apply verifies the target and reviewed digest, checks for a stale database baseline, takes one consistent
@@ -101,7 +101,7 @@ It does not use the limited `/user-filters/event-sessions` lookup as a complete 
 
 Currently listed parents are represented as locally active; past/upcoming is a date distinction, not proof
 of provider archival or attendance. Metadata refreshes preserve existing local completed/canceled states
-rather than reopening them or removing attendance credit.
+rather than reopening them.
 Missing source records are only candidates within the covered event/date scope. Parents absent from the
 covered inventory are not automatically archived. Unsupported state/pairing changes need organizer review.
 Existing hybrid groups cannot be silently downgraded by incomplete input.
@@ -123,9 +123,10 @@ pnpm test tests/solidarity-dashboard.test.ts tests/solidarity-event-sync.test.ts
 ```
 
 Two small HTML checks cover acquisition and failed reads. One real migrated SQLite integration covers
-stable IDs, rescheduling, hybrid grouping, explicit retirement, retained completion/activity, target binding,
+stable IDs, rescheduling, hybrid grouping, explicit retirement, retained completion status, target binding,
 and no-op behavior. Extend these only for a new meaningful contract; do not add tests for constants, wrapper
 formatting, or a reversible display expression. A local packaged-CLI rehearsal can use `--database-url
 file:/absolute/disposable.db` instead of `--connection`. Never run mutating smoke tests on production.
 
-Report-based People/RSVP/attendance imports remain separate under [`events-and-solidarity.md`](events-and-solidarity.md).
+The events-only import contract is documented in [Events and Solidarity](events-and-solidarity.md).
+People/RSVP/attendance report imports are no longer part of this application.

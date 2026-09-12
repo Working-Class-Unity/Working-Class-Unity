@@ -1,22 +1,20 @@
-# Current basic-release capability boundary
+# Public website scope
 
-This document is the WCU-authoritative release boundary for inherited AI and user-file code. It
-supersedes imported Baseline guides and ADRs wherever they describe those capabilities as active.
+The application serves public WCU content and public event listings. Membership contributions use
+Stripe-hosted links for $10/month Membership and $27/month Solidarity; subscription management uses
+the hosted Stripe customer portal. RSVP and organizing forms open Solidarity.
 
-- AI chat, Files, File Search, Web Search, OpenAI resources, and user-file R2 are excluded from the
-  basic release for anonymous users, authenticated nonmembers, and members.
-- Exact `/api/ai` and `/api/files` path families return the same non-cacheable `404` before auth,
-  request parsing, runtime provider configuration, SQLite, quota, storage, or provider work.
-- Production AI/File service composition is source-blocked, the worker registers no Files handler
-  or reconciliation scheduler, account deletion creates no Files job, and the OpenAI corpus CLI is
-  not a package command and exits before credential or provider access.
-- Application OpenAI and user-file R2 values are not deployment inputs. Compose clears stale shared
-  values for every role. The separate private SQLite backup contract continues to use only
-  `BACKUP_R2_*` values.
-- Dormant services, lower-level deterministic tests, schema, and migrations are retained only to
-  keep this change small. Their presence is not product availability or provider certification.
+There are no website accounts, authentication, free-user tiers, local people, membership or governance
+records, RSVP or attendance records, billing APIs/webhooks, transactional email, AI chat/search,
+user uploads, or user-file storage. These are removed capabilities rather than runtime switches.
 
-Later work may give authenticated nonmembers a limited quota and dues-paying members one somewhat
-larger quota regardless of dues amount. That requires a separately approved vertical slice and a
-substantial WCU tenant-rights, know-your-rights, and organization corpus; a generic chat experience
-is not a WCU deliverable.
+The database contains event metadata only. `audience-members` remains an accepted source tag and is
+excluded from public responses everywhere. Campaign and Side-Quest database features are deferred;
+current public campaign pages and event campaign classification remain.
+
+Sentry error reporting is optional. The shipped Compose deployment includes a separate private R2
+event-database backup runner and requires its credentials. These operational capabilities do not
+introduce website identities or member-only pages.
+
+Removing local identity code is distinct from production data retirement. Follow the separately
+approved [database cutover](database-cutover.md); keep real Stripe subscriptions intact.

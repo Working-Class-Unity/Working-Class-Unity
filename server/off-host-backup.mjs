@@ -227,15 +227,7 @@ export async function uploadVerifiedSnapshot({ path, store, signal, verifiedSnap
   return { key, byteSize: snapshot.byteSize, sha256: snapshot.sha256, reused: Boolean(existing) }
 }
 
-export async function fetchVerifiedSnapshot({
-  key,
-  paths,
-  store,
-  signal,
-  verifyBackup,
-  backupBucket,
-  removePath = rm
-}) {
+export async function fetchVerifiedSnapshot({ key, paths, store, signal, verifyBackup, removePath = rm }) {
   const parsed = parseObjectKey(key)
   const finalPath = join(paths.backupsDirectory, basename(parsed.key))
   await assertUnusedRegularPath(finalPath, 'Fetched backup output')
@@ -250,7 +242,7 @@ export async function fetchVerifiedSnapshot({
     const downloaded = await store.readAndHash(parsed.key, signal, stagedPath)
     assertRemoteBytes(downloaded, expected.byteSize, parsed.sha256)
     await chmod(stagedPath, 0o600)
-    await verifyBackup(stagedPath, { current: false, offHostCoverage: true, backupBucket, signal })
+    await verifyBackup(stagedPath, { current: false, signal })
     await link(stagedPath, finalPath)
     return { path: finalPath, key: parsed.key, byteSize: downloaded.byteSize, sha256: downloaded.sha256 }
   } catch (error) {
@@ -345,8 +337,6 @@ export async function runOffHostBackupCli(args, environment, dependencies = {}) 
             const verifiedSnapshot = await inspectSnapshot(snapshotPath, signal)
             await verifyBackup(snapshotPath, {
               current: true,
-              offHostCoverage: true,
-              backupBucket: configuration.bucket,
               signal
             })
             const receipt = await uploadVerifiedSnapshot({ path: snapshotPath, store, signal, verifiedSnapshot })
@@ -369,8 +359,6 @@ export async function runOffHostBackupCli(args, environment, dependencies = {}) 
             const verifiedSnapshot = await inspectSnapshot(inputPath, signal)
             await verifyBackup(inputPath, {
               current: true,
-              offHostCoverage: true,
-              backupBucket: configuration.bucket,
               signal
             })
             const receipt = await uploadVerifiedSnapshot({ path: inputPath, store, signal, verifiedSnapshot })
@@ -394,7 +382,6 @@ export async function runOffHostBackupCli(args, environment, dependencies = {}) 
             store,
             signal,
             verifyBackup,
-            backupBucket: configuration.bucket,
             removePath
           })
           return { command, ...receipt }
@@ -701,9 +688,6 @@ async function runMaintenance(args, environment, maintenanceEntry, signal, clean
 async function runMaintenanceVerification(path, options, environment, maintenanceEntry, signal) {
   const args = ['verify-backup', '--input', path]
   if (options.current) args.push('--require-current')
-  if (options.offHostCoverage) {
-    args.push('--require-off-host-coverage', '--backup-r2-bucket', options.backupBucket)
-  }
   await runMaintenance(args, environment, maintenanceEntry, signal)
 }
 

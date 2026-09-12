@@ -1,10 +1,7 @@
 import type { ContentSecurityPolicyValue } from 'nuxt-security'
 
-const turnstileOrigin = 'https://challenges.cloudflare.com'
-
 type BrowserProviderConfig = Readonly<{
   sentryDsn: string
-  fileRequestOrigin: string
 }>
 
 export function createBaseContentSecurityPolicy(isProduction: boolean): ContentSecurityPolicyValue {
@@ -43,17 +40,6 @@ export function withBrowserProviderSources(
   if (config.sentryDsn) {
     appendSource(extended, 'connect-src', new URL(config.sentryDsn).origin)
   }
-
-  if (config.fileRequestOrigin) {
-    const fileRequestUrl = new URL(config.fileRequestOrigin)
-    if (fileRequestUrl.protocol !== 'https:' || fileRequestUrl.origin !== config.fileRequestOrigin) {
-      throw new TypeError('The browser file-request source must be an exact HTTPS origin')
-    }
-    appendSource(extended, 'connect-src', fileRequestUrl.origin)
-  }
-
-  appendSource(extended, 'script-src', turnstileOrigin)
-  appendSource(extended, 'frame-src', turnstileOrigin)
 
   return extended
 }

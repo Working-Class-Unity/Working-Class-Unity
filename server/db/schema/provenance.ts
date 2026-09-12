@@ -2,7 +2,7 @@ import { sql } from 'drizzle-orm'
 import { check, index, integer, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core'
 import { createdAtColumn, updatedAtColumn } from './core'
 
-export const importProviders = ['stripe', 'solidarity', 'discourse', 'pocketbase'] as const
+export const importProviders = ['solidarity'] as const
 export const importBatchStatuses = ['pending', 'completed', 'failed'] as const
 
 export const importBatches = sqliteTable(
@@ -21,10 +21,7 @@ export const importBatches = sqliteTable(
   },
   (table) => [
     index('import_batches_provider_started_idx').on(table.provider, table.startedAt),
-    check(
-      'import_batches_provider_check',
-      sql`${table.provider} in ('stripe', 'solidarity', 'discourse', 'pocketbase')`
-    ),
+    check('import_batches_provider_check', sql`${table.provider} = 'solidarity'`),
     check('import_batches_status_check', sql`${table.status} in ('pending', 'completed', 'failed')`),
     check('import_batches_started_at_check', sql`julianday(${table.startedAt}) is not null`),
     check(
@@ -46,7 +43,7 @@ export const externalRecordSnapshots = sqliteTable(
     importBatchId: text('import_batch_id')
       .notNull()
       .references(() => importBatches.id, { onDelete: 'restrict' }),
-    objectType: text('object_type').notNull(),
+    objectType: text('object_type', { enum: ['solidarity.event', 'solidarity.session'] }).notNull(),
     externalId: text('external_id').notNull(),
     observedAt: text('observed_at').notNull(),
     payloadHash: text('payload_hash').notNull(),
@@ -62,10 +59,13 @@ export const externalRecordSnapshots = sqliteTable(
     index('external_record_snapshots_external_idx').on(table.objectType, table.externalId, table.observedAt),
     check(
       'external_record_snapshots_identity_check',
-      sql`length(trim(${table.objectType})) between 1 and 100 and length(trim(${table.externalId})) between 1 and 255`
+      sql`${table.objectType} in ('solidarity.event', 'solidarity.session') and length(trim(${table.externalId})) between 1 and 255`
     ),
     check('external_record_snapshots_hash_check', sql`length(trim(${table.payloadHash})) between 16 and 128`),
-    check('external_record_snapshots_payload_check', sql`json_valid(${table.rawPayload})`),
+    check(
+      'external_record_snapshots_payload_check',
+      sql`json_valid(${table.rawPayload}) and json_type(${table.rawPayload}) = 'object'`
+    ),
     check('external_record_snapshots_observed_at_check', sql`julianday(${table.observedAt}) is not null`)
   ]
 )

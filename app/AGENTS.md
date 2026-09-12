@@ -1,6 +1,6 @@
-# Nuxt application contract
+# Nuxt public website contract
 
-The root [`AGENTS.md`](../AGENTS.md) governs all work. The normative interface architecture is
+The normative interface architecture is
 [`docs/baseline/css-and-interface.md`](../docs/baseline/css-and-interface.md).
 
 ## Commands
@@ -25,13 +25,15 @@ The root [`AGENTS.md`](../AGENTS.md) governs all work. The normative interface a
 
 ## Component inventory
 
+- `AppActionLink`: localized internal navigation and native external links, including hosted dues and RSVP destinations.
 - `AppButton`: native command button; never navigation.
 - `AppField`: label, hint, required, and validation-message relationships for a slotted native control.
 - `AppInput`: native input contract with model, attribute, class, focus, and validity forwarding.
 - `AppNotice`: persistent visual feedback with explicit, opt-in announcement behavior.
 - `AppTopbar`: the single site header, with Reka desktop Current Work and Events panels and native
   mobile disclosures. All links close the menu, including links to the current route. The campaign
-  shell supplies page framing and its footer, without a second navigation bar.
+  shell supplies page framing and its footer, without a second navigation bar. Dues management opens
+  the public Stripe portal; the header never requests an authentication session.
 - `ContextNavigation`: a labelled group of translated destinations in two desktop columns or one
   mobile column. Its `entry` slot lets AppTopbar own Reka link integration; its default is `NavigationEntry`.
 - `NavigationEntry`: an internal or external navigation link with a concise accessible title,
@@ -41,8 +43,8 @@ The root [`AGENTS.md`](../AGENTS.md) governs all work. The normative interface a
   Events panel, omits credentials, and provides the next three scheduled public sessions. The header
   owns pending, error/retry, and empty presentation, with All events always available.
 - `LanguageSelector`: compact native select with a globe label, localized accessible name, and full language names.
-- `AccountMenu`: feature-owned Reka dropdown for identity, account navigation, and sign-out.
-- `calendar/CalendarDatePicker`: feature-owned Reka calendar and popover for agenda date navigation.
+- `calendar/CalendarDatePicker`: feature-owned Reka calendar and popover for agenda date navigation,
+  initialized to the current date in America/Los_Angeles. Date controls remain available when no events match.
 - `calendar/EventDirectionsMenu`: feature-owned Reka dropdown for map and address actions.
 - `calendar/CalendarAgendaView`, `calendar/CalendarMonthView`, `calendar/CalendarEventActions`, and
   `calendar/CalendarEventBadge`: calendar-owned views, recurring event presentation, and outbound Solidarity RSVP links.
@@ -55,9 +57,12 @@ The root [`AGENTS.md`](../AGENTS.md) governs all work. The normative interface a
 - `campaign/Landing*`: campaign-owned narrative sections composed by `CampaignLanding`.
 - `KnowYourRightsShell`, `KnowYourRightsGuide`, and `KnowYourRightsScript`: feature-owned localized
   navigation, long-form guide framing, and speakable scripts for the Know Your Rights page family.
-- `AuthEntryForm`, `TurnstileChallenge`, `AccountProfileForm`, and `AccountDeletionSection`: feature components, not shared primitives.
+- `/join`: an Open Assembly membership explanation, with participation and governance before two
+  hosted Stripe dues links and the public dues-management portal. Native disclosures own the FAQ;
+  container queries let benefits and dues options stack. There is no local account, checkout form,
+  or free-supporter registration. `shared/membership-links.ts` owns the public URLs.
 
-Direct `reka-ui` imports are allowed only in `components/AccountMenu.vue`, `components/AppTopbar.vue`,
+Direct `reka-ui` imports are allowed only in `components/AppTopbar.vue`,
 `components/CampaignCitation.vue`, `components/PageOutline.vue`, and the three documented
 `components/calendar/` integrations.
 Pages and unrelated components consume app-owned contracts. Do not add another Reka primitive or a
@@ -67,9 +72,8 @@ generic wrapper without a documented product journey.
 
 - SSR is the default. Use `useFetch` or `useAsyncData` for initial reads and `$fetch` for
   user-triggered mutations.
-- Every applicable asynchronous surface handles unresolved authentication, pending, error, empty,
-  and success states. Recoverable errors provide a safe retry.
-- Do not render private identity or account information until authentication is resolved.
+- Every applicable asynchronous surface handles pending, error, empty, and success states.
+  Recoverable errors provide a safe retry. The public website does not render private identity or account information.
 - Each route supplies one clear `h1` and meaningful page title. The default layout owns the stable
   `main-content` landmark and skip-link target.
 - Forms use native controls, stable names and IDs, associated labels, descriptions, visible errors,
@@ -77,5 +81,5 @@ generic wrapper without a documented product journey.
 - Notice tone is visual only. Enable a live announcement only for content that changed after a user
   action.
 
-The canonical component fixture is `tests/components/ui-foundation.test.ts`; the assembled shell,
-form, authentication, notice, and AccountMenu journey is `tests/browser/foundation.pw.mjs`.
+The canonical component fixture is `tests/components/ui-foundation.test.ts`; the assembled public shell,
+dues links, navigation, and notice journey is `tests/browser/foundation.pw.mjs`.

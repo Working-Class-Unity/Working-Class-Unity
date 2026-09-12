@@ -16,23 +16,22 @@ English URLs remain unprefixed. Spanish uses `/es` and Punjabi uses `/pa`.
 Each public URL declares its own canonical and reciprocal English, Spanish,
 Punjabi, and `x-default` alternates. Browser-language detection redirects only
 the root entry point. Explicit content URLs work without language cookies.
-Private, completion, and utility pages opt out of localized routing with
-`defineI18nRoute(false)`. The utility-locale plugin preserves their existing
-saved-language and browser-language behavior on fresh requests.
+Utility pages opt out of localized routing where required. Public pages preserve the selected
+language across navigation; retired account and activation routes are not public catalog entries.
 
 ## Publishing contract
 
 Add a public page to the catalog only after its content and translations are
 ready. Use `NuxtLinkLocale` or the existing `AppActionLink` for public internal
-navigation. Account and authentication destinations remain unprefixed. Keep
+navigation. Hosted Stripe and Solidarity destinations remain external links. Keep
 page metadata in the existing content sources; do not add competing canonical
 or social tags in page components.
 
 Unlisted routes and error pages receive `noindex, nofollow` and no public
-canonical, alternates, or structured data. The discovery endpoints never read
-member, account, payment, RSVP, or attendee records. They link the calendar
-without exporting its session-aware event response. Existing authentication
-remains the access control; discovery exclusions are not a security boundary.
+canonical, alternates, or structured data. The discovery endpoints use public repository content and never export restricted event metadata.
+They link to the public calendar; events tagged `audience-members` are excluded everywhere. The
+website has no authentication or personal records. Discovery exclusions do not replace server-side
+audience filtering.
 
 `robots.txt` permits public crawlers through one wildcard group and excludes
 `/api/`. This intentionally allows OpenAI and Anthropic search and training,
@@ -45,7 +44,7 @@ the origin response and require an operator check after deployment.
 `pnpm check` runs the repository gate. `pnpm test:browser` builds the production
 application and verifies initial HTML for every catalog URL in every language,
 metadata updates during navigation, discovery endpoints, the social image,
-and private/missing-route exclusions against disposable local state.
+and utility/missing-route exclusions against disposable local state.
 
 After an authorized deployment, check the public responses through the CDN,
 submit the sitemap in the organization's Google Search Console and Bing

@@ -33,7 +33,6 @@ export type CalendarApiResponse = Readonly<{
       id: string
       locationAddress: string | null
       locationName: string | null
-      meetingKind: 'general' | 'steering' | null
       rsvpUrl: string | null
       startsAt: string
       status: 'completed' | 'scheduled'

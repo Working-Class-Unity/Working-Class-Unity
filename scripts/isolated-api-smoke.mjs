@@ -1,7 +1,5 @@
 import { randomBytes } from 'node:crypto'
-import { once } from 'node:events'
-import { existsSync, mkdirSync, mkdtempSync, readdirSync } from 'node:fs'
-import { createServer } from 'node:http'
+import { existsSync, mkdirSync, mkdtempSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
@@ -18,14 +16,12 @@ import {
   stopManaged,
   waitForHttp
 } from './ci-browser-helpers.mjs'
-import { assertIsolatedSmokeInvocation } from './isolated-smoke-policy.mjs'
+import { assertIsolatedSmokeInvocation, createSqliteWriteObserver } from './isolated-smoke-policy.mjs'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const runPnpm = resolve(root, 'scripts/run-pnpm.mjs')
 const serverEntry = resolve(root, '.output/server/index.mjs')
 const serverPreload = resolve(root, '.output/server/sentry.server.config.mjs')
-const stripeProviderPreload = resolve(root, 'scripts/isolated-stripe-provider-preload.mjs')
-const turnstileProviderPreload = resolve(root, 'scripts/isolated-turnstile-provider-preload.mjs')
 const requireFromApp = createRequire(resolve(root, 'package.json'))
 const inheritedEnvironment = selectEnvironment(process.env, [
   'CI',
@@ -53,22 +49,9 @@ const inheritedEnvironment = selectEnvironment(process.env, [
 let sandbox
 let databasePath
 let runtimeCwd
-let emailCaptureDirectory
 let fixtureId
-let authSecret
 let readinessToken
-let stripeSecret
-let stripeWebhookSecret
-let stripeProvider
-let stripeProviderUrl
-const stripeProviderRequests = []
-const stripeCatalog = {
-  portalConfigurationId: 'bpc_isolated',
-  membershipDues10PriceId: 'price_isolated_personal_monthly',
-  solidarityDues27PriceId: 'price_isolated_family_monthly',
-  legacyDues10PriceIds: 'membership-10-1month',
-  legacyDues27PriceIds: 'solidarity-27-1month'
-}
+let databaseObserver
 let server
 let serverOutputMonitor
 const activeChildren = new Set()
@@ -80,12 +63,8 @@ try {
   sandbox = mkdtempSync(join(tmpdir(), 'swl-isolated-api-smoke-'))
   databasePath = join(sandbox, 'data', 'app.db')
   runtimeCwd = join(sandbox, 'runtime-workspace')
-  emailCaptureDirectory = join(sandbox, 'email-capture')
   fixtureId = `r011-${randomBytes(8).toString('hex')}`
-  authSecret = `auth_${randomBytes(32).toString('base64url')}`
   readinessToken = `ready_${randomBytes(32).toString('base64url')}`
-  stripeSecret = `rk_test_${randomBytes(24).toString('hex')}`
-  stripeWebhookSecret = `whsec_${randomBytes(24).toString('hex')}`
 
   const coordinator = createCleanupCoordinator({ cleanup })
   let result
@@ -97,20 +76,17 @@ try {
       throw new Error('Injected isolated API smoke failure after sandbox creation.')
     }
 
-    await runPhase(
-      'isolated API production build',
-      process.execPath,
-      [runPnpm, 'run', 'build'],
-      buildEnvironment(),
-      180_000
-    )
+    if (!process.argv.includes('--skip-build')) {
+      await runPhase(
+        'isolated API production build',
+        process.execPath,
+        [runPnpm, 'run', 'build'],
+        buildEnvironment(),
+        180_000
+      )
+    }
     assert(existsSync(serverEntry), `Production server entry was not built: ${serverEntry}`)
     assert(existsSync(serverPreload), `Production Sentry preload was not built: ${serverPreload}`)
-    assert(existsSync(stripeProviderPreload), `Stripe provider preload was not found: ${stripeProviderPreload}`)
-    assert(
-      existsSync(turnstileProviderPreload),
-      `Turnstile provider preload was not found: ${turnstileProviderPreload}`
-    )
     assert(!existsSync(databasePath), 'Production build touched the isolated runtime database.')
 
     await runPhase(
@@ -124,27 +100,15 @@ try {
 
     const port = await reservePort()
     const baseUrl = `http://127.0.0.1:${port}`
-    stripeProvider = createServer(handleStripeProviderRequest)
-    stripeProvider.unref()
-    stripeProvider.listen(0, '127.0.0.1')
-    await once(stripeProvider, 'listening')
-    const stripeProviderAddress = stripeProvider.address()
-    assert(
-      stripeProviderAddress && typeof stripeProviderAddress === 'object',
-      'The isolated Stripe provider did not bind a loopback port.'
-    )
-    stripeProviderUrl = `http://127.0.0.1:${stripeProviderAddress.port}`
+    seedEventFixture()
+    databaseObserver = createSqliteWriteObserver(requireFromApp('better-sqlite3'), databasePath)
     serverOutputMonitor = createOutputMonitor('isolated API built server')
-    server = spawnManaged(
-      process.execPath,
-      ['--import', stripeProviderPreload, '--import', turnstileProviderPreload, '--import', serverPreload, serverEntry],
-      {
-        cwd: runtimeCwd,
-        env: applicationEnvironment(baseUrl, port),
-        stdio: ['ignore', 'pipe', 'pipe'],
-        onSpawn: track
-      }
-    )
+    server = spawnManaged(process.execPath, ['--import', serverPreload, serverEntry], {
+      cwd: runtimeCwd,
+      env: applicationEnvironment(baseUrl, port),
+      stdio: ['ignore', 'pipe', 'pipe'],
+      onSpawn: track
+    })
     capture(server.stdout, serverOutputMonitor)
     capture(server.stderr, serverOutputMonitor)
 
@@ -154,9 +118,8 @@ try {
       timeoutMs: remainingTimeout(overallDeadline, 45_000, 'isolated API server liveness')
     })
 
-    result = await runIsolatedApiSmoke({ baseUrl, fixtureId, stripeWebhookSecret, emailCaptureDirectory })
-    assertStripeProviderInteraction()
-    const fixtureCounts = assertFixtureRecorded()
+    result = await runIsolatedApiSmoke({ baseUrl, fixtureId })
+    databaseObserver.assertUnchanged('Public API smoke')
 
     const completedServer = server
     server = undefined
@@ -164,14 +127,11 @@ try {
     await waitForChildClose(completedServer)
     untrack(completedServer)
     serverOutputMonitor.assertNoForbidden()
-
-    result = { ...result, fixtureCounts }
   })
 
   assert(!existsSync(sandbox), 'Isolated API sandbox remained after cleanup.')
   console.log(
-    `Isolated API smoke passed: recorded fixture ${result.fixtureId} ` +
-      `(${formatCounts(result.fixtureCounts)}); the disposable database, local provider state, and runtime workspace were removed.`
+    `Isolated API smoke passed for fixture ${result.fixtureId}; public requests made no database writes and the disposable database and runtime workspace were removed.`
   )
 } catch (error) {
   const diagnostic = serverOutputMonitor?.redactedDiagnostic().trim()
@@ -207,32 +167,9 @@ function applicationEnvironment(baseUrl, port) {
     NITRO_HOST: '127.0.0.1',
     NITRO_PORT: String(port),
     NITRO_PRESET: 'node-server',
-    NUXT_BETTER_AUTH_SECRET: authSecret,
-    NUXT_BETTER_AUTH_URL: baseUrl,
-    NUXT_EMAIL_TRANSPORT: 'capture',
-    NUXT_EMAIL_FROM: 'baseline@example.test',
-    NUXT_EMAIL_CAPTURE_DIRECTORY: emailCaptureDirectory,
-    NUXT_TWILIO_VERIFY_API_KEY_SID: 'SK33333333333333333333333333333333',
-    NUXT_TWILIO_VERIFY_API_KEY_SECRET: 'isolated-twilio-secret-not-a-credential',
-    NUXT_TWILIO_VERIFY_SERVICE_SID: 'VA33333333333333333333333333333333',
-    NUXT_CLOUDFLARE_TURNSTILE_SECRET_KEY: 'isolated-turnstile-secret-not-a-provider-credential',
-    NUXT_PUBLIC_TURNSTILE_SITE_KEY: 'isolated-turnstile-site-not-a-provider-credential',
-    NUXT_SENTRY_DSN: 'http://public@127.0.0.1:9/1',
-    NUXT_PUBLIC_SENTRY_DSN: 'http://public@127.0.0.1:9/1',
-    NUXT_SENTRY_TRACES_SAMPLE_RATE: '0',
-    NUXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE: '0',
     NUXT_PUBLIC_APP_NAME: 'Isolated API Smoke',
     NUXT_PUBLIC_APP_URL: baseUrl,
-    NUXT_READINESS_TOKEN: readinessToken,
-    NUXT_STRIPE_SECRET_KEY: stripeSecret,
-    NUXT_STRIPE_WEBHOOK_SECRET: stripeWebhookSecret,
-    NUXT_STRIPE_PORTAL_CONFIGURATION_ID: stripeCatalog.portalConfigurationId,
-    NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID: stripeCatalog.membershipDues10PriceId,
-    NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID: stripeCatalog.solidarityDues27PriceId,
-    NUXT_STRIPE_LEGACY_DUES10_PRICE_IDS: stripeCatalog.legacyDues10PriceIds,
-    NUXT_STRIPE_LEGACY_DUES27_PRICE_IDS: stripeCatalog.legacyDues27PriceIds,
-    SWL_ISOLATED_STRIPE_PROVIDER_URL: stripeProviderUrl,
-    SWL_ISOLATED_TURNSTILE_HOSTNAME: new URL(baseUrl).hostname
+    NUXT_READINESS_TOKEN: readinessToken
   }
 }
 
@@ -259,56 +196,65 @@ async function runPhase(label, command, args, env, maximumMs) {
   }
 }
 
-function assertFixtureRecorded() {
+function seedEventFixture() {
   const Database = requireFromApp('better-sqlite3')
-  const sqlite = new Database(databasePath, { readonly: true, fileMustExist: true })
+  const sqlite = new Database(databasePath, { fileMustExist: true })
   try {
-    const likeFixture = `%${fixtureId}%`
-    const counts = {
-      billingEvents: count(
-        sqlite,
-        'select count(*) as count from billing_events where stripe_event_id like ?',
-        likeFixture
-      ),
-      aiAttempts: count(sqlite, 'select count(*) as count from ai_generation_attempts'),
-      aiConversations: count(sqlite, 'select count(*) as count from ai_conversations'),
-      aiMessages: count(sqlite, 'select count(*) as count from ai_messages'),
-      aiUsageBuckets: count(sqlite, 'select count(*) as count from ai_usage_buckets'),
-      fileCleanupJobs: count(sqlite, "select count(*) as count from job_queue where type = 'files.cleanup-orphans'"),
-      files: count(sqlite, 'select count(*) as count from files'),
-      users: count(sqlite, 'select count(*) as count from user where email like ?', likeFixture)
-    }
-    assert(counts.users > 0, 'Expected isolated users to be recorded.')
-    assert(counts.billingEvents === 1, 'Expected one packaged Stripe webhook receipt fixture.')
-    for (const [name, value] of Object.entries(counts).filter(
-      ([name]) => name !== 'billingEvents' && name !== 'users'
-    )) {
-      assert(value === 0, `Expected excluded ${name} state to remain empty, received ${value}.`)
-    }
-
-    const objectFiles = listFiles(join(dirname(databasePath), 'objects'))
-    assert(objectFiles.length === 0, `Expected no user-file objects, received ${objectFiles.length}.`)
-    return { ...counts, localObjects: objectFiles.length }
+    // Match runtime journaling before observing writes; switching journal mode
+    // itself changes data_version even when no event rows change.
+    sqlite.pragma('journal_mode = WAL')
+    const tables = sqlite
+      .prepare("select name from sqlite_master where type = 'table' and name not like 'sqlite_%' order by name")
+      .all()
+      .map((row) => row.name)
+    assert(
+      JSON.stringify(tables) ===
+        JSON.stringify([
+          '__drizzle_migrations',
+          'event_provider_links',
+          'event_session_provider_links',
+          'event_sessions',
+          'event_tags',
+          'events',
+          'external_record_snapshots',
+          'import_batches'
+        ]),
+      'Runtime database must contain only event tables and its migration ledger.'
+    )
+    const eventInsert = sqlite.prepare(
+      'insert into events (id, title, kind, visibility, status) values (?, ?, ?, ?, ?)'
+    )
+    const sessionInsert = sqlite.prepare(
+      'insert into event_sessions (id, event_id, starts_at, timezone, virtual_url, rsvp_url, status) values (?, ?, ?, ?, ?, ?, ?)'
+    )
+    sqlite.transaction(() => {
+      for (const [label, visibility, eventStatus, sessionStatus] of [
+        ['public', 'public', 'active', 'scheduled'],
+        ['members', 'members', 'active', 'scheduled'],
+        ['member-tag', 'public', 'active', 'scheduled'],
+        ['hidden', 'hidden', 'active', 'scheduled'],
+        ['archived', 'public', 'archived', 'scheduled'],
+        ['canceled', 'public', 'active', 'canceled']
+      ]) {
+        const id = `${fixtureId}-${label}`
+        eventInsert.run(id, `${label} fixture event`, 'meeting', visibility, eventStatus)
+        sessionInsert.run(
+          `${id}-session`,
+          id,
+          '2030-01-15T18:00:00.000Z',
+          'America/Los_Angeles',
+          'https://private-video.invalid/secret',
+          'https://solidarity.example.com/event/public',
+          sessionStatus
+        )
+      }
+      sqlite
+        .prepare("insert into event_tags (event_id, kind, value) values (?, 'event', 'audience-members')")
+        .run(`${fixtureId}-member-tag`)
+    })()
   } finally {
     sqlite.close()
   }
-}
-
-function count(sqlite, sql, parameter) {
-  const statement = sqlite.prepare(sql)
-  const row = parameter === undefined ? statement.get() : statement.get(parameter)
-  return Number(row?.count ?? 0)
-}
-
-function listFiles(directory) {
-  if (!existsSync(directory)) return []
-  const files = []
-  for (const entry of readdirSync(directory, { withFileTypes: true })) {
-    const path = join(directory, entry.name)
-    if (entry.isDirectory()) files.push(...listFiles(path))
-    else if (entry.isFile()) files.push(path)
-  }
-  return files.sort((left, right) => left.localeCompare(right))
 }
 
 async function cleanup() {
@@ -323,110 +269,13 @@ async function cleanup() {
       })
     )
     stopFailure = results.find((result) => result.status === 'rejected')?.reason
-    await stopStripeProvider()
+    databaseObserver?.close()
   } finally {
     if (sandbox) {
       cleanupDisposableState({ sandbox, databasePath, runtimeCwd })
     }
   }
   if (stopFailure) throw stopFailure
-}
-
-function handleStripeProviderRequest(request, response) {
-  const requestUrl = new URL(request.url ?? '/', stripeProviderUrl)
-  const prefix = '/v1/checkout/sessions/'
-  const sessionId = requestUrl.pathname.startsWith(prefix)
-    ? decodeURIComponent(requestUrl.pathname.slice(prefix.length))
-    : ''
-  const expansionValues = [...requestUrl.searchParams.entries()]
-    .filter(([key]) => /^expand(?:\[\d+\])?$/.test(key))
-    .map(([, value]) => value)
-
-  stripeProviderRequests.push({
-    authorized: request.headers.authorization === `Bearer ${stripeSecret}`,
-    expansions: expansionValues,
-    method: request.method,
-    pathname: requestUrl.pathname
-  })
-
-  if (
-    request.method !== 'GET' ||
-    request.headers.authorization !== `Bearer ${stripeSecret}` ||
-    !new RegExp(`^cs_test_${escapeRegExp(fixtureId)}-billing-[1-9][0-9]*$`).test(sessionId) ||
-    expansionValues.length !== 1 ||
-    expansionValues[0] !== 'line_items'
-  ) {
-    respondStripeJson(response, 404, {
-      error: { code: 'isolated_provider_request_rejected', type: 'invalid_request_error' }
-    })
-    return
-  }
-
-  const attemptId = `billing_attempt_${sessionId.slice('cs_test_'.length)}`
-  respondStripeJson(response, 200, {
-    id: sessionId,
-    object: 'checkout.session',
-    client_reference_id: attemptId,
-    customer: null,
-    line_items: {
-      object: 'list',
-      data: [
-        {
-          id: `li_${sessionId.slice('cs_test_'.length)}`,
-          object: 'item',
-          price: stripeCatalog.membershipDues10PriceId,
-          quantity: 1
-        }
-      ],
-      has_more: false,
-      url: `${requestUrl.pathname}/line_items`
-    },
-    metadata: { billing_attempt_id: attemptId },
-    mode: 'subscription',
-    payment_status: 'unpaid',
-    status: 'expired',
-    subscription: null
-  })
-}
-
-function respondStripeJson(response, status, body) {
-  response.writeHead(status, {
-    'content-type': 'application/json',
-    'request-id': 'req_isolated_api_smoke'
-  })
-  response.end(JSON.stringify(body))
-}
-
-function assertStripeProviderInteraction() {
-  assert(
-    stripeProviderRequests.length === 1,
-    `Expected one bounded Stripe provider read, received ${stripeProviderRequests.length}.`
-  )
-  const [request] = stripeProviderRequests
-  assert(request.authorized, 'The isolated Stripe provider request did not use the fixture key.')
-  assert(request.method === 'GET', 'The isolated Stripe provider received a mutating request.')
-  assert(
-    request.pathname.startsWith('/v1/checkout/sessions/cs_test_'),
-    'The isolated Stripe provider received an unexpected path.'
-  )
-  assert(
-    request.expansions.length === 1 && request.expansions[0] === 'line_items',
-    'The isolated Stripe provider did not receive the bounded Checkout expansion.'
-  )
-}
-
-async function stopStripeProvider() {
-  const activeProvider = stripeProvider
-  stripeProvider = undefined
-  stripeProviderUrl = undefined
-  if (!activeProvider?.listening) return
-  await new Promise((resolveClose, rejectClose) => {
-    activeProvider.close((error) => (error ? rejectClose(error) : resolveClose()))
-  })
-}
-
-function escapeRegExp(value) {
-  return value.replaceAll(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
 function track(child) {
@@ -465,14 +314,7 @@ function capture(stream, outputMonitor) {
 }
 
 function createOutputMonitor(label) {
-  const forbiddenValues = [
-    authSecret,
-    readinessToken,
-    stripeSecret,
-    stripeWebhookSecret,
-    ...Object.values(stripeCatalog),
-    databasePath
-  ]
+  const forbiddenValues = [readinessToken, databasePath]
   const detected = new Set()
   const maximumValueLength = Math.max(...forbiddenValues.map((value) => value.length))
   let overlap = ''
@@ -498,22 +340,9 @@ function createOutputMonitor(label) {
   }
 }
 
-function formatCounts(counts) {
-  return Object.entries(counts)
-    .map(([name, value]) => `${name}=${value}`)
-    .join(', ')
-}
-
 function redact(value) {
   let result = String(value)
-  for (const secret of [
-    authSecret,
-    readinessToken,
-    stripeSecret,
-    stripeWebhookSecret,
-    ...Object.values(stripeCatalog),
-    databasePath
-  ]) {
+  for (const secret of [readinessToken, databasePath]) {
     if (secret) result = result.replaceAll(secret, '[redacted]')
   }
   return result

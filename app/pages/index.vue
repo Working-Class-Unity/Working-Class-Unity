@@ -195,7 +195,7 @@ const participationRoutes = computed(() => [
               <NuxtLinkLocale to="/legal/privacy">{{ t('home.footer.privacy') }}</NuxtLinkLocale>
             </li>
             <li>
-              <NuxtLinkLocale to="/login">{{ t('navigation.login') }}</NuxtLinkLocale>
+              <NuxtLinkLocale to="/join">{{ t('navigation.join') }}</NuxtLinkLocale>
             </li>
           </ul>
         </nav>

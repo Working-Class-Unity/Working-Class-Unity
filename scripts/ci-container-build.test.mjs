@@ -7,18 +7,19 @@ import { test } from 'node:test'
 const entry = resolve('scripts/ci-container-build.mjs')
 const canaryPath = resolve('.env.container-canary')
 
-test('Docker context packages the Stripe membership operators', () => {
+test('Docker context packages the event import and transition operators', () => {
   const dockerignore = readFileSync(resolve('.dockerignore'), 'utf8')
 
-  assert.match(dockerignore, /^!scripts\/sync-stripe-membership-links\.ts$/m)
-  assert.match(dockerignore, /^!scripts\/adopt-stripe-membership-account\.ts$/m)
+  assert.match(dockerignore, /^!scripts\/import-solidarity-events\.ts$/m)
+  assert.match(dockerignore, /^!scripts\/copy-legacy-events\.ts$/m)
+  assert.match(dockerignore, /^!scripts\/solidarity-event-operator\.ts$/m)
 })
 
 test('Docker build stage trusts public TLS certificates before Sentry upload', () => {
   const dockerfile = readFileSync(resolve('Dockerfile'), 'utf8')
   const buildStage = dockerfile.slice(
-    dockerfile.indexOf('FROM node:24-bookworm-slim AS build'),
-    dockerfile.indexOf('FROM node:24-bookworm-slim AS runtime')
+    dockerfile.indexOf('FROM node:24.18.1-bookworm-slim AS build'),
+    dockerfile.indexOf('FROM node:24.18.1-bookworm-slim AS runtime')
   )
   const caBundleCopy = 'COPY --from=deps /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt'
   const caBundleCheck = 'RUN test -s /etc/ssl/certs/ca-certificates.crt'

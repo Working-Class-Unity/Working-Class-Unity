@@ -4,6 +4,7 @@ import { join } from 'node:path'
 const SUPPORTED_NODE_MAJOR = 24
 const MINIMUM_NODE_MINOR = 11
 const SUPPORTED_NODE_RANGE = '>=24.11.0 <25.0.0'
+const EXPECTED_DOCKER_TAG = '24.18.1-bookworm-slim'
 const EXPECTED_PNPM_VERSION = '11.1.2'
 const EXPECTED_NODE_TYPES_VERSION = '24.13.3'
 
@@ -81,8 +82,8 @@ export function validateRepositoryDeclarations(root) {
   }
 
   for (const tag of dockerTags) {
-    if (tag !== `${SUPPORTED_NODE_MAJOR}-bookworm-slim`) {
-      errors.push(`Docker Node tag must be ${SUPPORTED_NODE_MAJOR}-bookworm-slim; found ${tag}`)
+    if (tag !== EXPECTED_DOCKER_TAG) {
+      errors.push(`Docker Node tag must be ${EXPECTED_DOCKER_TAG}; found ${tag}`)
     }
   }
 
@@ -90,8 +91,8 @@ export function validateRepositoryDeclarations(root) {
     errors.push('Dockerfile must not require Corepack')
   }
 
-  if (!dockerfile.includes('RUN npm run bootstrap')) {
-    errors.push('Dockerfile dependency stage must use npm run bootstrap')
+  if (!dockerfile.includes('RUN npm_config_build_from_source=true npm run bootstrap')) {
+    errors.push('Dockerfile dependency stage must bootstrap with native addons built from source')
   }
 
   if (!dockerfile.includes('npm run pnpm -- run build')) {

@@ -16,15 +16,10 @@ describe('Sentry privacy allowlist', () => {
     const policy = createPolicy()
     const inheritOrSampleWith = vi.fn((rate: number) => rate)
 
-    expect(resolveCaptureDiagnostic('background-job-execution-failed')).toEqual({
-      code: 'background-job-execution-failed',
-      component: 'worker',
-      operation: 'execute-job'
-    })
-    expect(resolveCaptureDiagnostic('openai-response-failed')).toEqual({
-      code: 'openai-response-failed',
-      component: 'openai',
-      operation: 'create-response'
+    expect(resolveCaptureDiagnostic('observability-test-error')).toEqual({
+      code: 'observability-test-error',
+      component: 'observability',
+      operation: 'test-error'
     })
 
     expect(

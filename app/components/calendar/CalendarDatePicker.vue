@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CalendarDate, type DateValue } from '@internationalized/date'
+import { parseDate, today, type DateValue } from '@internationalized/date'
 import {
   CalendarCell,
   CalendarCellTrigger,
@@ -19,15 +19,15 @@ import {
   PopoverTrigger
 } from 'reka-ui'
 
+const props = defineProps<{ date: string | null }>()
 const emit = defineEmits<{ select: [date: string] }>()
 const { locale, localeProperties, t } = useI18n()
 const languageTag = computed(() => localeProperties.value.language ?? locale.value)
 const open = ref(false)
-const selectedDate = shallowRef<DateValue>(new CalendarDate(2026, 8, 20))
+const selectedDate = computed<DateValue>(() => (props.date ? parseDate(props.date) : today('America/Los_Angeles')))
 
 function selectDate(date: DateValue | undefined) {
   if (!date) return
-  selectedDate.value = date
   emit('select', date.toString())
   open.value = false
 }

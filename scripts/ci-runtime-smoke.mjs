@@ -1,7 +1,5 @@
 import assert from 'node:assert/strict'
-import { once } from 'node:events'
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync } from 'node:fs'
-import { createServer as createHttpServer } from 'node:http'
 import { createConnection } from 'node:net'
 import { createRequire } from 'node:module'
 import { tmpdir } from 'node:os'
@@ -16,44 +14,26 @@ import {
   stopManaged,
   waitForHttp
 } from './ci-browser-helpers.mjs'
-import { createSqliteWriteObserver, fingerprintDirectory } from './isolated-smoke-policy.mjs'
+import { createSqliteWriteObserver } from './isolated-smoke-policy.mjs'
 
+const args = process.argv.slice(2)
+assert(
+  args.length === 0 || (args.length === 1 && args[0] === '--skip-build'),
+  'Usage: node scripts/ci-runtime-smoke.mjs [--skip-build]'
+)
+const skipBuild = args.includes('--skip-build')
 const root = process.cwd()
 const requireFromApp = createRequire(resolve(root, 'package.json'))
-const sandbox = mkdtempSync(join(tmpdir(), 'swl-built-runtime-'))
+const sandbox = mkdtempSync(join(tmpdir(), 'wcu-built-runtime-'))
 const runtimeCwd = sandbox
 const buildDatabasePath = join(sandbox, 'build-data', 'must-not-exist.db')
 const canonicalBuildDatabasePath = join(sandbox, 'build-data', 'canonical-must-not-exist.db')
 const runtimeDatabasePath = join(sandbox, 'runtime-data', 'app.db')
-const runtimeEmailCaptureDirectory = join(sandbox, 'runtime-email-capture')
 const serverEntry = resolve(root, '.output/server/index.mjs')
 const serverPreload = resolve(root, '.output/server/sentry.server.config.mjs')
-const buildPrivateCanary = 'legacy-build-private-canary-must-not-enter-output'
-const canonicalBuildAuthCanary = 'canonical-build-auth-canary-must-not-enter-output'
 const canonicalBuildReadinessCanary = 'canonical-build-readiness-canary-must-not-enter-output'
-const canonicalBuildStripeCanary = 'rk_test_canonical_build_canary_must_not_enter_output'
-const canonicalBuildWebhookCanary = 'whsec_canonical_build_canary_must_not_enter_output'
-const canonicalBuildStripeCatalogCanaries = {
-  portalConfigurationId: 'bpc_canonical_build_must_not_enter_output',
-  membershipDues10PriceId: 'price_canonical_build_personal_monthly',
-  solidarityDues27PriceId: 'price_canonical_build_family_monthly',
-  legacyDues10PriceIds: 'membership-build-canary',
-  legacyDues27PriceIds: 'solidarity-build-canary'
-}
 const canonicalBuildSentryCanary = 'https://build-canary@o0.ingest.invalid/0'
-const runtimeAuthSecret = 'runtime-only-auth-secret-sentinel-not-a-credential'
 const runtimeReadinessToken = 'runtime-only-readiness-token-sentinel-not-a-credential'
-const runtimeAuthEscapeCanary = 'runtime-auth-escape-canary-must-never-appear'
-const runtimeStripeSecret = 'rk_test_runtime_config_boundary_not_used'
-const runtimeStripeWebhookSecret = 'whsec_runtime_config_boundary'
-const runtimeStripeCatalog = {
-  portalConfigurationId: 'bpc_runtime',
-  membershipDues10PriceId: 'price_runtime_personal_monthly',
-  solidarityDues27PriceId: 'price_runtime_family_monthly',
-  legacyDues10PriceIds: 'membership-10-1month',
-  legacyDues27PriceIds: 'solidarity-27-1month'
-}
-const runtimeEmailFrom = 'baseline@example.test'
 const httpRequestTimeoutMs = 10_000
 const overallDeadline = Date.now() + 300_000
 const inheritedEnvironment = selectEnvironment(process.env, [
@@ -84,20 +64,10 @@ const buildEnv = {
   CI: 'true',
   NODE_ENV: 'production',
   NITRO_PRESET: 'node-server',
-  // Deliberately poison removed legacy names. They must not affect or enter the build.
+  // Builds must not capture runtime configuration or create a database.
   DATABASE_URL: `file:${buildDatabasePath}`,
-  BETTER_AUTH_SECRET: buildPrivateCanary,
-  STRIPE_SECRET_KEY: buildPrivateCanary,
   NUXT_DATABASE_URL: `file:${canonicalBuildDatabasePath}`,
-  NUXT_BETTER_AUTH_SECRET: canonicalBuildAuthCanary,
   NUXT_READINESS_TOKEN: canonicalBuildReadinessCanary,
-  NUXT_STRIPE_SECRET_KEY: canonicalBuildStripeCanary,
-  NUXT_STRIPE_WEBHOOK_SECRET: canonicalBuildWebhookCanary,
-  NUXT_STRIPE_PORTAL_CONFIGURATION_ID: canonicalBuildStripeCatalogCanaries.portalConfigurationId,
-  NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID: canonicalBuildStripeCatalogCanaries.membershipDues10PriceId,
-  NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID: canonicalBuildStripeCatalogCanaries.solidarityDues27PriceId,
-  NUXT_STRIPE_LEGACY_DUES10_PRICE_IDS: canonicalBuildStripeCatalogCanaries.legacyDues10PriceIds,
-  NUXT_STRIPE_LEGACY_DUES27_PRICE_IDS: canonicalBuildStripeCatalogCanaries.legacyDues27PriceIds,
   NUXT_SENTRY_DSN: canonicalBuildSentryCanary
 }
 const runtimeDatabaseEnv = {
@@ -109,7 +79,6 @@ const runtimeDatabaseEnv = {
 
 let baseUrl
 let child
-let telemetrySink
 const buildOutputMonitor = createOutputMonitor('production build')
 let buildVerified = false
 let serverOutputMonitor
@@ -120,9 +89,11 @@ const coordinator = createCleanupCoordinator({ cleanup })
 await coordinator.run(async () => {
   try {
     mkdirSync(runtimeCwd, { recursive: true })
-    await runPhase('pnpm', ['run', 'build'], buildEnv, 180_000, 'production build', {
-      outputMonitor: buildOutputMonitor
-    })
+    if (!skipBuild) {
+      await runPhase('pnpm', ['run', 'build'], buildEnv, 180_000, 'production build', {
+        outputMonitor: buildOutputMonitor
+      })
+    }
     assertPrivateBuildCanariesAbsent()
     assertBuildDatabaseUntouched('production build')
     buildVerified = true
@@ -146,28 +117,11 @@ await coordinator.run(async () => {
       NITRO_HOST: '127.0.0.1',
       NITRO_PORT: String(port),
       NUXT_PUBLIC_APP_URL: baseUrl,
-      NUXT_BETTER_AUTH_SECRET: runtimeAuthSecret,
-      NUXT_BETTER_AUTH_URL: baseUrl,
-      NUXT_EMAIL_TRANSPORT: 'capture',
-      NUXT_EMAIL_FROM: runtimeEmailFrom,
-      NUXT_EMAIL_CAPTURE_DIRECTORY: runtimeEmailCaptureDirectory,
-      NUXT_TWILIO_VERIFY_API_KEY_SID: 'SK11111111111111111111111111111111',
-      NUXT_TWILIO_VERIFY_API_KEY_SECRET: 'runtime-twilio-secret-not-a-credential',
-      NUXT_TWILIO_VERIFY_SERVICE_SID: 'VA11111111111111111111111111111111',
       NUXT_READINESS_TOKEN: runtimeReadinessToken,
-      NUXT_CLOUDFLARE_TURNSTILE_SECRET_KEY: 'runtime-turnstile-secret-not-a-provider-credential',
-      NUXT_PUBLIC_TURNSTILE_SITE_KEY: 'runtime-turnstile-site-not-a-provider-credential',
       NUXT_SENTRY_DSN: 'http://public@127.0.0.1:9/1',
       NUXT_PUBLIC_SENTRY_DSN: 'http://public@127.0.0.1:9/1',
       NUXT_SENTRY_TRACES_SAMPLE_RATE: '0',
-      NUXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE: '0',
-      NUXT_STRIPE_SECRET_KEY: runtimeStripeSecret,
-      NUXT_STRIPE_WEBHOOK_SECRET: runtimeStripeWebhookSecret,
-      NUXT_STRIPE_PORTAL_CONFIGURATION_ID: runtimeStripeCatalog.portalConfigurationId,
-      NUXT_STRIPE_MEMBERSHIP_DUES10_PRICE_ID: runtimeStripeCatalog.membershipDues10PriceId,
-      NUXT_STRIPE_SOLIDARITY_DUES27_PRICE_ID: runtimeStripeCatalog.solidarityDues27PriceId,
-      NUXT_STRIPE_LEGACY_DUES10_PRICE_IDS: runtimeStripeCatalog.legacyDues10PriceIds,
-      NUXT_STRIPE_LEGACY_DUES27_PRICE_IDS: runtimeStripeCatalog.legacyDues27PriceIds
+      NUXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE: '0'
     }
     await assertStartupRejected(
       { ...runtimeEnv, NUXT_DATABASE_URL: undefined },
@@ -180,26 +134,6 @@ await coordinator.run(async () => {
       'nuxt-security runtime override'
     )
 
-    const rejectedTelemetrySink = await startTelemetrySink()
-    telemetrySink = rejectedTelemetrySink
-    try {
-      await assertStartupRejected(
-        {
-          ...runtimeEnv,
-          BETTER_AUTH_TELEMETRY: 'true',
-          BETTER_AUTH_TELEMETRY_ENDPOINT: rejectedTelemetrySink.endpoint
-        },
-        ['BETTER_AUTH_TELEMETRY', 'BETTER_AUTH_TELEMETRY_ENDPOINT'],
-        'Better Auth telemetry environment escape'
-      )
-    } finally {
-      await closeTelemetrySink(rejectedTelemetrySink)
-      if (telemetrySink === rejectedTelemetrySink) telemetrySink = undefined
-    }
-    assert(
-      rejectedTelemetrySink.requestCount() === 0,
-      `rejected Better Auth telemetry overrides made ${rejectedTelemetrySink.requestCount()} request(s)`
-    )
     child = spawnManaged(process.execPath, ['--import', serverPreload, serverEntry], {
       cwd: runtimeCwd,
       env: runtimeEnv,
@@ -216,7 +150,6 @@ await coordinator.run(async () => {
       requestTimeoutMs: 1_000
     })
     await assertRuntimeBoundary(runtimeEnv)
-    await runCommandOriginSmoke()
     await assertDeploymentSmokeReadOnly()
     await assertReadinessDependencyFailure(runtimeEnv)
 
@@ -226,7 +159,7 @@ await coordinator.run(async () => {
     serverOutputMonitor.assertNoForbidden()
 
     console.log(
-      'Built runtime smoke passed: 3 representative pre-listen configuration rejections, public liveness, protected 200/401/503 readiness with build-to-runtime token precedence and a dependency-failure transition, one encoded app-command origin canary, and read-only deployment checks with unchanged database/provider state.'
+      'Built runtime smoke passed: database and security configuration rejections, provider-free public events, protected 200/401/503 readiness with build-to-runtime token precedence, and read-only deployment checks with unchanged event data.'
     )
   } catch (error) {
     for (const monitor of [buildVerified ? undefined : buildOutputMonitor, serverOutputMonitor]) {
@@ -250,9 +183,7 @@ function assertBuildDatabaseUntouched(stage) {
 async function assertDeploymentSmokeReadOnly() {
   const Database = requireFromApp('better-sqlite3')
   const observer = createSqliteWriteObserver(Database, runtimeDatabasePath)
-  const objectDirectory = join(dirname(runtimeDatabasePath), 'objects')
   try {
-    const objectStateBefore = fingerprintDirectory(objectDirectory)
     await runPhase(
       process.execPath,
       [resolve(root, 'scripts/deployment-smoke.mjs'), '--base-url', baseUrl],
@@ -260,9 +191,7 @@ async function assertDeploymentSmokeReadOnly() {
       60_000,
       'deployment smoke'
     )
-    const objectStateAfter = fingerprintDirectory(objectDirectory)
     observer.assertUnchanged('Read-only deployment smoke')
-    assert(objectStateAfter === objectStateBefore, 'Read-only deployment smoke changed local provider/object state')
   } finally {
     observer.close()
   }
@@ -273,13 +202,8 @@ function assertPrivateBuildCanariesAbsent() {
   for (const path of walkFiles(outputRoot)) {
     const contents = readFileSync(path)
     for (const forbidden of [
-      buildPrivateCanary,
       buildDatabasePath,
-      canonicalBuildAuthCanary,
       canonicalBuildReadinessCanary,
-      canonicalBuildStripeCanary,
-      canonicalBuildWebhookCanary,
-      ...Object.values(canonicalBuildStripeCatalogCanaries),
       canonicalBuildSentryCanary,
       canonicalBuildDatabasePath
     ]) {
@@ -392,6 +316,25 @@ async function assertRuntimeBoundary(runtimeEnvironment) {
   )
   assertExactJson(readiness, { status: 'ready' }, 'authorized readiness')
   assert(!JSON.stringify(readiness).match(/sqlite|database|module|path|duration|check/i), 'Readiness exposed topology')
+  const eventsResponse = await fetchWithTimeout(`${baseUrl}/api/events`, {
+    headers: { accept: 'application/json' }
+  })
+  assert(eventsResponse.status === 200, `Public events expected 200, received ${eventsResponse.status}`)
+  assertExactJson(await eventsResponse.json(), { events: [] }, 'fresh public calendar')
+
+  const Database = requireFromApp('better-sqlite3')
+  const sqlite = new Database(runtimeDatabasePath, { readonly: true, fileMustExist: true })
+  try {
+    const tables = sqlite.prepare("select name from sqlite_master where type = 'table'").all()
+    const retiredTables = tables.filter(({ name }) =>
+      /^(user|session|account|verification|people|memberships|account_stripe_memberships|event_rsvps|event_attendance)$/.test(
+        name
+      )
+    )
+    assert(retiredTables.length === 0, 'Fresh event database retained identity or membership tables')
+  } finally {
+    sqlite.close()
+  }
   serverOutputMonitor.assertNoForbidden('built server output during runtime boundary checks')
 }
 
@@ -434,52 +377,6 @@ function assertExactJson(actual, expected, label) {
   assert(JSON.stringify(actual) === JSON.stringify(expected), `${label} returned an unexpected response shape`)
 }
 
-function assertBaselineSecurityHeaders(response, label) {
-  const expected = {
-    'x-content-type-options': 'nosniff',
-    // Nitro's pinned production error handler deliberately replaces the
-    // baseline value with a stricter error-response policy and CSP.
-    'referrer-policy': 'no-referrer',
-    'x-frame-options': 'DENY',
-    'content-security-policy': "script-src 'none'; frame-ancestors 'none';",
-    'strict-transport-security': 'max-age=15552000; includeSubDomains'
-  }
-  for (const [name, value] of Object.entries(expected)) {
-    assert(response.headers.get(name) === value, `${label} did not retain ${name}`)
-  }
-}
-
-async function runCommandOriginSmoke() {
-  const userCountBefore = countRuntimeUsers()
-  const label = 'Encoded hostile account-deletion command'
-  const response = await fetchWithTimeout(`${baseUrl}/%61pi/account`, {
-    method: 'DELETE',
-    headers: { origin: 'https://attacker.invalid' }
-  })
-  const body = await response.json().catch(() => null)
-
-  assert(response.status === 403, `${label} expected command-origin 403, received ${response.status}`)
-  assert(body?.data?.code === 'CROSS_ORIGIN_REQUEST_BLOCKED', `${label} did not return the stable origin error code`)
-  assert(response.headers.get('cache-control') === 'no-store', `${label} did not disable caching`)
-  assert(
-    response.headers.get('vary') === 'Origin, Sec-Fetch-Site',
-    `${label} did not retain the source-signal vary policy`
-  )
-  assertBaselineSecurityHeaders(response, label)
-
-  assert(countRuntimeUsers() === userCountBefore, 'Command-origin smoke unexpectedly mutated account state')
-}
-
-function countRuntimeUsers() {
-  const Database = requireFromApp('better-sqlite3')
-  const sqlite = new Database(runtimeDatabasePath, { readonly: true })
-  try {
-    return sqlite.prepare('select count(*) as count from user').get().count
-  } finally {
-    sqlite.close()
-  }
-}
-
 async function fetchWithTimeout(url, init = {}) {
   return fetch(url, {
     ...init,
@@ -498,13 +395,6 @@ async function cleanup() {
   const failures = []
 
   try {
-    await closeTelemetrySink(telemetrySink)
-    telemetrySink = undefined
-  } catch (error) {
-    failures.push(error)
-  }
-
-  try {
     await stopActiveChildren()
   } catch (error) {
     failures.push(error)
@@ -521,7 +411,7 @@ async function cleanup() {
     throw failures[0]
   }
   if (failures.length > 1) {
-    throw new AggregateError(failures, 'Runtime process, telemetry sink, or sandbox cleanup failed')
+    throw new AggregateError(failures, 'Runtime process or sandbox cleanup failed')
   }
 }
 
@@ -610,21 +500,11 @@ function childClosePromise(managedChild) {
 
 function createOutputMonitor(label) {
   const forbiddenValues = [
-    ['private build canary', buildPrivateCanary],
     ['build-only database path', buildDatabasePath],
-    ['canonical build auth canary', canonicalBuildAuthCanary],
     ['canonical build readiness canary', canonicalBuildReadinessCanary],
-    ['canonical build Stripe canary', canonicalBuildStripeCanary],
-    ['canonical build webhook canary', canonicalBuildWebhookCanary],
     ['canonical build Sentry canary', canonicalBuildSentryCanary],
     ['canonical build database path', canonicalBuildDatabasePath],
-    ['runtime auth secret', runtimeAuthSecret],
-    ['runtime readiness token', runtimeReadinessToken],
-    ['runtime auth escape canary', runtimeAuthEscapeCanary],
-    ['runtime Stripe secret', runtimeStripeSecret],
-    ['runtime Stripe webhook secret', runtimeStripeWebhookSecret],
-    ...Object.entries(canonicalBuildStripeCatalogCanaries).map(([key, value]) => [`canonical build ${key}`, value]),
-    ...Object.entries(runtimeStripeCatalog).map(([key, value]) => [`runtime ${key}`, value])
+    ['runtime readiness token', runtimeReadinessToken]
   ].filter(([, value]) => value)
   const maximumValueLength = Math.max(1, ...forbiddenValues.map(([, value]) => value.length))
   const diagnosticLimit = 16_384
@@ -658,44 +538,4 @@ function createOutputMonitor(label) {
       return diagnostic.slice(-diagnosticLimit)
     }
   }
-}
-
-async function startTelemetrySink() {
-  let requests = 0
-  const server = createHttpServer((request, response) => {
-    requests += 1
-    request.resume()
-    response.writeHead(204)
-    response.end()
-  })
-  server.unref()
-  server.listen(0, '127.0.0.1')
-  await once(server, 'listening')
-  const address = server.address()
-  const port = typeof address === 'object' && address ? address.port : null
-  assert(port, 'Could not bind the bounded Better Auth telemetry sink')
-
-  return {
-    endpoint: `http://127.0.0.1:${port}/collect/${runtimeAuthEscapeCanary}`,
-    requestCount: () => requests,
-    server
-  }
-}
-
-async function closeTelemetrySink(sink) {
-  if (!sink?.server.listening) return
-
-  await new Promise((resolveClose, rejectClose) => {
-    const timeout = setTimeout(() => {
-      sink.server.closeAllConnections?.()
-      rejectClose(new Error('Better Auth telemetry sink did not close within its bounded timeout'))
-    }, 5_000)
-
-    sink.server.close((error) => {
-      clearTimeout(timeout)
-      if (error) rejectClose(error)
-      else resolveClose()
-    })
-    sink.server.closeAllConnections?.()
-  })
 }

@@ -22,17 +22,6 @@ const { t } = useI18n()
         <p>{{ t('legal.privacy.providers.description') }}</p>
       </section>
 
-      <section aria-labelledby="privacy-abuse-defense-title">
-        <h2 id="privacy-abuse-defense-title">{{ t('legal.privacy.abuseDefense.title') }}</h2>
-        <i18n-t keypath="legal.privacy.abuseDefense.description" tag="p">
-          <template #addendum>
-            <a href="https://www.cloudflare.com/turnstile-privacy-policy/">
-              {{ t('legal.privacy.abuseDefense.addendum') }}
-            </a>
-          </template>
-        </i18n-t>
-      </section>
-
       <section aria-labelledby="privacy-retention-title">
         <h2 id="privacy-retention-title">{{ t('legal.privacy.retention.title') }}</h2>
         <p>{{ t('legal.privacy.retention.description') }}</p>

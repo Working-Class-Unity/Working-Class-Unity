@@ -5,20 +5,22 @@ configuration implemented on August 26, 2026, the United Front organization-sign
 reviewed on September 3, 2026, and the rules that website/database integrations and organizer
 workflows must follow.
 
-Solidarity remains disconnected from WCU account creation, Stripe, and the website join flow. The
-four Solidarity forms below are configured inside Solidarity. WCU links to hosted forms rather than
+Solidarity owns organizer data and hosted forms. The public website has no accounts or local person
+records; joining and subscription management are hosted by Stripe. The four forms below are configured inside Solidarity. WCU links to hosted forms rather than
 submitting personal information through the website. No paid Solidarity API is assumed.
 
 ## Authority boundaries
 
-| Data                                                                          | Authority                        | Allowed direction and conflict rule                                                                                                           |
-| ----------------------------------------------------------------------------- | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| Canonical person and provider links                                           | WCU SQLite                       | Provider IDs flow into SQLite; an existing provider ID wins. Match only unique verified email or phone, never name; leave ambiguity unlinked. |
-| Website login identity                                                        | Better Auth and WCU SQLite       | Login identity may link to a canonical person but does not itself grant membership.                                                           |
-| Dues, payments, membership, and good standing                                 | Stripe facts and WCU SQLite      | Stripe is read-only input. Never derive or override these facts with a Solidarity property or tag.                                            |
-| Solidarity person, permissions, events, forms, RSVP, attendance, and activity | Solidarity                       | Reviewed exports flow to SQLite with provider IDs, timestamps, and private source snapshots. An explicit communication opt-out wins.          |
-| Topic subscriptions, interests, skills, preference, and onboarding workflow   | Solidarity structured properties | Update only through an approved form/automation, a direct request, an organizer recording that request, or a governed import.                 |
-| Cross-system reporting                                                        | WCU SQLite                       | Compute from source facts; do not write derived attendance, payment, or standing tags back to Solidarity.                                     |
+| Data                                                                   | Authority                        | Website boundary                                                                                |
+| ---------------------------------------------------------------------- | -------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Dues, payments, and subscriptions                                      | Stripe                           | Public payment and portal links only; no local billing model or webhook.                        |
+| People, permissions, forms, RSVP, attendance, and activity             | Solidarity                       | Hosted forms and links; none of these personal records are imported into the website database.  |
+| Event metadata and classification                                      | Solidarity                       | Reviewed event-only imports flow into SQLite using stable provider IDs.                         |
+| Topics, interests, skills, contact preference, and onboarding workflow | Solidarity structured properties | Organizer-owned external configuration; no website synchronization.                             |
+| Website campaign presentation                                          | Repository content               | Existing public content and source records remain; campaign database management is future work. |
+
+The website does not calculate organizational membership or good standing. This application change
+also does not modify the external fields, form disclosures, or automations recorded below.
 
 ## Native fields
 
@@ -37,7 +39,7 @@ workflow state.
 
 | ID   | Internal key                     | Label                              | Type and authority                                                                                                                      |
 | ---- | -------------------------------- | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| 7974 | `wcu-person-id`                  | WCU Person ID                      | Single-line; WCU SQLite-owned and read-only in Solidarity.                                                                              |
+| 7974 | `wcu-person-id`                  | WCU Person ID                      | Legacy single-line identifier; retained in Solidarity, unused by the public website.                                                    |
 | 7975 | `email-subscriptions`            | Email Subscriptions                | Multiple checkboxes; explicit disclosure/direct request/approved automation.                                                            |
 | 7981 | `sms-subscriptions`              | SMS Subscriptions                  | Multiple checkboxes; separate affirmative SMS choice/direct request only. Native SMS permission remains decisive.                       |
 | 7976 | `preferred-contact-channel`      | Preferred Contact Channel          | Dropdown; person preference, not permission.                                                                                            |
@@ -48,7 +50,7 @@ workflow state.
 | 1277 | `tenant-assocaition`             | Tenant Association                 | Existing dropdown. Preserve the misspelled internal key for compatibility; do not publish its address-like values.                      |
 | 1009 | `tenant-engagement-level`        | Tenant Engagement Level            | Existing five-step organizer assessment from supportive/recruiting to openly hostile; forms never set it.                               |
 | 1010 | `tenant-issues`                  | DEPRECATED — Tenant Issues         | Read-only legacy free text; replace only through an approved dated activity/case workflow.                                              |
-| 1013 | `wcu-membership`                 | DEPRECATED — WCU Membership Status | Read-only legacy value; Stripe/WCU SQLite is authoritative.                                                                             |
+| 1013 | `wcu-membership`                 | DEPRECATED — WCU Membership Status | Read-only legacy value; the website neither reads nor derives membership from it.                                                       |
 | 8254 | `united-front-organization-name` | United Front Organization Name     | Single-line text; organization a primary contact was authorized to represent. The dated form submission remains the endorsement record. |
 
 ### Controlled values
@@ -137,8 +139,8 @@ The current engagement assessment values are `Contact`, `Supporter`, `Activist`,
 `DEPRECATED — Active WCU Member` remain only for later reconciliation. Assessment definitions and
 the eventual disposition of `Disengaged` still need owner approval.
 
-The Solidarity assessment `Supporter` is an organizer judgment. It is not the website's Supporter
-account type and is not evidence of paid membership.
+The Solidarity assessment `Supporter` is an organizer judgment, not evidence of paid membership.
+The website has no Supporter account type.
 
 Create no new durable People Tags. Existing People Tags remain migration inputs only; no legacy
 assignment has been migrated or deleted. If a temporary technical workflow cannot use a property,
@@ -149,7 +151,8 @@ traits, or personal data.
 ## Event and campaign tags
 
 Every event has exactly one audience and one category. Meetings also have exactly one meeting
-subtype.
+subtype. `audience-members` is retained as a source classification and excluded from all public
+website listings, navigation, metadata, and discovery output; it is never remapped to public.
 
 | Facet           | Exact governed tags                                                           |
 | --------------- | ----------------------------------------------------------------------------- |
@@ -170,7 +173,7 @@ still precedes creation.
 
 Other Event Tags and Campaign Tags outside the `focus-*` / `sidequest-*` naming convention fail
 before a normalized bundle or database write. Keep private source files and their hashes for
-provenance; SQLite stores canonical operational tags.
+provenance; SQLite stores only the canonical event classification and allowed metadata.
 
 ## Current forms and automations
 
@@ -209,7 +212,7 @@ Reviewed September 3, 2026.
   - Primary contact phone -> native Phone Number.
   - City or service area -> form response `organization_service_area`.
   - Organization website -> form response `organization_website`.
-- The human primary contact is the canonical Person. The single-line organization property supports
+- The human primary contact is the Solidarity Person. The single-line organization property supports
   current lookup; the dated page submission and its answers are the endorsement evidence. Do not put
   an organization name in Full Name and do not derive membership or supporter status.
 - Email behavior: the disclosure covers only `Know Your Rights / United Front updates`; automation
@@ -283,25 +286,19 @@ or follow-up state.
 
 ## Developer integration
 
-- Preserve Solidarity provider IDs, source timestamps, and private source hashes.
-- Use an existing provider identity first; otherwise match only a unique verified normalized email or
-  phone. Never merge by name and leave ambiguous identifiers unlinked.
-- Keep imports preview/dry-run by default, transactional, and idempotent. Report/activity logs remain count-only;
-  private organizer event previews may show event titles, dates, formats, classification, and changed-field names.
-- Store canonical taxonomy keys rather than mutable display labels. Reject unregistered Event Tags
-  and require Campaign Tags to follow the shared convention.
-- The current executable importer covers events, sessions, RSVP, attendance, and only the
-  identity/contact fields needed from the People export. Synchronizing permissions, forms,
-  subscriptions, properties, or other profile/activity data remains unimplemented and requires a
-  separate reviewed contract.
-- The [on-demand browser-assisted event sync](solidarity-event-sync.md) is metadata-only and reuses that
-  importer. Keep full provider inventories and explicit pairs, preserve IDs during rescheduling, and retire
-  missing sessions only after explicit review. Failed/incomplete reads never mean deletion. It does not
-  read or synchronize People, RSVP, attendance, permissions, or memberships, and is not a vendor-supported API.
-- Never write Stripe payment or membership facts from Solidarity. Compute standing and attendance
-  recency in WCU SQLite.
-- Keep exports, captures, private previews, normalized bundles, snapshots, backups, and detailed receipts
-  outside Git and shared logs. Public logs may contain aggregate counts and issue codes only.
+- Import only event metadata, canonical tags, stable provider IDs, and the minimal sync provenance.
+  The database has no local People, contacts, RSVP, attendance, membership, or governance tables.
+- Keep imports dry-run by default, transactional, and idempotent. Public logs contain aggregate
+  counts and issue codes; organizer previews may show reviewed event metadata.
+- Reject unregistered Event Tags and require Campaign Tags to follow the shared convention.
+  Preserve `audience-members` and exclude it from every public response.
+- The [on-demand event sync](solidarity-event-sync.md) uses an organizer's authenticated browser for
+  metadata collection. It is not a vendor-supported API. Preserve IDs during rescheduling and hybrid
+  pairing; retire missing sessions only after explicit review. Failed reads never imply removal.
+- RSVP buttons open Solidarity. Website operators do not copy form submissions or contact reports
+  into the event bundle or write derived payment or standing facts back to Solidarity.
+- Keep captures, private previews, normalized bundles, backups, and detailed receipts outside Git
+  and shared logs. Local campaign and Side-Quest management is deferred.
 
 ## Changing the taxonomy
 

@@ -56,6 +56,11 @@ function jumpToDate(date: string) {
   jumpDate.value = date
 }
 
+function showAllUpcomingEvents() {
+  jumpDate.value = null
+  activeFilter.value = 'Everything'
+}
+
 function formatDate(value: string, timeZone: string) {
   return new Intl.DateTimeFormat(languageTag.value, {
     day: 'numeric',
@@ -117,6 +122,9 @@ function eventDateKey(value: string, timeZone: string) {
           {{ t('calendar.view.month') }}
         </AppButton>
       </div>
+      <AppButton v-if="jumpDate" size="compact" variant="secondary" @click="showAllUpcomingEvents">
+        {{ t('calendar.resetDate') }}
+      </AppButton>
     </div>
 
     <div v-if="status === 'pending'" class="calendar-state" aria-live="polite">{{ t('calendar.loading') }}</div>
@@ -124,11 +132,11 @@ function eventDateKey(value: string, timeZone: string) {
       <p>{{ t('calendar.loadError') }}</p>
       <AppButton size="compact" variant="secondary" @click="refresh()">{{ t('common.retry') }}</AppButton>
     </div>
-    <div v-else-if="visibleEvents.length === 0" class="calendar-state">{{ t('calendar.empty') }}</div>
     <CalendarAgendaView
       v-else-if="activeView === 'agenda'"
       v-model:active-filter="activeFilter"
       :events="visibleEvents"
+      :date="jumpDate"
       :jump-message="jumpMessage"
       @jump="jumpToDate"
     />
@@ -180,6 +188,11 @@ function eventDateKey(value: string, timeZone: string) {
   }
 
   .calendar-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
     border-block-end: 1px solid var(--color-divider);
   }
 

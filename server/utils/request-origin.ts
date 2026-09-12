@@ -11,10 +11,8 @@ export type CommandOriginSignals = Readonly<{
 }>
 
 /**
- * App-owned scope policy. Better Auth owns its own CSRF/origin boundary, while
- * the other exact exemptions authenticate a provider signature or dedicated
- * operational token instead of a browser session. Local file capabilities
- * additionally require the user's session, so they remain origin-protected.
+ * Only the two operational test routes bypass browser origin checks; each
+ * authenticates its dedicated operator token before doing any work.
  */
 export function requiresCommandOriginPolicy(method: string, pathname: string): boolean {
   const normalizedMethod = method.toUpperCase()
@@ -54,8 +52,6 @@ export function isCommandOriginAllowed(signals: CommandOriginSignals, configured
 }
 
 export function isCommandOriginExempt(method: string, pathname: string): boolean {
-  if (pathname === '/api/auth' || pathname.startsWith('/api/auth/')) return true
-  if (method === 'POST' && pathname === '/api/webhooks/stripe') return true
   return method === 'POST' && observabilityTokenPaths.has(pathname)
 }
 

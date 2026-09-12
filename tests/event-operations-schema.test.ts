@@ -10,7 +10,7 @@ import { describe, expect, it } from 'vitest'
 const migrationsFolder = fileURLToPath(new URL('../server/db/migrations/', import.meta.url))
 
 describe('event operations schema', () => {
-  it('separates audience, category, occurrence, provider identity, and governance role', () => {
+  it('separates audience, category, occurrence, and provider identity', () => {
     withMigratedDatabase((sqlite) => {
       sqlite
         .prepare(
@@ -61,21 +61,13 @@ describe('event operations schema', () => {
              '2026-08-23T18:00:00.000Z')`
         )
         .run()
-      sqlite
-        .prepare(
-          `insert into meetings (event_session_id, kind)
-           values ('session-steering', 'steering')`
-        )
-        .run()
-
       expect(
         sqlite
           .prepare(
             `select events.kind as category, events.visibility, sessions.delivery_mode as deliveryMode,
-                    meetings.kind as meetingKind, count(links.id) as providerLinks
+                    count(links.id) as providerLinks
              from events
              join event_sessions sessions on sessions.event_id = events.id
-             join meetings on meetings.event_session_id = sessions.id
              join event_session_provider_links links on links.event_session_id = sessions.id
              where events.id = 'event-steering'`
           )
@@ -83,7 +75,6 @@ describe('event operations schema', () => {
       ).toEqual({
         category: 'meeting',
         deliveryMode: 'hybrid',
-        meetingKind: 'steering',
         providerLinks: 2,
         visibility: 'members'
       })
@@ -95,7 +86,7 @@ describe('event operations schema', () => {
              values ('invalid-category', 'Invalid', 'canvass', 'public', 'America/Los_Angeles')`
           )
           .run()
-      ).toThrow(/events category is not supported/)
+      ).toThrow(/CHECK constraint failed/)
       expect(() =>
         sqlite
           .prepare(

@@ -3,7 +3,6 @@ import { readFileSync } from 'node:fs'
 import { localizedPublicPath, publicLocales, publicPages, siteSocialImage } from '../../shared/public-site.ts'
 
 const spanishMessages = JSON.parse(readFileSync(new URL('../../i18n/locales/es.json', import.meta.url), 'utf8'))
-const punjabiMessages = JSON.parse(readFileSync(new URL('../../i18n/locales/pa.json', import.meta.url), 'utf8'))
 const punjabiCampaign = JSON.parse(
   readFileSync(new URL('../../i18n/locales/content/remove-flock/pa.json', import.meta.url), 'utf8')
 ).localizedRemoveFlock
@@ -75,7 +74,7 @@ test('discovery endpoints and the social image are publicly fetchable without ac
   expect(bytes.readUInt32BE(20)).toBe(siteSocialImage.height)
 })
 
-test('metadata follows client navigation and private or missing pages stay out of discovery', async ({
+test('metadata follows client navigation and missing pages stay out of discovery', async ({
   page,
   request,
   baseURL
@@ -87,9 +86,9 @@ test('metadata follows client navigation and private or missing pages stay out o
   await expect(page.locator('meta[property="og:url"]')).toHaveAttribute('content', `${baseURL}/es/bylaws`)
   await expect(page).toHaveTitle(spanishMessages.metadata.bylaws.title)
 
-  for (const path of ['/login', '/join/complete', '/es/login', '/pa/account', '/unknown-discovery-page']) {
+  for (const path of ['/es/login', '/pa/account', '/unknown-discovery-page']) {
     const response = await request.get(path)
-    expect(response.status(), path).toBe(path === '/login' || path === '/join/complete' ? 200 : 404)
+    expect(response.status(), path).toBe(404)
     const head = await readInitialHead(page, await response.text())
     expect(head.robots, path).toBe('noindex, nofollow')
     expect(head.canonical, path).toEqual([])
@@ -99,20 +98,20 @@ test('metadata follows client navigation and private or missing pages stay out o
   }
 })
 
-test('unprefixed login keeps a saved language without overriding an explicit English public URL', async ({
-  request,
-  page,
-  baseURL
+test('retired website account URLs lead to public dues options without forwarding private query data', async ({
+  request
 }) => {
-  const headers = { cookie: 'wcu_locale=pa', 'accept-language': 'en-US' }
-  const login = await request.get('/login', { headers, maxRedirects: 0 })
-  expect(login.status()).toBe(200)
-  expect(login.url()).toBe(`${baseURL}/login`)
-  const loginHead = await readInitialHead(page, await login.text())
-  expect(loginHead.language).toBe('pa')
-  expect(loginHead.title).toBe(punjabiMessages.metadata.login.title)
-  expect(loginHead.robots).toBe('noindex, nofollow')
+  for (const path of ['/login', '/signup', '/activate', '/account', '/app', '/join/complete']) {
+    const response = await request.get(`${path}?token=retired-link&session_id=retired-checkout`, {
+      maxRedirects: 0
+    })
+    expect(response.status(), path).toBe(302)
+    expect(response.headers().location, path).toBe('/join')
+  }
+})
 
+test('an explicit English public URL overrides a saved language', async ({ request, page, baseURL }) => {
+  const headers = { cookie: 'wcu_locale=pa', 'accept-language': 'en-US' }
   const about = await request.get('/about', { headers, maxRedirects: 0 })
   expect(about.status()).toBe(200)
   const aboutHead = await readInitialHead(page, await about.text())
