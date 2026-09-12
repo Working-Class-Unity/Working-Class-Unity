@@ -544,7 +544,6 @@
     "loadError": "No pudimos cargar el calendario.",
     "empty": "Aún no se han publicado próximos eventos.",
     "upcomingDates": "{count} próxima fecha | {count} próximas fechas",
-    "showingFrom": "Mostrando eventos de {date}.",
     "delivery": {
       "virtual": "En línea",
       "hybrid": "En persona y en línea",
@@ -574,9 +573,7 @@
       "noMatches": "Ningún evento coincide con este filtro todavía.",
       "upNext": "A continuación",
       "series": "Serie",
-      "noAdditional": "No hay eventos adicionales en esta vista.",
-      "recurring": "Eventos recurrentes",
-      "moreDates": "Más fechas"
+      "noAdditional": "No hay eventos adicionales en esta vista."
     },
     "month": {
       "title": "Vista mensual",
@@ -587,12 +584,8 @@
       "noEvents": "No hay eventos este mes",
       "browse": "Utilice Anterior o Siguiente para buscar otro mes."
     },
-    "picker": {
-      "jump": "Saltar a la fecha",
-      "label": "Elija una fecha de la agenda"
-    },
     "actions": {
-      "rsvp": "RSVP",
+      "rsvp": "RSVP + Detalles",
       "details": "Detalles del evento"
     },
     "directions": {
@@ -601,7 +594,6 @@
       "copied": "Dirección copiada",
       "copiedAnnouncement": "Dirección copiada."
     },
-    "resetDate": "Mostrar todos los próximos eventos",
     "refine": {
       "type": "Tipo de evento",
       "campaign": "Campaña",

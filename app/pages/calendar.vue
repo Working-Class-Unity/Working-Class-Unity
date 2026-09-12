@@ -24,7 +24,6 @@ function clearFilters() {
   activeCampaign.value = 'all'
 }
 const selectedMonthEventId = ref('')
-const jumpDate = ref<string | null>(null)
 const { data, error, refresh, status } = await useFetch<CalendarApiResponse>('/api/events')
 
 const calendarEvents = computed<readonly CalendarEvent[]>(() =>
@@ -54,27 +53,10 @@ const calendarEvents = computed<readonly CalendarEvent[]>(() =>
 const visibleEvents = computed(() =>
   calendarEvents.value.filter(
     (event) =>
-      (!jumpDate.value || eventDateKey(event.startsAt, event.timezone) >= jumpDate.value) &&
       (activeFilter.value === 'Everything' || event.kind === activeFilter.value) &&
       (!selectedCampaign.value.tag || event.campaignTags?.includes(selectedCampaign.value.tag))
   )
 )
-const jumpMessage = computed(() => {
-  if (!jumpDate.value) return ''
-  const displayDate = new Intl.DateTimeFormat(languageTag.value, { dateStyle: 'long', timeZone: 'UTC' }).format(
-    new Date(`${jumpDate.value}T12:00:00Z`)
-  )
-  return t('calendar.showingFrom', { date: displayDate })
-})
-function jumpToDate(date: string) {
-  jumpDate.value = date
-}
-
-function showAllUpcomingEvents() {
-  jumpDate.value = null
-  clearFilters()
-}
-
 function formatDate(value: string, timeZone: string) {
   return new Intl.DateTimeFormat(languageTag.value, {
     day: 'numeric',
@@ -91,17 +73,6 @@ function formatTimeRange(startsAt: string, endsAt: string | null, timeZone: stri
 
 function deliveryLabel(deliveryMode: 'hybrid' | 'in_person' | 'virtual') {
   return t(`calendar.delivery.${deliveryMode}`)
-}
-
-function eventDateKey(value: string, timeZone: string) {
-  const parts = new Intl.DateTimeFormat('en-CA', {
-    day: '2-digit',
-    month: '2-digit',
-    timeZone,
-    year: 'numeric'
-  }).formatToParts(new Date(value))
-  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]))
-  return `${values.year}-${values.month}-${values.day}`
 }
 </script>
 
@@ -136,9 +107,6 @@ function eventDateKey(value: string, timeZone: string) {
           {{ t('calendar.view.month') }}
         </AppButton>
       </div>
-      <AppButton v-if="jumpDate" size="compact" variant="secondary" @click="showAllUpcomingEvents">
-        {{ t('calendar.resetDate') }}
-      </AppButton>
     </div>
 
     <div class="event-filter-area">
@@ -197,14 +165,7 @@ function eventDateKey(value: string, timeZone: string) {
       <p>{{ t('calendar.loadError') }}</p>
       <AppButton size="compact" variant="secondary" @click="refresh()">{{ t('common.retry') }}</AppButton>
     </div>
-    <CalendarAgendaView
-      v-else-if="activeView === 'agenda'"
-      :has-filters="hasFilters"
-      :events="visibleEvents"
-      :date="jumpDate"
-      :jump-message="jumpMessage"
-      @jump="jumpToDate"
-    />
+    <CalendarAgendaView v-else-if="activeView === 'agenda'" :has-filters="hasFilters" :events="visibleEvents" />
     <CalendarMonthView v-else v-model:selected-event-id="selectedMonthEventId" :events="visibleEvents" />
   </section>
 </template>

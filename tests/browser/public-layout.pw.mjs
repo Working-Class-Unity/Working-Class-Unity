@@ -180,14 +180,15 @@ test('Calendar preserves occurrence titles and chronology in agenda and month vi
   try {
     sqlite
       .prepare(
-        `insert into events (id, title, kind, visibility) values
-      ('layout-series-a', 'Layout series A', 'social', 'public'),
-      ('layout-series-b', 'Layout series B', 'social', 'public')`
+        `insert into events (id, title, kind, visibility, description) values
+      ('layout-series-a', 'Layout series A', 'social', 'public', 'Detailed description only on the event page.'),
+      ('layout-series-b', 'Layout series B', 'social', 'public', 'Detailed description only on the event page.')`
       )
       .run()
     const insert = sqlite.prepare(`insert into event_sessions
-      (id, event_id, status, delivery_mode, starts_at, timezone, title)
-      values (?, ?, 'scheduled', 'hybrid', ?, 'America/Los_Angeles', ?)`)
+      (id, event_id, status, delivery_mode, starts_at, timezone, title, location, rsvp_url)
+      values (?, ?, 'scheduled', 'hybrid', ?, 'America/Los_Angeles', ?,
+        '2522 Grand Canal Blvd, Stockton, CA', 'https://example.test/event-details')`)
     for (const [index, startsAt] of starts.entries()) {
       insert.run(
         `layout-session-${index}`,
@@ -205,7 +206,22 @@ test('Calendar preserves occurrence titles and chronology in agenda and month vi
     expect(dates).toEqual(starts.slice(1))
     await expect(page.locator('.featured-event h3')).toHaveText(displayedTitles[0])
     await expect(page.locator('.event-list h4')).toHaveText(displayedTitles.slice(1))
-    await expect(page.locator('.series-item h4')).toHaveText(displayedTitles.slice(0, 2))
+    await expect(page.getByRole('button', { name: 'Jump to date', exact: true })).toHaveCount(0)
+    await expect(page.locator('.series-panel')).toHaveCount(0)
+    await expect(page.getByText('Detailed description only on the event page.', { exact: true })).toHaveCount(0)
+    await expect(page.getByRole('link', { name: 'RSVP + Details', exact: true })).toHaveCount(4)
+    await expect(page.getByRole('button', { name: 'Directions', exact: true })).toHaveCount(4)
+    const nextEvent = page.locator('.event-row').first()
+    await expect(nextEvent.getByRole('link', { name: 'RSVP + Details', exact: true })).toHaveAttribute(
+      'href',
+      'https://example.test/event-details'
+    )
+    await nextEvent.getByRole('button', { name: 'Directions', exact: true }).click()
+    await expect(page.getByRole('menuitem', { name: 'Google Maps', exact: true })).toHaveAttribute(
+      'href',
+      'https://www.google.com/maps/search/?api=1&query=2522%20Grand%20Canal%20Blvd%2C%20Stockton%2C%20CA'
+    )
+    await page.keyboard.press('Escape')
     await page.getByRole('button', { name: 'Month', exact: true }).click()
     for (const title of displayedTitles) {
       const occurrence = page.locator('.calendar-event').filter({ hasText: title })
@@ -223,70 +239,39 @@ test('Calendar preserves occurrence titles and chronology in agenda and month vi
   }
 })
 
-test.describe('calendar date selection', () => {
-  test.use({ timezoneId: 'UTC' })
-
-  test('starts on today in Los Angeles and lets visitors reset a date beyond all events', async ({ page }) => {
-    const sqlite = new Database(process.env.BROWSER_RUNTIME_DATABASE_PATH, { fileMustExist: true })
-    const eventDate = new Date(Date.now() + 7 * 86_400_000)
-    const startsAt = eventDate.toISOString()
-    const year = eventDate.getUTCFullYear()
-    const month = eventDate.getUTCMonth()
-    const previousMonthEnd = new Date(Date.UTC(year, month, 0))
-    const afterEventMonth = new Date(Date.UTC(year, month + 1, 1)).toISOString().slice(0, 10)
-    // Keep the fixture inside the server's upcoming window. Freeze only the
-    // browser at a month boundary: UTC has advanced but Los Angeles has not.
-    await page.clock.setFixedTime(new Date(Date.UTC(year, month, 1, 2)))
-    try {
-      sqlite
-        .prepare("insert into events (id, title, kind, visibility) values (?, ?, 'social', 'public')")
-        .run('date-reset-event', 'Calendar reset gathering')
-      sqlite
-        .prepare(
-          `insert into event_sessions
-          (id, event_id, status, delivery_mode, starts_at, timezone)
-          values ('date-reset-session', 'date-reset-event', 'scheduled', 'in_person', ?, 'America/Los_Angeles')`
-        )
-        .run(startsAt)
-      await page.goto('/calendar')
-      await page.waitForFunction(() => window.useNuxtApp?.().isHydrating === false)
-      await expect(page.locator('.featured-event h3')).toHaveText('Calendar reset gathering')
-
-      const datePicker = page.getByRole('button', { name: /Jump to (?:a )?date/, exact: true })
-      await datePicker.click()
-      const calendar = page.locator('.wcu-date-popover')
-      await expect(calendar.locator('[data-selected]')).toHaveAttribute(
-        'data-value',
-        previousMonthEnd.toISOString().slice(0, 10)
+test('Calendar filters reset event type and campaign together', async ({ page }) => {
+  const sqlite = new Database(process.env.BROWSER_RUNTIME_DATABASE_PATH, { fileMustExist: true })
+  const startsAt = new Date(Date.now() + 7 * 86_400_000).toISOString()
+  try {
+    sqlite
+      .prepare("insert into events (id, title, kind, visibility) values (?, ?, 'social', 'public')")
+      .run('filter-reset-event', 'Calendar reset gathering')
+    sqlite
+      .prepare(
+        `insert into event_sessions
+        (id, event_id, status, delivery_mode, starts_at, timezone)
+        values ('filter-reset-session', 'filter-reset-event', 'scheduled', 'in_person', ?, 'America/Los_Angeles')`
       )
-      await expect(calendar.locator('.wcu-date-heading')).toHaveText(
-        new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(previousMonthEnd)
-      )
-      await calendar.getByRole('button', { name: 'Next month', exact: true }).click()
-      await calendar.getByRole('button', { name: 'Next month', exact: true }).click()
-      await calendar.locator(`[data-value="${afterEventMonth}"]:not([data-outside-view])`).click()
-      await expect(calendar).toBeHidden()
-      await expect(page.locator('.featured-event')).toHaveCount(0)
-      await expect(page.getByText('No events match this filter yet.', { exact: true })).toBeVisible()
-      await expect(datePicker).toBeVisible()
+      .run(startsAt)
+    await page.goto('/calendar')
+    await page.waitForFunction(() => window.useNuxtApp?.().isHydrating === false)
+    await expect(page.locator('.featured-event h3')).toHaveText('Calendar reset gathering')
 
-      // Reset restores the date, type, and campaign when they exclude the event.
-      const typeFilter = page.getByRole('combobox', { name: 'Event type', exact: true })
-      const campaignFilter = page.getByRole('combobox', { name: 'Campaign', exact: true })
-      await typeFilter.selectOption('Meeting')
-      await campaignFilter.selectOption('united-front')
-      const reset = page.getByRole('button', { name: 'Show all upcoming events', exact: true })
-      await expect(reset).toBeVisible()
-      await reset.click()
-      await expect(page.locator('.featured-event h3')).toHaveText('Calendar reset gathering')
-      await expect(typeFilter).toHaveValue('Everything')
-      await expect(campaignFilter).toHaveValue('all')
-      await expect(reset).toHaveCount(0)
-      await expect(page.locator('.jump-message')).toHaveCount(0)
-    } finally {
-      sqlite.prepare("delete from event_sessions where event_id = 'date-reset-event'").run()
-      sqlite.prepare("delete from events where id = 'date-reset-event'").run()
-      sqlite.close()
-    }
-  })
+    const typeFilter = page.getByRole('combobox', { name: 'Event type', exact: true })
+    const campaignFilter = page.getByRole('combobox', { name: 'Campaign', exact: true })
+    await typeFilter.selectOption('Meeting')
+    await campaignFilter.selectOption('united-front')
+    await expect(page.locator('.featured-event')).toHaveCount(0)
+    await expect(page.getByText('No events match this filter yet.', { exact: true })).toBeVisible()
+    const reset = page.getByRole('button', { name: 'Clear filters', exact: true })
+    await reset.click()
+    await expect(page.locator('.featured-event h3')).toHaveText('Calendar reset gathering')
+    await expect(typeFilter).toHaveValue('Everything')
+    await expect(campaignFilter).toHaveValue('all')
+    await expect(reset).toHaveCount(0)
+  } finally {
+    sqlite.prepare("delete from event_sessions where event_id = 'filter-reset-event'").run()
+    sqlite.prepare("delete from events where id = 'filter-reset-event'").run()
+    sqlite.close()
+  }
 })

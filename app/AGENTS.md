@@ -43,11 +43,9 @@ The normative interface architecture is
   Events panel, omits credentials, and provides the next three scheduled public sessions. The header
   owns pending, error/retry, and empty presentation, with All events always available.
 - `LanguageSelector`: compact native select with a globe label, localized accessible name, and full language names.
-- `calendar/CalendarDatePicker`: feature-owned Reka calendar and popover for agenda date navigation,
-  initialized to the current date in America/Los_Angeles. Date controls remain available when no events match.
 - `calendar/EventDirectionsMenu`: feature-owned Reka dropdown for map and address actions.
 - `calendar/CalendarAgendaView`, `calendar/CalendarMonthView`, `calendar/CalendarEventActions`, and
-  `calendar/CalendarEventBadge`: calendar-owned views, recurring event presentation, and outbound Solidarity RSVP links.
+  `calendar/CalendarEventBadge`: calendar-owned views, series labels, and outbound Solidarity RSVP and details links.
 - `PageOutline`: shared desktop index and mobile Reka drawer for flat or nested page outlines.
 - `BylawsPageOutline`: bylaws-owned configuration of `PageOutline`.
 - `CampaignCitedText`: feature-owned renderer for claim-level citation parts and deterministic occurrences.
@@ -63,8 +61,8 @@ The normative interface architecture is
   or free-supporter registration. `shared/membership-links.ts` owns the public URLs.
 
 Direct `reka-ui` imports are allowed only in `components/AppTopbar.vue`,
-`components/CampaignCitation.vue`, `components/PageOutline.vue`, and the three documented
-`components/calendar/` integrations.
+`components/CampaignCitation.vue`, `components/PageOutline.vue`, and
+`components/calendar/EventDirectionsMenu.vue`.
 Pages and unrelated components consume app-owned contracts. Do not add another Reka primitive or a
 generic wrapper without a documented product journey.
 
