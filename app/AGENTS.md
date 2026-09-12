@@ -53,6 +53,8 @@ The normative interface architecture is
 - `CampaignPageOutline`: campaign-owned configuration of `PageOutline`.
 - `CampaignEditorialHeader`: shared long-form campaign page heading group.
 - `campaign/Landing*`: campaign-owned narrative sections composed by `CampaignLanding`.
+  `LandingEvents` reads the public calendar, shows scheduled Deflock sessions in date order, and falls
+  back to the next public event when none match. The full-calendar link remains available in every state.
 - `KnowYourRightsShell`, `KnowYourRightsGuide`, and `KnowYourRightsScript`: feature-owned localized
   navigation, long-form guide framing, and speakable scripts for the Know Your Rights page family.
 - `/join`: an Open Assembly membership explanation, with participation and governance before two

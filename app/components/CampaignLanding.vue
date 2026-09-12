@@ -13,6 +13,7 @@ function section(id: string): CampaignSection {
 <template>
   <article class="campaign-landing" aria-labelledby="remove-flock-title">
     <CampaignLandingHero :page="campaignLandingPage" />
+    <CampaignLandingEvents />
     <CampaignLandingCouncil :section="section('verified-facts')" :facts="campaignFacts" />
     <CampaignLandingSystem :section="section('system')" />
     <CampaignLandingCase

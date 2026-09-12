@@ -285,6 +285,12 @@
       "recordValues": {
         "term": "ਅਪ੍ਰੈਲ 14, 2031",
         "system": "ਇੱਕ ਜੁੜਿਆ ਸਿਸਟਮ"
+      },
+      "events": {
+        "title": "Deflock Stockton ਦੇ ਸਮਾਗਮ",
+        "none": "Deflock Stockton ਦਾ ਕੋਈ ਸਮਾਗਮ ਨਹੀਂ ਹੈ",
+        "instead": "ਇਸ ਦੀ ਬਜਾਏ, ਸਾਡੇ ਨਾਲ ਇੱਥੇ ਸ਼ਾਮਲ ਹੋਵੋ…",
+        "calendar": "ਪੂਰਾ ਕੈਲੰਡਰ ਵੇਖੋ"
       }
     },
     "faq": {

@@ -285,6 +285,12 @@
       "recordValues": {
         "term": "April 14, 2031",
         "system": "A connected system"
+      },
+      "events": {
+        "title": "Deflock Stockton events",
+        "none": "No Deflock Stockton Events",
+        "instead": "Instead, join us at…",
+        "calendar": "View the full calendar"
       }
     },
     "faq": {
