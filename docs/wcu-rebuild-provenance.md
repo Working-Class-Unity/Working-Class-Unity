@@ -19,8 +19,12 @@ removing the imported account, billing, AI, Files, and membership platform.
 | Source reviewed before public-site simplification       | `da51242`                                   |
 
 The legacy `wcu-website/app/pages/join.vue` directly linked the existing $10 and $27 hosted payment
-pages. The current simplification restores that boundary while preserving the newer public UI.
-It does not restore the legacy styling framework or undo current campaign content.
+pages. Its invitation, membership explanation, and FAQ now inform `/join`, adapted to the
+[Open Assembly design authority](../DESIGN.md) and current CSS/component contracts. Participation
+and governance precede the two dues options. The one-time donation option, numeric member claim,
+and obsolete call-booking FAQ are omitted. The existing English, Spanish, and Punjabi copy is reused,
+with eligibility and good-standing language aligned to the published bylaws. This restores the
+Stripe-only payment boundary without restoring the legacy styling framework or changing campaign content.
 
 ## Current direction
 

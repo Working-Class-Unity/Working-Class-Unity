@@ -57,8 +57,10 @@ The normative interface architecture is
 - `campaign/Landing*`: campaign-owned narrative sections composed by `CampaignLanding`.
 - `KnowYourRightsShell`, `KnowYourRightsGuide`, and `KnowYourRightsScript`: feature-owned localized
   navigation, long-form guide framing, and speakable scripts for the Know Your Rights page family.
-- `/join`: two hosted Stripe dues links and the public dues-management portal. There is no local
-  account, checkout form, or free-supporter registration. `shared/membership-links.ts` owns the public URLs.
+- `/join`: an Open Assembly membership explanation, with participation and governance before two
+  hosted Stripe dues links and the public dues-management portal. Native disclosures own the FAQ;
+  container queries let benefits and dues options stack. There is no local account, checkout form,
+  or free-supporter registration. `shared/membership-links.ts` owns the public URLs.
 
 Direct `reka-ui` imports are allowed only in `components/AppTopbar.vue`,
 `components/CampaignCitation.vue`, `components/PageOutline.vue`, and the three documented

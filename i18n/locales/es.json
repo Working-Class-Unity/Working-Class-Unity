@@ -605,20 +605,73 @@
   },
   "join": {
     "title": "Únase a Working Class Unity",
-    "chooseTier": "Elija su nivel",
-    "tiers": {
+    "description": "Si crees en organizarnos en masa en vez de luchar solos, en la democracia por encima de los intereses del dinero y en construir conciencia de clase en lugar de sostener el status quo, ya eres de los nuestros. Hay una guerra contra la clase trabajadora. Únete y lucha con nosotros.",
+    "hero": {
+      "title": "Poder colectivo y conciencia de clase",
+      "invitation": "Únete a nosotros en el condado de San Joaquín."
+    },
+    "membership": {
+      "title": "Opciones de membresía",
       "member": {
-        "name": "Miembro",
-        "price": "$10/mes"
+        "title": "Membresía de base",
+        "description": "Hazte miembro de base.",
+        "price": "$10 al mes",
+        "button": "Únete"
       },
       "solidarity": {
-        "name": "Socio Solidario",
-        "price": "$27/mes"
+        "title": "Solidaridad",
+        "description": "Hazte miembro de base. Aportar más no te da beneficios adicionales, pero nos permite imprimir más volantes.",
+        "price": "$27 al mes",
+        "button": "Únete"
       }
     },
     "tierExplanation": "Ambas opciones de cuotas incluyen los mismos derechos de membresía.",
     "codeOfConduct": "Unirse significa aceptar el Código de Conducta de WCU.",
-    "description": "Elija sus cuotas mensuales y continúe a Stripe para pagar.",
+    "benefits": {
+      "title": "Membresía de base",
+      "description": "Unirse a Working Class Unity significa dar forma activamente a la dirección de la organización, asumir responsabilidad en las acciones y participar en nuestras campañas.",
+      "items": {
+        "voting": {
+          "title": "Derecho a voto",
+          "description": "Los miembros en buen estado participan en las decisiones y determinan el rumbo de nuestra organización."
+        },
+        "leadership": {
+          "title": "Liderazgo",
+          "description": "Los miembros en buen estado pueden ocupar cualquier cargo o servir en cualquier comité de nuestra organización."
+        },
+        "campaigns": {
+          "title": "Campañas",
+          "description": "Nuestras campañas buscan principalmente impulsar el socialismo y construir poder para la clase trabajadora."
+        },
+        "education": {
+          "title": "Educación",
+          "description": "Los miembros trabajan juntos para crear material de educación política y capacitaciones de organización."
+        }
+      }
+    },
+    "faq": {
+      "title": "Preguntas sobre la membresía",
+      "subtitle": "Quién puede unirse, qué significa estar en buen estado y cómo las cuotas sostienen a WCU.",
+      "items": {
+        "eligibility": {
+          "question": "¿Cuáles son los requisitos para ser miembro de Working Class Unity?",
+          "answer": "Para ser elegible para la membresía en WCU, las personas deben estar en buen estado y vivir, trabajar, asistir a la escuela o a un lugar de culto en el condado de San Joaquín, California."
+        },
+        "good_standing": {
+          "question": "¿Qué significa ser miembro en buen estado?",
+          "answer": "Los miembros comienzan en buen estado. Para mantenerlo, deben pagar sus cuotas (con un período de gracia de 30 días), asistir al menos a una reunión regular al año y respetar los valores, la misión y el Código de Conducta de WCU."
+        },
+        "dues": {
+          "question": "¿Por qué tienen cuotas de membresía?",
+          "answer": "WCU se financia completamente con cuotas y donaciones de sus miembros. Al no aceptar grandes donantes ni subsidios del gobierno, podemos enfocarnos únicamente en nuestra misión y en los intereses de la clase trabajadora sin influencia externa."
+        }
+      }
+    },
+    "actions": {
+      "membership": "Lee cómo funciona la membresía",
+      "bylaws": "Lee los estatutos de membresía"
+    },
+    "paymentExplanation": "Stripe gestiona tu pago mensual y tu suscripción. Usa {manageDues} para actualizar tus datos de pago, cambiar tus cuotas o cancelar la renovación. Los derechos de voto y de ocupar cargos dependen de los requisitos de buen estado indicados arriba.",
     "manageTitle": "¿Ya paga cuotas?",
     "manageDues": "Administrar cuotas"
   }

@@ -605,20 +605,73 @@
   },
   "join": {
     "title": "Join Working Class Unity",
-    "chooseTier": "Choose your tier",
-    "tiers": {
+    "description": "If you believe in mass organizing over fighting alone, in democracy over monied interests, and in building class-consciousness over supporting the status quo, you are already one of us. There is a war being waged against the working class. Join us and fight back.",
+    "hero": {
+      "title": "Collective, class-conscious power",
+      "invitation": "Join us in San Joaquin County."
+    },
+    "membership": {
+      "title": "Membership options",
       "member": {
-        "name": "Member",
-        "price": "$10/month"
+        "title": "Membership",
+        "description": "Become a rank and file member.",
+        "price": "$10 per month",
+        "button": "Join"
       },
       "solidarity": {
-        "name": "Solidarity Member",
-        "price": "$27/month"
+        "title": "Solidarity",
+        "description": "Become a rank and file member. Paying more does not get you additional benefits, but it does let us print more flyers.",
+        "price": "$27 per month",
+        "button": "Join"
       }
     },
     "tierExplanation": "Both dues options include the same member rights.",
     "codeOfConduct": "Joining means accepting WCU’s Code of Conduct.",
-    "description": "Choose monthly dues and continue to Stripe to pay.",
+    "benefits": {
+      "title": "Rank and file membership",
+      "description": "Joining Working Class Unity means actively shaping the organization's direction, taking responsibility for actions, and engaging in our campaigns.",
+      "items": {
+        "voting": {
+          "title": "Voting rights",
+          "description": "Members in good standing participate in decision-making and determine the direction of our organization."
+        },
+        "leadership": {
+          "title": "Leadership",
+          "description": "Members in good standing may hold any office or serve on any committee within our organization."
+        },
+        "campaigns": {
+          "title": "Campaigns",
+          "description": "Our campaigns primarily aim to advance socialism and build power for the working class."
+        },
+        "education": {
+          "title": "Education",
+          "description": "Members work together to produce political educational material & organizing skill trainings."
+        }
+      }
+    },
+    "faq": {
+      "title": "Membership questions",
+      "subtitle": "Who can join, what good standing means, and how dues support WCU.",
+      "items": {
+        "eligibility": {
+          "question": "What are the eligibility requirements to become a member of Working Class Unity?",
+          "answer": "To be eligible for membership in WCU, individuals must be in good standing and reside, work, attend school, or attend a place of worship in San Joaquin County, California."
+        },
+        "good_standing": {
+          "question": "What does it mean to be a member in good standing?",
+          "answer": "Members begin in good standing. To remain in good standing, members must pay their dues (with a 30-day grace period), attend at least one regular meeting per year, and follow WCU’s values, mission, and Code of Conduct."
+        },
+        "dues": {
+          "question": "Why do you have membership dues?",
+          "answer": "WCU is fully funded by Member dues and donations. By not taking large donor or government grants, we are able to focus solely on our mission and the interests of the working class without external influence."
+        }
+      }
+    },
+    "actions": {
+      "membership": "Read how membership works",
+      "bylaws": "Read the membership bylaws"
+    },
+    "paymentExplanation": "Stripe handles your monthly payment and subscription. Use {manageDues} to update payment details, change your dues, or cancel renewal. Voting and leadership rights follow the good-standing requirements above.",
     "manageTitle": "Already paying dues?",
     "manageDues": "Manage dues"
   }

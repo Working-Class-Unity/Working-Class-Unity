@@ -594,35 +594,70 @@ test('campaign citations preview, navigate, and return at desktop and mobile wid
 })
 
 test('joining and managing dues use public Stripe links without website account requests', async ({ page }) => {
+  test.setTimeout(45_000)
   const observations = observePage(page)
-  await page.goto('/join')
-  await page.waitForFunction(() => window.useNuxtApp?.().isHydrating === false)
-  await expect(page.getByRole('heading', { name: 'Join Working Class Unity', exact: true })).toBeVisible()
-  const joinPage = page.locator('.join-page')
-  const options = joinPage.getByRole('list')
-  await expect(options.getByRole('listitem')).toHaveCount(2)
-  for (const [label, url] of [
-    ['$10/month', 'https://pay.workingclassunity.com/b/7sI4hF1hc9IIepq4gh'],
-    ['$27/month', 'https://pay.workingclassunity.com/b/bIY4hF4tof325SUaEE']
-  ]) {
-    const link = options.getByRole('link', { name: label, exact: true })
-    await expect(link).toHaveAttribute('href', url)
-    await assertMinimumTargetSize(link)
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  for (const locale of ['en', 'es', 'pa']) {
+    const messages = readLocaleMessages(locale)
+    const pathPrefix = locale === 'en' ? '' : `/${locale}`
+    await page.setViewportSize({ width: 1440, height: 1000 })
+    await page.goto(`${pathPrefix}/join`)
+    await page.waitForFunction(() => window.useNuxtApp?.().isHydrating === false)
+    const joinPage = page.locator('.join-page')
+    await expect(joinPage.getByRole('heading', { level: 1 })).toHaveText(messages.join.hero.title)
+    await expect(joinPage.getByRole('link', { name: messages.home.actions.events, exact: true })).toHaveAttribute(
+      'href',
+      `${pathPrefix}/calendar`
+    )
+    const membershipLink = joinPage.getByRole('link', { name: messages.join.actions.membership, exact: true })
+    await membershipLink.click()
+    await expect(page).toHaveURL(new RegExp(`${pathPrefix}/join#membership$`))
+    const options = joinPage.getByRole('list', { name: messages.join.membership.title, exact: true })
+    await expect(options.getByRole('listitem')).toHaveCount(2)
+    for (const [tier, url] of [
+      ['member', 'https://pay.workingclassunity.com/b/7sI4hF1hc9IIepq4gh'],
+      ['solidarity', 'https://pay.workingclassunity.com/b/bIY4hF4tof325SUaEE']
+    ]) {
+      const option = messages.join.membership[tier]
+      const link = options.getByRole('link', { name: `${option.button} ${option.title} ${option.price}`, exact: true })
+      await expect(link).toHaveAttribute('href', url)
+      await assertMinimumTargetSize(link)
+    }
+    const portalUrl = 'https://pay.workingclassunity.com/p/login/00g29l9RKespfsI7ss'
+    await expect(joinPage.getByRole('link', { name: messages.join.manageDues, exact: true })).toHaveAttribute(
+      'href',
+      portalUrl
+    )
+    await expect(
+      page.getByRole('banner').getByRole('link', { name: messages.join.manageDues, exact: true })
+    ).toHaveAttribute('href', portalUrl)
+    await expect(joinPage.locator('form, input, iframe')).toHaveCount(0)
+    await expect(joinPage.locator('a[href*="cal.com"]')).toHaveCount(0)
+    const questions = joinPage.locator('details')
+    await expect(questions).toHaveCount(3)
+    await expect(questions.first()).toHaveAttribute('open', '')
+    const standing = questions.nth(1)
+    const summary = standing.locator('summary')
+    await summary.focus()
+    await page.keyboard.press('Enter')
+    await expect(standing).toHaveAttribute('open', '')
+    await expect(standing.getByText(messages.join.faq.items.good_standing.answer, { exact: true })).toBeVisible()
+    await assertVisibleFocusIndicator(page, summary)
+    await page.keyboard.press('Space')
+    await expect(standing).not.toHaveAttribute('open')
+    await assertAccessibleWithoutOverflow(page)
+    for (const width of [768, 390, 320]) {
+      await page.setViewportSize({ width, height: 900 })
+      await assertNoHorizontalOverflow(page)
+    }
+    await page.evaluate(() => {
+      document.documentElement.style.fontSize = '200%'
+    })
+    await assertNoHorizontalOverflow(page)
   }
-  const portalUrl = 'https://pay.workingclassunity.com/p/login/00g29l9RKespfsI7ss'
-  await expect(joinPage.getByRole('link', { name: 'Manage dues', exact: true })).toHaveAttribute('href', portalUrl)
-  await expect(page.getByRole('banner').getByRole('link', { name: 'Manage dues', exact: true })).toHaveAttribute(
-    'href',
-    portalUrl
-  )
-  await expect(joinPage.locator('form, input, iframe')).toHaveCount(0)
-  await assertAccessibleWithoutOverflow(page)
-  await page.setViewportSize({ width: 320, height: 800 })
-  await assertAccessibleWithoutOverflow(page)
-  await page.evaluate(() => {
-    document.documentElement.style.fontSize = '200%'
-  })
-  await assertNoHorizontalOverflow(page)
+  expect(
+    observations.sameOriginRequests.filter((request) => /\/api\/(auth|account|join)(?:\/|$)/.test(request))
+  ).toEqual([])
   await assertCleanPage(page, observations)
 })
 
