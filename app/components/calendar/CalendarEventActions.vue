@@ -65,8 +65,10 @@ const { t } = useI18n()
   }
 
   .calendar-event-actions .primary-action {
+    --anchor-color: var(--color-accent-action-contrast);
+
     border: 1px solid var(--color-accent-action);
-    color: var(--color-accent-action-contrast);
+    color: var(--anchor-color);
     background: var(--color-accent-action);
   }
 

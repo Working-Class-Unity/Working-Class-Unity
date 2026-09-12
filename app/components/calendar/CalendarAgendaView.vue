@@ -113,7 +113,8 @@ function eventStartTime(event: CalendarEvent) {
   }
 
   .view-heading h2,
-  .featured-copy h3 {
+  .featured-copy h3,
+  .event-row-copy h4 {
     color: var(--color-brand-primary);
     font-family: var(--font-family-display);
     font-weight: 650;
@@ -178,10 +179,14 @@ function eventStartTime(event: CalendarEvent) {
     min-inline-size: 0;
   }
 
-  .featured-copy h3 {
+  .featured-copy h3,
+  .event-row-copy h4 {
+    --font-size-heading-3: clamp(1.75rem, 3vw, 2.25rem);
+
     max-inline-size: 28ch;
     margin: var(--space-2) 0;
-    font-size: clamp(1.75rem, 3vw, 2.25rem);
+    font-size: var(--font-size-heading-3);
+    line-height: 1.15;
   }
 
   .event-details {
@@ -253,7 +258,6 @@ function eventStartTime(event: CalendarEvent) {
     min-inline-size: 0;
   }
 
-  .event-row-copy h4,
   .event-row-copy p {
     margin: 0;
     color: var(--color-text-muted);

@@ -50,7 +50,7 @@ const entries = computed(() =>
 </script>
 
 <template>
-  <section class="landing-events" aria-labelledby="deflock-events-title">
+  <section id="events" class="landing-events" aria-labelledby="deflock-events-title">
     <div class="flock-field">
       <div class="landing-events-content">
         <header class="landing-events-heading">
@@ -79,7 +79,7 @@ const entries = computed(() =>
               <AppActionLink
                 v-if="entry.url"
                 :to="entry.url"
-                variant="text"
+                variant="secondary"
                 size="compact"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -198,7 +198,6 @@ const entries = computed(() =>
     font-size: 1rem;
   }
 
-  .landing-event-actions > a,
   .landing-calendar-link {
     text-decoration: underline;
     text-underline-offset: 0.2em;

@@ -35,6 +35,10 @@ function section(id: string): CampaignSection {
   }
 
   /* Shared presentation contract for the overview's feature-owned sections. */
+  .campaign-landing :deep(section[id]) {
+    scroll-margin-block-start: var(--space-5);
+  }
+
   .campaign-landing :deep(.flock-field) {
     inline-size: 100%;
     max-inline-size: var(--home-content-max-width);

@@ -8,7 +8,7 @@ const detailLinks = flockNavigation.links.filter((link) => link.path !== flockNa
 </script>
 
 <template>
-  <section class="landing-hero flock-field" aria-labelledby="remove-flock-title">
+  <section id="overview" class="landing-hero flock-field" aria-labelledby="remove-flock-title">
     <div class="landing-hero-copy">
       <p class="flock-kicker">{{ page.eyebrow }}</p>
       <h1 id="remove-flock-title" class="landing-title">{{ page.title }}</h1>
