@@ -1,0 +1,1056 @@
+{
+  "version": "6",
+  "dialect": "sqlite",
+  "id": "e8650824-27e2-4545-9f5d-e6801b61aa44",
+  "prevId": "8cf9d732-7706-4968-a29d-423d94afeb21",
+  "tables": {
+    "event_provider_links": {
+      "name": "event_provider_links",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "event_id": {
+          "name": "event_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "provider": {
+          "name": "provider",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "external_id": {
+          "name": "external_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "primary_external_id": {
+          "name": "primary_external_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "source_url": {
+          "name": "source_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "last_seen_at": {
+          "name": "last_seen_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "source_snapshot_id": {
+          "name": "source_snapshot_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {
+        "event_provider_links_provider_external_uidx": {
+          "name": "event_provider_links_provider_external_uidx",
+          "columns": [
+            "provider",
+            "external_id"
+          ],
+          "isUnique": true
+        },
+        "event_provider_links_event_idx": {
+          "name": "event_provider_links_event_idx",
+          "columns": [
+            "event_id",
+            "provider"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "event_provider_links_event_id_events_id_fk": {
+          "name": "event_provider_links_event_id_events_id_fk",
+          "tableFrom": "event_provider_links",
+          "tableTo": "events",
+          "columnsFrom": [
+            "event_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "event_provider_links_source_snapshot_id_external_record_snapshots_id_fk": {
+          "name": "event_provider_links_source_snapshot_id_external_record_snapshots_id_fk",
+          "tableFrom": "event_provider_links",
+          "tableTo": "external_record_snapshots",
+          "columnsFrom": [
+            "source_snapshot_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "event_provider_links_provider_check": {
+          "name": "event_provider_links_provider_check",
+          "value": "\"event_provider_links\".\"provider\" = 'solidarity'"
+        },
+        "event_provider_links_identity_check": {
+          "name": "event_provider_links_identity_check",
+          "value": "length(trim(\"event_provider_links\".\"external_id\")) between 1 and 255 and (\"event_provider_links\".\"primary_external_id\" is null or length(trim(\"event_provider_links\".\"primary_external_id\")) between 1 and 255)"
+        },
+        "event_provider_links_source_check": {
+          "name": "event_provider_links_source_check",
+          "value": "\"event_provider_links\".\"source_url\" is null or (length(trim(\"event_provider_links\".\"source_url\")) between 9 and 2000 and lower(\"event_provider_links\".\"source_url\") like 'https://%')"
+        },
+        "event_provider_links_seen_check": {
+          "name": "event_provider_links_seen_check",
+          "value": "julianday(\"event_provider_links\".\"last_seen_at\") is not null"
+        }
+      }
+    },
+    "event_session_campaign_tags": {
+      "name": "event_session_campaign_tags",
+      "columns": {
+        "event_session_id": {
+          "name": "event_session_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "value": {
+          "name": "value",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {
+        "event_session_campaign_tags_session_value_uidx": {
+          "name": "event_session_campaign_tags_session_value_uidx",
+          "columns": [
+            "event_session_id",
+            "value"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "event_session_campaign_tags_event_session_id_event_sessions_id_fk": {
+          "name": "event_session_campaign_tags_event_session_id_event_sessions_id_fk",
+          "tableFrom": "event_session_campaign_tags",
+          "tableTo": "event_sessions",
+          "columnsFrom": [
+            "event_session_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "event_session_campaign_tags_value_check": {
+          "name": "event_session_campaign_tags_value_check",
+          "value": "\"event_session_campaign_tags\".\"value\" = trim(\"event_session_campaign_tags\".\"value\") and length(\"event_session_campaign_tags\".\"value\") between 1 and 100"
+        }
+      }
+    },
+    "event_session_provider_links": {
+      "name": "event_session_provider_links",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "event_session_id": {
+          "name": "event_session_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "provider": {
+          "name": "provider",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "external_id": {
+          "name": "external_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "primary_external_id": {
+          "name": "primary_external_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "paired_external_id": {
+          "name": "paired_external_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "last_seen_at": {
+          "name": "last_seen_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "source_snapshot_id": {
+          "name": "source_snapshot_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {
+        "event_session_provider_links_provider_external_uidx": {
+          "name": "event_session_provider_links_provider_external_uidx",
+          "columns": [
+            "provider",
+            "external_id"
+          ],
+          "isUnique": true
+        },
+        "event_session_provider_links_session_idx": {
+          "name": "event_session_provider_links_session_idx",
+          "columns": [
+            "event_session_id",
+            "provider"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "event_session_provider_links_event_session_id_event_sessions_id_fk": {
+          "name": "event_session_provider_links_event_session_id_event_sessions_id_fk",
+          "tableFrom": "event_session_provider_links",
+          "tableTo": "event_sessions",
+          "columnsFrom": [
+            "event_session_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "event_session_provider_links_source_snapshot_id_external_record_snapshots_id_fk": {
+          "name": "event_session_provider_links_source_snapshot_id_external_record_snapshots_id_fk",
+          "tableFrom": "event_session_provider_links",
+          "tableTo": "external_record_snapshots",
+          "columnsFrom": [
+            "source_snapshot_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "event_session_provider_links_provider_check": {
+          "name": "event_session_provider_links_provider_check",
+          "value": "\"event_session_provider_links\".\"provider\" = 'solidarity'"
+        },
+        "event_session_provider_links_identity_check": {
+          "name": "event_session_provider_links_identity_check",
+          "value": "length(trim(\"event_session_provider_links\".\"external_id\")) between 1 and 255 and (\"event_session_provider_links\".\"primary_external_id\" is null or length(trim(\"event_session_provider_links\".\"primary_external_id\")) between 1 and 255) and (\"event_session_provider_links\".\"paired_external_id\" is null or length(trim(\"event_session_provider_links\".\"paired_external_id\")) between 1 and 255)"
+        },
+        "event_session_provider_links_seen_check": {
+          "name": "event_session_provider_links_seen_check",
+          "value": "julianday(\"event_session_provider_links\".\"last_seen_at\") is not null"
+        }
+      }
+    },
+    "event_sessions": {
+      "name": "event_sessions",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "event_id": {
+          "name": "event_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'scheduled'"
+        },
+        "delivery_mode": {
+          "name": "delivery_mode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'in_person'"
+        },
+        "starts_at": {
+          "name": "starts_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "ends_at": {
+          "name": "ends_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "timezone": {
+          "name": "timezone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "location_name": {
+          "name": "location_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "location": {
+          "name": "location",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "virtual_url": {
+          "name": "virtual_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "rsvp_url": {
+          "name": "rsvp_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "source_snapshot_id": {
+          "name": "source_snapshot_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {
+        "event_sessions_event_start_idx": {
+          "name": "event_sessions_event_start_idx",
+          "columns": [
+            "event_id",
+            "starts_at"
+          ],
+          "isUnique": false
+        },
+        "event_sessions_status_start_idx": {
+          "name": "event_sessions_status_start_idx",
+          "columns": [
+            "status",
+            "starts_at"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "event_sessions_event_id_events_id_fk": {
+          "name": "event_sessions_event_id_events_id_fk",
+          "tableFrom": "event_sessions",
+          "tableTo": "events",
+          "columnsFrom": [
+            "event_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "event_sessions_source_snapshot_id_external_record_snapshots_id_fk": {
+          "name": "event_sessions_source_snapshot_id_external_record_snapshots_id_fk",
+          "tableFrom": "event_sessions",
+          "tableTo": "external_record_snapshots",
+          "columnsFrom": [
+            "source_snapshot_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "event_sessions_title_check": {
+          "name": "event_sessions_title_check",
+          "value": "\"event_sessions\".\"title\" is null or length(trim(\"event_sessions\".\"title\")) between 1 and 255"
+        },
+        "event_sessions_status_check": {
+          "name": "event_sessions_status_check",
+          "value": "\"event_sessions\".\"status\" in ('scheduled', 'canceled', 'completed')"
+        },
+        "event_sessions_delivery_check": {
+          "name": "event_sessions_delivery_check",
+          "value": "\"event_sessions\".\"delivery_mode\" in ('in_person', 'virtual', 'hybrid')"
+        },
+        "event_sessions_interval_check": {
+          "name": "event_sessions_interval_check",
+          "value": "julianday(\"event_sessions\".\"starts_at\") is not null and (\"event_sessions\".\"ends_at\" is null or julianday(\"event_sessions\".\"ends_at\") >= julianday(\"event_sessions\".\"starts_at\"))"
+        },
+        "event_sessions_timezone_check": {
+          "name": "event_sessions_timezone_check",
+          "value": "length(trim(\"event_sessions\".\"timezone\")) between 1 and 100"
+        },
+        "event_sessions_location_name_check": {
+          "name": "event_sessions_location_name_check",
+          "value": "\"event_sessions\".\"location_name\" is null or length(trim(\"event_sessions\".\"location_name\")) between 1 and 255"
+        },
+        "event_sessions_location_check": {
+          "name": "event_sessions_location_check",
+          "value": "(\"event_sessions\".\"location\" is null or length(trim(\"event_sessions\".\"location\")) between 1 and 500) and (\"event_sessions\".\"virtual_url\" is null or length(trim(\"event_sessions\".\"virtual_url\")) between 1 and 2000)"
+        },
+        "event_sessions_rsvp_url_check": {
+          "name": "event_sessions_rsvp_url_check",
+          "value": "\"event_sessions\".\"rsvp_url\" is null or (length(trim(\"event_sessions\".\"rsvp_url\")) between 9 and 2000 and lower(\"event_sessions\".\"rsvp_url\") like 'https://%')"
+        }
+      }
+    },
+    "event_tags": {
+      "name": "event_tags",
+      "columns": {
+        "event_id": {
+          "name": "event_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "kind": {
+          "name": "kind",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "value": {
+          "name": "value",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "source_snapshot_id": {
+          "name": "source_snapshot_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {
+        "event_tags_event_kind_value_uidx": {
+          "name": "event_tags_event_kind_value_uidx",
+          "columns": [
+            "event_id",
+            "kind",
+            "value"
+          ],
+          "isUnique": true
+        },
+        "event_tags_kind_value_idx": {
+          "name": "event_tags_kind_value_idx",
+          "columns": [
+            "kind",
+            "value",
+            "event_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "event_tags_event_id_events_id_fk": {
+          "name": "event_tags_event_id_events_id_fk",
+          "tableFrom": "event_tags",
+          "tableTo": "events",
+          "columnsFrom": [
+            "event_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "event_tags_source_snapshot_id_external_record_snapshots_id_fk": {
+          "name": "event_tags_source_snapshot_id_external_record_snapshots_id_fk",
+          "tableFrom": "event_tags",
+          "tableTo": "external_record_snapshots",
+          "columnsFrom": [
+            "source_snapshot_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "event_tags_kind_check": {
+          "name": "event_tags_kind_check",
+          "value": "\"event_tags\".\"kind\" in ('event', 'campaign')"
+        },
+        "event_tags_value_check": {
+          "name": "event_tags_value_check",
+          "value": "\"event_tags\".\"value\" = trim(\"event_tags\".\"value\") and length(\"event_tags\".\"value\") between 1 and 100"
+        }
+      }
+    },
+    "events": {
+      "name": "events",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "kind": {
+          "name": "kind",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "visibility": {
+          "name": "visibility",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'hidden'"
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'active'"
+        },
+        "default_timezone": {
+          "name": "default_timezone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'America/Los_Angeles'"
+        },
+        "event_page_url": {
+          "name": "event_page_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "source_snapshot_id": {
+          "name": "source_snapshot_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {
+        "events_status_kind_idx": {
+          "name": "events_status_kind_idx",
+          "columns": [
+            "status",
+            "kind"
+          ],
+          "isUnique": false
+        },
+        "events_visibility_status_category_idx": {
+          "name": "events_visibility_status_category_idx",
+          "columns": [
+            "visibility",
+            "status",
+            "kind"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "events_source_snapshot_id_external_record_snapshots_id_fk": {
+          "name": "events_source_snapshot_id_external_record_snapshots_id_fk",
+          "tableFrom": "events",
+          "tableTo": "external_record_snapshots",
+          "columnsFrom": [
+            "source_snapshot_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "events_title_check": {
+          "name": "events_title_check",
+          "value": "length(trim(\"events\".\"title\")) between 1 and 255"
+        },
+        "events_kind_check": {
+          "name": "events_kind_check",
+          "value": "\"events\".\"kind\" in ('meeting', 'action', 'learning', 'social')"
+        },
+        "events_visibility_check": {
+          "name": "events_visibility_check",
+          "value": "\"events\".\"visibility\" in ('hidden', 'public', 'members')"
+        },
+        "events_status_check": {
+          "name": "events_status_check",
+          "value": "\"events\".\"status\" in ('active', 'archived')"
+        },
+        "events_timezone_check": {
+          "name": "events_timezone_check",
+          "value": "length(trim(\"events\".\"default_timezone\")) between 1 and 100"
+        },
+        "events_page_url_check": {
+          "name": "events_page_url_check",
+          "value": "\"events\".\"event_page_url\" is null or (length(trim(\"events\".\"event_page_url\")) between 9 and 2000 and lower(\"events\".\"event_page_url\") like 'https://%')"
+        }
+      }
+    },
+    "external_record_snapshots": {
+      "name": "external_record_snapshots",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "import_batch_id": {
+          "name": "import_batch_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "object_type": {
+          "name": "object_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "external_id": {
+          "name": "external_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "observed_at": {
+          "name": "observed_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "payload_hash": {
+          "name": "payload_hash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "raw_payload": {
+          "name": "raw_payload",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {
+        "external_record_snapshots_batch_object_uidx": {
+          "name": "external_record_snapshots_batch_object_uidx",
+          "columns": [
+            "import_batch_id",
+            "object_type",
+            "external_id"
+          ],
+          "isUnique": true
+        },
+        "external_record_snapshots_external_idx": {
+          "name": "external_record_snapshots_external_idx",
+          "columns": [
+            "object_type",
+            "external_id",
+            "observed_at"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "external_record_snapshots_import_batch_id_import_batches_id_fk": {
+          "name": "external_record_snapshots_import_batch_id_import_batches_id_fk",
+          "tableFrom": "external_record_snapshots",
+          "tableTo": "import_batches",
+          "columnsFrom": [
+            "import_batch_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "external_record_snapshots_identity_check": {
+          "name": "external_record_snapshots_identity_check",
+          "value": "\"external_record_snapshots\".\"object_type\" in ('solidarity.event', 'solidarity.session') and length(trim(\"external_record_snapshots\".\"external_id\")) between 1 and 255"
+        },
+        "external_record_snapshots_hash_check": {
+          "name": "external_record_snapshots_hash_check",
+          "value": "length(trim(\"external_record_snapshots\".\"payload_hash\")) between 16 and 128"
+        },
+        "external_record_snapshots_payload_check": {
+          "name": "external_record_snapshots_payload_check",
+          "value": "json_valid(\"external_record_snapshots\".\"raw_payload\") and json_type(\"external_record_snapshots\".\"raw_payload\") = 'object'"
+        },
+        "external_record_snapshots_observed_at_check": {
+          "name": "external_record_snapshots_observed_at_check",
+          "value": "julianday(\"external_record_snapshots\".\"observed_at\") is not null"
+        }
+      }
+    },
+    "import_batches": {
+      "name": "import_batches",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "provider": {
+          "name": "provider",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'pending'"
+        },
+        "source_name": {
+          "name": "source_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "source_checksum": {
+          "name": "source_checksum",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "started_at": {
+          "name": "started_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "completed_at": {
+          "name": "completed_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "record_count": {
+          "name": "record_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {
+        "import_batches_provider_started_idx": {
+          "name": "import_batches_provider_started_idx",
+          "columns": [
+            "provider",
+            "started_at"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "import_batches_provider_check": {
+          "name": "import_batches_provider_check",
+          "value": "\"import_batches\".\"provider\" = 'solidarity'"
+        },
+        "import_batches_status_check": {
+          "name": "import_batches_status_check",
+          "value": "\"import_batches\".\"status\" in ('pending', 'completed', 'failed')"
+        },
+        "import_batches_started_at_check": {
+          "name": "import_batches_started_at_check",
+          "value": "julianday(\"import_batches\".\"started_at\") is not null"
+        },
+        "import_batches_completion_check": {
+          "name": "import_batches_completion_check",
+          "value": "(\"import_batches\".\"status\" = 'pending' and \"import_batches\".\"completed_at\" is null) or (\"import_batches\".\"status\" in ('completed', 'failed') and \"import_batches\".\"completed_at\" is not null and julianday(\"import_batches\".\"completed_at\") >= julianday(\"import_batches\".\"started_at\"))"
+        },
+        "import_batches_record_count_check": {
+          "name": "import_batches_record_count_check",
+          "value": "\"import_batches\".\"record_count\" is null or \"import_batches\".\"record_count\" >= 0"
+        },
+        "import_batches_checksum_check": {
+          "name": "import_batches_checksum_check",
+          "value": "\"import_batches\".\"source_checksum\" is null or length(trim(\"import_batches\".\"source_checksum\")) between 16 and 128"
+        }
+      }
+    }
+  },
+  "views": {},
+  "enums": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  },
+  "internal": {
+    "indexes": {}
+  }
+}

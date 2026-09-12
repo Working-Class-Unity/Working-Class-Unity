@@ -31,7 +31,7 @@ const calendarEvents = computed<readonly CalendarEvent[]>(() =>
     .flatMap((event) =>
       event.sessions.map((session, index) => ({
         address: session.locationAddress ?? '',
-        campaignTags: event.campaignTags ?? [],
+        campaignTags: session.campaignTags ?? event.campaignTags ?? [],
         dateLabel: formatDate(session.startsAt, session.timezone),
         description: event.description ?? '',
         endsAt: session.endsAt,

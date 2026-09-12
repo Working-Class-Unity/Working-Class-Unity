@@ -31,7 +31,7 @@ describe('public calendar', () => {
       sqlite
         .prepare(
           `insert into event_tags (event_id, kind, value) values
-        ('public', 'campaign', 'sidequest-2026-03-deflock-stockton'),
+        ('public', 'campaign', 'sidequest-2025-06-kyr'),
         ('public', 'campaign', 'focus-unpublished-internal'),
         ('members', 'campaign', 'sidequest-2025-06-kyr')`
         )
@@ -50,6 +50,11 @@ describe('public calendar', () => {
       insert.run('archived-session', 'archived', 'scheduled', '2026-09-03T00:00:00.000Z')
       insert.run('before-window', 'public', 'scheduled', '2026-08-31T23:59:59.000Z')
       insert.run('after-window', 'public', 'scheduled', '2026-10-01T00:00:00.000Z')
+      sqlite.exec(`insert into event_session_campaign_tags (event_session_id, value) values
+        ('public-first', 'sidequest-2026-03-deflock-stockton'),
+        ('public-first', 'sidequest-2025-06-kyr'),
+        ('public-first', 'focus-unpublished-internal'),
+        ('private-session', 'sidequest-2026-03-deflock-stockton')`)
 
       const input = { from: '2026-09-01T00:00:00.000Z', limit: 200, to: '2026-10-01T00:00:00.000Z' }
       const result = listVisibleCalendarEvents(connection, input)
@@ -58,7 +63,12 @@ describe('public calendar', () => {
       expect(result.events[0]!.sessions[0]!.rsvpUrl).toBe('https://tech.workingclassunity.com/public-action')
       expect(JSON.stringify(result)).not.toContain('private-token')
       expect(result.events[0]).not.toHaveProperty('visibility')
-      expect(result.events[0]!.campaignTags).toEqual(['sidequest-2026-03-deflock-stockton'])
+      expect(result.events[0]!.campaignTags).toEqual(['sidequest-2025-06-kyr'])
+      expect(result.events[0]!.sessions[0]!.campaignTags).toEqual([
+        'sidequest-2025-06-kyr',
+        'sidequest-2026-03-deflock-stockton'
+      ])
+      expect(result.events[0]!.sessions[1]!.campaignTags).toEqual(['sidequest-2025-06-kyr'])
       expect(JSON.stringify(result)).not.toContain('focus-unpublished-internal')
       expect(listVisibleCalendarEvents(connection, { ...input, limit: 1 }).events[0]!.sessions).toHaveLength(1)
     } finally {

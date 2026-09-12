@@ -30,6 +30,7 @@ export type CalendarApiResponse = Readonly<{
     eventPageUrl: string | null
     id: string
     sessions: readonly Readonly<{
+      campaignTags?: readonly string[]
       deliveryMode: 'hybrid' | 'in_person' | 'virtual'
       endsAt: string | null
       id: string

@@ -8,6 +8,13 @@
       "when": 1789192776777,
       "tag": "0000_public_events",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1789235466420,
+      "tag": "0001_occurrence_campaign_tags",
+      "breakpoints": true
     }
   ]
 }

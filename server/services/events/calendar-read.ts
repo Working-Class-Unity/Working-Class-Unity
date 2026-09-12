@@ -12,6 +12,7 @@ export type CalendarEvent = Readonly<{
 }>
 
 export type CalendarEventSession = Readonly<{
+  campaignTags: readonly string[]
   deliveryMode: 'hybrid' | 'in_person' | 'virtual'
   endsAt: string | null
   id: string
@@ -83,6 +84,11 @@ export function listVisibleCalendarEvents(
      and value in ('sidequest-2025-06-kyr', 'sidequest-2026-03-deflock-stockton', 'focus-tenant-union')
      order by value`
   )
+  const sessionCampaignTags = connection.sqlite.prepare(
+    `select value from event_session_campaign_tags where event_session_id = ?
+     and value in ('sidequest-2025-06-kyr', 'sidequest-2026-03-deflock-stockton', 'focus-tenant-union')
+     order by value`
+  )
   for (const row of rows) {
     const existing = events.get(row.eventId)
     const event =
@@ -98,6 +104,14 @@ export function listVisibleCalendarEvents(
       } satisfies CalendarEvent & { sessions: CalendarEventSession[] })
     event.sessions.push(
       Object.freeze({
+        campaignTags: Object.freeze(
+          [
+            ...new Set([
+              ...event.campaignTags,
+              ...(sessionCampaignTags.all(row.sessionId) as { value: string }[]).map(({ value }) => value)
+            ])
+          ].sort()
+        ),
         deliveryMode: row.deliveryMode,
         endsAt: row.endsAt,
         id: row.sessionId,
