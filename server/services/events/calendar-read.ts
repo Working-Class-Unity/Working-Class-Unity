@@ -3,6 +3,7 @@ import type { EventCategory } from '../../db/schema/events'
 
 export type CalendarEvent = Readonly<{
   category: EventCategory
+  campaignTags: readonly string[]
   description: string | null
   eventPageUrl: string | null
   id: string
@@ -77,12 +78,18 @@ export function listVisibleCalendarEvents(
     .all(from, to, input.limit) as CalendarRow[]
 
   const events = new Map<string, CalendarEvent & { sessions: CalendarEventSession[] }>()
+  const campaignTags = connection.sqlite.prepare(
+    `select value from event_tags where event_id = ? and kind = 'campaign'
+     and value in ('sidequest-2025-06-kyr', 'sidequest-2026-03-deflock-stockton', 'focus-tenant-union')
+     order by value`
+  )
   for (const row of rows) {
     const existing = events.get(row.eventId)
     const event =
       existing ??
       ({
         category: row.category,
+        campaignTags: Object.freeze((campaignTags.all(row.eventId) as { value: string }[]).map(({ value }) => value)),
         description: row.description,
         eventPageUrl: row.eventPageUrl,
         id: row.eventId,

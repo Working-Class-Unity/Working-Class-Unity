@@ -28,6 +28,14 @@ describe('public calendar', () => {
       sqlite
         .prepare("insert into event_tags (event_id, kind, value) values ('member-tagged', 'event', 'audience-members')")
         .run()
+      sqlite
+        .prepare(
+          `insert into event_tags (event_id, kind, value) values
+        ('public', 'campaign', 'sidequest-2026-03-deflock-stockton'),
+        ('public', 'campaign', 'focus-unpublished-internal'),
+        ('members', 'campaign', 'sidequest-2025-06-kyr')`
+        )
+        .run()
       const insert = sqlite.prepare(
         `insert into event_sessions (id, event_id, status, starts_at, timezone, rsvp_url, virtual_url)
          values (?, ?, ?, ?, 'America/Los_Angeles', 'https://tech.workingclassunity.com/public-action',
@@ -50,6 +58,8 @@ describe('public calendar', () => {
       expect(result.events[0]!.sessions[0]!.rsvpUrl).toBe('https://tech.workingclassunity.com/public-action')
       expect(JSON.stringify(result)).not.toContain('private-token')
       expect(result.events[0]).not.toHaveProperty('visibility')
+      expect(result.events[0]!.campaignTags).toEqual(['sidequest-2026-03-deflock-stockton'])
+      expect(JSON.stringify(result)).not.toContain('focus-unpublished-internal')
       expect(listVisibleCalendarEvents(connection, { ...input, limit: 1 }).events[0]!.sessions).toHaveLength(1)
     } finally {
       sqlite.close()

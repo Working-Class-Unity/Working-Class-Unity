@@ -2,26 +2,22 @@
 import CalendarDatePicker from '~/components/calendar/CalendarDatePicker.vue'
 import CalendarEventActions from '~/components/calendar/CalendarEventActions.vue'
 import CalendarEventBadge from '~/components/calendar/CalendarEventBadge.vue'
-import { calendarFilters, type CalendarEvent, type CalendarFilter } from '~/content/calendar'
+import type { CalendarEvent } from '~/content/calendar'
 
 const props = defineProps<{
   date: string | null
   events: readonly CalendarEvent[]
   jumpMessage: string
+  hasFilters?: boolean
 }>()
 
-const activeFilter = defineModel<CalendarFilter>('activeFilter', { required: true })
 const emit = defineEmits<{ jump: [date: string] }>()
 const { locale, localeProperties, t } = useI18n()
 const languageTag = computed(() => localeProperties.value.language ?? locale.value)
 
-const filteredEvents = computed(() => {
-  if (activeFilter.value === 'Everything') return props.events
-  return props.events.filter((event) => event.kind === activeFilter.value)
-})
-const featuredEvent = computed(() => filteredEvents.value[0] ?? null)
-const recurringEvents = computed(() => filteredEvents.value.filter((event) => event.recurring))
-const agendaEvents = computed(() => filteredEvents.value.slice(1))
+const featuredEvent = computed(() => props.events[0] ?? null)
+const recurringEvents = computed(() => props.events.filter((event) => event.recurring))
+const agendaEvents = computed(() => props.events.slice(1))
 const featuredDate = computed(() => {
   const event = featuredEvent.value
   if (!event) return null
@@ -84,25 +80,8 @@ function recurrenceSchedule(event: CalendarEvent) {
       <CalendarEventActions class="featured-actions" :event="featuredEvent" show-directions />
     </article>
 
-    <div class="agenda-filter-row">
-      <p>{{ t('calendar.filters.label') }}</p>
-      <div class="event-filters" role="group" :aria-label="t('calendar.filters.label')">
-        <AppButton
-          v-for="filter in calendarFilters"
-          :key="filter"
-          class="filter-action"
-          size="compact"
-          variant="secondary"
-          :aria-pressed="activeFilter === filter"
-          @click="activeFilter = filter"
-        >
-          {{ t(`calendar.filters.${filter.toLowerCase()}`) }}
-        </AppButton>
-      </div>
-    </div>
-
     <p v-if="!featuredEvent" class="empty-state">
-      {{ t(activeFilter === 'Everything' && !date ? 'calendar.empty' : 'calendar.agenda.noMatches') }}
+      {{ t(!hasFilters && !date ? 'calendar.empty' : 'calendar.agenda.noMatches') }}
     </p>
     <div v-else class="agenda-layout">
       <section aria-labelledby="up-next-title">
@@ -273,49 +252,6 @@ function recurrenceSchedule(event: CalendarEvent) {
     inline-size: 9.5rem;
   }
 
-  .agenda-filter-row {
-    display: flex;
-    align-items: center;
-    gap: var(--space-4);
-    flex-wrap: wrap;
-  }
-
-  .agenda-filter-row > p {
-    margin: 0;
-    color: var(--color-brand-primary);
-    font-size: 0.875rem;
-    font-weight: 650;
-  }
-
-  .event-filters {
-    display: flex;
-    gap: var(--space-2);
-    flex-wrap: wrap;
-  }
-
-  .event-filters .filter-action[data-variant='secondary'] {
-    min-block-size: var(--control-min-block-size);
-    border: 0;
-    border-radius: var(--radius-2);
-    padding: 0.6rem 0.75rem;
-    color: var(--color-text-muted);
-    background: transparent;
-    font: inherit;
-    font-weight: 650;
-    filter: none;
-    cursor: pointer;
-  }
-
-  .event-filters .filter-action[data-variant='secondary']:hover,
-  .event-filters .filter-action[data-variant='secondary'][aria-pressed='true'] {
-    color: var(--color-action);
-    background: var(--color-action-soft);
-  }
-
-  .event-filters .filter-action[data-variant='secondary'][aria-pressed='true'] {
-    box-shadow: inset 0 0 0 1px var(--color-action);
-  }
-
   .agenda-layout {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 17rem;
@@ -435,10 +371,6 @@ function recurrenceSchedule(event: CalendarEvent) {
       font-size: 1rem;
     }
 
-    .event-filters .filter-action {
-      font-size: 1rem;
-    }
-
     .featured-event {
       grid-template-columns: 1fr;
     }
@@ -457,16 +389,6 @@ function recurrenceSchedule(event: CalendarEvent) {
 
     .featured-actions,
     .row-actions {
-      inline-size: 100%;
-    }
-
-    .agenda-filter-row {
-      align-items: flex-start;
-      flex-direction: column;
-      gap: var(--space-2);
-    }
-
-    .event-filters {
       inline-size: 100%;
     }
 

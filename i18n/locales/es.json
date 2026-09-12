@@ -601,7 +601,20 @@
       "copied": "Dirección copiada",
       "copiedAnnouncement": "Dirección copiada."
     },
-    "resetDate": "Mostrar todos los próximos eventos"
+    "resetDate": "Mostrar todos los próximos eventos",
+    "refine": {
+      "type": "Tipo de evento",
+      "campaign": "Campaña",
+      "future": "A futuro",
+      "clear": "Quitar filtros",
+      "results": "No hay eventos que coincidan | 1 evento coincide | {count} eventos coinciden"
+    },
+    "campaigns": {
+      "all": "Todas las campañas",
+      "unitedFront": "SQ - United Front",
+      "deflockStockton": "SQ - Deflock Stockton",
+      "tenantUnion": "CA - Tenant Union"
+    }
   },
   "join": {
     "title": "Únase a Working Class Unity",

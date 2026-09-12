@@ -26,6 +26,19 @@ Campaign Tags currently recorded in the registry are `focus-tenant-union`, `side
 and `sidequest-2026-03-deflock-stockton`. Approved future tags follow `focus-*` or `sidequest-*`.
 They remain event classification; a separate campaign/Side-Quest database is future work.
 
+The public calendar uses these display labels for the existing campaign tags:
+
+- `SQ - United Front`: `sidequest-2025-06-kyr` (the existing Know Your Rights / United Front work).
+- `SQ - Deflock Stockton`: `sidequest-2026-03-deflock-stockton`.
+- `CA - Tenant Union`: `focus-tenant-union`, shown as a disabled future option until the campaign is ready.
+
+Type and campaign filters combine and apply to both agenda and month views. Unlabelled events
+remain visible under All campaigns. The public read exposes only these known campaign tags.
+The display mapping does not change Solidarity records or taxonomy. Events without an approved
+campaign tag appear only under All campaigns. Desktop shows type buttons and a campaign select;
+narrow layouts use two native selects. Clear filters preserves a selected date; All upcoming events
+resets the date, type, and campaign together.
+
 Before publishing or updating:
 
 1. Set the title, description, timezone, sessions, format, location, and Event Page in Solidarity.

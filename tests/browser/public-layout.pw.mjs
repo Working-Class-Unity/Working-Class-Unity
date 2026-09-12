@@ -270,14 +270,17 @@ test.describe('calendar date selection', () => {
       await expect(page.getByText('No events match this filter yet.', { exact: true })).toBeVisible()
       await expect(datePicker).toBeVisible()
 
-      // Reset must restore the date and the category when both exclude the event.
-      const filters = page.getByRole('group', { name: 'Filter upcoming events', exact: true })
-      await filters.getByRole('button', { name: 'Meeting', exact: true }).click()
+      // Reset restores the date, type, and campaign when they exclude the event.
+      const typeFilter = page.getByRole('combobox', { name: 'Event type', exact: true })
+      const campaignFilter = page.getByRole('combobox', { name: 'Campaign', exact: true })
+      await typeFilter.selectOption('Meeting')
+      await campaignFilter.selectOption('united-front')
       const reset = page.getByRole('button', { name: 'Show all upcoming events', exact: true })
       await expect(reset).toBeVisible()
       await reset.click()
       await expect(page.locator('.featured-event h3')).toHaveText('Calendar reset gathering')
-      await expect(filters.getByRole('button', { name: 'All', exact: true })).toHaveAttribute('aria-pressed', 'true')
+      await expect(typeFilter).toHaveValue('Everything')
+      await expect(campaignFilter).toHaveValue('all')
       await expect(reset).toHaveCount(0)
       await expect(page.locator('.jump-message')).toHaveCount(0)
     } finally {

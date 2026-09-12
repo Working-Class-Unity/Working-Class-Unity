@@ -601,7 +601,20 @@
       "copied": "ਪਤਾ ਕਾਪੀ ਕੀਤਾ ਗਿਆ",
       "copiedAnnouncement": "ਪਤਾ ਕਾਪੀ ਕੀਤਾ ਗਿਆ।"
     },
-    "resetDate": "ਆਉਣ ਵਾਲੇ ਸਾਰੇ ਸਮਾਗਮ ਵੇਖੋ"
+    "resetDate": "ਆਉਣ ਵਾਲੇ ਸਾਰੇ ਸਮਾਗਮ ਵੇਖੋ",
+    "refine": {
+      "type": "ਸਮਾਗਮ ਦੀ ਕਿਸਮ",
+      "campaign": "ਮੁਹਿੰਮ",
+      "future": "ਭਵਿੱਖ ਵਿੱਚ",
+      "clear": "ਫਿਲਟਰ ਹਟਾਓ",
+      "results": "ਕੋਈ ਮੇਲ ਖਾਂਦਾ ਸਮਾਗਮ ਨਹੀਂ | 1 ਮੇਲ ਖਾਂਦਾ ਸਮਾਗਮ | {count} ਮੇਲ ਖਾਂਦੇ ਸਮਾਗਮ"
+    },
+    "campaigns": {
+      "all": "ਸਾਰੀਆਂ ਮੁਹਿੰਮਾਂ",
+      "unitedFront": "SQ - United Front",
+      "deflockStockton": "SQ - Deflock Stockton",
+      "tenantUnion": "CA - Tenant Union"
+    }
   },
   "join": {
     "title": "Working Class Unity ਵਿੱਚ ਸ਼ਾਮਲ ਹੋਵੋ",
