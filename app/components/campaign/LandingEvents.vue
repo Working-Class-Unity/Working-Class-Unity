@@ -17,7 +17,9 @@ const upcoming = computed(() =>
     .sort((a, b) => Date.parse(a.session.startsAt) - Date.parse(b.session.startsAt))
 )
 const campaignEvents = computed(() =>
-  upcoming.value.filter(({ event }) => campaignTag && event.campaignTags?.includes(campaignTag))
+  upcoming.value.filter(
+    ({ event, session }) => campaignTag && (session.campaignTags ?? event.campaignTags)?.includes(campaignTag)
+  )
 )
 const hasCampaignEvents = computed(() => campaignEvents.value.length > 0)
 const showingFallback = computed(() => status.value === 'success' && !hasCampaignEvents.value)

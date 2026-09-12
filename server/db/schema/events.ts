@@ -111,6 +111,26 @@ export const eventTags = sqliteTable(
   ]
 )
 
+// Website-owned additions for one occurrence; Solidarity still owns series tags.
+export const eventSessionCampaignTags = sqliteTable(
+  'event_session_campaign_tags',
+  {
+    eventSessionId: text('event_session_id')
+      .notNull()
+      .references(() => eventSessions.id, { onDelete: 'restrict' }),
+    value: text('value').notNull(),
+    createdAt: createdAtColumn(),
+    updatedAt: updatedAtColumn()
+  },
+  (table) => [
+    uniqueIndex('event_session_campaign_tags_session_value_uidx').on(table.eventSessionId, table.value),
+    check(
+      'event_session_campaign_tags_value_check',
+      sql`${table.value} = trim(${table.value}) and length(${table.value}) between 1 and 100`
+    )
+  ]
+)
+
 export const eventProviderLinks = sqliteTable(
   'event_provider_links',
   {

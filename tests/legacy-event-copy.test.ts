@@ -68,7 +68,7 @@ describe('one-time legacy event copy', () => {
               "select name from sqlite_master where type = 'table' and name not like 'sqlite_%' and name <> '__drizzle_migrations' order by name"
             )
             .all()
-        ).toHaveLength(7)
+        ).toHaveLength(8)
         const eventSnapshots = copied
           .prepare(
             "select raw_payload from external_record_snapshots where external_id in ('event-public', 'event-members')"

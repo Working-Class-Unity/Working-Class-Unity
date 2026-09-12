@@ -9,6 +9,7 @@ const migrationsFolder = fileURLToPath(new URL('./migrations/', import.meta.url)
 const sqlite = new Database(':memory:')
 const expectedTables = [
   'event_provider_links',
+  'event_session_campaign_tags',
   'event_session_provider_links',
   'event_sessions',
   'event_tags',
@@ -46,7 +47,7 @@ try {
   ).map(({ name }) => name)
   if (JSON.stringify(tables) !== JSON.stringify(expectedTables)) fail('Unexpected application tables.')
   verifySqliteIntegrityAndForeignKeys(sqlite, 'Event-only migration', fail)
-  console.log('Fresh and repeat event-only migrations passed with 7 application tables.')
+  console.log(`Fresh and repeat event-only migrations passed with ${expectedTables.length} application tables.`)
 } finally {
   sqlite.close()
 }

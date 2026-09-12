@@ -34,6 +34,13 @@ to the packaged operator over SSH stdin; it does not transfer data through sched
 Edit the event in Solidarity first. Keep the registered audience/category/campaign rules in
 [`solidarity-taxonomy.md`](solidarity-taxonomy.md). A session title can differ from its parent series title.
 
+The website can add a campaign tag to one dated occurrence in `event_session_campaign_tags`.
+These local additions belong to the occurrence's stable `event_session_id`; they are separate from
+Solidarity's series-wide tags and survive metadata sync. The public calendar and campaign sections
+combine both sets for that occurrence only. A local tag does not change other dates in the series
+or write back to Solidarity. Use a consistent backup and a transaction when making an approved
+local edit, then verify the selected occurrence and its untagged sibling dates.
+
 ### Collect and preview
 
 ```sh

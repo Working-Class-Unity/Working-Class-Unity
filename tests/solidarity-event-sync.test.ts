@@ -93,6 +93,9 @@ describe('Solidarity browser event sync', () => {
         observedAt: new Date('2026-09-08T12:00:00.000Z')
       })
       const moveId = localSession(connection, 'move').id
+      connection.sqlite
+        .prepare('insert into event_session_campaign_tags (event_session_id, value) values (?, ?)')
+        .run(moveId, 'sidequest-2026-03-deflock-stockton')
       const missingId = localSession(connection, 'missing-in').id
       const outside = localSession(connection, 'outside')
       const incoming = capture([
@@ -165,6 +168,9 @@ describe('Solidarity browser event sync', () => {
         starts_at: '2026-10-02T19:00:00.000Z'
       })
       expect(localSession(connection, 'move-virtual').id).toBe(moveId)
+      expect(
+        connection.sqlite.prepare('select event_session_id, value from event_session_campaign_tags').all()
+      ).toEqual([{ event_session_id: moveId, value: 'sidequest-2026-03-deflock-stockton' }])
       expect(localSession(connection, 'missing-in').status).toBe('scheduled')
       expect(localSession(connection, 'outside')).toEqual(outside)
       expect(localSession(connection, 'completed').status).toBe('completed')
