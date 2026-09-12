@@ -5,6 +5,8 @@ import {
   importSolidarityEventDataset,
   previewSolidarityEventImport,
   readSolidarityEventImportState,
+  solidarityEventFields,
+  solidaritySessionFields,
   type SolidarityEventImportDataset,
   type SolidaritySessionRecord
 } from './solidarity-import'
@@ -23,34 +25,6 @@ export type SolidarityEventSyncChange = {
   kind: 'create' | 'update'
   fields: Array<{ field: string; before?: unknown; after?: unknown }>
 }
-
-const eventFields = [
-  'campaignTags',
-  'description',
-  'eventPageUrl',
-  'eventTags',
-  'id',
-  'primaryEventId',
-  'status',
-  'timezone',
-  'title'
-]
-const sessionFields = [
-  'endsAt',
-  'eventId',
-  'eventType',
-  'id',
-  'locationAddress',
-  'locationName',
-  'pairedSessionId',
-  'primarySessionId',
-  'rsvpUrl',
-  'startsAt',
-  'status',
-  'timezone',
-  'title',
-  'virtualUrl'
-]
 
 export function previewSolidarityEventSync(
   connection: DatabaseConnection,
@@ -106,9 +80,6 @@ function planSync(connection: DatabaseConnection, capture: SolidarityEventSyncCa
   const selectedSourceIds = new Set(selectedSessions.flatMap(({ externalIds }) => externalIds))
   const selectedSourceEventIds = new Set(selectedEvents.flatMap(({ externalIds }) => externalIds))
   const scopedDataset: SolidarityEventImportDataset = {
-    attendance: [],
-    people: [],
-    rsvps: [],
     events: dataset.events.filter(({ id }) => selectedSourceEventIds.has(String(id))),
     sessions: dataset.sessions
       .filter(({ id }) => selectedSourceIds.has(String(id)))
@@ -140,8 +111,7 @@ function planSync(connection: DatabaseConnection, capture: SolidarityEventSyncCa
       retirementProjection.sessions.length !== 1 ||
       !proposed ||
       proposed.after.id !== stored.id ||
-      hash({ ...proposed.after, status: stored.projection!.status, meetingKind: stored.projection!.meetingKind }) !==
-        hash(stored.projection) ||
+      hash({ ...proposed.after, status: stored.projection!.status }) !== hash(stored.projection) ||
       hash(proposed.linksAfter) !== hash(stored.links)
     ) {
       throw new Error(
@@ -269,7 +239,7 @@ function rehydrateRetirement(
         const raw = JSON.parse(payload)
         if (!raw || typeof raw !== 'object' || Array.isArray(raw)) continue
         const record = Object.fromEntries(
-          sessionFields.filter((key) => key in raw).map((key) => [key, raw[key]])
+          solidaritySessionFields.filter((key) => key in raw).map((key) => [key, raw[key]])
         ) as SolidaritySessionRecord
         if (
           String(record.id) !== link.externalId ||
@@ -322,8 +292,7 @@ function summarizeChanges(projection: ImportPreview): SolidarityEventSyncChange[
     'campaignTags',
     'deliveryMode',
     'startsAt',
-    'endsAt',
-    'meetingKind'
+    'endsAt'
   ])
   const changes: SolidarityEventSyncChange[] = []
   for (const level of ['series', 'session'] as const) {
@@ -345,7 +314,7 @@ function summarizeChanges(projection: ImportPreview): SolidarityEventSyncChange[
 function validateCapture(input: SolidarityEventSyncCapture): SolidarityEventSyncCapture {
   assertFields(input, ['dataset', 'scope', 'observedAt'])
   assertFields(input.scope, ['eventIds', 'from', 'to'])
-  assertFields(input.dataset, ['attendance', 'events', 'people', 'rsvps', 'sessions'])
+  assertFields(input.dataset, ['events', 'sessions'])
   assertTimestamp(input.observedAt)
   assertTimestamp(input.scope.from)
   assertTimestamp(input.scope.to)
@@ -357,16 +326,13 @@ function validateCapture(input: SolidarityEventSyncCapture): SolidarityEventSync
   ) {
     throw new TypeError('Solidarity scope must contain unique provider event IDs')
   }
-  for (const key of ['attendance', 'events', 'people', 'rsvps', 'sessions'] as const) {
-    if (!Array.isArray(input.dataset[key])) throw new TypeError('Solidarity capture requires all five dataset arrays')
-  }
-  if (input.dataset.attendance.length || input.dataset.people.length || input.dataset.rsvps.length) {
-    throw new TypeError('Solidarity browser sync accepts event-only captures')
+  for (const key of ['events', 'sessions'] as const) {
+    if (!Array.isArray(input.dataset[key])) throw new TypeError('Solidarity capture requires event and session arrays')
   }
   const eventIds = new Set(input.dataset.events.map(({ id }) => id))
   const sessionIds = new Set(input.dataset.sessions.map(({ id }) => id))
   for (const event of input.dataset.events) {
-    assertFields(event, eventFields)
+    assertFields(event, solidarityEventFields)
     if (
       !validId(event.id) ||
       !input.scope.eventIds.includes(event.id) ||
@@ -379,7 +345,7 @@ function validateCapture(input: SolidarityEventSyncCapture): SolidarityEventSync
   if (input.scope.eventIds.some((id) => !eventIds.has(id)))
     throw new TypeError('Solidarity capture is missing a covered event')
   for (const session of input.dataset.sessions) {
-    assertFields(session, sessionFields)
+    assertFields(session, solidaritySessionFields)
     if (
       !validId(session.id) ||
       !eventIds.has(session.eventId) ||

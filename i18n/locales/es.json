@@ -78,14 +78,10 @@
     }
   },
   "common": {
-    "email": "Correo electrónico",
-    "emailInvalid": "Ingrese una dirección de correo electrónico válida.",
     "language": "Idioma",
     "opensInNewTab": "se abre en una nueva pestaña",
     "required": "requerido",
     "retry": "Intentar otra vez",
-    "checkingSession": "Comprobando su sesión...",
-    "sessionVerificationFailed": "No pudimos verificar su sesión en este momento.",
     "source": "Fuente",
     "working": "Procesando...",
     "carousel": {
@@ -136,21 +132,6 @@
         "description": "Respuestas sobre seguridad, datos de movimiento, tecnología policial, gasto público y eliminación."
       }
     },
-    "login": {
-      "title": "Iniciar sesión"
-    },
-    "activate": {
-      "title": "Active su cuenta"
-    },
-    "signup": {
-      "title": "Crear cuenta"
-    },
-    "app": {
-      "title": "Aplicación"
-    },
-    "account": {
-      "title": "Cuenta"
-    },
     "observability": {
       "title": "Prueba de observabilidad"
     },
@@ -169,7 +150,6 @@
     "applicationLabel": "Encabezado del sitio de Working Class Unity",
     "brandHome": "Inicio de {appName}",
     "primaryLabel": "Principal",
-    "sessionUnavailable": "Verificación de sesión no disponible",
     "about": "Quiénes somos",
     "currentWork": "Trabajo actual",
     "allCurrentWork": "Todo nuestro trabajo actual",
@@ -177,9 +157,6 @@
     "calendar": "Eventos",
     "forum": "Foro de miembros",
     "menu": "Menú",
-    "app": "Aplicación",
-    "login": "Inicio de sesión de miembro",
-    "signup": "Únase a WCU",
     "getInvolved": "Participe",
     "otherCurrentWork": "Otros trabajos en marcha",
     "knowYourRights": "Conozca sus derechos",
@@ -192,7 +169,8 @@
       "faq": "Respuestas sobre Flock, la seguridad pública y la campaña.",
       "unitedFront": "Un llamado a la organización política independiente de la clase trabajadora.",
       "rights": "Guías prácticas para encuentros con las autoridades de inmigración."
-    }
+    },
+    "join": "Unirse a WCU"
   },
   "removeFlock": {
     "campaignLabel": "Misión secundaria para eliminar la vigilancia masiva de Stockton",
@@ -328,200 +306,6 @@
       "terms": "Términos"
     }
   },
-  "account": {
-    "eyebrow": "Configuraciones personales",
-    "title": "Cuenta",
-    "sessionUnavailable": {
-      "title": "Cuenta no disponible"
-    },
-    "loginRequired": {
-      "title": "Continuar iniciando sesión",
-      "description": "Se requiere una sesión iniciada para ver esta página."
-    },
-    "profile": {
-      "title": "Configuración de perfil",
-      "description": "Agregue estos detalles cuando esté listo. No son obligatorios para usar su cuenta.",
-      "help": "Los nombres y apellidos permanecen en la configuración de la cuenta. Solo se utiliza un nombre para mostrar explícito en otras partes de su cuenta WCU.",
-      "firstName": "Nombre de pila",
-      "lastName": "Apellido",
-      "displayName": "Nombre para mostrar",
-      "optional": "Opcional",
-      "displayNameHelp": "Opcional. Su correo electrónico o número de teléfono se utiliza en su panel de control y en el menú de su cuenta cuando está en blanco.",
-      "save": "Guardar perfil",
-      "saving": "Guardando perfil...",
-      "saved": "Perfil guardado.",
-      "saveError": "No pudimos guardar su perfil en este momento. Por favor inténtalo de nuevo."
-    },
-    "identity": {
-      "title": "Detalles de inicio de sesión",
-      "avatar": "Avatar",
-      "avatarAlt": "Avatar para {identity}",
-      "noAvatar": "Sin avatar",
-      "phone": "Número de teléfono",
-      "notAdded": "No agregado"
-    },
-    "email": {
-      "title": "Inicio de sesión por correo electrónico",
-      "description": "Un correo electrónico verificado le brinda otra forma de iniciar sesión en esta misma cuenta.",
-      "current": "Dirección de correo electrónico",
-      "status": "Estado del correo electrónico",
-      "verified": "Verificado",
-      "notVerified": "No verificado",
-      "addEmail": "Agregar una dirección de correo electrónico",
-      "newEmail": "Nueva dirección de correo electrónico",
-      "help": "Le enviaremos un enlace de verificación WCU. Su correo electrónico se convierte en un inicio de sesión solo después de hacer clic en él.",
-      "required": "Se requiere correo electrónico.",
-      "unchanged": "Ingrese una dirección de correo electrónico diferente.",
-      "sending": "Enviando enlace de verificación...",
-      "send": "Enviar enlace de verificación",
-      "requested": "Si se puede utilizar esa dirección, un enlace de verificación WCU está en camino.",
-      "requestError": "No pudimos enviar el enlace de verificación. Inténtelo de nuevo o comuníquese con WCU."
-    },
-    "membership": {
-      "title": "membresía WCU",
-      "description": "El monto de su contribución no cambia sus derechos de membresía.",
-      "loading": "Cargando su estado de membresía...",
-      "loadError": "No pudimos cargar su estado de membresía en este momento.",
-      "accountType": "Tipo de cuenta",
-      "supporter": "Colaborador",
-      "member": "Miembro",
-      "contribution": "Contribución actual",
-      "amountMonthly": "${amount} por mes",
-      "equalRights": "Las contribuciones $10 y $27 tienen derechos de membresía idénticos.",
-      "currentContribution": "Contribución actual",
-      "scheduledContribution": "Contribución programada",
-      "identityReviewTitle": "Es necesario revisar la coincidencia de membresía",
-      "identityReview": "No pudimos relacionar de manera segura esta cuenta con una membresía existente. Póngase en contacto con WCU antes de iniciar otra suscripción.",
-      "joinContribution": "Conviértete en miembro por ${amount}/mes",
-      "changeContribution": "Cambiar a ${amount}/mes",
-      "changeSaved": "Su cambio de contribución está programado para su próxima renovación.",
-      "paymentProblemTitle": "El pago necesita atención",
-      "paymentProblem": "Conserva todos los derechos de membresía hasta {deadline}. Corrija el pago antes de esa fecha para seguir siendo miembro.",
-      "fixPayment": "Arreglar pago",
-      "managePayment": "Gestionar pago",
-      "cancellationTitle": "Cancelación de membresía programada",
-      "cancellation": "Sus derechos de membresía continúan hasta {deadline}.",
-      "changePendingTitle": "Cambio de contribución programado",
-      "changePending": "Su contribución cambia a ${amount}/mes el {deadline}. No hay prorrateo.",
-      "checkoutCancelled": "El proceso de pago se canceló. No se hizo ningún cargo a su cuenta.",
-      "refresh": "Actualizar el estado de Stripe",
-      "refreshed": "Su estado Stripe está actualizado.",
-      "commandError": "No pudimos completar esa acción Stripe. Inténtelo de nuevo o comuníquese con WCU.",
-      "dateUnavailable": "la fecha que se muestra en Stripe"
-    },
-    "menu": {
-      "triggerLabel": "Menú de cuenta para {identity}",
-      "account": "Cuenta",
-      "signingOut": "Cerrando sesión...",
-      "signOut": "Cerrar sesión",
-      "signOutError": "No pudimos confirmar que cerró la sesión. Es posible que su sesión aún esté activa. Inténtelo de nuevo."
-    },
-    "deletion": {
-      "title": "Eliminar cuenta",
-      "description": "Al eliminar la cuenta, se borran su acceso y el contenido privado de la aplicación.",
-      "billingWarning": "Si posee una suscripción Stripe, la eliminación espera hasta que se confirme la cancelación. Su cuenta permanece disponible mientras ese resultado sea incierto; posteriormente, podremos conservar solo las referencias de facturación mínimas necesarias para la conciliación.",
-      "confirmationLabel": "Escriba {confirmation} para confirmar",
-      "help": "Una vez confirmada cualquier cancelación requerida de Stripe, esta acción no tiene período de gracia.",
-      "deleting": "Eliminando cuenta...",
-      "submit": "Eliminar cuenta",
-      "sessionTooOld": "Su sesión es demasiado antigua para esta acción. Cierre sesión, inicie sesión nuevamente y luego vuelva a intentar la eliminación.",
-      "billingPending": "La cancelación de Stripe no está confirmada, por lo que su cuenta no fue eliminada. Espere brevemente y vuelva a intentarlo.",
-      "unknownResult": "No pudimos confirmar si se completó la eliminación. Intente iniciar sesión de nuevo. Si esta cuenta todavía se abre, puede volver a intentarlo."
-    }
-  },
-  "security": {
-    "check": {
-      "label": "control de seguridad",
-      "complete": "Control de seguridad completo.",
-      "failure": "No se pudo completar el control de seguridad.",
-      "progress": "Control de seguridad en curso.",
-      "retry": "Reintentar control de seguridad"
-    }
-  },
-  "auth": {
-    "login": {
-      "eyebrow": "Bienvenido de nuevo",
-      "title": "Iniciar sesión",
-      "introduction": "Utilice su dirección de correo electrónico o número de teléfono de EE. UU. para iniciar sesión sin contraseña.",
-      "needAccount": "¿Necesita una nueva cuenta?",
-      "join": "Únase a WCU.",
-      "alreadyPay": "¿Ya pagas cuotas mensuales?",
-      "activate": "Active su cuenta."
-    },
-    "signup": {
-      "eyebrow": "Comenzar",
-      "title": "Cree su cuenta",
-      "introduction": "Cree una cuenta de colaborador con correo electrónico o un número de teléfono de EE. UU., o regrese a su cuenta WCU existente."
-    },
-    "method": {
-      "label": "Elija cómo continuar",
-      "email": "Usar correo electrónico",
-      "phone": "Usar teléfono"
-    },
-    "errors": {
-      "authenticationFailed": "No pudimos completar la autenticación. Solicite un nuevo enlace de correo electrónico.",
-      "accountNotActivated": "Este correo electrónico no tiene una cuenta del sitio web WCU activada. Utilice Únase a WCU o Active su cuenta a continuación.",
-      "loginLinkUnavailable": "Este enlace de inicio de sesión expiró o ya se utilizó. Solicite un nuevo enlace de correo electrónico.",
-      "activationLinkUnavailable": "Este enlace de activación ya no está disponible. Solicite otro enlace de activación o comuníquese con WCU.",
-      "formInvalid": "Verifique el campo resaltado e inténtelo nuevamente.",
-      "securityRequired": "Complete el control de seguridad antes de continuar.",
-      "emailLink": "No pudimos enviar un enlace de correo electrónico en este momento. Por favor inténtalo de nuevo.",
-      "phoneCode": "No pudimos enviar un texto de verificación. Verifique el número de teléfono de EE. UU. e inténtelo nuevamente.",
-      "phoneVerification": "Ese código de verificación no funcionó. Revise el código o solicite uno nuevo.",
-      "phoneUnavailable": "La verificación telefónica no está disponible en este momento. Por favor inténtalo de nuevo."
-    },
-    "status": {
-      "signedOut": "Has cerrado sesión.",
-      "billingEmailChecked": "Si se pudo verificar este correo electrónico de facturación, ahora estará listo para iniciar sesión por correo electrónico. Solicite un enlace de inicio de sesión a continuación.",
-      "activationComplete": "Su cuenta fue activada, pero el inicio de sesión automático no se completó. Solicite un enlace de inicio de sesión a continuación.",
-      "emailLinkSent": "Si puede recibir correo electrónico en esa dirección, un enlace de inicio de sesión está en camino.",
-      "phoneCodeSent": "Un código de verificación único está en camino."
-    },
-    "sessionUnavailable": {
-      "title": "Verificación de sesión no disponible",
-      "description": "No pudimos verificar su sesión actual. Aún puede solicitar un nuevo enlace por correo electrónico."
-    },
-    "email": {
-      "required": "Se requiere correo electrónico.",
-      "sending": "Envío...",
-      "submit": "Enviar enlace de correo electrónico"
-    },
-    "phone": {
-      "label": "número de teléfono de EE. UU.",
-      "required": "Se requiere número de teléfono.",
-      "invalid": "Ingrese un número de teléfono válido de EE. UU.",
-      "help": "Le enviaremos un mensaje de texto a este número con un código de verificación único. Es posible que se apliquen tarifas de mensajes y datos.",
-      "sending": "Enviando código...",
-      "send": "Envíame un código",
-      "codeLabel": "Código de verificación",
-      "codeRequired": "Se requiere código de verificación.",
-      "codeInvalid": "Ingrese el código numérico del mensaje de texto.",
-      "codeHelp": "Ingrese el código enviado a {phone}.",
-      "verifying": "Verificando...",
-      "verify": "Verificar y continuar",
-      "change": "Use otro número"
-    },
-    "legal": {
-      "acknowledgment": "Al continuar, reconoces {terms} y {privacy}.",
-      "terms": "Términos",
-      "privacy": "Política de privacidad"
-    }
-  },
-  "activation": {
-    "eyebrow": "Miembros pagos existentes",
-    "title": "Active su cuenta",
-    "introduction": "Si ya paga las cuotas mensuales de WCU a través de Stripe, utilice el correo electrónico de esa membresía de Stripe para activar su cuenta del sitio web.",
-    "emailHelp": "Enviaremos el enlace únicamente al correo electrónico actual de la membresía Stripe elegible.",
-    "submit": "Enviar enlace de activación",
-    "sending": "Comprobando...",
-    "error": "No pudimos solicitar la activación de la cuenta en este momento. Por favor inténtalo de nuevo.",
-    "status": "Si este correo electrónico es elegible, se enviará un enlace de activación al correo electrónico que actualmente tiene Stripe. De lo contrario, comuníquese con WCU.",
-    "existingAccount": "¿La cuenta ya está activada?",
-    "login": "Iniciar sesión.",
-    "newAccount": "¿Necesita una nueva membresía?",
-    "join": "Únase a WCU.",
-    "support": "Contacto WCU"
-  },
   "errors": {
     "notFound": {
       "heading": "Página no encontrada",
@@ -557,16 +341,11 @@
       },
       "providers": {
         "title": "Proveedores y datos compartidos",
-        "description": "Enumere todos los proveedores de autenticación, pago, infraestructura, análisis, correo electrónico y defensa contra abusos junto con la información que recibe cada proveedor."
-      },
-      "abuseDefense": {
-        "title": "Defensa contra abuso",
-        "description": "Las páginas de enlace mágico cargan el script y el marco del desafío Turnstile de Cloudflare, que permiten a Cloudflare procesar las señales del navegador y de la red para distinguir a las personas de los robots. La aplicación envía el token opaco resultante a Cloudflare Siteverify, pero no agrega el campo de visitante opcional IP, no habilita la retroalimentación de falla del widget, no retiene el token o la respuesta del proveedor en los datos de la aplicación o en los registros ordinarios, ni muestra los códigos de error del proveedor. Describa la retención real de la implementación y enlace a {addendum} de Cloudflare.",
-        "addendum": "Anexo de privacidad de Turnstile"
+        "description": "Enumere todos los proveedores de pago, infraestructura, análisis y comunicaciones junto con la información que recibe cada proveedor."
       },
       "retention": {
         "title": "Retención y opciones",
-        "description": "Indique los períodos de retención reales, el comportamiento de eliminación de cuentas, las excepciones del historial de facturación, los controles de seguridad y un método de contacto funcional para preguntas sobre privacidad."
+        "description": "Indique los períodos de retención reales, los controles de seguridad y un método de contacto funcional para preguntas sobre privacidad."
       }
     },
     "terms": {
@@ -574,15 +353,15 @@
       "notice": "Este texto es un aviso de personalización, no términos de producción ni asesoramiento legal. Reemplácelo antes del lanzamiento.",
       "service": {
         "title": "el servicio",
-        "description": "Describa qué proporciona Working Class Unity, quién puede usarlo y cualquier requisito de elegibilidad o cuenta."
+        "description": "Describa qué proporciona Working Class Unity, quién puede usarlo y cualquier requisito de elegibilidad."
       },
       "conduct": {
         "title": "Uso aceptable",
         "description": "Documente las reglas de conducta, contenido, automatización y abuso adecuadas para el servicio."
       },
       "payments": {
-        "title": "Pagos y finalización del acceso",
-        "description": "Explique el precio real, renovación, cancelación, reembolso, eliminación de cuenta y comportamiento de acceso."
+        "title": "Pagos",
+        "description": "Explique el precio real y el funcionamiento de la renovación, cancelación y los reembolsos."
       }
     }
   },
@@ -755,7 +534,7 @@
   "calendar": {
     "eyebrow": "calendario WCU",
     "title": "Encuentre cómo participar",
-    "description": "Asista a una reunión de organización, actúe con sus vecinos o conozca gente en una reunión comunitaria. Los eventos públicos están abiertos a los recién llegados. Los miembros que hayan iniciado sesión también pueden ver las reuniones de miembros.",
+    "description": "Asista a una reunión de organización, actúe con sus vecinos o conozca gente en una reunión comunitaria. Los eventos públicos están abiertos a los recién llegados.",
     "view": {
       "label": "Vista de calendario",
       "agenda": "Orden del día",
@@ -821,16 +600,13 @@
       "copy": "Copiar dirección",
       "copied": "Dirección copiada",
       "copiedAnnouncement": "Dirección copiada."
-    }
+    },
+    "resetDate": "Mostrar todos los próximos eventos"
   },
   "join": {
     "title": "Únase a Working Class Unity",
     "chooseTier": "Elija su nivel",
     "tiers": {
-      "supporter": {
-        "name": "Colaborador",
-        "price": "$0/mes"
-      },
       "member": {
         "name": "Miembro",
         "price": "$10/mes"
@@ -840,35 +616,10 @@
         "price": "$27/mes"
       }
     },
-    "tierExplanation": "El nivel Colaborador solo incluye una cuenta. Ambos niveles de pago incluyen los mismos derechos de membresía.",
-    "continueToStripe": "Continuar a Stripe",
+    "tierExplanation": "Ambas opciones de cuotas incluyen los mismos derechos de membresía.",
     "codeOfConduct": "Unirse significa aceptar el Código de Conducta de WCU.",
-    "errors": {
-      "invalidLink": "Ese enlace de membresía no es válido o ya no está disponible.",
-      "checkoutUnavailable": "El pago no está disponible temporalmente. Por favor inténtalo de nuevo."
-    },
-    "complete": {
-      "title": "Revise su correo electrónico",
-      "pending": "Validando su inscripción Stripe…",
-      "sent": "Enviamos un enlace de cuenta al correo electrónico utilizado en Stripe Checkout. Úselo dentro de cinco minutos para terminar.",
-      "error": "No pudimos validar este proceso de pago.",
-      "return": "Volver a la página para unirse"
-    }
-  },
-  "personalApp": {
-    "eyebrow": "Working Class Unity",
-    "welcome": "Bienvenido de nuevo",
-    "welcomeNamed": "Bienvenido de nuevo, {name}",
-    "loading": {
-      "title": "Cargando su cuenta",
-      "description": "Recuperando la sesión de su cuenta."
-    },
-    "unavailable": {
-      "title": "Aplicación no disponible",
-      "description": "No pudimos cargar su cuenta en este momento."
-    },
-    "ready": "Su cuenta WCU está lista.",
-    "signedInAs": "Iniciado sesión como {identity}",
-    "manageAccount": "Administrar cuenta"
+    "description": "Elija sus cuotas mensuales y continúe a Stripe para pagar.",
+    "manageTitle": "¿Ya paga cuotas?",
+    "manageDues": "Administrar cuotas"
   }
 }

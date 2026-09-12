@@ -1,7 +1,6 @@
 import { sql } from 'drizzle-orm'
 import { check, index, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core'
 import { createdAtColumn, updatedAtColumn } from './core'
-import { people } from './people'
 import { externalRecordSnapshots } from './provenance'
 
 export const eventStatuses = ['active', 'archived'] as const
@@ -11,9 +10,6 @@ export const eventDeliveryModes = ['in_person', 'virtual', 'hybrid'] as const
 export const eventTagKinds = ['event', 'campaign'] as const
 export const eventProviders = ['solidarity'] as const
 export const eventSessionStatuses = ['scheduled', 'canceled', 'completed'] as const
-export const rsvpStatuses = ['yes', 'no', 'maybe', 'waitlisted', 'canceled'] as const
-export const attendanceStatuses = ['attended', 'absent', 'excused', 'unknown'] as const
-export const attendanceSources = ['manual', 'solidarity', 'discourse', 'import'] as const
 
 export const events = sqliteTable(
   'events',
@@ -34,7 +30,7 @@ export const events = sqliteTable(
     index('events_status_kind_idx').on(table.status, table.category),
     index('events_visibility_status_category_idx').on(table.visibility, table.status, table.category),
     check('events_title_check', sql`length(trim(${table.title})) between 1 and 255`),
-    check('events_kind_check', sql`length(trim(${table.category})) between 1 and 100`),
+    check('events_kind_check', sql`${table.category} in ('meeting', 'action', 'learning', 'social')`),
     check('events_visibility_check', sql`${table.visibility} in ('hidden', 'public', 'members')`),
     check('events_status_check', sql`${table.status} in ('active', 'archived')`),
     check('events_timezone_check', sql`length(trim(${table.defaultTimezone})) between 1 and 100`),
@@ -175,85 +171,11 @@ export const eventSessionProviderLinks = sqliteTable(
   ]
 )
 
-export const rsvps = sqliteTable(
-  'rsvps',
-  {
-    id: text('id').primaryKey(),
-    eventSessionId: text('event_session_id')
-      .notNull()
-      .references(() => eventSessions.id, { onDelete: 'restrict' }),
-    personId: text('person_id')
-      .notNull()
-      .references(() => people.id, { onDelete: 'restrict' }),
-    status: text('status', { enum: rsvpStatuses }).notNull(),
-    respondedAt: text('responded_at').notNull(),
-    sourceSnapshotId: text('source_snapshot_id').references(() => externalRecordSnapshots.id, { onDelete: 'restrict' }),
-    createdAt: createdAtColumn(),
-    updatedAt: updatedAtColumn()
-  },
-  (table) => [
-    uniqueIndex('rsvps_session_person_uidx').on(table.eventSessionId, table.personId),
-    index('rsvps_person_idx').on(table.personId, table.respondedAt),
-    check('rsvps_status_check', sql`${table.status} in ('yes', 'no', 'maybe', 'waitlisted', 'canceled')`),
-    check('rsvps_responded_at_check', sql`julianday(${table.respondedAt}) is not null`)
-  ]
-)
-
-export const attendance = sqliteTable(
-  'attendance',
-  {
-    id: text('id').primaryKey(),
-    eventSessionId: text('event_session_id')
-      .notNull()
-      .references(() => eventSessions.id, { onDelete: 'restrict' }),
-    personId: text('person_id')
-      .notNull()
-      .references(() => people.id, { onDelete: 'restrict' }),
-    status: text('status', { enum: attendanceStatuses }).notNull(),
-    source: text('source', { enum: attendanceSources }).notNull(),
-    recordedAt: text('recorded_at').notNull(),
-    sourceSnapshotId: text('source_snapshot_id').references(() => externalRecordSnapshots.id, { onDelete: 'restrict' }),
-    createdAt: createdAtColumn(),
-    updatedAt: updatedAtColumn()
-  },
-  (table) => [
-    uniqueIndex('attendance_session_person_uidx').on(table.eventSessionId, table.personId),
-    index('attendance_person_recorded_idx').on(table.personId, table.recordedAt),
-    check('attendance_status_check', sql`${table.status} in ('attended', 'absent', 'excused', 'unknown')`),
-    check('attendance_source_check', sql`${table.source} in ('manual', 'solidarity', 'discourse', 'import')`),
-    check('attendance_recorded_at_check', sql`julianday(${table.recordedAt}) is not null`)
-  ]
-)
-
-export const attendanceIntervals = sqliteTable(
-  'attendance_intervals',
-  {
-    id: text('id').primaryKey(),
-    attendanceId: text('attendance_id')
-      .notNull()
-      .references(() => attendance.id, { onDelete: 'restrict' }),
-    checkedInAt: text('checked_in_at').notNull(),
-    checkedOutAt: text('checked_out_at'),
-    sourceSnapshotId: text('source_snapshot_id').references(() => externalRecordSnapshots.id, { onDelete: 'restrict' }),
-    createdAt: createdAtColumn()
-  },
-  (table) => [
-    uniqueIndex('attendance_intervals_attendance_checkin_uidx').on(table.attendanceId, table.checkedInAt),
-    check(
-      'attendance_intervals_range_check',
-      sql`julianday(${table.checkedInAt}) is not null and (${table.checkedOutAt} is null or julianday(${table.checkedOutAt}) >= julianday(${table.checkedInAt}))`
-    )
-  ]
-)
-
 export type EventStatus = (typeof eventStatuses)[number]
 export type EventCategory = (typeof eventCategories)[number]
 export type EventVisibility = (typeof eventVisibilities)[number]
 export type EventDeliveryMode = (typeof eventDeliveryModes)[number]
 export type EventTagKind = (typeof eventTagKinds)[number]
 export type EventSessionStatus = (typeof eventSessionStatuses)[number]
-export type RsvpStatus = (typeof rsvpStatuses)[number]
-export type AttendanceStatus = (typeof attendanceStatuses)[number]
 export type Event = typeof events.$inferSelect
 export type EventSession = typeof eventSessions.$inferSelect
-export type Attendance = typeof attendance.$inferSelect

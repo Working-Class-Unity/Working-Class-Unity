@@ -49,7 +49,7 @@ function currentPage(path: string) {
             <NuxtLinkLocale to="/calendar">{{ t('navigation.calendar') }}</NuxtLinkLocale>
           </li>
           <li>
-            <NuxtLinkLocale to="/join">{{ t('navigation.signup') }}</NuxtLinkLocale>
+            <NuxtLinkLocale to="/join">{{ t('navigation.join') }}</NuxtLinkLocale>
           </li>
         </ul>
       </div>

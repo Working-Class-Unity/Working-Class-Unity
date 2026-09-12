@@ -2,12 +2,15 @@ import { resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
 const usage = 'Usage: node scripts/deployment-smoke.mjs [--base-url <http(s)://host[:port]>]'
-const capabilityBoundaryPaths = {
-  ai: '/api/ai/conversations',
-  billing: '/api/account/billing',
-  files: '/api/files',
-  observability: '/observability-client-test'
-}
+const retiredApiPaths = [
+  '/api/me',
+  '/api/auth/get-session',
+  '/api/account/billing',
+  '/api/account/membership',
+  '/api/join/checkout',
+  '/api/ai/conversations',
+  '/api/files'
+]
 
 export async function runDeploymentSmoke({ baseUrl, fetchImpl = globalThis.fetch, logger = console }) {
   const normalizedBaseUrl = normalizeBaseUrl(baseUrl)
@@ -56,6 +59,31 @@ export async function runDeploymentSmoke({ baseUrl, fetchImpl = globalThis.fetch
       }
     },
     {
+      name: 'GET /join renders hosted membership links',
+      run: async () => {
+        const response = await request('/join')
+        const html = await response.text()
+        assert(response.ok, `expected 2xx, received ${response.status}`)
+        const links = [...html.matchAll(/<a\b[^>]*\bhref=["']([^"']+)["']/g)].map((match) => match[1])
+        for (const url of [
+          'https://pay.workingclassunity.com/b/7sI4hF1hc9IIepq4gh',
+          'https://pay.workingclassunity.com/b/bIY4hF4tof325SUaEE'
+        ]) {
+          assert(links.includes(url), `expected hosted checkout link ${url}`)
+        }
+      }
+    },
+    {
+      name: 'GET /api/events serves the public calendar without authentication',
+      run: async () => {
+        const response = await request('/api/events')
+        assert(response.status === 200, `expected 200, received ${response.status}`)
+        const body = await response.json()
+        assert(body && Array.isArray(body.events), 'expected an events array')
+        assertHeaderAbsent(response, 'set-cookie')
+      }
+    },
+    {
       name: 'GET /api/live reports process liveness without topology',
       run: async () => {
         const response = await request('/api/live')
@@ -70,21 +98,14 @@ export async function runDeploymentSmoke({ baseUrl, fetchImpl = globalThis.fetch
     await runCheck(check.name, check.run)
   }
 
-  for (const [capabilityId, path] of Object.entries(capabilityBoundaryPaths)) {
-    await runCheck(`GET ${path} reaches the ${capabilityId} release boundary`, async () => {
+  for (const path of retiredApiPaths) {
+    await runCheck(`GET ${path} is unavailable`, async () => {
       const response = await request(path)
-      if (capabilityId === 'observability') {
-        const html = await response.text()
-        assert(response.ok, `expected observability page 2xx, received ${response.status}`)
-        assert(/Client Event Test/.test(html), 'expected the observability client-test page')
-        return
+      assert(response.status === 404, `expected retired API 404, received ${response.status}`)
+      // Nuxt renders missing GET routes through the localized public error page.
+      for (const cookie of response.headers.getSetCookie()) {
+        assert(cookie.split('=', 1)[0].trim() === 'wcu_locale', 'retired API created a non-locale cookie')
       }
-      if (capabilityId === 'ai' || capabilityId === 'files') {
-        assert(response.status === 404, `expected excluded ${capabilityId} 404, received ${response.status}`)
-        assertHeader(response, 'cache-control', 'no-store')
-        return
-      }
-      assert(response.status === 401, `expected anonymous 401 for ${capabilityId}, received ${response.status}`)
     })
   }
 

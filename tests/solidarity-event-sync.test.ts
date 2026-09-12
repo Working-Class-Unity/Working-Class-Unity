@@ -42,7 +42,7 @@ function session(id: string, overrides: Partial<SolidaritySessionRecord> = {}): 
 }
 
 function capture(sessions: readonly SolidaritySessionRecord[]): SolidarityEventSyncCapture {
-  return { dataset: { events: [event], sessions, people: [], rsvps: [], attendance: [] }, scope, observedAt }
+  return { dataset: { events: [event], sessions }, scope, observedAt }
 }
 
 function withDatabase(run: (connection: DatabaseConnection) => void) {
@@ -72,7 +72,7 @@ function batches(connection: DatabaseConnection) {
 }
 
 describe('Solidarity browser event sync', () => {
-  it('reschedules out of scope, adds a hybrid counterpart using the same ID, and retires only explicitly while preserving history', () => {
+  it('reschedules out of scope, adds a hybrid counterpart using the same ID, and retires only explicitly while preserving event metadata', () => {
     withDatabase((connection) => {
       const original = capture([
         session('move'),
@@ -88,33 +88,13 @@ describe('Solidarity browser event sync', () => {
         session('outside', { startsAt: '2026-10-15T19:00:00.000Z', endsAt: '2026-10-15T20:00:00.000Z' }),
         session('completed', { status: 'completed' })
       ])
-      importSolidarityEventDataset(
-        connection,
-        {
-          ...original.dataset,
-          people: [{ id: 'person', displayName: 'Attendee' }],
-          rsvps: [{ id: 'rsvp', userId: 'person', sessionId: 'missing-in', status: 'yes', respondedAt: observedAt }],
-          attendance: [
-            {
-              id: 'attendance',
-              userId: 'person',
-              sessionId: 'missing-virtual',
-              status: 'attended',
-              recordedAt: observedAt,
-              checkedInAt: observedAt
-            }
-          ]
-        },
-        { apply: true, observedAt: new Date('2026-09-08T12:00:00.000Z') }
-      )
+      importSolidarityEventDataset(connection, original.dataset, {
+        apply: true,
+        observedAt: new Date('2026-09-08T12:00:00.000Z')
+      })
       const moveId = localSession(connection, 'move').id
       const missingId = localSession(connection, 'missing-in').id
       const outside = localSession(connection, 'outside')
-      const history = () =>
-        ['rsvps', 'attendance', 'attendance_intervals', 'people'].map((table) =>
-          connection.sqlite.prepare(`select * from ${table} order by id`).all()
-        )
-      const previousHistory = history()
       const incoming = capture([
         session('move', {
           pairedSessionId: 'move-virtual',
@@ -168,6 +148,12 @@ describe('Solidarity browser event sync', () => {
       )
       expect(JSON.stringify(preview.changes)).not.toMatch(/secret=|private description|https:/)
       expect(batches(connection)).toHaveLength(1)
+      connection.sqlite.prepare('update event_sessions set title = ? where id = ?').run('Concurrent change', moveId)
+      const changedState = localSession(connection, 'move')
+      expect(() => applySolidarityEventSync(connection, preview, { retireSessionIds: [], observedAt })).toThrow(/stale/)
+      expect(localSession(connection, 'move')).toEqual(changedState)
+      expect(batches(connection)).toHaveLength(1)
+      connection.sqlite.prepare('update event_sessions set title = ? where id = ?').run('September meeting', moveId)
       const first = applySolidarityEventSync(connection, JSON.parse(JSON.stringify(preview)), {
         retireSessionIds: [],
         observedAt
@@ -187,8 +173,7 @@ describe('Solidarity browser event sync', () => {
       const retired = applySolidarityEventSync(connection, next, { retireSessionIds: [missingId], observedAt })
       expect(retired).toMatchObject({
         changed: true,
-        retiredSessionIds: [missingId],
-        report: { activities: { attendance: 0, rsvps: 0 } }
+        retiredSessionIds: [missingId]
       })
       expect(localSession(connection, 'missing-in')).toMatchObject({
         id: missingId,
@@ -196,7 +181,6 @@ describe('Solidarity browser event sync', () => {
         delivery_mode: 'hybrid'
       })
       expect(localSession(connection, 'missing-virtual').id).toBe(missingId)
-      expect(history()).toEqual(previousHistory)
       const payloads = connection.sqlite
         .prepare(
           `select external_id, raw_payload from external_record_snapshots
@@ -214,7 +198,6 @@ describe('Solidarity browser event sync', () => {
       expect(noOp).toMatchObject({ changed: false, noOp: true, report: { batchId: null } })
       expect(batches(connection)).toEqual(beforeNoOp)
       expect(localSession(connection, 'outside')).toEqual(outside)
-      expect(history()).toEqual(previousHistory)
     })
   })
 })

@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { test } from 'node:test'
 import { promisify } from 'node:util'
-import { createIsolatedClientAddressBook, runIsolatedApiSmoke } from './api-smoke.mjs'
+import { runIsolatedApiSmoke } from './api-smoke.mjs'
 import { createSqliteWriteObserver, fingerprintDirectory } from './isolated-smoke-policy.mjs'
 
 const execFileAsync = promisify(execFile)
@@ -19,7 +19,7 @@ test('isolated API command refuses arbitrary targets before creating a sandbox',
   const result = await runProcess(['https://production.example.com'], cleanEnvironment(temporaryRoot))
 
   assert.equal(result.code, 1)
-  assert.match(result.stderr, /does not accept a deployment URL or command-line options/)
+  assert.match(result.stderr, /does not accept a deployment URL/)
   assert.equal(result.stdout, '')
   assert.deepEqual(readdirSync(temporaryRoot), [])
 })
@@ -53,30 +53,17 @@ test('isolated API command removes its sandbox after an injected operation failu
   assert.deepEqual(readdirSync(temporaryRoot), [])
 })
 
-test('mutating API client refuses a non-loopback target', async () => {
+test('isolated API client refuses a non-loopback target', async () => {
   await assert.rejects(
     runIsolatedApiSmoke({
       baseUrl: 'https://production.example.com',
-      fixtureId: 'r011-policy-fixture',
-      stripeWebhookSecret: 'whsec_isolated_fixture',
-      emailCaptureDirectory: resolve('/tmp/swl-isolated-email-policy-fixture')
+      fixtureId: 'r011-policy-fixture'
     }),
     /requires an HTTP loopback URL/
   )
 })
 
-test('isolated auth clients receive stable and distinct trusted fixture addresses', () => {
-  const addresses = createIsolatedClientAddressBook()
-  const firstClient = new Map()
-  const secondClient = new Map()
-
-  assert.equal(addresses.addressFor(), '192.0.2.1')
-  assert.equal(addresses.addressFor(firstClient), '192.0.2.2')
-  assert.equal(addresses.addressFor(firstClient), '192.0.2.2')
-  assert.equal(addresses.addressFor(secondClient), '192.0.2.3')
-})
-
-test('provider-directory fingerprint changes with fixture bytes', (t) => {
+test('artifact-directory fingerprint changes with fixture bytes', (t) => {
   const temporaryRoot = disposableDirectory(t)
   const objects = join(temporaryRoot, 'objects')
   assert.equal(fingerprintDirectory(objects), 'absent')

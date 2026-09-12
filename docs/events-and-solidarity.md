@@ -1,143 +1,69 @@
 # Events and Solidarity
 
-Solidarity is the event-authoring system for WCU. SQLite is the durable WCU record and the website reads only from SQLite. The website does not create or edit Solidarity events, and its RSVP buttons currently open the applicable Solidarity event page.
+Solidarity authors WCU events and hosts RSVP forms. The website reads event metadata from SQLite
+and sends RSVP visitors to the applicable Solidarity event page. It does not import People, RSVPs,
+attendance, contact data, or membership records.
 
-The complete property, form, automation, event, and campaign registry is in [`solidarity-taxonomy.md`](solidarity-taxonomy.md).
+The organizer property and form registry is in [Solidarity taxonomy](solidarity-taxonomy.md).
 
-## Organizer convention
+## Classification
 
-Every Solidarity event must have exactly one audience tag and one category tag:
+Every event needs one audience tag and one category tag:
 
-| Purpose                                                                        | Allowed event tag   |
-| ------------------------------------------------------------------------------ | ------------------- |
-| Visible to anyone on the WCU website                                           | `audience-public`   |
-| Visible only to a signed-in website account linked to an active WCU membership | `audience-members`  |
-| Meeting                                                                        | `category-meeting`  |
-| Collective action, canvass, tabling, rally, or similar mobilization            | `category-action`   |
-| Political education, training, forum, or workshop                              | `category-learning` |
-| Coffee, game night, meal, or other social gathering                            | `category-social`   |
+| Purpose                                                                  | Event tag           |
+| ------------------------------------------------------------------------ | ------------------- |
+| Eligible for public website listings                                     | `audience-public`   |
+| Retained as restricted metadata; excluded from all public website output | `audience-members`  |
+| Meeting                                                                  | `category-meeting`  |
+| Collective action, canvass, tabling, rally, or similar mobilization      | `category-action`   |
+| Political education, training, forum, or workshop                        | `category-learning` |
+| Coffee, game night, meal, or other social gathering                      | `category-social`   |
 
-Meetings also require exactly one subtype tag:
+Meetings also require one subtype: `meeting-general` or `meeting-steering`. These classify events;
+they do not create local governance or attendance records.
 
-- `meeting-general` for WCU General Meetings;
-- `meeting-steering` for Steering Committee meetings.
+Campaign Tags currently recorded in the registry are `focus-tenant-union`, `sidequest-2025-06-kyr`,
+and `sidequest-2026-03-deflock-stockton`. Approved future tags follow `focus-*` or `sidequest-*`.
+They remain event classification; a separate campaign/Side-Quest database is future work.
 
-The Campaign Tags currently configured in Solidarity are `focus-tenant-union`, `sidequest-2025-06-kyr`, and `sidequest-2026-03-deflock-stockton`. Future approved campaigns use the `focus-*` or `sidequest-*` convention and do not require an importer code change. The normalizer rejects other Event Tags and campaign names outside the convention. Keep the reviewed source metadata and manifest hash privately for provenance.
+Before publishing or updating:
 
-Before publishing or updating an event:
+1. Set the title, description, timezone, sessions, format, location, and Event Page in Solidarity.
+2. Add one audience and category tag; add a meeting subtype when applicable.
+3. Add an approved Campaign Tag when applicable.
+4. Set the hosted RSVP destination and any confirmations inside Solidarity.
+5. Create a separate event if an occurrence needs a different audience or category.
 
-1. Set its title, description, timezone, sessions, format, location, and Event Page in Solidarity.
-2. Add one `audience-*` tag.
-3. Add one `category-*` tag.
-4. For a meeting, add one `meeting-*` tag.
-5. Add a governed Campaign Tag when applicable.
-6. Make the Event Page the RSVP destination and enable the desired Solidarity confirmations and automations.
-7. If one occurrence needs a different audience or category, create a separate Solidarity event rather than putting conflicting tags on a session.
+Missing or conflicting classification hides the event and produces an import issue. Unregistered
+Event Tags or invalid campaign naming are rejected. Never infer classification from a title.
+The audience tag governs WCU publication, not access to a separately known Solidarity URL.
 
-Missing or conflicting classification tags make the local event `hidden` and create an import issue. An unregistered Event Tag or nonconforming Campaign Tag rejects the normalized input before a database write. The audience tag controls only the WCU website. Solidarity has no true private-event setting, so anyone who already knows a member event's direct Solidarity URL may still open it.
+## Local record
 
-## Local model
+The database retains event series, dated sessions, canonical tags, stable Solidarity event/session
+links, and minimal import/sync provenance. A recurring series has several sessions; a hybrid pair
+is represented by one local session with both provider links. A session may have its own display title.
 
-- `events` is the stable series or program, such as “WCU General Meeting.”
-- `event_sessions` is a dated occurrence. A one-time event has one session; a recurring event has several.
-- A Solidarity hybrid pair becomes one local session with two provider links.
-- `event_tags` retains canonical Event Tags and Campaign Tags. Private source metadata and hashes retain source provenance.
-- `event_provider_links` and `event_session_provider_links` retain Solidarity IDs, primary IDs, mirror IDs, and hybrid-pair IDs.
-- RSVPs and attendance attach to a person and an existing Solidarity-linked session. Attendance recording cannot create or reclassify events. General- and steering-meeting meaning is stored separately in `meetings`.
-- Raw imported records are retained through `import_batches` and `external_record_snapshots`; application and API responses never expose those payloads.
+Only allowlisted event fields enter SQLite. Arbitrary source snapshots and metadata must not carry
+personal records into the database. Private source captures and reviewed previews stay outside Git.
 
-The category names shown to website visitors are Meeting, Action, Learning, and Social. They are intentionally based on useful browsing filters rather than every internal organizing activity recorded in old minutes.
+## Updating the calendar
 
-## Event metadata updates
+Use the [on-demand browser-assisted sync](solidarity-event-sync.md) for ordinary updates. Collect
+metadata from an authenticated organizer browser, review its preview, and apply the exact approved
+change. The server stores no Solidarity login credentials and runs no unattended sync.
 
-For ordinary event updates, use the [on-demand browser-assisted sync](solidarity-event-sync.md): collect,
-review one change preview, approve, and apply through the existing importer. No People or RSVP exports
-are needed. The process preserves provider IDs and hybrid pairs and retires missing occurrences only
-when explicitly selected. Production use requires the packaged operator from that release.
+For an already normalized events-only bundle, use the importer:
 
-## Report and activity import
-
-First normalize one People JSON export and one or more aligned event-metadata/RSVP report pairs:
-
-```sh
-pnpm db:normalize:solidarity-events -- \
-  --people /private/path/people.json \
-  --event /private/path/general-meeting.json \
-  --rsvps /private/path/general-meeting-rsvps.csv \
-  --event /private/path/steering-meeting.json \
-  --rsvps /private/path/steering-meeting-rsvps.csv \
-  --bundle /private/path/solidarity-events.json \
-  --manifest /private/path/solidarity-events-manifest.json
+```bash
+node scripts/run-pnpm.mjs run db:import:solidarity-events -- --input=/private/events/events.json
+node scripts/run-pnpm.mjs run db:import:solidarity-events -- --input=/private/events/events.json --apply
 ```
 
-Each event metadata file is an operator-reviewed, schema-versioned allowlist:
+The first command is a dry run. Apply only the same reviewed input. The importer validates the
+bundle before transactionally writing it and reports aggregate counts and issue codes. Use the
+current exported event import schema; People/RSVP/attendance report conversion is no longer supported.
 
-```json
-{
-  "schemaVersion": 1,
-  "event": {
-    "id": "solidarity-event-id",
-    "primaryEventId": null,
-    "title": "Event title",
-    "description": null,
-    "status": "active",
-    "timezone": "America/Los_Angeles",
-    "eventPageUrl": "https://events.solidarity.tech/example",
-    "eventTags": ["audience-public", "category-social"],
-    "campaignTags": ["focus-tenant-union"]
-  },
-  "sessions": [
-    {
-      "id": "solidarity-session-id",
-      "eventId": "solidarity-event-id",
-      "primarySessionId": null,
-      "pairedSessionId": null,
-      "title": "Dated occurrence",
-      "status": "scheduled",
-      "eventType": "in_person",
-      "startsAt": "2026-09-01T02:00:00.000Z",
-      "endsAt": "2026-09-01T03:00:00.000Z",
-      "timezone": "America/Los_Angeles",
-      "locationName": "Example Hall",
-      "locationAddress": "100 Example Street",
-      "virtualUrl": null,
-      "rsvpUrl": "https://events.solidarity.tech/example"
-    }
-  ],
-  "attendance": []
-}
-```
-
-The converter quarantines blank RSVP statuses and Solidarity's known `recurring_auto_rsvp` rows that have no occurrence metadata. Sessionless rows from any other source fail closed because they cannot be attached safely to an event session.
-
-Do not infer event type, pairing, tags, visibility, category, location, or attendance from a title or free-form dashboard text. Put those facts explicitly in the reviewed metadata. The converter rejects noncanonical taxonomy before writing either output. Attendance records use the normalized importer fields and canonical UTC timestamps shown in the import contract; use an empty array when no attendance was recorded.
-
-The converter reads only People ID, name, primary email, and primary phone from the People report and ignores every other field. From RSVP CSV it reads RSVP ID, User ID, Session ID, status, and created/updated timestamps; Source and occurrence metadata are consulted only to recognize a completely sessionless `recurring_auto_rsvp` row. It accepts standard quoted CSV fields, requires the current named headers, and fails closed on malformed records, unsupported values, unknown references, or duplicate normalized activity. A blank RSVP status is omitted and counted as `rsvp_status_missing`, matching the currently observed Solidarity report behavior. The event and RSVP options may be repeated for any number of events, but each event must have exactly one matching RSVP report in the same option order.
-
-The converter has no network or database access. It refuses existing outputs, limits total inputs and the normalized bundle to 25 MiB, writes both new files with mode `0600`, and prints only aggregate counts, issue-code counts, and the bundle hash. Its manifest contains source hashes and counts but no paths, filenames, external IDs, titles, names, or contact data. Keep the source reports, metadata, normalized bundle, and database backups outside Git and shared logs. Review the issue counts and retain the exact manifest and bundle hash used for staging and production.
-
-Run a dry run first:
-
-```sh
-pnpm db:import:solidarity-events -- --input=/private/path/solidarity-events.json
-```
-
-After reviewing the count-only receipt and issue-code counts, apply the same file:
-
-```sh
-pnpm db:import:solidarity-events -- --input=/private/path/solidarity-events.json --apply
-```
-
-The input is the normalized converter output, not an untouched dashboard export. It is limited to 25 MiB and has five arrays: `events`, `sessions`, `people`, `rsvps`, and `attendance`. IDs may be numbers or strings. Dates must be canonical UTC timestamps. Events carry Event Tags and Campaign Tags; sessions carry the parent event ID, `in_person` or `virtual` type, optional primary/paired IDs, location, and RSVP URL. A paired/hybrid local session may have only one RSVP and one attendance record per person in a normalized bundle. The importer rejects conflicting mirror records instead of choosing one by input order. It is transactional and idempotent, never matches a person by name, considers only verified local email/phone contacts for automatic matching, quarantines ambiguous matches, and does not infer deletion from a record missing from one report bundle.
-
-The command logs only aggregate counts, the local batch ID, and issue-code counts. Do not put raw exports in Git, fixtures, command output, or public logs.
-
-## Current synchronization boundary
-
-The paid Solidarity API is not used. Event-only updates use the documented on-demand browser-assisted
-connector; this is not a claim of vendor API support. Dashboard People and RSVP exports plus reviewed
-metadata remain the separate activity-import boundary. Neither route expands consent, profile, or
-membership synchronization. Failed or incomplete reads never authorize removal; missing event sessions
-require explicit retirement review. No unattended calendar-feed or dashboard synchronization is configured.
-
-Native WCU RSVP forms are a later change. They must store a local receipt and reliably create the corresponding Solidarity action so Solidarity confirmations and engagement ladders remain deterministic. Until that contract is available, RSVP links go to Solidarity.
+Provider IDs preserve identity during rescheduling and hybrid pairing. Missing records do not mean
+deletion: explicitly select missing occurrences for retirement through the reviewed sync workflow.
+Failed or incomplete collection cannot authorize retirement. Repeated unchanged input should be a no-op.

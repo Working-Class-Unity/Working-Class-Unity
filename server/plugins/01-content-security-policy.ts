@@ -14,8 +14,7 @@ export default defineNitroPlugin((nitroApp) => {
     }
 
     headers.contentSecurityPolicy = withBrowserProviderSources(policy as ContentSecurityPolicyValue, {
-      sentryDsn: config.public.sentryDsn,
-      fileRequestOrigin: ''
+      sentryDsn: config.public.sentryDsn
     })
   })
 })

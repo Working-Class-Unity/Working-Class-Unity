@@ -5,6 +5,7 @@ import CalendarEventBadge from '~/components/calendar/CalendarEventBadge.vue'
 import { calendarFilters, type CalendarEvent, type CalendarFilter } from '~/content/calendar'
 
 const props = defineProps<{
+  date: string | null
   events: readonly CalendarEvent[]
   jumpMessage: string
 }>()
@@ -53,7 +54,7 @@ function recurrenceSchedule(event: CalendarEvent) {
         <h2 id="agenda-title">{{ t('calendar.agenda.title') }}</h2>
         <p>{{ t('calendar.agenda.description') }}</p>
       </div>
-      <CalendarDatePicker @select="emit('jump', $event)" />
+      <CalendarDatePicker :date="date" @select="emit('jump', $event)" />
     </div>
     <p v-if="jumpMessage" class="jump-message" aria-live="polite">{{ jumpMessage }}</p>
 
@@ -100,7 +101,9 @@ function recurrenceSchedule(event: CalendarEvent) {
       </div>
     </div>
 
-    <p v-if="!featuredEvent" class="empty-state">{{ t('calendar.agenda.noMatches') }}</p>
+    <p v-if="!featuredEvent" class="empty-state">
+      {{ t(activeFilter === 'Everything' && !date ? 'calendar.empty' : 'calendar.agenda.noMatches') }}
+    </p>
     <div v-else class="agenda-layout">
       <section aria-labelledby="up-next-title">
         <div class="section-heading-row">

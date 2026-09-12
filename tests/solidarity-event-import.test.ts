@@ -9,30 +9,12 @@ import { spawnSync } from 'node:child_process'
 import { describe, expect, it } from 'vitest'
 import * as schema from '../server/db/schema/index'
 import { importSolidarityEventDataset } from '../server/services/events/solidarity-import'
-import {
-  solidarityAudienceTags,
-  solidarityCategoryTags,
-  solidarityMeetingTags
-} from '../server/services/events/solidarity-taxonomy'
 
 const migrationsFolder = fileURLToPath(new URL('../server/db/migrations/', import.meta.url))
 const observedAt = new Date('2026-08-23T20:00:00.000Z')
 
 describe('Solidarity event import', () => {
-  it('defines the exact website-interpreted Event Tags', () => {
-    expect([...solidarityAudienceTags, ...solidarityCategoryTags, ...solidarityMeetingTags]).toEqual([
-      'audience-members',
-      'audience-public',
-      'category-action',
-      'category-learning',
-      'category-meeting',
-      'category-social',
-      'meeting-general',
-      'meeting-steering'
-    ])
-  })
-
-  it('projects tagged events, paired hybrid sessions, people, RSVPs, and attendance idempotently', () => {
+  it('projects tagged events and paired hybrid sessions idempotently', () => {
     withMigratedDatabase((sqlite, connection) => {
       const dataset = {
         events: [
@@ -94,57 +76,8 @@ describe('Solidarity event import', () => {
             virtualUrl: 'https://meet.example.test/steering',
             rsvpUrl: 'https://events.example.test/steering'
           }
-        ],
-        people: [
-          {
-            id: 'person-member',
-            firstName: 'Test',
-            lastName: 'Member',
-            email: 'member@example.test',
-            phone: '+12095550100'
-          }
-        ],
-        rsvps: [
-          {
-            id: 'rsvp-general',
-            userId: 'person-member',
-            sessionId: 'session-general-in-person',
-            status: 'yes',
-            respondedAt: '2026-08-20T20:00:00.000Z'
-          }
-        ],
-        attendance: [
-          {
-            id: 'attendance-general',
-            userId: 'person-member',
-            sessionId: 'session-general-virtual',
-            status: 'attended',
-            recordedAt: '2026-09-18T03:35:00.000Z',
-            checkedInAt: '2026-09-18T02:05:00.000Z',
-            checkedOutAt: '2026-09-18T03:25:00.000Z'
-          }
         ]
       } as const
-
-      expect(() =>
-        importSolidarityEventDataset(
-          connection,
-          {
-            ...dataset,
-            rsvps: [
-              ...dataset.rsvps,
-              {
-                id: 'rsvp-general-mirror',
-                userId: 'person-member',
-                sessionId: 'session-general-virtual',
-                status: 'yes',
-                respondedAt: '2026-08-20T20:00:00.000Z'
-              }
-            ]
-          },
-          { apply: false, observedAt }
-        )
-      ).toThrow(/duplicate normalized RSVP person\/session/)
 
       const dryRun = importSolidarityEventDataset(connection, dataset, { apply: false, observedAt })
       expect(dryRun.mode).toBe('dry-run')
@@ -164,21 +97,15 @@ describe('Solidarity event import', () => {
       expect(count(sqlite, 'event_sessions')).toBe(2)
       expect(count(sqlite, 'event_provider_links')).toBe(2)
       expect(count(sqlite, 'event_session_provider_links')).toBe(3)
-      expect(count(sqlite, 'people')).toBe(1)
-      expect(count(sqlite, 'provider_identities')).toBe(1)
-      expect(count(sqlite, 'rsvps')).toBe(1)
-      expect(count(sqlite, 'attendance')).toBe(1)
-      expect(count(sqlite, 'attendance_intervals')).toBe(1)
       expect(count(sqlite, 'import_batches')).toBe(2)
 
       expect(
         sqlite
           .prepare(
             `select e.visibility, e.kind as category, es.delivery_mode as deliveryMode,
-                    m.kind as meetingKind, count(espl.id) as providerLinks
+                    count(espl.id) as providerLinks
              from events e
              join event_sessions es on es.event_id = e.id
-             join meetings m on m.event_session_id = es.id
              join event_session_provider_links espl on espl.event_session_id = es.id
              where e.title = 'WCU General Meeting'`
           )
@@ -186,21 +113,9 @@ describe('Solidarity event import', () => {
       ).toEqual({
         category: 'meeting',
         deliveryMode: 'hybrid',
-        meetingKind: 'general',
         providerLinks: 2,
         visibility: 'public'
       })
-      expect(
-        sqlite
-          .prepare(
-            `select e.visibility, m.kind as meetingKind
-             from events e join event_sessions es on es.event_id = e.id
-             join meetings m on m.event_session_id = es.id
-             where e.title = 'WCU Steering Committee Meeting'`
-          )
-          .get()
-      ).toEqual({ meetingKind: 'steering', visibility: 'members' })
-
       const reclassifiedDataset = {
         ...dataset,
         events: dataset.events.map((event) =>
@@ -216,13 +131,12 @@ describe('Solidarity event import', () => {
       expect(
         sqlite
           .prepare(
-            `select e.kind as category, m.kind as meetingKind
+            `select e.kind as category
              from events e join event_sessions es on es.event_id = e.id
-             left join meetings m on m.event_session_id = es.id
              where e.title = 'WCU General Meeting'`
           )
           .get()
-      ).toEqual({ category: 'social', meetingKind: null })
+      ).toEqual({ category: 'social' })
     })
   })
 
@@ -242,7 +156,7 @@ describe('Solidarity event import', () => {
         timezone: 'America/Los_Angeles',
         title: 'Governed campaign action'
       } as const
-      const dataset = { attendance: [], events: [event], people: [], rsvps: [], sessions: [] } as const
+      const dataset = { events: [event], sessions: [] } as const
 
       expect(importSolidarityEventDataset(connection, dataset, { apply: true, observedAt }).issues).toEqual([])
       expect(
@@ -321,7 +235,7 @@ describe('Solidarity event import', () => {
       } as const
       importSolidarityEventDataset(
         connection,
-        { attendance: [], events: [event], people: [], rsvps: [], sessions: [originalSession] },
+        { events: [event], sessions: [originalSession] },
         { apply: true, observedAt }
       )
       const originalLocalId = (
@@ -336,10 +250,7 @@ describe('Solidarity event import', () => {
       importSolidarityEventDataset(
         connection,
         {
-          attendance: [],
           events: [{ ...event, primaryEventId: 'event-primary' }],
-          people: [],
-          rsvps: [],
           sessions: [{ ...originalSession, primarySessionId: 'session-a' }]
         },
         { apply: true, observedAt: new Date('2026-08-24T20:00:00.000Z') }
@@ -347,10 +258,7 @@ describe('Solidarity event import', () => {
       importSolidarityEventDataset(
         connection,
         {
-          attendance: [],
           events: [{ ...event, id: 'event-primary' }],
-          people: [],
-          rsvps: [],
           sessions: [
             {
               eventId: 'event-primary',
@@ -369,10 +277,7 @@ describe('Solidarity event import', () => {
       importSolidarityEventDataset(
         connection,
         {
-          attendance: [],
           events: [event],
-          people: [],
-          rsvps: [],
           sessions: [
             { ...originalSession, pairedSessionId: 'session-a' },
             {
@@ -411,20 +316,8 @@ describe('Solidarity event import', () => {
     })
   })
 
-  it('fails visibility closed and quarantines ambiguous people without partial activity links', () => {
+  it('keeps conflicting or incomplete classification hidden', () => {
     withMigratedDatabase((sqlite, connection) => {
-      sqlite.prepare("insert into people (id, display_name) values ('person-a', 'A'), ('person-b', 'B')").run()
-      sqlite
-        .prepare(
-          `insert into person_contacts
-             (id, person_id, kind, value, normalized_value, is_primary, verified_at)
-           values ('contact-a', 'person-a', 'email', 'shared@example.test', 'shared@example.test', 1,
-                     '2026-08-01T00:00:00.000Z'),
-                  ('contact-b', 'person-b', 'email', 'shared@example.test', 'shared@example.test', 1,
-                     '2026-08-01T00:00:00.000Z')`
-        )
-        .run()
-
       const report = importSolidarityEventDataset(
         connection,
         {
@@ -479,39 +372,45 @@ describe('Solidarity event import', () => {
               startsAt: '2026-10-03T02:00:00.000Z',
               timezone: 'America/Los_Angeles'
             }
-          ],
-          people: [{ id: 'user-ambiguous', email: 'SHARED@example.test' }],
-          rsvps: [
-            {
-              id: 'rsvp-ambiguous',
-              userId: 'user-ambiguous',
-              sessionId: 'session-ambiguous',
-              status: 'yes',
-              respondedAt: '2026-08-23T19:00:00.000Z'
-            }
-          ],
-          attendance: []
+          ]
         },
         { apply: true, observedAt }
       )
 
       expect(report.issues.map(({ code }) => code).sort()).toEqual([
-        'ambiguous_person_match',
         'invalid_audience_tags',
         'invalid_category_tags',
-        'invalid_meeting_tags',
-        'rsvp_person_unresolved'
+        'invalid_meeting_tags'
       ])
       expect(report.events).toEqual({ hidden: 3, imported: 3 })
       expect(sqlite.prepare("select visibility from events where title = 'Unclassified event'").get()).toEqual({
         visibility: 'hidden'
       })
-      expect(
-        sqlite
-          .prepare("select person_id as personId, state from provider_identities where provider = 'solidarity'")
-          .get()
-      ).toEqual({ personId: null, state: 'unlinked' })
-      expect(count(sqlite, 'rsvps')).toBe(0)
+    })
+  })
+
+  it('rejects personal dataset arrays and extra event metadata before writing', () => {
+    withMigratedDatabase((sqlite, connection) => {
+      const event = {
+        id: 'event',
+        title: 'Public gathering',
+        status: 'active',
+        timezone: 'America/Los_Angeles',
+        eventTags: ['audience-public', 'category-social'],
+        campaignTags: []
+      } as const
+      const input = { events: [event], sessions: [] }
+      for (const invalid of [
+        { ...input, people: [{ id: 'person', email: 'private@example.test' }] },
+        { ...input, events: [{ ...event, organizerEmail: 'private@example.test' }] }
+      ]) {
+        expect(() => importSolidarityEventDataset(connection, invalid, { apply: true, observedAt })).toThrow(
+          /unsupported fields/
+        )
+      }
+      expect(count(sqlite, 'events')).toBe(0)
+      expect(count(sqlite, 'external_record_snapshots')).toBe(0)
+      expect(count(sqlite, 'import_batches')).toBe(0)
     })
   })
 
@@ -521,7 +420,6 @@ describe('Solidarity event import', () => {
         importSolidarityEventDataset(
           connection,
           {
-            attendance: [],
             events: [
               {
                 campaignTags: [],
@@ -532,8 +430,6 @@ describe('Solidarity event import', () => {
                 title: 'Invalid timezone event'
               }
             ],
-            people: [],
-            rsvps: [],
             sessions: []
           },
           { apply: true, observedAt }
@@ -549,7 +445,6 @@ describe('Solidarity event import', () => {
       writeFileSync(
         inputPath,
         JSON.stringify({
-          attendance: [],
           events: [
             {
               campaignTags: [],
@@ -560,8 +455,6 @@ describe('Solidarity event import', () => {
               title: 'Private fixture title'
             }
           ],
-          people: [{ email: 'private-person@example.test', id: 'private-person-id' }],
-          rsvps: [],
           sessions: [
             {
               eventId: 'private-external-event-id',
@@ -592,7 +485,6 @@ describe('Solidarity event import', () => {
       expect(result.status, result.stderr).toBe(0)
       const receipt = JSON.parse(result.stdout) as { batchId: string | null; mode: string }
       expect(receipt).toMatchObject({ batchId: null, mode: 'dry-run' })
-      expect(result.stdout).not.toContain('private-person@example.test')
       expect(result.stdout).not.toContain('private-external-event-id')
       expect(result.stdout).not.toContain('Private fixture title')
       expect(count(sqlite, 'events')).toBe(0)

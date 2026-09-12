@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs'
-import { formatWithOptions, inspect, parseEnv } from 'node:util'
+import { parseEnv } from 'node:util'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 interface TestedNuxtConfig {
@@ -45,8 +45,6 @@ interface TestedNuxtConfig {
     xssValidator?: unknown
   }
 }
-
-const forbiddenBetterAuthBuildFallbacks = ['NEXT_PUBLIC_AUTH_URL', 'NEXTAUTH_URL', 'VERCEL_URL'] as const
 
 afterEach(() => {
   vi.restoreAllMocks()
@@ -94,49 +92,6 @@ describe('Nuxt build policy', () => {
     })
   })
 
-  it.each(forbiddenBetterAuthBuildFallbacks)(
-    'rejects the %s Better Auth fallback through the evaluated Nuxt config without exposing its value',
-    async (key) => {
-      const sentinel = `sensitive-build-${key.toLowerCase()}-value`
-      const capturedOutput: string[] = []
-      const stdoutWrite = vi.spyOn(process.stdout, 'write').mockImplementation(captureWrite(capturedOutput))
-      const stderrWrite = vi.spyOn(process.stderr, 'write').mockImplementation(captureWrite(capturedOutput))
-      const consoleSpies = [
-        vi.spyOn(console, 'debug'),
-        vi.spyOn(console, 'error'),
-        vi.spyOn(console, 'info'),
-        vi.spyOn(console, 'log'),
-        vi.spyOn(console, 'trace'),
-        vi.spyOn(console, 'warn')
-      ].map((spy) =>
-        spy.mockImplementation((...values: unknown[]) =>
-          capturedOutput.push(formatWithOptions({ depth: null }, ...values))
-        )
-      )
-      let caught: unknown
-
-      try {
-        await loadNuxtConfig({
-          environment: { [key]: sentinel },
-          sentryAuthToken: ''
-        })
-      } catch (error) {
-        caught = error
-      } finally {
-        stdoutWrite.mockRestore()
-        stderrWrite.mockRestore()
-        for (const spy of consoleSpies) spy.mockRestore()
-      }
-
-      expect(caught).toBeInstanceOf(Error)
-      expect(caught).toMatchObject({ issues: [expect.objectContaining({ code: 'invalid', key })] })
-      expect((caught as Error).message).toContain(key)
-      expect((caught as Error).message).not.toContain(sentinel)
-      expect(inspect(caught, { depth: null })).not.toContain(sentinel)
-      expect(capturedOutput.join('')).not.toContain(sentinel)
-    }
-  )
-
   it.each([
     { label: 'missing token', token: '', org: 'org', project: 'project' },
     { label: 'missing organization', token: 'token', org: '', project: 'project' },
@@ -171,29 +126,18 @@ describe('Nuxt build policy', () => {
 })
 
 async function loadNuxtConfig({
-  environment = {},
   sentryAuthToken,
   sentryOrg = '',
   sentryProject = ''
 }: {
-  environment?: Readonly<Record<string, string>>
   sentryAuthToken: string
   sentryOrg?: string
   sentryProject?: string
 }): Promise<TestedNuxtConfig> {
-  for (const key of forbiddenBetterAuthBuildFallbacks) vi.stubEnv(key, undefined)
-  for (const [key, value] of Object.entries(environment)) vi.stubEnv(key, value)
   vi.stubEnv('NODE_ENV', 'production')
   vi.stubEnv('SENTRY_AUTH_TOKEN', sentryAuthToken)
   vi.stubEnv('SENTRY_ORG', sentryOrg)
   vi.stubEnv('SENTRY_PROJECT', sentryProject)
   vi.resetModules()
   return (await import('../nuxt.config')).default as TestedNuxtConfig
-}
-
-function captureWrite(output: string[]): typeof process.stdout.write {
-  return ((chunk: string | Uint8Array) => {
-    output.push(typeof chunk === 'string' ? chunk : Buffer.from(chunk).toString())
-    return true
-  }) as typeof process.stdout.write
 }

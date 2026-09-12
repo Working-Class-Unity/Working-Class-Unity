@@ -9,18 +9,13 @@ import {
   NavigationMenuRoot,
   NavigationMenuTrigger
 } from 'reka-ui'
-import { toAppSession } from '~/composables/useAppSession'
+import { duesPortalUrl } from '#shared/membership-links'
 import { currentWorkNavigation } from '~/content/navigation'
-import { authClient } from '~/lib/auth-client'
 
 const route = useRoute()
 const publicPath = computed(() => unlocalizedPublicPath(route.path))
 const { t } = useI18n()
 const usesWideSurface = useWideSurfaceRoute()
-const responseCacheControl = useResponseHeader('cache-control')
-const clientSession = import.meta.client ? authClient.useSession() : null
-const { data: session, error: sessionError, status: sessionStatus, refresh: refreshSession } = await useAppSession()
-const retryState = ref<'idle' | 'pending' | 'failed'>('idle')
 const mobileMenuOpen = ref(false)
 const desktopMenuValue = ref('')
 const mobileMenuToggle = ref<HTMLButtonElement | null>(null)
@@ -48,36 +43,7 @@ watch(
     if (open && eventsStatus.value !== 'pending') void refreshEvents()
   }
 )
-const retrying = computed(() => retryState.value === 'pending')
 const nuxtUseId = () => useId()
-const retryAnnouncement = computed<'polite' | 'assertive' | undefined>(() => {
-  if (retryState.value === 'pending') return 'polite'
-  if (retryState.value === 'failed') return 'assertive'
-  return undefined
-})
-
-if (import.meta.server && session.value?.user) {
-  responseCacheControl.value = 'private, no-store'
-}
-
-if (clientSession) {
-  watch(
-    clientSession,
-    (state) => {
-      if (state.isPending || state.isRefetching || state.error) return
-
-      const currentUserId = session.value?.user.id ?? null
-      const nextSession = toAppSession(state.data)
-      const identityChanged = Boolean(currentUserId && currentUserId !== (nextSession?.user.id ?? null))
-
-      session.value = nextSession
-      sessionError.value = undefined
-      if (identityChanged) reloadNuxtApp()
-    },
-    { immediate: true }
-  )
-}
-
 watch(
   () => route.fullPath,
   () => {
@@ -94,10 +60,6 @@ function onNavigationClick(event: MouseEvent) {
   void closeMobileMenu()
 }
 
-function signedOut() {
-  session.value = null
-}
-
 function toggleMobileMenu() {
   mobileMenuOpen.value = !mobileMenuOpen.value
 }
@@ -108,19 +70,6 @@ async function closeMobileMenu() {
   mobileMenuOpen.value = false
   await nextTick()
   mobileMenuToggle.value?.focus()
-}
-
-async function retrySession() {
-  if (retrying.value) return
-
-  retryState.value = 'pending'
-  try {
-    await refreshSession()
-  } catch {
-    retryState.value = 'failed'
-    return
-  }
-  retryState.value = sessionError.value ? 'failed' : 'idle'
 }
 
 function currentPage(path: string) {
@@ -347,37 +296,9 @@ function currentParticipationLocation() {
             {{ t('navigation.forum') }}
             <span class="visually-hidden"> ({{ t('common.opensInNewTab') }})</span>
           </a>
-          <AppNotice
-            v-if="sessionError"
-            class="topbar-session"
-            :tone="retrying ? 'info' : 'error'"
-            :announce="retryAnnouncement"
-            :title="retrying ? t('common.checkingSession') : t('navigation.sessionUnavailable')"
-          >
-            <AppButton
-              variant="secondary"
-              size="compact"
-              :aria-busy="retrying ? 'true' : undefined"
-              :aria-disabled="retrying ? 'true' : undefined"
-              @click="retrySession"
-            >
-              {{ retrying ? t('common.checkingSession') : t('common.retry') }}
-            </AppButton>
-          </AppNotice>
-          <AppNotice v-else-if="sessionStatus === 'pending'" class="topbar-session" tone="info">
-            {{ t('common.checkingSession') }}
-          </AppNotice>
-          <template v-else-if="!session?.user">
-            <NuxtLink class="topbar-link topbar-link--login" to="/login" :aria-current="currentPage('/login')">
-              {{ t('navigation.login') }}
-            </NuxtLink>
-          </template>
-          <template v-else>
-            <NuxtLink class="topbar-link topbar-link--app" to="/app" :aria-current="currentPage('/app')">
-              {{ t('navigation.app') }}
-            </NuxtLink>
-            <AccountMenu :user="session.user" @signed-out="signedOut" />
-          </template>
+          <a class="topbar-link topbar-link--utility" :href="duesPortalUrl" @click="closeMobileMenu">
+            {{ t('join.manageDues') }}
+          </a>
         </div>
       </div>
 
@@ -468,10 +389,6 @@ function currentParticipationLocation() {
   .mobile-navigation,
   .mobile-menu-toggle {
     display: none;
-  }
-
-  .topbar-session {
-    max-inline-size: 22rem;
   }
 
   .topbar-link {
@@ -592,21 +509,13 @@ function currentParticipationLocation() {
     text-align: start;
   }
 
-  .topbar-link--utility,
-  .topbar-link--login,
-  .topbar-link--app {
+  .topbar-link--utility {
     color: var(--color-text-muted);
     font-size: 0.875rem;
   }
 
   .topbar-link--utility:hover,
-  .topbar-link--utility:focus-visible,
-  .topbar-link--login:hover,
-  .topbar-link--login:focus-visible,
-  .topbar-link--login[aria-current='page'],
-  .topbar-link--app:hover,
-  .topbar-link--app:focus-visible,
-  .topbar-link--app[aria-current='page'] {
+  .topbar-link--utility:focus-visible {
     color: var(--color-brand-primary);
     background: var(--color-action-soft);
   }
@@ -751,11 +660,6 @@ function currentParticipationLocation() {
 
     .topbar-link--public[aria-current] {
       border-inline-start: var(--border-width-accent) solid var(--color-brand-primary);
-    }
-
-    .topbar-session {
-      max-inline-size: none;
-      inline-size: 100%;
     }
   }
 }

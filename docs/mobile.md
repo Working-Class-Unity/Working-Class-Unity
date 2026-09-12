@@ -1,28 +1,13 @@
-# Mobile Path
+# Mobile presentation
 
-## Default Strategy
+The public WCU website uses one responsive Nuxt interface across narrow and wide screens.
 
-Use this order:
+- Start with content-driven narrow layouts and semantic HTML.
+- Keep expected touch controls at least 44 CSS pixels high.
+- Verify public navigation, hosted payment links, calendar controls, and RSVP links on mobile widths.
+- Avoid hover-only interactions and preserve keyboard/focus behavior.
+- Check long translations, reduced motion, text resizing, and reflow without horizontal overflow.
 
-```text
-Responsive Nuxt web app -> product-specific Capacitor or targeted native work -> full native only if justified
-```
-
-The baseline keeps one product codebase while mobile demand is still uncertain.
-
-## Responsive Web
-
-- Design narrow screens from the start.
-- Use semantic HTML controls.
-- Keep primary touch targets at least 44px tall.
-- Test forms on mobile browser widths.
-- Avoid hover-only interactions.
-- Keep pages usable on midrange phones.
-
-## Capacitor Triggers
-
-Consider Capacitor when the product needs app-store distribution, native plugins, native push reliability, camera/filesystem/biometrics/deep-link access, or a mobile shell before a full native rewrite is justified.
-
-## Native Escape Hatches
-
-Use targeted native work before a full rewrite: one native plugin, one native screen, one native background task, or one deep-link bridge. Full native becomes reasonable only when mobile UX, native performance, background behavior, or platform-specific interaction is central to the product.
+The [interface contract](baseline/css-and-interface.md) and [app inventory](../app/AGENTS.md) govern
+implementation. A native app, app-store wrapper, push notifications, or native background work is
+outside this website's scope and requires a separate product decision.

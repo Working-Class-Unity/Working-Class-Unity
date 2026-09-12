@@ -14,8 +14,8 @@ const forbiddenExactEnvironmentKeys = new Set([
 const forbiddenEnvironmentPrefixes = ['AWS_', 'BETTER_AUTH_', 'CLOUDFLARE_', 'NITRO_', 'NUXT_', 'SENTRY_', 'STRIPE_']
 
 export function assertIsolatedSmokeInvocation(args, environment) {
-  if (args.length !== 0) {
-    throw new Error('The isolated API smoke does not accept a deployment URL or command-line options.')
+  if (args.length > 1 || (args.length === 1 && args[0] !== '--skip-build')) {
+    throw new Error('The isolated API smoke does not accept a deployment URL; only --skip-build is supported.')
   }
 
   const forbiddenKeys = Object.keys(environment)

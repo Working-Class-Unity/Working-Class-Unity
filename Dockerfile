@@ -49,11 +49,6 @@ RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN,env=BUILD_SECRET_SENTRY_AUTH_TOKEN,
     unset SENTRY_URL; \
   fi \
   && npm run pnpm -- run build
-RUN mkdir -p /app/.output/server/db \
-  && cp /app/server/maintenance.mjs /app/.output/server/maintenance.mjs \
-  && cp -R /app/server/db/migrations /app/.output/server/db/migrations \
-  && cp /app/node_modules/drizzle-orm/better-sqlite3/migrator.js /app/.output/server/node_modules/drizzle-orm/better-sqlite3/migrator.js \
-  && cp /app/node_modules/drizzle-orm/migrator.js /app/.output/server/node_modules/drizzle-orm/migrator.js
 
 FROM node:24.18.1-bookworm-slim AS runtime
 WORKDIR /app

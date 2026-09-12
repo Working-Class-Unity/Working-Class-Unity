@@ -280,7 +280,7 @@ test('the operator creates, exactly verifies, uploads, reads back, and removes i
   const sandbox = disposableDirectory(t)
   const databasePath = join(sandbox, 'app.db')
   await migrate(databasePath)
-  writeSetting(databasePath, 'recovery-sentinel', 'off-host')
+  writeEventTitle(databasePath, 'recovery-sentinel', 'off-host')
   const store = new MemoryStore()
 
   const receipt = await runOffHostBackupCli(['backup'], backupEnvironment(databasePath), {
@@ -297,7 +297,7 @@ test('the operator creates, exactly verifies, uploads, reads back, and removes i
     store,
     maintenanceEntry
   })
-  assert.equal(readSetting(fetched.path, 'recovery-sentinel'), 'off-host')
+  assert.equal(readEventTitle(fetched.path, 'recovery-sentinel'), 'off-host')
   assert.equal(readFileSync(fetched.path).byteLength, receipt.byteSize)
 
   await assert.rejects(
@@ -393,7 +393,6 @@ test('cleanup failure rejects success and does not replace the primary operation
       key,
       paths: { databasePath, dataDirectory: sandbox, backupsDirectory },
       store,
-      backupBucket: 'private-database-backups',
       verifyBackup: async () => {
         throw primary
       },
@@ -429,31 +428,6 @@ test('a snapshot changed after database verification is retained and never publi
   )
   assert.equal(store.putCalls, 0)
   assert(existsSync(snapshotPath))
-})
-
-test('SQLite-only publication fails closed when active Files bytes are bound to local storage', async (t) => {
-  const sandbox = disposableDirectory(t)
-  const databasePath = join(sandbox, 'app.db')
-  await migrate(databasePath)
-  addActiveFile(databasePath, { driver: 'local', bucket: 'local' })
-  const store = new MemoryStore()
-
-  await assert.rejects(
-    runOffHostBackupCli(['backup'], backupEnvironment(databasePath), {
-      store,
-      now: () => fixedNow,
-      maintenanceEntry
-    }),
-    (error) => {
-      assert(error instanceof OffHostBackupError)
-      assert.match(error.message, /maintenance process rejected the backup/)
-      assert.match(error.retainedSnapshot, /^sqlite-offhost-/)
-      return true
-    }
-  )
-  assert.equal(store.objects.size, 0)
-  assert.equal(readdirSync(join(sandbox, 'backups')).filter((name) => name.startsWith('sqlite-offhost-')).length, 1)
-  assert(!existsSync(join(sandbox, 'backups', '.off-host-backup.lock')))
 })
 
 test('corrupt and stale-ledger retry inputs fail before any provider request', async (t) => {
@@ -495,69 +469,6 @@ test('corrupt and stale-ledger retry inputs fail before any provider request', a
   )
   assert.equal(store.putCalls, 0)
   assert(existsSync(corruptPath))
-})
-
-test('active Files metadata is publishable only when the copied snapshot has one matching R2 binding', async (t) => {
-  const sandbox = disposableDirectory(t)
-  const databasePath = join(sandbox, 'app.db')
-  await migrate(databasePath)
-  addActiveFile(databasePath, {
-    driver: 'r2',
-    bucket: 'private-user-files',
-    endpoint: `https://${accountId}.r2.cloudflarestorage.com`
-  })
-
-  const receipt = await runOffHostBackupCli(['backup'], backupEnvironment(databasePath), {
-    store: new MemoryStore(),
-    now: () => fixedNow,
-    maintenanceEntry
-  })
-  assert.equal(receipt.command, 'backup')
-})
-
-test('the database backup bucket cannot be reused as the persisted Files bucket', async (t) => {
-  const sandbox = disposableDirectory(t)
-  const databasePath = join(sandbox, 'app.db')
-  await migrate(databasePath)
-  addActiveFile(databasePath, {
-    driver: 'r2',
-    bucket: 'private-database-backups',
-    endpoint: `https://${accountId}.r2.cloudflarestorage.com`
-  })
-  const store = new MemoryStore()
-  await assert.rejects(
-    runOffHostBackupCli(['backup'], backupEnvironment(databasePath), {
-      store,
-      now: () => fixedNow,
-      maintenanceEntry
-    }),
-    /maintenance process rejected the backup/
-  )
-  assert.equal(store.putCalls, 0)
-
-  const inactiveSandbox = disposableDirectory(t)
-  const inactiveDatabasePath = join(inactiveSandbox, 'app.db')
-  await migrate(inactiveDatabasePath)
-  const sqlite = new Database(inactiveDatabasePath)
-  try {
-    insertStorageBinding(sqlite, {
-      driver: 'r2',
-      bucket: 'private-database-backups',
-      endpoint: `https://${accountId}.r2.cloudflarestorage.com`
-    })
-  } finally {
-    sqlite.close()
-  }
-  const inactiveStore = new MemoryStore()
-  await assert.rejects(
-    runOffHostBackupCli(['backup'], backupEnvironment(inactiveDatabasePath), {
-      store: inactiveStore,
-      now: () => fixedNow,
-      maintenanceEntry
-    }),
-    /maintenance process rejected the backup/
-  )
-  assert.equal(inactiveStore.putCalls, 0)
 })
 
 test('fetch stages privately and removes partial bytes when interrupted or corrupted', async (t) => {
@@ -808,61 +719,22 @@ async function migrate(databasePath) {
   })
 }
 
-function writeSetting(databasePath, key, value) {
+function writeEventTitle(databasePath, id, title) {
   const sqlite = new Database(databasePath)
   try {
-    sqlite.prepare('insert into app_settings (key, value) values (?, ?)').run(key, JSON.stringify(value))
+    sqlite.prepare("insert into events (id, title, kind) values (?, ?, 'meeting')").run(id, title)
   } finally {
     sqlite.close()
   }
 }
 
-function readSetting(databasePath, key) {
+function readEventTitle(databasePath, id) {
   const sqlite = new Database(databasePath, { readonly: true })
   try {
-    return JSON.parse(sqlite.prepare('select value from app_settings where key = ?').get(key).value)
+    return sqlite.prepare('select title from events where id = ?').get(id).title
   } finally {
     sqlite.close()
   }
-}
-
-function addActiveFile(databasePath, binding) {
-  const sqlite = new Database(databasePath)
-  try {
-    sqlite.pragma('foreign_keys = ON')
-    sqlite
-      .prepare('insert into user (id, name, email, email_verified, created_at, updated_at) values (?, ?, ?, ?, ?, ?)')
-      .run('user_backup', 'Backup User', 'backup@example.test', 1, 1784200000000, 1784200000000)
-    insertStorageBinding(sqlite, binding)
-    sqlite
-      .prepare(
-        `insert into files (
-          id, owner_id, bucket, object_key, original_name, content_type, byte_size,
-          content_md5, status, upload_expires_at, created_at, updated_at
-        ) values (?, ?, ?, ?, ?, ?, ?, ?, 'ready', ?, ?, ?)`
-      )
-      .run(
-        'file_backup',
-        'user_backup',
-        binding.bucket,
-        'files/v1/file_123e4567-e89b-42d3-a456-426614174000',
-        'private.txt',
-        'text/plain',
-        7,
-        'Mhw89IbtUJFk7eweGYH+yA==',
-        '2026-07-16T13:00:00.000Z',
-        '2026-07-16T12:00:00.000Z',
-        '2026-07-16T12:00:00.000Z'
-      )
-  } finally {
-    sqlite.close()
-  }
-}
-
-function insertStorageBinding(sqlite, binding) {
-  sqlite
-    .prepare('insert into app_settings (key, value) values (?, ?)')
-    .run('files.storage-binding.v1', JSON.stringify({ version: 1, ...binding }))
 }
 
 function disposableDirectory(t) {

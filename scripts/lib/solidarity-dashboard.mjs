@@ -316,7 +316,7 @@ export async function collectSolidarityDashboardEvents({ from, to, timezone, eve
     }
   }
   return {
-    dataset: { events, sessions, people: [], rsvps: [], attendance: [] },
+    dataset: { events, sessions },
     scope: { from, to, eventIds: [...ids] },
     observedAt: new Date().toISOString(),
     eventPageUrls: [...new Set(events.map((event) => event.eventPageUrl).filter((url) => url !== null))]

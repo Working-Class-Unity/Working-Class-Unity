@@ -10,11 +10,11 @@ import {
 const maximumInputBytes = 25 * 1024 * 1024
 const usage = `Usage: node .output/server/import-solidarity-events.mjs --input <file> [options]
 
-Imports a validated normalized bundle assembled from Solidarity reports. The command is a local database
+Imports reviewed Solidarity event and session metadata. Personal records are rejected. The command is a local database
 dry run unless --apply is provided. It never calls or changes Solidarity.
 
 Options:
-  --input <file>                 Normalized Solidarity JSON export (required)
+  --input <file>                 Event-only Solidarity JSON bundle (required)
   --apply                        Write the imported records to SQLite
   --database-url <file:...>      Override NUXT_DATABASE_URL
   --help                         Show this help
@@ -85,10 +85,8 @@ function redactedReceipt(report: SolidarityEventImportReport) {
   const issueCodes: Record<string, number> = {}
   for (const { code } of report.issues) issueCodes[code] = (issueCodes[code] ?? 0) + 1
   return Object.freeze({
-    activities: report.activities,
     batchId: report.batchId,
     events: report.events,
-    identities: report.identities,
     issueCodes,
     mode: report.mode,
     sessions: report.sessions,

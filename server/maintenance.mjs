@@ -60,7 +60,7 @@ async function run(args, environment) {
   }
 
   if (command === 'verify-backup') {
-    const { input, requireCurrent, requireOffHostCoverage, backupR2Bucket } = parseVerifyBackupOptions(args.slice(1))
+    const { input, requireCurrent } = parseVerifyBackupOptions(args.slice(1))
     const inputPath = resolveBackupPath(dataDirectory, input, 'Backup verification input', { mustExist: true })
     verifyDatabase(inputPath)
     if (requireCurrent) {
@@ -68,9 +68,8 @@ async function run(args, environment) {
     } else {
       verifyAppDatabaseIdentity(inputPath, 'Backup verification input')
     }
-    if (requireOffHostCoverage) assertOffHostBackupCoverage(inputPath, backupR2Bucket)
     console.log(
-      `Backup verification passed: ${basename(inputPath)}; integrity ok; foreign keys ok; migration ledger ${requireCurrent ? 'current' : 'recognized'}${requireOffHostCoverage ? '; off-host Files coverage ok' : ''}.`
+      `Backup verification passed: ${basename(inputPath)}; integrity ok; foreign keys ok; migration ledger ${requireCurrent ? 'current' : 'recognized'}.`
     )
     return
   }
@@ -85,13 +84,13 @@ async function run(args, environment) {
       failAfterInstall: environment.NODE_ENV === 'test' && environment.SWL_MAINTENANCE_TEST_FAIL_AFTER_INSTALL === '1'
     })
     console.log(
-      `Restore passed: ${basename(inputPath)} restored and migrated; restored sessions and one-time verifications invalidated; pre-restore backup ${result.backup ? `written as ${basename(result.backup)}` : 'not available'}${result.quarantine ? `; prior state retained as ${basename(result.quarantine)}` : ''}.`
+      `Restore passed: ${basename(inputPath)} restored and migrated; pre-restore backup ${result.backup ? `written as ${basename(result.backup)}` : 'not available'}${result.quarantine ? `; prior state retained as ${basename(result.quarantine)}` : ''}.`
     )
     return
   }
 
   throw new Error(
-    'Usage: node .output/server/maintenance.mjs <migrate --confirm-app-stopped|backup [--output PATH]|verify|verify-backup --input PATH [--require-current] [--require-off-host-coverage --backup-r2-bucket BUCKET]|restore --input PATH --confirm-app-stopped>'
+    'Usage: node .output/server/maintenance.mjs <migrate --confirm-app-stopped|backup [--output PATH]|verify|verify-backup --input PATH [--require-current]|restore --input PATH --confirm-app-stopped>'
   )
 }
 
@@ -192,7 +191,6 @@ async function restoreDatabase(databasePath, inputPath, dataDirectory, { failAft
     verifyDatabase(stagedPath)
     verifyAppDatabaseIdentity(stagedPath, 'Staged restore database')
     await migrateDatabase(stagedPath, dataDirectory, { backupExisting: false })
-    invalidateRestoredAuthenticationState(stagedPath)
     verifyDatabase(stagedPath)
     verifyMigrationLedger(stagedPath)
     assertNoDatabaseSidecars(stagedPath)
@@ -228,21 +226,6 @@ async function restoreDatabase(databasePath, inputPath, dataDirectory, { failAft
   } finally {
     removeDatabaseFiles(stagedPath)
   }
-}
-
-function invalidateRestoredAuthenticationState(path) {
-  const sqlite = new Database(path)
-  try {
-    sqlite.pragma('foreign_keys = ON')
-    const invalidate = sqlite.transaction(() => {
-      sqlite.prepare('delete from session').run()
-      sqlite.prepare('delete from verification').run()
-    })
-    invalidate.immediate()
-  } finally {
-    sqlite.close()
-  }
-  makeDatabaseStandalone(path)
 }
 
 function replaceDatabaseState(databasePath, stagedPath, dataDirectory, { failAfterInstall, retainQuarantine }) {
@@ -413,8 +396,6 @@ function parseRestoreOptions(args) {
 function parseVerifyBackupOptions(args) {
   let input = ''
   let requireCurrent = false
-  let requireOffHostCoverage = false
-  let backupR2Bucket = ''
 
   for (let index = 0; index < args.length; index += 1) {
     const argument = args[index]
@@ -422,17 +403,8 @@ function parseVerifyBackupOptions(args) {
       requireCurrent = true
       continue
     }
-    if (argument === '--require-off-host-coverage' && !requireOffHostCoverage) {
-      requireOffHostCoverage = true
-      continue
-    }
     if (argument === '--input' && !input) {
       input = args[index + 1] ?? ''
-      index += 1
-      continue
-    }
-    if (argument === '--backup-r2-bucket' && !backupR2Bucket) {
-      backupR2Bucket = args[index + 1] ?? ''
       index += 1
       continue
     }
@@ -442,90 +414,7 @@ function parseVerifyBackupOptions(args) {
   if (!input || input.startsWith('--')) {
     throw new Error('Backup verification requires one --input PATH directly inside the backup directory.')
   }
-  if (requireOffHostCoverage !== Boolean(backupR2Bucket)) {
-    throw new Error('Off-host backup verification requires --backup-r2-bucket together with coverage checking.')
-  }
-  if (backupR2Bucket && !/^[a-z0-9](?:[a-z0-9-]{1,61}[a-z0-9])$/.test(backupR2Bucket)) {
-    throw new Error('Off-host backup verification requires a valid private R2 backup bucket name.')
-  }
-  return { input, requireCurrent, requireOffHostCoverage, backupR2Bucket }
-}
-
-function assertOffHostBackupCoverage(path, backupR2Bucket) {
-  const sqlite = new Database(path, { readonly: true, fileMustExist: true })
-  try {
-    const activeFiles = Number(
-      sqlite.prepare("select count(*) as count from files where status in ('pending', 'ready')").get()?.count ?? 0
-    )
-    const bindingRows = sqlite.prepare("select value from app_settings where key = 'files.storage-binding.v1'").all()
-    if (bindingRows.length === 1) {
-      let persistedBinding
-      try {
-        persistedBinding = JSON.parse(String(bindingRows[0].value))
-      } catch {
-        // Active Files rows below still fail closed for an invalid binding.
-      }
-      if (persistedBinding?.driver === 'r2' && persistedBinding.bucket === backupR2Bucket) {
-        throw new DatabaseVerificationError(
-          'The database-backup R2 bucket must be separate from the persisted private Files bucket.'
-        )
-      }
-    }
-
-    if (activeFiles === 0) return
-    if (bindingRows.length !== 1) throw incompleteLocalFilesBackup()
-
-    let binding
-    try {
-      binding = JSON.parse(String(bindingRows[0].value))
-    } catch {
-      throw incompleteLocalFilesBackup()
-    }
-
-    const validBinding =
-      binding &&
-      typeof binding === 'object' &&
-      !Array.isArray(binding) &&
-      binding.version === 1 &&
-      binding.driver === 'r2' &&
-      typeof binding.bucket === 'string' &&
-      /^[a-z0-9](?:[a-z0-9-]{1,61}[a-z0-9])$/.test(binding.bucket) &&
-      isPrivateCloudflareR2Endpoint(binding.endpoint)
-    if (!validBinding) throw incompleteLocalFilesBackup()
-
-    const buckets = sqlite
-      .prepare("select distinct bucket from files where status in ('pending', 'ready') order by bucket")
-      .all()
-      .map((row) => String(row.bucket))
-    if (buckets.length !== 1 || buckets[0] !== binding.bucket) throw incompleteLocalFilesBackup()
-  } finally {
-    sqlite.close()
-  }
-}
-
-function isPrivateCloudflareR2Endpoint(value) {
-  if (typeof value !== 'string') return false
-  try {
-    const url = new URL(value)
-    return (
-      url.protocol === 'https:' &&
-      !url.username &&
-      !url.password &&
-      !url.port &&
-      url.pathname === '/' &&
-      !url.search &&
-      !url.hash &&
-      /^[0-9a-f]{32}\.(?:eu\.|fedramp\.)?r2\.cloudflarestorage\.com$/.test(url.hostname)
-    )
-  } catch {
-    return false
-  }
-}
-
-function incompleteLocalFilesBackup() {
-  return new DatabaseVerificationError(
-    'The SQLite snapshot contains active Files rows whose bytes are not proven to reside in its bound private R2 bucket; refusing off-host publication.'
-  )
+  return { input, requireCurrent }
 }
 
 function resolveBackupPath(dataDirectory, candidate, label, { mustExist = false } = {}) {

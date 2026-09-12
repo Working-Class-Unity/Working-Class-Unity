@@ -1,25 +1,9 @@
 import type { Breadcrumb, ErrorEvent, Event } from '@sentry/nuxt'
 
 export const captureDiagnosticDefinitions = {
-  'account-deletion-orphan-cleanup-failed': {
-    component: 'account-deletion',
-    operation: 'file-orphan-cleanup'
-  },
-  'background-job-execution-failed': {
-    component: 'worker',
-    operation: 'execute-job'
-  },
-  'billing-operation-failed': {
-    component: 'billing',
-    operation: 'provider-operation'
-  },
   'observability-test-error': {
     component: 'observability',
     operation: 'test-error'
-  },
-  'openai-response-failed': {
-    component: 'openai',
-    operation: 'create-response'
   }
 } as const
 

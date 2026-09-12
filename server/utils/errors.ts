@@ -17,39 +17,10 @@ export function unauthorizedError(statusMessage = 'Authentication required') {
   })
 }
 
-export function forbiddenError(statusMessage = 'Permission denied') {
-  return createError({
-    statusCode: 403,
-    statusMessage
-  })
-}
-
-export function conflictError(statusMessage = 'Conflict') {
-  return createError({
-    statusCode: 409,
-    statusMessage
-  })
-}
-
 export function notFoundError(statusMessage = 'Not found') {
   return createError({
     statusCode: 404,
     statusMessage
-  })
-}
-
-export function configurationError(statusMessage = 'Service is not configured') {
-  return createError({
-    statusCode: 503,
-    statusMessage
-  })
-}
-
-export function upstreamServiceError(statusCode: number, statusMessage: string, data?: unknown) {
-  return createError({
-    statusCode,
-    statusMessage,
-    data: safeErrorData(data)
   })
 }
 

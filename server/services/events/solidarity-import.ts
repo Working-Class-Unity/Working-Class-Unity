@@ -1,8 +1,7 @@
 import { createHash, randomUUID } from 'node:crypto'
 import type Database from 'better-sqlite3'
 import type { DatabaseConnection } from '../../db/connect'
-import type { AttendanceStatus, EventCategory, EventVisibility, RsvpStatus } from '../../db/schema/events'
-import { recalculateMembershipStandingInTransaction } from '../membership/membership-standing'
+import type { EventCategory, EventVisibility } from '../../db/schema/events'
 import {
   normalizeSolidarityTaxonomyTags,
   solidarityAudienceTags,
@@ -13,14 +12,39 @@ import {
 type Sqlite = InstanceType<typeof Database>
 
 export type SolidarityEventImportDataset = Readonly<{
-  attendance: readonly SolidarityAttendanceRecord[]
   events: readonly SolidarityEventRecord[]
-  people: readonly SolidarityPersonRecord[]
-  rsvps: readonly SolidarityRsvpRecord[]
   sessions: readonly SolidaritySessionRecord[]
 }>
 
 type ExternalId = string | number
+
+export const solidarityEventFields = [
+  'campaignTags',
+  'description',
+  'eventPageUrl',
+  'eventTags',
+  'id',
+  'primaryEventId',
+  'status',
+  'timezone',
+  'title'
+] as const
+export const solidaritySessionFields = [
+  'endsAt',
+  'eventId',
+  'eventType',
+  'id',
+  'locationAddress',
+  'locationName',
+  'pairedSessionId',
+  'primarySessionId',
+  'rsvpUrl',
+  'startsAt',
+  'status',
+  'timezone',
+  'title',
+  'virtualUrl'
+] as const
 
 export type SolidarityEventRecord = Readonly<{
   campaignTags: readonly string[]
@@ -51,33 +75,6 @@ export type SolidaritySessionRecord = Readonly<{
   virtualUrl?: string | null
 }>
 
-export type SolidarityPersonRecord = Readonly<{
-  displayName?: string | null
-  email?: string | null
-  firstName?: string | null
-  id: ExternalId
-  lastName?: string | null
-  phone?: string | null
-}>
-
-export type SolidarityRsvpRecord = Readonly<{
-  id: ExternalId
-  respondedAt: string
-  sessionId: ExternalId
-  status: RsvpStatus
-  userId: ExternalId
-}>
-
-export type SolidarityAttendanceRecord = Readonly<{
-  checkedInAt?: string | null
-  checkedOutAt?: string | null
-  id: ExternalId
-  recordedAt: string
-  sessionId: ExternalId
-  status: AttendanceStatus
-  userId: ExternalId
-}>
-
 export type SolidarityEventImportIssue = Readonly<{
   code: string
   externalId: string
@@ -85,10 +82,8 @@ export type SolidarityEventImportIssue = Readonly<{
 }>
 
 export type SolidarityEventImportReport = Readonly<{
-  activities: Readonly<{ attendance: number; rsvps: number }>
   batchId: string | null
   events: Readonly<{ hidden: number; imported: number }>
-  identities: Readonly<{ ambiguous: number; created: number; existing: number }>
   issues: readonly SolidarityEventImportIssue[]
   mode: 'apply' | 'dry-run'
   sessions: Readonly<{ imported: number; providerLinks: number }>
@@ -111,23 +106,8 @@ type NormalizedSession = Omit<SolidaritySessionRecord, 'eventId' | 'id' | 'paire
   primarySessionId: string | null
 }
 
-type NormalizedPerson = Omit<SolidarityPersonRecord, 'id'> & { id: string }
-type NormalizedRsvp = Omit<SolidarityRsvpRecord, 'id' | 'sessionId' | 'userId'> & {
-  id: string
-  sessionId: string
-  userId: string
-}
-type NormalizedAttendance = Omit<SolidarityAttendanceRecord, 'id' | 'sessionId' | 'userId'> & {
-  id: string
-  sessionId: string
-  userId: string
-}
-
 type NormalizedDataset = Readonly<{
-  attendance: readonly NormalizedAttendance[]
   events: readonly NormalizedEvent[]
-  people: readonly NormalizedPerson[]
-  rsvps: readonly NormalizedRsvp[]
   sessions: readonly NormalizedSession[]
 }>
 
@@ -144,7 +124,6 @@ type EventPlan = Readonly<{
   event: NormalizedEvent
   externalEvents: readonly NormalizedEvent[]
   localId: string
-  meetingKind: 'general' | 'steering' | null
   visibility: EventVisibility
 }>
 
@@ -156,18 +135,9 @@ type SessionPlan = Readonly<{
   session: NormalizedSession
 }>
 
-type PersonPlan = Readonly<{
-  action: 'ambiguous' | 'created' | 'existing'
-  person: NormalizedPerson
-  personId: string | null
-}>
-
 type PreparedImport = Readonly<{
-  attendance: readonly Readonly<{ record: NormalizedAttendance; personId: string; sessionId: string }>[]
   eventPlans: readonly EventPlan[]
   issues: SolidarityEventImportIssue[]
-  personPlans: readonly PersonPlan[]
-  rsvps: readonly Readonly<{ record: NormalizedRsvp; personId: string; sessionId: string }>[]
   sessionPlans: readonly SessionPlan[]
   snapshots: readonly PreparedSnapshot[]
 }>
@@ -204,16 +174,10 @@ export function importSolidarityEventDataset(
   }
 
   return Object.freeze({
-    activities: Object.freeze({ attendance: prepared.attendance.length, rsvps: prepared.rsvps.length }),
     batchId,
     events: Object.freeze({
       hidden: prepared.eventPlans.filter(({ visibility }) => visibility === 'hidden').length,
       imported: prepared.eventPlans.length
-    }),
-    identities: Object.freeze({
-      ambiguous: prepared.personPlans.filter(({ action }) => action === 'ambiguous').length,
-      created: prepared.personPlans.filter(({ action }) => action === 'created').length,
-      existing: prepared.personPlans.filter(({ action }) => action === 'existing').length
     }),
     issues: Object.freeze([...prepared.issues]),
     mode: options.apply ? 'apply' : 'dry-run',
@@ -227,17 +191,13 @@ export function importSolidarityEventDataset(
 
 function assertEventSchema(sqlite: Sqlite): void {
   const required = [
-    'attendance',
     'event_provider_links',
     'event_session_provider_links',
     'event_sessions',
     'event_tags',
     'events',
     'external_record_snapshots',
-    'import_batches',
-    'people',
-    'provider_identities',
-    'rsvps'
+    'import_batches'
   ]
   const rows = sqlite
     .prepare("select name from sqlite_master where type = 'table' and name in (select value from json_each(?))")
@@ -248,12 +208,13 @@ function assertEventSchema(sqlite: Sqlite): void {
 }
 
 function normalizeDataset(input: SolidarityEventImportDataset): NormalizedDataset {
-  if (!input || typeof input !== 'object') throw new TypeError('Solidarity event import must be an object')
-  for (const key of ['attendance', 'events', 'people', 'rsvps', 'sessions'] as const) {
+  assertFields(input, ['events', 'sessions'], 'event dataset')
+  for (const key of ['events', 'sessions'] as const) {
     if (!Array.isArray(input[key])) throw new TypeError(`Solidarity event import ${key} must be an array`)
   }
   const events = input.events.map((event) => {
-    assertObject(event, 'event')
+    assertFields(event, solidarityEventFields, 'event')
+    assertOptionalText(event.description, 'Solidarity event description', 10_000)
     assertText(event.title, 'Solidarity event title', 255)
     assertTimezone(event.timezone, 'Solidarity event timezone')
     assertEnum(event.status, ['active', 'archived'], 'Solidarity event status')
@@ -272,7 +233,10 @@ function normalizeDataset(input: SolidarityEventImportDataset): NormalizedDatase
     }
   })
   const sessions = input.sessions.map((session) => {
-    assertObject(session, 'session')
+    assertFields(session, solidaritySessionFields, 'session')
+    assertOptionalText(session.title, 'Solidarity session title', 255)
+    assertOptionalText(session.locationName, 'Solidarity session location name', 255)
+    assertOptionalText(session.locationAddress, 'Solidarity session address', 500)
     assertEnum(session.status, ['canceled', 'completed', 'scheduled'], 'Solidarity session status')
     assertEnum(session.eventType, ['in_person', 'virtual'], 'Solidarity session event type')
     canonicalUtcTimestamp(session.startsAt, 'Solidarity session startsAt')
@@ -297,51 +261,9 @@ function normalizeDataset(input: SolidarityEventImportDataset): NormalizedDatase
           : externalId(session.primarySessionId, 'Solidarity primary session ID')
     }
   })
-  const people = input.people.map((person) => {
-    assertObject(person, 'person')
-    return { ...person, id: externalId(person.id, 'Solidarity person ID') }
-  })
-  const rsvps = input.rsvps.map((rsvp) => {
-    assertObject(rsvp, 'RSVP')
-    assertEnum(rsvp.status, ['canceled', 'maybe', 'no', 'waitlisted', 'yes'], 'Solidarity RSVP status')
-    canonicalUtcTimestamp(rsvp.respondedAt, 'Solidarity RSVP respondedAt')
-    return {
-      ...rsvp,
-      id: externalId(rsvp.id, 'Solidarity RSVP ID'),
-      sessionId: externalId(rsvp.sessionId, 'Solidarity RSVP session ID'),
-      userId: externalId(rsvp.userId, 'Solidarity RSVP user ID')
-    }
-  })
-  const attendance = input.attendance.map((record) => {
-    assertObject(record, 'attendance')
-    assertEnum(record.status, ['absent', 'attended', 'excused', 'unknown'], 'Solidarity attendance status')
-    canonicalUtcTimestamp(record.recordedAt, 'Solidarity attendance recordedAt')
-    if (record.checkedInAt) canonicalUtcTimestamp(record.checkedInAt, 'Solidarity attendance checkedInAt')
-    if (record.checkedOutAt) canonicalUtcTimestamp(record.checkedOutAt, 'Solidarity attendance checkedOutAt')
-    if (record.checkedOutAt && !record.checkedInAt) {
-      throw new TypeError('Solidarity attendance checkedOutAt requires checkedInAt')
-    }
-    if (record.checkedInAt && record.checkedOutAt && record.checkedOutAt < record.checkedInAt) {
-      throw new TypeError('Solidarity attendance checkedOutAt cannot be before checkedInAt')
-    }
-    return {
-      ...record,
-      id: externalId(record.id, 'Solidarity attendance ID'),
-      sessionId: externalId(record.sessionId, 'Solidarity attendance session ID'),
-      userId: externalId(record.userId, 'Solidarity attendance user ID')
-    }
-  })
   assertUniqueIds(events, 'event')
   assertUniqueIds(sessions, 'session')
-  assertUniqueIds(people, 'person')
-  assertUniqueIds(rsvps, 'RSVP')
-  assertUniqueIds(attendance, 'attendance')
-  assertUniqueActivitySubjects(rsvps, 'RSVP')
-  assertUniqueActivitySubjects(attendance, 'attendance')
-  const canonicalSessionByExternalId = canonicalSessionIds(sessions)
-  assertUniqueCanonicalActivitySubjects(rsvps, 'RSVP', canonicalSessionByExternalId)
-  assertUniqueCanonicalActivitySubjects(attendance, 'attendance', canonicalSessionByExternalId)
-  return Object.freeze({ attendance, events, people, rsvps, sessions })
+  return Object.freeze({ events, sessions })
 }
 
 function prepareImport(sqlite: Sqlite, dataset: NormalizedDataset): PreparedImport {
@@ -351,46 +273,8 @@ function prepareImport(sqlite: Sqlite, dataset: NormalizedDataset): PreparedImpo
   for (const plan of eventPlans) {
     for (const event of plan.externalEvents) eventByExternalId.set(event.id, plan)
   }
-  const { sessionByExternalId, sessionPlans } = prepareSessions(sqlite, dataset.sessions, eventByExternalId, issues)
-  const personPlans = preparePeople(sqlite, dataset.people, issues)
-  const personByExternalId = new Map(personPlans.map((plan) => [plan.person.id, plan]))
-  const rsvps = dataset.rsvps.flatMap((record) => {
-    const session = sessionByExternalId.get(record.sessionId)
-    if (!session) {
-      issue(issues, 'rsvp_session_missing', 'solidarity.rsvp', record.id)
-      return []
-    }
-    const person = personByExternalId.get(record.userId)
-    if (!person?.personId) {
-      issue(issues, 'rsvp_person_unresolved', 'solidarity.rsvp', record.id)
-      return []
-    }
-    return [{ personId: person.personId, record, sessionId: session.localId }]
-  })
-  const attendance = dataset.attendance.flatMap((record) => {
-    const session = sessionByExternalId.get(record.sessionId)
-    if (!session) {
-      issue(issues, 'attendance_session_missing', 'solidarity.attendance', record.id)
-      return []
-    }
-    const person = personByExternalId.get(record.userId)
-    if (!person?.personId) {
-      issue(issues, 'attendance_person_unresolved', 'solidarity.attendance', record.id)
-      return []
-    }
-    return [{ personId: person.personId, record, sessionId: session.localId }]
-  })
-  assertUniqueResolvedActivitySubjects(rsvps, 'RSVP')
-  assertUniqueResolvedActivitySubjects(attendance, 'attendance')
-  return Object.freeze({
-    attendance,
-    eventPlans,
-    issues,
-    personPlans,
-    rsvps,
-    sessionPlans,
-    snapshots: prepareSnapshots(dataset)
-  })
+  const sessionPlans = prepareSessions(sqlite, dataset.sessions, eventByExternalId, issues)
+  return Object.freeze({ eventPlans, issues, sessionPlans, snapshots: prepareSnapshots(dataset) })
 }
 
 function prepareEvents(
@@ -431,7 +315,7 @@ function prepareEvents(
 function classifyEvent(
   event: NormalizedEvent,
   issues: SolidarityEventImportIssue[]
-): Readonly<{ category: EventCategory; meetingKind: 'general' | 'steering' | null; visibility: EventVisibility }> {
+): Readonly<{ category: EventCategory; visibility: EventVisibility }> {
   const tags = new Set(event.eventTags)
   const audiences = solidarityAudienceTags.filter((tag) => tags.has(tag))
   const categories = solidarityCategoryTags.filter((tag) => tags.has(tag))
@@ -446,14 +330,11 @@ function classifyEvent(
     issue(issues, 'invalid_category_tags', 'solidarity.event', event.id)
   }
   const meetingTags = solidarityMeetingTags.filter((tag) => tags.has(tag))
-  let meetingKind: 'general' | 'steering' | null = null
-  if (category === 'meeting' && meetingTags.length === 1) {
-    meetingKind = meetingTags[0] === 'meeting-general' ? 'general' : 'steering'
-  } else if (meetingTags.length > 0 || category === 'meeting') {
+  if ((category === 'meeting' && meetingTags.length !== 1) || (category !== 'meeting' && meetingTags.length > 0)) {
     visibility = 'hidden'
     issue(issues, 'invalid_meeting_tags', 'solidarity.event', event.id)
   }
-  return { category, meetingKind, visibility }
+  return { category, visibility }
 }
 
 function prepareSessions(
@@ -461,10 +342,7 @@ function prepareSessions(
   sessions: readonly NormalizedSession[],
   eventByExternalId: ReadonlyMap<string, EventPlan>,
   issues: SolidarityEventImportIssue[]
-): Readonly<{
-  sessionByExternalId: ReadonlyMap<string, SessionPlan>
-  sessionPlans: readonly SessionPlan[]
-}> {
+): readonly SessionPlan[] {
   const existingLinks = sqlite.prepare(
     `select distinct event_session_id as localId from event_session_provider_links
      where provider = 'solidarity'
@@ -506,11 +384,7 @@ function prepareSessions(
         session
       })
     })
-  const sessionByExternalId = new Map<string, SessionPlan>()
-  for (const plan of plans) {
-    for (const session of plan.externalSessions) sessionByExternalId.set(session.id, plan)
-  }
-  return Object.freeze({ sessionByExternalId, sessionPlans: Object.freeze(plans) })
+  return Object.freeze(plans)
 }
 
 function canonicalSessionIds(sessions: readonly NormalizedSession[]): ReadonlyMap<string, string> {
@@ -540,41 +414,6 @@ function canonicalSessionIds(sessions: readonly NormalizedSession[]): ReadonlyMa
   return new Map(sessions.map((session) => [session.id, find(session.primarySessionId ?? session.id)]))
 }
 
-function preparePeople(
-  sqlite: Sqlite,
-  people: readonly NormalizedPerson[],
-  issues: SolidarityEventImportIssue[]
-): readonly PersonPlan[] {
-  const identity = sqlite.prepare(
-    `select person_id as personId, state from provider_identities
-     where provider = 'solidarity' and external_id = ?`
-  )
-  const matchingContacts = sqlite.prepare(
-    `select distinct person_id as personId from person_contacts
-     where verified_at is not null
-       and ((kind = 'email' and normalized_value = ?) or (kind = 'phone' and normalized_value = ?))`
-  )
-  return people.map((person) => {
-    const existing = identity.get(person.id) as { personId: string | null; state: string } | undefined
-    if (existing?.personId) return Object.freeze({ action: 'existing', person, personId: existing.personId })
-    const email = normalizeEmail(person.email)
-    const phone = normalizePhone(person.phone)
-    const matches =
-      email || phone ? (matchingContacts.all(email ?? '', phone ?? '') as Array<{ personId: string }>) : []
-    const personIds = new Set(matches.map(({ personId }) => personId))
-    if (personIds.size > 1) {
-      issue(issues, 'ambiguous_person_match', 'solidarity.person', person.id)
-      return Object.freeze({ action: 'ambiguous', person, personId: null })
-    }
-    const matched = [...personIds][0]
-    return Object.freeze({
-      action: matched ? 'existing' : 'created',
-      person,
-      personId: matched ?? deterministicId('solidarity_person', person.id)
-    })
-  })
-}
-
 function prepareSnapshots(dataset: NormalizedDataset): readonly PreparedSnapshot[] {
   const snapshots: PreparedSnapshot[] = []
   const add = (objectType: string, externalId: string, value: unknown) => {
@@ -583,9 +422,6 @@ function prepareSnapshots(dataset: NormalizedDataset): readonly PreparedSnapshot
   }
   for (const record of dataset.events) add('solidarity.event', record.id, record)
   for (const record of dataset.sessions) add('solidarity.session', record.id, record)
-  for (const record of dataset.people) add('solidarity.person', record.id, record)
-  for (const record of dataset.rsvps) add('solidarity.rsvp', record.id, record)
-  for (const record of dataset.attendance) add('solidarity.attendance', record.id, record)
   return Object.freeze(snapshots.sort(compareSnapshots))
 }
 
@@ -637,8 +473,7 @@ function sessionProjection(plan: SessionPlan) {
     locationName: normalizedText(inPerson?.locationName ?? plan.session.locationName, 255),
     locationAddress: normalizedText(inPerson?.locationAddress ?? plan.session.locationAddress, 500),
     virtualUrl: normalizedText(virtual?.virtualUrl ?? plan.session.virtualUrl, 2_000),
-    rsvpUrl: normalizedText(plan.externalSessions.find(({ rsvpUrl }) => rsvpUrl)?.rsvpUrl, 2_000),
-    meetingKind: plan.eventPlan.meetingKind
+    rsvpUrl: normalizedText(plan.externalSessions.find(({ rsvpUrl }) => rsvpUrl)?.rsvpUrl, 2_000)
   }
 }
 
@@ -692,8 +527,7 @@ export function readSolidarityEventImportState(
         `select s.id, s.event_id as eventId, s.title, s.status,
       s.delivery_mode as deliveryMode, s.starts_at as startsAt, s.ends_at as endsAt, s.timezone,
       s.location_name as locationName, s.location as locationAddress, s.virtual_url as virtualUrl,
-      s.rsvp_url as rsvpUrl, m.kind as meetingKind from event_sessions s
-      left join meetings m on m.event_session_id = s.id where s.id = ?`
+      s.rsvp_url as rsvpUrl from event_sessions s where s.id = ?`
       )
       .get(id) as SolidaritySessionProjection | undefined
     const links = sqlite
@@ -783,10 +617,6 @@ function applyImport(
     const snapshotIds = persistSnapshots(sqlite, prepared.snapshots, context)
     persistEvents(sqlite, prepared.eventPlans, snapshotIds, context.observedAt)
     persistSessions(sqlite, prepared.sessionPlans, snapshotIds, context.observedAt)
-    persistPeople(sqlite, prepared.personPlans, snapshotIds, context.observedAt)
-    persistRsvps(sqlite, prepared.rsvps, snapshotIds, context.observedAt)
-    const affectedPeople = persistAttendance(sqlite, prepared.attendance, snapshotIds, context.observedAt)
-    recalculateStanding(sqlite, affectedPeople, prepared.issues, context.observedAt)
     sqlite
       .prepare(
         `update import_batches set status = 'completed', completed_at = ?, record_count = ?, updated_at = ?
@@ -951,13 +781,6 @@ function persistSessions(
        paired_external_id = excluded.paired_external_id, last_seen_at = excluded.last_seen_at,
        source_snapshot_id = excluded.source_snapshot_id, updated_at = excluded.updated_at`
   )
-  const upsertMeeting = sqlite.prepare(
-    `insert into meetings (event_session_id, kind, source_snapshot_id, created_at, updated_at)
-     values (?, ?, ?, ?, ?)
-     on conflict(event_session_id) do update set kind = excluded.kind,
-       source_snapshot_id = excluded.source_snapshot_id, updated_at = excluded.updated_at`
-  )
-  const deleteMeeting = sqlite.prepare('delete from meetings where event_session_id = ?')
   for (const plan of plans) {
     const previous = existingSession.get(plan.localId) as { eventId: string } | undefined
     if (previous && previous.eventId !== plan.eventPlan.localId) {
@@ -982,11 +805,6 @@ function persistSessions(
       observedAt,
       observedAt
     )
-    if (projection.meetingKind) {
-      upsertMeeting.run(plan.localId, projection.meetingKind, sourceSnapshotId, observedAt, observedAt)
-    } else {
-      deleteMeeting.run(plan.localId)
-    }
     for (const externalSession of plan.externalSessions) {
       const linked = existingLink.get(externalSession.id) as { sessionId: string } | undefined
       if (linked && linked.sessionId !== plan.localId) {
@@ -1003,180 +821,6 @@ function persistSessions(
         observedAt,
         observedAt
       )
-    }
-  }
-}
-
-function persistPeople(
-  sqlite: Sqlite,
-  plans: readonly PersonPlan[],
-  snapshotIds: ReadonlyMap<string, string>,
-  observedAt: string
-): void {
-  const upsertPerson = sqlite.prepare(
-    `insert into people (id, first_name, last_name, display_name, created_at, updated_at)
-     values (?, ?, ?, ?, ?, ?)
-     on conflict(id) do update set first_name = coalesce(people.first_name, excluded.first_name),
-       last_name = coalesce(people.last_name, excluded.last_name),
-       display_name = coalesce(people.display_name, excluded.display_name), updated_at = excluded.updated_at`
-  )
-  const primaryContact = sqlite.prepare(
-    'select 1 from person_contacts where person_id = ? and kind = ? and is_primary = 1 limit 1'
-  )
-  const upsertContact = sqlite.prepare(
-    `insert into person_contacts
-       (id, person_id, kind, value, normalized_value, is_primary, verified_at,
-        source_snapshot_id, created_at, updated_at)
-     values (?, ?, ?, ?, ?, ?, null, ?, ?, ?)
-     on conflict(person_id, kind, normalized_value) do update set value = excluded.value,
-       source_snapshot_id = excluded.source_snapshot_id, updated_at = excluded.updated_at`
-  )
-  const upsertIdentity = sqlite.prepare(
-    `insert into provider_identities
-       (id, person_id, provider, external_id, state, linked_at, last_synced_at,
-        source_snapshot_id, created_at, updated_at)
-     values (?, ?, 'solidarity', ?, ?, ?, ?, ?, ?, ?)
-     on conflict(provider, external_id) do update set
-       person_id = case when provider_identities.state = 'unlinked' and excluded.person_id is not null
-         then excluded.person_id else provider_identities.person_id end,
-       state = case when provider_identities.state = 'unlinked' and excluded.person_id is not null
-         then 'active' else provider_identities.state end,
-       linked_at = case when provider_identities.state = 'unlinked' and excluded.person_id is not null
-         then excluded.linked_at else provider_identities.linked_at end,
-       last_synced_at = excluded.last_synced_at, source_snapshot_id = excluded.source_snapshot_id,
-       updated_at = excluded.updated_at`
-  )
-  for (const plan of plans) {
-    const sourceSnapshotId = snapshotId(snapshotIds, 'solidarity.person', plan.person.id)
-    if (plan.personId) {
-      upsertPerson.run(
-        plan.personId,
-        normalizedText(plan.person.firstName, 100),
-        normalizedText(plan.person.lastName, 100),
-        normalizedText(plan.person.displayName, 100),
-        observedAt,
-        observedAt
-      )
-      persistContact('email', plan.person.email, normalizeEmail(plan.person.email))
-      persistContact('phone', plan.person.phone, normalizePhone(plan.person.phone))
-    }
-    upsertIdentity.run(
-      deterministicId('solidarity_identity', plan.person.id),
-      plan.personId,
-      plan.person.id,
-      plan.personId ? 'active' : 'unlinked',
-      plan.personId ? observedAt : null,
-      observedAt,
-      sourceSnapshotId,
-      observedAt,
-      observedAt
-    )
-
-    function persistContact(kind: 'email' | 'phone', value: unknown, normalized: string | null) {
-      const display = normalizedText(value, 320)
-      if (!plan.personId || !display || !normalized) return
-      upsertContact.run(
-        deterministicId('solidarity_contact', `${plan.personId}\0${kind}\0${normalized}`),
-        plan.personId,
-        kind,
-        display,
-        normalized,
-        primaryContact.get(plan.personId, kind) ? 0 : 1,
-        sourceSnapshotId,
-        observedAt,
-        observedAt
-      )
-    }
-  }
-}
-
-function persistRsvps(
-  sqlite: Sqlite,
-  rsvps: PreparedImport['rsvps'],
-  snapshotIds: ReadonlyMap<string, string>,
-  observedAt: string
-): void {
-  const upsert = sqlite.prepare(
-    `insert into rsvps
-       (id, event_session_id, person_id, status, responded_at, source_snapshot_id, created_at, updated_at)
-     values (?, ?, ?, ?, ?, ?, ?, ?)
-     on conflict(event_session_id, person_id) do update set status = excluded.status,
-       responded_at = excluded.responded_at, source_snapshot_id = excluded.source_snapshot_id,
-       updated_at = excluded.updated_at`
-  )
-  for (const { personId, record, sessionId } of rsvps) {
-    upsert.run(
-      deterministicId('solidarity_rsvp', record.id),
-      sessionId,
-      personId,
-      record.status,
-      record.respondedAt,
-      snapshotId(snapshotIds, 'solidarity.rsvp', record.id),
-      observedAt,
-      observedAt
-    )
-  }
-}
-
-function persistAttendance(
-  sqlite: Sqlite,
-  records: PreparedImport['attendance'],
-  snapshotIds: ReadonlyMap<string, string>,
-  observedAt: string
-): ReadonlySet<string> {
-  const affected = new Set<string>()
-  const upsert = sqlite.prepare(
-    `insert into attendance
-       (id, event_session_id, person_id, status, source, recorded_at,
-        source_snapshot_id, created_at, updated_at)
-     values (?, ?, ?, ?, 'solidarity', ?, ?, ?, ?)
-     on conflict(event_session_id, person_id) do update set status = excluded.status,
-       source = excluded.source, recorded_at = excluded.recorded_at,
-       source_snapshot_id = excluded.source_snapshot_id, updated_at = excluded.updated_at`
-  )
-  const findAttendance = sqlite.prepare('select id from attendance where event_session_id = ? and person_id = ?')
-  const clearIntervals = sqlite.prepare('delete from attendance_intervals where attendance_id = ?')
-  const insertInterval = sqlite.prepare(
-    `insert into attendance_intervals
-       (id, attendance_id, checked_in_at, checked_out_at, source_snapshot_id, created_at)
-     values (?, ?, ?, ?, ?, ?)`
-  )
-  for (const { personId, record, sessionId } of records) {
-    const localId = deterministicId('solidarity_attendance', record.id)
-    const sourceSnapshotId = snapshotId(snapshotIds, 'solidarity.attendance', record.id)
-    upsert.run(localId, sessionId, personId, record.status, record.recordedAt, sourceSnapshotId, observedAt, observedAt)
-    const attendanceId = (findAttendance.get(sessionId, personId) as { id: string }).id
-    clearIntervals.run(attendanceId)
-    if (record.checkedInAt) {
-      insertInterval.run(
-        deterministicId('solidarity_attendance_interval', `${record.id}\0${record.checkedInAt}`),
-        attendanceId,
-        record.checkedInAt,
-        record.checkedOutAt ?? null,
-        sourceSnapshotId,
-        observedAt
-      )
-    }
-    affected.add(personId)
-  }
-  return affected
-}
-
-function recalculateStanding(
-  sqlite: Sqlite,
-  personIds: ReadonlySet<string>,
-  issues: SolidarityEventImportIssue[],
-  observedAt: string
-): void {
-  const activeMembership = sqlite.prepare(
-    `select id from memberships where person_id = ? and status = 'active' and ended_at is null`
-  )
-  for (const personId of [...personIds].sort()) {
-    const membership = activeMembership.get(personId) as { id: string } | undefined
-    if (!membership) continue
-    const result = recalculateMembershipStandingInTransaction(sqlite, { membershipId: membership.id, observedAt })
-    if (result.outcome === 'policy_missing') {
-      issue(issues, 'membership_policy_missing', 'membership', membership.id)
     }
   }
 }
@@ -1220,17 +864,6 @@ function uniqueTags(tags: readonly string[]): readonly string[] {
   return [...new Set(tags.map((tag) => tag.trim()))].sort()
 }
 
-function normalizeEmail(value: unknown): string | null {
-  const normalized = normalizedText(value, 320)?.toLowerCase()
-  return normalized && normalized.includes('@') ? normalized : null
-}
-
-function normalizePhone(value: unknown): string | null {
-  const normalized = normalizedText(value, 320)?.replace(/[^\d+]/g, '') ?? null
-  if (!normalized) return null
-  return normalized.startsWith('+') ? `+${normalized.slice(1).replace(/\+/g, '')}` : normalized.replace(/\+/g, '')
-}
-
 function normalizedText(value: unknown, maximumLength: number): string | null {
   if (typeof value !== 'string') return null
   const normalized = value.trim()
@@ -1256,6 +889,19 @@ function canonicalUtcTimestamp(value: unknown, label: string): string {
 function assertObject(value: unknown, label: string): asserts value is Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
     throw new TypeError(`Solidarity ${label} must be an object`)
+  }
+}
+
+function assertFields(value: unknown, allowed: readonly string[], label: string): void {
+  assertObject(value, label)
+  if (Object.keys(value).some((key) => !allowed.includes(key))) {
+    throw new TypeError(`Solidarity ${label} contains unsupported fields`)
+  }
+}
+
+function assertOptionalText(value: unknown, label: string, maximumLength: number): void {
+  if (value != null && (typeof value !== 'string' || value.length > maximumLength)) {
+    throw new TypeError(`${label} must be text of at most ${maximumLength} characters`)
   }
 }
 
@@ -1301,46 +947,6 @@ function assertUniqueIds(values: readonly Readonly<{ id: string }>[], label: str
   for (const { id } of values) {
     if (seen.has(id)) throw new TypeError(`Solidarity event import contains duplicate ${label} ID ${id}`)
     seen.add(id)
-  }
-}
-
-function assertUniqueActivitySubjects(
-  values: readonly Readonly<{ sessionId: string; userId: string }>[],
-  label: string
-): void {
-  const seen = new Set<string>()
-  for (const { sessionId, userId } of values) {
-    const key = `${sessionId}\0${userId}`
-    if (seen.has(key)) throw new TypeError(`Solidarity event import contains duplicate ${label} person/session`)
-    seen.add(key)
-  }
-}
-
-function assertUniqueCanonicalActivitySubjects(
-  values: readonly Readonly<{ sessionId: string; userId: string }>[],
-  label: string,
-  canonicalSessionByExternalId: ReadonlyMap<string, string>
-): void {
-  const seen = new Set<string>()
-  for (const { sessionId, userId } of values) {
-    const key = `${canonicalSessionByExternalId.get(sessionId) ?? sessionId}\0${userId}`
-    if (seen.has(key))
-      throw new TypeError(`Solidarity event import contains duplicate normalized ${label} person/session`)
-    seen.add(key)
-  }
-}
-
-function assertUniqueResolvedActivitySubjects(
-  values: readonly Readonly<{ personId: string; sessionId: string }>[],
-  label: string
-): void {
-  const seen = new Set<string>()
-  for (const { personId, sessionId } of values) {
-    const key = `${sessionId}\0${personId}`
-    if (seen.has(key)) {
-      throw new TypeError(`Solidarity event import contains duplicate normalized ${label} person/session`)
-    }
-    seen.add(key)
   }
 }
 

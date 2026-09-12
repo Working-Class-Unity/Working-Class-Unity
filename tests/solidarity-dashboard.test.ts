@@ -61,7 +61,7 @@ async function capture(overrides: Record<string, string> = {}) {
   }
 }
 
-it('captures identities and complete hybrid metadata, including a reschedule outside the selected month, without authentication data', async () => {
+it('captures provider IDs and complete hybrid metadata, including a reschedule outside the selected month, without authentication data', async () => {
   const result = await capture()
   expect(result.scope.eventIds).toEqual(['73'])
   expect(result.dataset.events[0].eventTags).toEqual(['audience-public', 'category-social'])
@@ -73,7 +73,7 @@ it('captures identities and complete hybrid metadata, including a reschedule out
     startsAt: '2026-10-10T01:00:00.000Z'
   })
   expect(result.dataset.sessions[1]).toMatchObject({ id: '5012', pairedSessionId: '5011', eventType: 'virtual' })
-  expect([result.dataset.people, result.dataset.rsvps, result.dataset.attendance]).toEqual([[], [], []])
+  expect(Object.keys(result.dataset).sort()).toEqual(['events', 'sessions'])
   expect(JSON.stringify(result)).not.toContain('DO-NOT-COLLECT')
 })
 

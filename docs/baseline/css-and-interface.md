@@ -1,5 +1,5 @@
 - **Status and scope**
-  - Canonical target reviewed on [[August 6th, 2026]] against the official Nuxt 4, Vue 3, Reka UI, Stylelint, ESLint, MDN, and W3C documentation linked below.
+  - This is the normative interface guide for the public website. Its original August 6, 2026 review used the official Nuxt, Vue, Reka UI, Stylelint, ESLint, MDN, and W3C documentation linked below.
   - The baseline exactly pins compatible versions of Nuxt, Vue, Stylelint, ESLint, and Reka UI in the repository manifest and lockfile. The supported Node.js and package-manager versions are also pinned in repository toolchain configuration.
   - The baseline uses native HTML, raw CSS, Vue single-file components, app-owned wrappers, and Reka UI only for composite accessible behavior.
   - PrimeVue, Tailwind CSS, Nuxt UI, shadcn-vue, and utility-class-generated product styling are excluded.
@@ -11,10 +11,10 @@
   - Prefer native semantic elements before any custom primitive.
   - Use Reka UI for interaction patterns whose keyboard navigation, focus management, dismissal, or ARIA behavior would otherwise be substantial application code.
   - Wrap Reka primitives in small app-owned components. Pages should not scatter Reka imports, content policy, and styling.
-  - Keep the initial shared surface to `AppButton`, `AppField`, and `AppNotice`, plus the feature-owned `AccountMenu`; keep flow, cluster, container, and grid as CSS layout primitives.
+  - Keep the shared surface small and maintain its actual inventory in `app/AGENTS.md`; keep flow, cluster, container, and grid as CSS layout primitives.
   - Give coding agents a concise `app/AGENTS.md`, one canonical implementation fixture, an explicit component inventory, and one repository check command.
-  - Keep SSR as the default and require unresolved-authentication, pending, error, empty, and success handling for asynchronous product surfaces.
-  - The feature-owned account menu may expose account settings and sign-out. Membership management belongs on the dashboard; invitations, organization/workspace controls, roles, and member administration are excluded.
+  - Keep SSR as the default and require pending, error, empty, and success handling for asynchronous product surfaces.
+  - The site is public. Joining and subscription management are ordinary links to Stripe-hosted pages; RSVP actions link to Solidarity.
   - Stylelint and Nuxt-aware ESLint belong in the baseline. Browser behavior and accessibility require behavioral tests; source-text assertions are not substitutes.
 - **1. CSS ownership and files**
   - Nuxt officially supports local stylesheets in `app/assets`, component imports, and global registration through the `css` property in `nuxt.config.ts`.
@@ -23,6 +23,7 @@
       app/assets/css/
         main.css
         reset.css
+        color-primitives.generated.css
         tokens.css
         base.css
         layout.css
@@ -32,7 +33,8 @@
   - Register the entry stylesheet as `~/assets/css/main.css` in `nuxt.config.ts`.
   - Ownership:
     - `reset`: conservative normalization only.
-    - `tokens`: primitive and semantic custom properties.
+    - `color-primitives.generated.css`: generated primitive colors; regenerate through `pnpm tokens:generate`.
+    - `tokens`: reviewed semantic custom properties and non-color design tokens.
     - `base`: document, typography, links, forms, focus, selection, and default table/list behavior.
     - `layout`: app shell and reusable flow, cluster, container, and grid primitives.
     - `components`: app-owned component and Reka-wrapper presentation.
@@ -93,7 +95,7 @@
     - Do not turn ordinary primary navigation into an ARIA menu.
     - Use native `fieldset`/`legend` for grouped controls, `details`/`summary` for ordinary disclosure, and `progress` or `output` when those semantics match the product need.
   - Relevant Reka primitives when native behavior is insufficient:
-    - `DropdownMenu` for the account command menu. Its official contract includes managed focus, keyboard navigation, typeahead, dismissal, and the Menu Button WAI-ARIA pattern.
+    - `DropdownMenu` for the event directions command menu. Its official contract includes managed focus, keyboard navigation, typeahead, dismissal, and the Menu Button WAI-ARIA pattern.
     - `Dialog` for modal tasks that require managed focus and labelled content.
     - `AlertDialog` for an important or destructive decision that requires a response.
     - `Popover` for rich transient content that is not a command menu.
@@ -109,21 +111,11 @@
   - Use Reka's documented CSS variables for collision-aware sizes and transform origins rather than measuring private internals.
   - Use controlled state such as `v-model:open` only when the application must coordinate behavior—for example, closing a menu on route navigation.
   - If `asChild` is used to compose an app-owned trigger, ensure the child renders one valid element and forwards the attributes, events, and reference required by Reka's composition contract.
-- **9. Feature-owned account menu contract**
-  - Implement `AccountMenu` as a feature-owned component around `DropdownMenuRoot`, `DropdownMenuTrigger`, `DropdownMenuPortal`, `DropdownMenuContent`, `DropdownMenuLabel`, `DropdownMenuItem`, and `DropdownMenuSeparator` as needed. Do not extract a generic `AppDropdownMenu` until a second real journey demonstrates a stable shared contract.
-  - Appropriate content: authenticated identity summary, account settings, and sign-out.
-  - Excluded content: membership management, invitations, organization/workspace controls, visible roles, member administration, ownership transfer, or a general workspace settings surface.
-  - Membership status belongs on the personal dashboard and never grants access to another person's private records.
-  - Required behavior:
-    - Accurate trigger name and expanded state.
-    - Pointer, Enter, and Space open behavior.
-    - Arrow-key navigation among enabled items and typeahead where labels support it.
-    - Escape closes and restores focus to the trigger.
-    - Outside interaction dismisses according to the documented Reka behavior.
-    - Route changes close controlled menu state.
-    - Disabled states are semantic, not visual-only.
-    - Long names and narrow viewports do not overflow.
-    - No private identity or account information renders before authentication is resolved.
+- **9. Public navigation and hosted actions**
+  - `AppTopbar` owns the site header, desktop Current Work and Events panels, and native mobile disclosures. Links close open navigation, including links to the current route.
+  - Navigation remains semantic links rather than command-menu items. Use localized internal links for public pages and native external anchors for Stripe and Solidarity destinations.
+  - `PageOutline`, campaign citations, and calendar interactions remain feature-owned Reka integrations. Keep their keyboard navigation, dismissal, focus return, and responsive presentation within the documented component boundary.
+  - Public event previews fetch only public event metadata and expose loading, error/retry, and empty states. They never depend on website authentication.
 - **10. Accessibility and motion**
   - Reka reduces primitive-level accessibility work but does not make application copy, labels, routing, contrast, loading states, or authorization correct automatically.
   - Maintain a visible focus indicator. The enhanced product target is at least the area of a 2 CSS-pixel perimeter with a 3:1 change of contrast; this corresponds to WCAG 2.2 Focus Appearance at Level AAA, while visible focus remains required at the baseline conformance level.
@@ -146,7 +138,7 @@
   - The agent file states the exact repository commands, directory ownership rules, current component inventory, allowed Reka import locations, required page-state handling, and the path to one canonical implementation example.
   - Record one deliberate Nuxt component auto-import convention. Nested component paths affect generated names, so filenames and directories must produce names that are obvious at the call site.
   - Keep auto-imported composables at the top level of `app/composables`, re-export nested composables from its index, or explicitly configure nested scanning. Do not leave discoverability to convention that Nuxt does not scan.
-  - Maintain one small reference fixture or non-production example that demonstrates the shell, a form field, asynchronous states, persistent feedback, and the account menu. Agents copy this working composition rather than reconstructing it from prose.
+  - Maintain one small reference fixture or non-production example that demonstrates the shell, asynchronous states, persistent feedback, and public navigation. Agents copy this working composition rather than reconstructing it from prose.
   - Restrict direct `reka-ui` imports with ESLint to the approved feature-owned components and shared wrappers. Pages and unrelated feature components consume the app-owned contract.
   - Adding or changing a shared component updates its inventory entry, usage example, public contract, and focused tests in the same change.
   - Prefer exact local documentation and the official Reka `.md` documentation endpoints when supplying context to an LLM; do not paste stale vendor API summaries into `AGENTS.md`.
@@ -156,7 +148,6 @@
   - `AppButton` renders a native `button`, defaults to `type="button"`, and supports only the documented semantic variants, sizes, disabled state, and pending state. It never performs navigation; use `NuxtLink` or a native link for navigation.
   - `AppField` owns the label, hint, required, and validation-message relationship for a native control. Its slot exposes the stable ID and ARIA attributes that the control must bind. Generate default IDs with Vue `useId()` so they remain stable across SSR and hydration.
   - `AppNotice` presents persistent information, success, warning, or error feedback. Its visual variant does not automatically determine live-region behavior; announcements are enabled explicitly according to whether content changed after a user action.
-  - `AccountMenu` remains feature-owned and may compose Reka directly within its documented boundary. Extract `AppDropdownMenu` only when another real journey demonstrates a coherent shared API.
   - Flow, cluster, container, and grid remain documented CSS layout primitives rather than renderless Vue wrappers.
   - Do not add generic `AppBox`, `AppStack`, `AppText`, `AppCard`, polymorphic “everything” components, or raw-CSS-value props. A component exists for repeated semantics, behavior, accessibility policy, or a stable visual contract—not merely to rename an element.
   - Shared baseline components do not fetch data, read feature stores, or contain authorization rules. Pages and feature components provide typed props and handle emitted events.
@@ -166,10 +157,10 @@
   - Do not read `window`, `document`, `localStorage`, current time, random values, or viewport state during universal rendering. Use CSS for responsive presentation and Nuxt/Vue SSR-safe state or post-mount behavior for genuine browser-only needs.
   - Use `useFetch` or `useAsyncData` for initial SSR-aware reads. Use `$fetch` for user-triggered mutations and other event-driven client requests.
   - Pages and feature composables own data access, caching keys, transformation, and retry policy. Foundational components render typed inputs and emit user intent.
-  - Every asynchronous surface deliberately handles unresolved authentication when applicable, pending, error, empty, and success states. Loading UI includes visible text or another understandable status; error UI provides a useful recovery action when recovery is possible.
+  - Every asynchronous surface deliberately handles pending, error, empty, and success states. Loading UI includes visible text or another understandable status; error UI provides a useful recovery action when recovery is possible.
   - Component-local state is the default. Use `useState` for genuinely shared SSR-safe state; never export module-level Vue reactive state that could be shared across server requests.
   - Put app/server-neutral types and pure utilities in `shared/types` and `shared/utils`. Client app code does not import server-only implementation, and Nitro code does not import Vue components or app composables.
-  - Authorization is enforced before protected data is queried or serialized into the Nuxt payload. Conditional rendering, hidden controls, route middleware, and disabled UI are not authorization boundaries.
+  - Filter event audiences before querying or serializing public data into the Nuxt payload. Conditional rendering and hidden controls cannot protect restricted event metadata.
   - Do not render untrusted content with `v-html`. A documented, reviewed sanitization boundary is required when rich HTML is a real product requirement.
   - Treat hydration warnings as defects. Do not suppress a mismatch until the differing server/client output is intentional, bounded, and tested.
 - **15. Application shell, forms, and feedback**
@@ -230,7 +221,7 @@
     - Stylelint owns CSS syntax and stable conventions. Extend its maintained configuration and use file-specific overrides as documented in [Stylelint configuration](https://stylelint.io/user-guide/configure/); do not create another CSS source scanner.
     - Vue component tests assert observable inputs and outputs—props, interactions, rendered roles/text, emitted events, and side effects—rather than classes or implementation internals, following [Vue Test Utils guidance](https://test-utils.vuejs.org/guide/essentials/easy-to-test).
     - Playwright tests assembled behavior using user-visible roles and labels, not CSS selectors. This follows [Playwright's testing guidance](https://playwright.dev/docs/best-practices).
-    - Reka-wrapper browser tests cover the documented keyboard, focus, dismissal, and labelling contract plus the application's route and authentication coordination.
+    - Reka-wrapper browser tests cover the documented keyboard, focus, dismissal, and labelling contract plus the application's route coordination.
     - Automated accessibility scans catch common defects but do not prove conformance. Combine them with keyboard, focus, zoom/reflow, contrast, and appropriate assistive-technology review as recommended by [Playwright's accessibility guide](https://playwright.dev/docs/accessibility-testing).
     - Use visual comparisons only for durable appearance contracts that behavior assertions cannot express. Playwright's official [`toHaveScreenshot()` workflow](https://playwright.dev/docs/next/test-snapshots) is preferred over a custom image-diff harness.
     - Add a maintained component catalog only when the shared surface becomes difficult to discover or review as a matrix. Storybook's model treats stories as discrete component states and supports interaction, accessibility, and visual testing; see [Storybook UI testing](https://storybook.js.org/docs/writing-tests). Adoption remains a separately reviewed tooling decision, not an automatic baseline dependency.
@@ -262,13 +253,13 @@
   - Move repeated primitives into semantic tokens and app-owned components.
   - Keep SFC rules scoped and layered.
   - Add `app/AGENTS.md` with the actual component inventory, directory/import boundaries, canonical example, and repository check command.
-  - Implement only the initial shared `AppButton`, `AppField`, and `AppNotice` contracts; keep `AccountMenu` feature-owned and layout primitives in CSS.
+  - Implement only shared components used by current public journeys; keep calendar and campaign interactions feature-owned and layout primitives in CSS.
   - Provide the semantic application shell, skip link, stable main target, `NuxtRouteAnnouncer`, meaningful page titles, and `error.vue`.
-  - Keep SSR as the default; use `useFetch`/`useAsyncData` for initial reads and `$fetch` for user-triggered mutations; render every applicable authentication and asynchronous state.
+  - Keep SSR as the default; use `useFetch`/`useAsyncData` for initial reads and `$fetch` for user-triggered mutations; render every applicable asynchronous state.
   - Pin Node.js and the package manager, configure Nuxt-aware ESLint, and enforce the approved `reka-ui` import boundary.
   - Verify native form labels, descriptions, validation messages, pending behavior, error recovery, and server-authoritative validation.
   - Exactly pin Reka UI in the repository manifest and lockfile.
-  - The baseline includes the feature-owned account `DropdownMenu`; add a generic dropdown wrapper or other Reka primitive only for a documented product journey.
+  - Keep direct Reka imports inside the current documented component boundaries; add a wrapper or primitive only for a supported public journey.
   - Keep primary navigation native and semantic.
   - Run the canonical check command covering Nuxt-aware ESLint, Stylelint, Nuxt typecheck, and fast tests, followed by targeted integration tests and the existing browser/accessibility gates.
   - Verify 320px, 390px, and desktop layouts; 200% text resizing; reflow at a 320 CSS-pixel viewport; long content; keyboard navigation; focus return and non-obscuring sticky UI; route announcements; reduced motion; and contrast.

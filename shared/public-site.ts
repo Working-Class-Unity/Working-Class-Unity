@@ -33,7 +33,7 @@ export const publicPages: readonly PublicPage[] = [
     titleKey: 'metadata.bylaws.title',
     descriptionKey: 'metadata.bylaws.description'
   },
-  { path: '/join', section: 'Participation', titleKey: 'join.title', descriptionKey: 'join.tierExplanation' },
+  { path: '/join', section: 'Participation', titleKey: 'join.title', descriptionKey: 'join.description' },
   {
     path: '/calendar',
     section: 'Participation',

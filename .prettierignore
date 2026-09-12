@@ -6,3 +6,4 @@ data/
 node_modules/
 pnpm-lock.yaml
 server/db/migrations/meta/
+.opencode/

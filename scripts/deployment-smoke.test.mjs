@@ -4,13 +4,22 @@ import { after, test } from 'node:test'
 
 import { parseDeploymentSmokeTarget, readOnlyFetch, runDeploymentSmoke } from './deployment-smoke.mjs'
 
+const retiredApiPaths = [
+  '/api/me',
+  '/api/auth/get-session',
+  '/api/account/billing',
+  '/api/account/membership',
+  '/api/join/checkout',
+  '/api/ai/conversations',
+  '/api/files'
+]
 const openServers = new Set()
 
 after(async () => {
   await Promise.all([...openServers].map((server) => closeServer(server)))
 })
 
-test('release-boundary checks produce only anonymous GET probes with no provider credentials', async (t) => {
+test('public-site checks produce only anonymous GET probes with no provider credentials', async (t) => {
   const fixture = await startRecorder()
   t.after(() => fixture.close())
   const logger = recordingLogger()
@@ -23,11 +32,10 @@ test('release-boundary checks produce only anonymous GET probes with no provider
 
   const expectedAccept = new Map([
     ['/', 'text/html'],
+    ['/join', 'text/html'],
+    ['/api/events', 'application/json'],
     ['/api/live', 'application/json'],
-    ['/observability-client-test', 'text/html'],
-    ['/api/ai/conversations', 'application/json'],
-    ['/api/account/billing', 'application/json'],
-    ['/api/files', 'application/json']
+    ...retiredApiPaths.map((path) => [path, 'application/json'])
   ])
   const forbiddenHeaders = [
     'authorization',
@@ -57,42 +65,67 @@ test('release-boundary checks produce only anonymous GET probes with no provider
   }
 })
 
-test('an active private boundary fails closed when its anonymous response is not 401', async (t) => {
-  const fixture = await startRecorder({ '/api/account/billing': { body: '{}', status: 200 } })
-  t.after(() => fixture.close())
-  const logger = recordingLogger()
+test('a retired account API fails when it still responds with authentication or account data', async (t) => {
+  for (const status of [200, 401]) {
+    const fixture = await startRecorder({ '/api/account/billing': { body: '{}', status } })
+    t.after(() => fixture.close())
+    const logger = recordingLogger()
 
-  const result = await runDeploymentSmoke({ baseUrl: fixture.baseUrl, logger })
+    const result = await runDeploymentSmoke({ baseUrl: fixture.baseUrl, logger })
 
-  assert.equal(result.ok, false)
-  assert.equal(result.failures.length, 1)
-  assert.match(result.failures[0], /expected anonymous 401 for billing, received 200/)
-  assert.equal(logger.errors.length, 1)
-  assert.match(logger.errors[0], /^fail - GET \/api\/account\/billing/)
+    assert.equal(result.ok, false)
+    assert.equal(result.failures.length, 1)
+    assert.match(result.failures[0], new RegExp(`expected retired API 404, received ${status}`))
+    assert.equal(logger.errors.length, 1)
+    assert.match(logger.errors[0], /^fail - GET \/api\/account\/billing/)
+  }
 })
 
-test('an excluded boundary fails when it is exposed or cacheable', async (t) => {
-  const fixture = await startRecorder({ '/api/ai/conversations': { body: '{}', status: 401 } })
+test('retired API error pages may set only the public language preference cookie', async (t) => {
+  for (const [cookies, expected] of [
+    [['wcu_locale=en; Path=/; SameSite=Lax'], true],
+    [['better-auth.session_token=unexpected; Path=/'], false],
+    [['wcu_locale=es; Path=/', 'session=unexpected; Path=/'], false],
+    [['unrecognized_id=unexpected; Path=/'], false]
+  ]) {
+    const fixture = await startRecorder({
+      '/api/account/billing': { status: 404, body: '{}', headers: { 'set-cookie': cookies } }
+    })
+    t.after(() => fixture.close())
+    const result = await runDeploymentSmoke({ baseUrl: fixture.baseUrl, logger: recordingLogger() })
+    assert.equal(result.ok, expected)
+    if (!expected) assert.match(result.failures[0], /created a non-locale cookie/)
+  }
+})
+
+test('the public calendar fails when unavailable or creating an account session', async (t) => {
+  for (const override of [
+    { status: 401, body: '{}' },
+    { status: 200, body: '{}' },
+    { status: 200, body: '{"events":[]}', headers: { 'set-cookie': 'session=unexpected' } }
+  ]) {
+    const fixture = await startRecorder({ '/api/events': override })
+    t.after(() => fixture.close())
+
+    const result = await runDeploymentSmoke({ baseUrl: fixture.baseUrl, logger: recordingLogger() })
+
+    assert.equal(result.ok, false)
+    assert.equal(result.failures.length, 1)
+    assert.match(result.failures[0], /^GET \/api\/events/)
+  }
+})
+
+test('Join must expose both hosted checkout links as actual anchors', async (t) => {
+  const fixture = await startRecorder({
+    '/join': { status: 200, body: '<p>https://pay.workingclassunity.com/b/7sI4hF1hc9IIepq4gh</p>' }
+  })
   t.after(() => fixture.close())
 
   const result = await runDeploymentSmoke({ baseUrl: fixture.baseUrl, logger: recordingLogger() })
 
   assert.equal(result.ok, false)
   assert.equal(result.failures.length, 1)
-  assert.match(result.failures[0], /expected excluded ai 404, received 401/)
-})
-
-test('observability page receives a GET-only probe', async (t) => {
-  const fixture = await startRecorder()
-  t.after(() => fixture.close())
-
-  const result = await runDeploymentSmoke({ baseUrl: fixture.baseUrl, logger: recordingLogger() })
-
-  assert.equal(result.ok, true)
-  assert.deepEqual(
-    fixture.requests.filter(({ url }) => url === '/observability-client-test').map(({ method, url }) => [method, url]),
-    [['GET', '/observability-client-test']]
-  )
+  assert.match(result.failures[0], /expected hosted checkout link/)
 })
 
 test('the request helper rejects unsafe methods before fetch and emits a closed HEAD request shape', async () => {
@@ -191,21 +224,20 @@ async function startRecorder(overrides = {}) {
       send(response, 204, '', { 'cache-control': 'no-store' })
       return
     }
-    const capabilityEntry = Object.entries({
-      ai: '/api/ai/conversations',
-      billing: '/api/account/billing',
-      files: '/api/files',
-      observability: '/observability-client-test'
-    }).find(([, path]) => path === request.url)
-    if (capabilityEntry) {
-      const [capabilityId] = capabilityEntry
-      if (capabilityId === 'observability') {
-        send(response, 200, '<h1>Client Event Test</h1>')
-      } else if (capabilityId === 'ai' || capabilityId === 'files') {
-        sendJson(response, 404, { statusCode: 404 }, { 'cache-control': 'no-store' })
-      } else {
-        sendJson(response, 401, { statusCode: 401 })
-      }
+    if (request.url === '/api/events') {
+      sendJson(response, 200, { events: [] })
+      return
+    }
+    if (request.url === '/join') {
+      send(
+        response,
+        200,
+        '<a href="https://pay.workingclassunity.com/b/7sI4hF1hc9IIepq4gh">$10/month</a><a href="https://pay.workingclassunity.com/b/bIY4hF4tof325SUaEE">$27/month</a>'
+      )
+      return
+    }
+    if (retiredApiPaths.includes(request.url)) {
+      sendJson(response, 404, { statusCode: 404 })
       return
     }
 

@@ -1,13 +1,10 @@
 import { defineNuxtConfig } from 'nuxt/config'
 import { createBaseContentSecurityPolicy } from './shared/content-security-policy'
-import { assertSafeBetterAuthBuildEnvironment } from './server/utils/runtime'
 
 const isProduction = process.env.NODE_ENV === 'production'
 const sentryUploadEnabled =
   isProduction &&
   ['SENTRY_AUTH_TOKEN', 'SENTRY_ORG', 'SENTRY_PROJECT'].every((key) => hasExactBuildValue(process.env[key]))
-
-assertSafeBetterAuthBuildEnvironment(process.env)
 
 export default defineNuxtConfig({
   compatibilityDate: '2026-05-13',
@@ -78,46 +75,6 @@ export default defineNuxtConfig({
   runtimeConfig: {
     databaseUrl: '',
     readinessToken: '',
-    betterAuth: {
-      secret: '',
-      url: ''
-    },
-    email: {
-      transport: '',
-      from: '',
-      captureDirectory: '',
-      resend: {
-        apiKey: ''
-      }
-    },
-    twilioVerify: {
-      apiKeySid: '',
-      apiKeySecret: '',
-      serviceSid: ''
-    },
-    stripe: {
-      secretKey: '',
-      webhookSecret: '',
-      portalConfigurationId: '',
-      membershipDues10PriceId: '',
-      solidarityDues27PriceId: '',
-      legacyDues10PriceIds: '',
-      legacyDues27PriceIds: ''
-    },
-    files: {
-      driver: ''
-    },
-    openai: {
-      apiKey: '',
-      projectId: '',
-      model: '',
-      fileSearch: {
-        vectorStoreId: ''
-      },
-      webSearch: {
-        allowedDomains: ''
-      }
-    },
     sentryDsn: '',
     sentryEnvironment: '',
     sentryRelease: '',
@@ -125,26 +82,13 @@ export default defineNuxtConfig({
     observability: {
       testToken: ''
     },
-    cloudflare: {
-      accountId: '',
-      r2: {
-        bucket: '',
-        endpoint: '',
-        accessKeyId: '',
-        secretAccessKey: ''
-      },
-      turnstile: {
-        secretKey: ''
-      }
-    },
     public: {
       appName: 'Working Class Unity',
       appUrl: '',
       sentryDsn: '',
       sentryEnvironment: '',
       sentryRelease: '',
-      sentryTracesSampleRate: '0.05',
-      turnstileSiteKey: ''
+      sentryTracesSampleRate: '0.05'
     }
   },
   nitro: {
@@ -156,58 +100,17 @@ export default defineNuxtConfig({
       // nuxt-security imports its optional XSS middleware dependency at module
       // initialization even when the middleware is disabled. Bundle it so the
       // standalone Nitro output does not depend on a workspace node_modules.
-      inline: ['xss', /shared\/basic-release-policy(?:\.js)?$/]
+      inline: ['xss']
     },
     experimental: {
       envExpansion: false
-    },
-    storage: {
-      local: {
-        driver: 'fs',
-        base: './data/nitro'
-      }
     }
   },
   routeRules: {
     '/_nuxt/**': { headers: { 'cache-control': 'public, max-age=31536000, immutable' } },
-    '/app': {
-      headers: {
-        'cache-control': 'private, no-store'
-      }
-    },
-    '/app/**': {
-      headers: {
-        'cache-control': 'private, no-store'
-      }
-    },
-    '/account': {
-      headers: {
-        'cache-control': 'private, no-store'
-      }
-    },
-    '/login': {
-      headers: {
-        'cache-control': 'private, no-store'
-      }
-    },
-    '/activate': {
-      headers: {
-        'cache-control': 'private, no-store'
-      }
-    },
-    '/signup': {
-      headers: {
-        'cache-control': 'private, no-store'
-      }
-    },
     '/api/**': { cache: false },
     '/api/live': { cache: false },
     '/api/ready': { cache: false },
-    '/api/auth/**': { cache: false },
-    '/api/ai/**': { cache: false },
-    '/api/account/billing/**': { cache: false },
-    '/api/webhooks/stripe': { cache: false },
-    '/api/files/**': { cache: false },
     '/api/observability/**': { cache: false }
   },
   security: {
@@ -216,8 +119,7 @@ export default defineNuxtConfig({
       contentSecurityPolicy: createBaseContentSecurityPolicy(isProduction),
       crossOriginResourcePolicy: 'same-origin',
       crossOriginOpenerPolicy: 'same-origin',
-      // Stripe does not support cross-origin isolation. Provider-specific
-      // resource permissions belong in the CSP instead of a blanket COEP.
+      // Keep resource permissions in the CSP without requiring cross-origin isolation.
       crossOriginEmbedderPolicy: false,
       originAgentCluster: '?1',
       referrerPolicy: 'strict-origin-when-cross-origin',
@@ -243,8 +145,7 @@ export default defineNuxtConfig({
         usb: []
       }
     },
-    // Better Auth and application routes own stricter, route-aware security
-    // boundaries. These generic middlewares cannot replace those guarantees.
+    // API routes own their input and operational-token boundaries.
     requestSizeLimiter: false,
     rateLimiter: false,
     xssValidator: false,

@@ -39,3 +39,12 @@ a754be80e7c34d1580396bb8facff9a79c8525eb:tests/twilio-verify.test.ts:generic-api
 576166187f3ffddc26d7fca297168496a5a34a88:knowledgebase/node.js Documentation 2025-11-24/nodejs.org_dist_latest_docs_api_https.html.md:generic-api-key:901
 576166187f3ffddc26d7fca297168496a5a34a88:knowledgebase/node.js Documentation 2025-11-24/nodejs.org_dist_latest_docs_api_https.html.md:generic-api-key:904
 576166187f3ffddc26d7fca297168496a5a34a88:knowledgebase/node.js Documentation 2025-11-24/nodejs.org_dist_latest_docs_api_https.html.md:generic-api-key:907
+
+# Reviewed 2026-09-11 during the public-site simplification.
+# These historical account tests use the same short, synthetic membership
+# restricted-key placeholder with injected Stripe responses. The suites are now
+# removed; the immutable history remains scanned. No provider credential is present.
+21e5a06cec4937b1122a643ff7d0f3fd2e9314d3:tests/stripe-account-adoption.test.ts:stripe-access-token:29
+c1f0c93ab70683ff6027064178e68c1494918877:tests/stripe-account-adoption.test.ts:stripe-access-token:29
+586ac005fef6be3c7fd2be9deeffd3648146db63:tests/stripe-first-membership.test.ts:stripe-access-token:27
+942a23b2c1d914fa0ef13d7dddb87e71a2dc9925:tests/stripe-first-membership.test.ts:stripe-access-token:27

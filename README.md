@@ -1,91 +1,62 @@
 # Working Class Unity
 
-This branch is the standalone rebuild of the Working Class Unity website. It starts from a
-reviewed Baseline snapshot without importing Baseline's Git ancestry, then removes the Baseline
-product model that WCU does not need.
+This repository runs the public Working Class Unity website: campaigns, Know Your Rights guides,
+bylaws, organization information, and an events calendar. Nuxt 4, Vue 3, and Nitro serve the site;
+SQLite and Drizzle store event metadata imported from Solidarity.
 
-The rebuild is a pre-launch foundation. It deliberately has only a minimal interface; WCU will not
-launch it until the application UI is designed and the hosted integrations are certified.
+Joining and subscription management happen on Stripe-hosted pages. The website offers the existing
+$10/month Membership and $27/month Solidarity links, with equal membership benefits. It has no
+website accounts, login, free-user tier, local membership authorization, billing webhook, or
+transactional email service.
 
-## Current foundation
-
-- Nuxt 4, Vue 3, Nitro, SQLite, and Drizzle in one root application package.
-- Open registration through email magic links only.
-- Private accounts with a display name, optional avatar, and an operator-assigned `user | admin`
-  role. New accounts are non-members; membership authorization comes later.
-- AI chat, Files, File Search, Web Search, OpenAI resources, and user-file R2 are source-disabled for
-  the basic release. Dormant implementation and schema are not product availability.
-- Purchaser-owned Stripe Billing. The final one-membership/two-price WCU catalog is deferred until
-  the rest of the foundation is complete.
-- Resend transactional email, SQLite-backed jobs, Sentry observability, and separate R2 database
-  backups.
-- A Docker/Coolify deployment shape with one web process, one worker, a migration gate, and an
-  off-host backup process.
-
-Family workspaces, generic Projects, invitations, social login, passwords, runtime product switches,
-and operator toggles for excluded capabilities are not part of WCU.
-
-The rebuild decisions and exact source boundary are recorded in
-[`docs/wcu-rebuild-provenance.md`](docs/wcu-rebuild-provenance.md). Agent working rules are in
-[`AGENTS.md`](AGENTS.md).
+Solidarity owns event authoring, RSVP forms, and attendance. The website links to Solidarity for
+RSVPs and imports only event metadata through an operator-run process. Events tagged
+`audience-members` stay classified that way and are excluded from every public listing.
 
 ## Local development
 
-Use Node 24 and the exact `pnpm@11.1.2` package manager pinned in `package.json`. The repository
-runner can obtain the pinned pnpm version without a global install.
+Use the supported Node 24 version and exact `pnpm@11.1.2` pinned by the repository toolchain.
+The repository runner can obtain pnpm without a global installation.
 
 ```bash
-nvm use
 cp .env.example .env
 node scripts/run-pnpm.mjs install --frozen-lockfile
 node scripts/run-pnpm.mjs run db:migrate
 node scripts/run-pnpm.mjs run dev
 ```
 
-If Node 24 is already active, the `nvm use` line is unnecessary. Review `.env.example` rather
-than copying its local-only values into a deployed environment. Local and test email uses the
-private capture transport; production uses Resend.
-
-The app and worker share one SQLite database, so run the worker in another terminal when testing
-queued work:
-
-```bash
-node scripts/run-pnpm.mjs run worker
-```
+Review `.env.example` before configuring a deployed environment. A new database starts empty; use
+an events-only import to populate its calendar. There is no background application worker.
 
 ## Verification
 
-The main local checks are:
-
 ```bash
-node scripts/run-pnpm.mjs run db:migrate:check
-node scripts/run-pnpm.mjs run typecheck
-node scripts/run-pnpm.mjs run lint
-node scripts/run-pnpm.mjs run stylelint
-node scripts/run-pnpm.mjs run test
-node scripts/run-pnpm.mjs run build
+node scripts/run-pnpm.mjs run check
+node scripts/run-pnpm.mjs run verify
 ```
 
-`npm run verify:pinned` runs the complete pinned verification pipeline, including tooling,
-supply-chain, runtime, browser, API, and container checks. Network-backed provider certification is
-separate: deterministic tests do not prove that WCU's Resend, Stripe, database-backup R2, Sentry, or
-Coolify credentials and hosted configuration are correct. This release provisions no OpenAI or
-user-file R2 resource.
+`check` runs the repository checks. `verify` adds the production build and packaged runtime,
+browser, API, and container checks. Tests use disposable state. They do not certify the current
+Stripe payment links, Solidarity dashboard, Sentry project, R2 bucket, or deployed Coolify resource.
 
-## Database and deployment
+## Live data and deployment
 
-The rebuild assumes a fresh pre-launch database. Its single initial migration is the complete WCU
-schema; it is not an upgrade path for the legacy WCU site or a Baseline database. Do not point the
-rebuild at either existing database.
+This is a live website. A code change does not authorize changing production data or deploying it.
+The public-site database is an events-only schema. Normal migration refuses the retired application
+database; conversion copies an explicit allowlist of event metadata into a new file.
 
-Production is intended for Coolify with private runtime configuration, a persistent `/app/data`
-volume, and the migration service completing before web or worker startup. Credentials are not
-committed and are intentionally deferred in this branch. The existing WCU domains and subdomains
-remain an external DNS/cutover concern; this branch does not recreate the old site's integrations.
+A separately approved cutover keeps one private temporary rollback backup, verifies the new database
+and public site, and then retires the old identity-bearing database and rollback copy. Never run the
+retired account-deletion flow: it can cancel real Stripe subscriptions. Existing Stripe subscriptions
+remain in Stripe throughout this change.
 
-## Imported documentation
+Docker/Coolify runs one web service after a migration gate, with a separate private R2 backup runner.
+The shipped Compose deployment requires the backup runner's R2 credentials. See
+[deployment](docs/deployment.md), [database conversion](docs/database-cutover.md),
+and the [backup runbook](ops/backup-runbook.md).
 
-The Baseline ADRs, audit evidence, and detailed guides under `docs/` remain useful source history,
-but many describe removed Baseline behavior. They are not WCU requirements unless the provenance
-ledger or current code explicitly ports them. See [`docs/README.md`](docs/README.md) before relying
-on an imported document.
+## Documentation
+
+Start with [the documentation index](docs/README.md). It links the architecture, interface contract,
+Solidarity event workflow, and operational guides. Historical account, billing, AI, and Files
+architecture remains in Git history and is not part of this application.

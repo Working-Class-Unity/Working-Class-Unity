@@ -56,7 +56,7 @@ async function run() {
   canaryDirectoryCreated = true
   for (const path of canaryPaths) {
     mkdirSync(dirname(path), { recursive: true })
-    writeFileSync(path, `NUXT_BETTER_AUTH_SECRET=${canary}\n`, { mode: 0o600, flag: 'wx' })
+    writeFileSync(path, `NUXT_READINESS_TOKEN=${canary}\n`, { mode: 0o600, flag: 'wx' })
     createdCanaries.push(path)
   }
   await docker(['version', '--format', '{{.Server.Version}}'], 10_000)
@@ -93,45 +93,54 @@ async function run() {
   assert(!inspect.stdout.includes(sentryAuthTokenCanary), 'Production image configuration retained the Sentry token')
   assert(!history.stdout.includes(sentryAuthTokenCanary), 'Production image history retained the Sentry token')
 
-  const stripeImporterHelp = await docker(
-    ['run', '--rm', '--entrypoint', 'node', image, '.output/server/import-stripe-membership.mjs', '--help'],
-    20_000
+  for (const [entry, usage] of [
+    ['import-solidarity-events.mjs', 'Usage: node .output/server/import-solidarity-events.mjs'],
+    ['solidarity-event-operator.mjs', 'Usage: solidarity-event-operator.mjs <preview|apply>']
+  ]) {
+    const help = await docker(
+      ['run', '--rm', '--entrypoint', 'node', image, `.output/server/${entry}`, '--help'],
+      20_000
+    )
+    assert(help.stdout.includes(usage), `Production image is missing the working event operator ${entry}`)
+  }
+
+  const operatorProof = await docker(
+    [
+      'run',
+      '--rm',
+      '--entrypoint',
+      'node',
+      image,
+      '-e',
+      `const assert = require('node:assert/strict');
+const { spawnSync } = require('node:child_process');
+const { mkdtempSync, rmSync } = require('node:fs');
+const { tmpdir } = require('node:os');
+const { join } = require('node:path');
+const copyHelp = spawnSync(process.execPath, ['.output/server/copy-legacy-events.mjs', '--help'], { encoding: 'utf8', timeout: 10000 });
+assert.equal(copyHelp.status, 1, 'Packaged legacy event copy must reject missing source/destination');
+assert(copyHelp.stderr.includes('Usage: copy-legacy-events --source'), 'Packaged legacy event copy did not reach argument validation');
+const directory = mkdtempSync(join(tmpdir(), 'wcu-event-package-proof-'));
+try {
+  const env = { ...process.env, NUXT_DATABASE_URL: 'file:' + join(directory, 'events.db') };
+  for (const [args, expected] of [
+    [['migrate', '--confirm-app-stopped'], 'Migration passed: 1 newly applied; 1/1 current'],
+    [['verify'], 'Database verification passed: integrity ok; foreign keys ok; migration ledger current.']
+  ]) {
+    const result = spawnSync(process.execPath, ['.output/server/maintenance.mjs', ...args], { encoding: 'utf8', env, timeout: 10000 });
+    assert.equal(result.status, 0, result.stderr || 'Packaged maintenance command failed');
+    assert(result.stdout.includes(expected), 'Packaged maintenance did not validate the event baseline');
+  }
+} finally {
+  rmSync(directory, { recursive: true, force: true });
+}
+console.log('Event copy entrypoint and packaged maintenance migration verified.');`
+    ],
+    30_000
   )
   assert(
-    stripeImporterHelp.stdout.includes('Usage: node .output/server/import-stripe-membership.mjs'),
-    'Production image is missing the packaged Stripe membership importer'
-  )
-  const stripeLinkSyncHelp = await docker(
-    ['run', '--rm', '--entrypoint', 'node', image, '.output/server/sync-stripe-membership-links.mjs', '--help'],
-    20_000
-  )
-  assert(
-    stripeLinkSyncHelp.stdout.includes('Usage: node .output/server/sync-stripe-membership-links.mjs'),
-    'Production image is missing the packaged Stripe account-membership synchronizer'
-  )
-  const stripeAccountAdoptionHelp = await docker(
-    ['run', '--rm', '--entrypoint', 'node', image, '.output/server/adopt-stripe-membership-account.mjs', '--help'],
-    20_000
-  )
-  assert(
-    stripeAccountAdoptionHelp.stdout.includes('Usage: node .output/server/adopt-stripe-membership-account.mjs'),
-    'Production image is missing the packaged Stripe account-adoption operator'
-  )
-  const solidarityImporterHelp = await docker(
-    ['run', '--rm', '--entrypoint', 'node', image, '.output/server/import-solidarity-events.mjs', '--help'],
-    20_000
-  )
-  assert(
-    solidarityImporterHelp.stdout.includes('Usage: node .output/server/import-solidarity-events.mjs'),
-    'Production image is missing the packaged Solidarity event importer'
-  )
-  const solidarityConverterHelp = await docker(
-    ['run', '--rm', '--entrypoint', 'node', image, '.output/server/normalize-solidarity-events.mjs', '--help'],
-    20_000
-  )
-  assert(
-    solidarityConverterHelp.stdout.includes('Usage: node .output/server/normalize-solidarity-events.mjs'),
-    'Production image is missing the packaged Solidarity report converter'
+    operatorProof.stdout.includes('Event copy entrypoint and packaged maintenance migration verified.'),
+    'Production image is missing the event copy operator or working maintenance migration assets'
   )
 
   await docker(
@@ -151,7 +160,7 @@ async function run() {
   )
 
   console.log(
-    'Container build proof passed: configured Sentry upload failures stop the build, BuildKit keeps the token out of diagnostics and the runtime image, deployable output contains no source maps, the build context excludes private state, both Stripe membership operators and the Solidarity event converter/importer are packaged, and the image defaults to node:node.'
+    'Container build proof passed: configured Sentry upload failures stop the build, BuildKit keeps the token out of diagnostics and the runtime image, deployable output contains no source maps, the build context excludes private state, event import/sync/copy operators are packaged and maintenance initializes and verifies the event database, and the image defaults to node:node.'
   )
 }
 

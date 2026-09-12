@@ -222,3 +222,68 @@ test('Calendar preserves occurrence titles and chronology in agenda and month vi
     sqlite.close()
   }
 })
+
+test.describe('calendar date selection', () => {
+  test.use({ timezoneId: 'UTC' })
+
+  test('starts on today in Los Angeles and lets visitors reset a date beyond all events', async ({ page }) => {
+    const sqlite = new Database(process.env.BROWSER_RUNTIME_DATABASE_PATH, { fileMustExist: true })
+    const eventDate = new Date(Date.now() + 7 * 86_400_000)
+    const startsAt = eventDate.toISOString()
+    const year = eventDate.getUTCFullYear()
+    const month = eventDate.getUTCMonth()
+    const previousMonthEnd = new Date(Date.UTC(year, month, 0))
+    const afterEventMonth = new Date(Date.UTC(year, month + 1, 1)).toISOString().slice(0, 10)
+    // Keep the fixture inside the server's upcoming window. Freeze only the
+    // browser at a month boundary: UTC has advanced but Los Angeles has not.
+    await page.clock.setFixedTime(new Date(Date.UTC(year, month, 1, 2)))
+    try {
+      sqlite
+        .prepare("insert into events (id, title, kind, visibility) values (?, ?, 'social', 'public')")
+        .run('date-reset-event', 'Calendar reset gathering')
+      sqlite
+        .prepare(
+          `insert into event_sessions
+          (id, event_id, status, delivery_mode, starts_at, timezone)
+          values ('date-reset-session', 'date-reset-event', 'scheduled', 'in_person', ?, 'America/Los_Angeles')`
+        )
+        .run(startsAt)
+      await page.goto('/calendar')
+      await page.waitForFunction(() => window.useNuxtApp?.().isHydrating === false)
+      await expect(page.locator('.featured-event h3')).toHaveText('Calendar reset gathering')
+
+      const datePicker = page.getByRole('button', { name: /Jump to (?:a )?date/, exact: true })
+      await datePicker.click()
+      const calendar = page.locator('.wcu-date-popover')
+      await expect(calendar.locator('[data-selected]')).toHaveAttribute(
+        'data-value',
+        previousMonthEnd.toISOString().slice(0, 10)
+      )
+      await expect(calendar.locator('.wcu-date-heading')).toHaveText(
+        new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(previousMonthEnd)
+      )
+      await calendar.getByRole('button', { name: 'Next month', exact: true }).click()
+      await calendar.getByRole('button', { name: 'Next month', exact: true }).click()
+      await calendar.locator(`[data-value="${afterEventMonth}"]:not([data-outside-view])`).click()
+      await expect(calendar).toBeHidden()
+      await expect(page.locator('.featured-event')).toHaveCount(0)
+      await expect(page.getByText('No events match this filter yet.', { exact: true })).toBeVisible()
+      await expect(datePicker).toBeVisible()
+
+      // Reset must restore the date and the category when both exclude the event.
+      const filters = page.getByRole('group', { name: 'Filter upcoming events', exact: true })
+      await filters.getByRole('button', { name: 'Meeting', exact: true }).click()
+      const reset = page.getByRole('button', { name: 'Show all upcoming events', exact: true })
+      await expect(reset).toBeVisible()
+      await reset.click()
+      await expect(page.locator('.featured-event h3')).toHaveText('Calendar reset gathering')
+      await expect(filters.getByRole('button', { name: 'All', exact: true })).toHaveAttribute('aria-pressed', 'true')
+      await expect(reset).toHaveCount(0)
+      await expect(page.locator('.jump-message')).toHaveCount(0)
+    } finally {
+      sqlite.prepare("delete from event_sessions where event_id = 'date-reset-event'").run()
+      sqlite.prepare("delete from events where id = 'date-reset-event'").run()
+      sqlite.close()
+    }
+  })
+})

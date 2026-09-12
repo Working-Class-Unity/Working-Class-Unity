@@ -1,14 +1,10 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
-import Database from 'better-sqlite3'
-import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
-import { join } from 'node:path'
-import { assertIdentityAccountJourney } from './identity-account-journey.mjs'
+import { readFileSync } from 'node:fs'
 import { petitionDemand } from '../../app/content/remove-flock-stockton/petition.ts'
 
 const runtimeName = requiredEnvironment('BROWSER_RUNTIME_APP_NAME')
 const runtimeUrl = requiredEnvironment('BROWSER_RUNTIME_APP_URL')
-const runtimeAuthSecret = requiredEnvironment('BROWSER_RUNTIME_AUTH_SECRET')
 const runtimeDatabase = requiredEnvironment('BROWSER_RUNTIME_DATABASE_PATH')
 const runtimeReadinessToken = requiredEnvironment('BROWSER_RUNTIME_READINESS_TOKEN')
 const buildName = requiredEnvironment('BROWSER_BUILD_APP_NAME')
@@ -16,19 +12,11 @@ const buildUrl = requiredEnvironment('BROWSER_BUILD_APP_URL')
 const buildReadinessToken = requiredEnvironment('BROWSER_BUILD_READINESS_TOKEN')
 const buildSentryRelease = requiredEnvironment('BROWSER_BUILD_SENTRY_RELEASE')
 const runtimeSentryRelease = requiredEnvironment('BROWSER_RUNTIME_SENTRY_RELEASE')
-const runtimeStripeSecret = requiredEnvironment('BROWSER_RUNTIME_STRIPE_SECRET')
-const runtimeStripeWebhookSecret = requiredEnvironment('BROWSER_RUNTIME_STRIPE_WEBHOOK_SECRET')
-const authEmailMarker = requiredEnvironment('BROWSER_AUTH_EMAIL_MARKER')
-const emailCaptureDirectory = requiredEnvironment('BROWSER_EMAIL_CAPTURE_DIRECTORY')
 const runtimeSentryOrigin = requiredEnvironment('BROWSER_RUNTIME_SENTRY_ORIGIN')
 const spanishMessages = readLocaleMessages('es')
 const punjabiMessages = readLocaleMessages('pa')
-const turnstileOrigin = 'https://challenges.cloudflare.com'
-const turnstileScriptUrl = `${turnstileOrigin}/turnstile/v0/api.js?render=explicit`
 const forumUrl = 'https://chat.workingclassunity.com/'
 const sentryEnvelopePath = '/api/1/envelope/'
-const maxCaptureFileBytes = 65_536
-const maxCaptureFiles = 64
 const intentionalManifestNavigations = new WeakMap()
 
 if (new URL(runtimeSentryOrigin).origin !== runtimeSentryOrigin) {
@@ -36,16 +24,6 @@ if (new URL(runtimeSentryOrigin).origin !== runtimeSentryOrigin) {
 }
 
 test.beforeEach(async ({ context }) => {
-  await context.route(`${turnstileOrigin}/**`, async (route) => {
-    if (route.request().method() !== 'GET' || route.request().url() !== turnstileScriptUrl) {
-      throw new Error('The Turnstile browser fixture received an unexpected request')
-    }
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/javascript',
-      body: isolatedTurnstileBrowserSource
-    })
-  })
   await context.route(`${runtimeSentryOrigin}/**`, async (route) => {
     const request = route.request()
     const url = new URL(request.url())
@@ -60,41 +38,6 @@ test.beforeEach(async ({ context }) => {
     })
   })
 })
-
-const isolatedTurnstileBrowserSource = `
-(() => {
-  const widgets = new Map()
-  let nextWidgetId = 0
-  const complete = (widgetId) => queueMicrotask(() => {
-    const options = widgets.get(widgetId)
-    if (options) options.callback('isolated-turnstile-' + crypto.randomUUID())
-  })
-
-  window.turnstile = Object.freeze({
-    render(container, options) {
-      if (
-        !(container instanceof HTMLElement) ||
-        !String(options?.sitekey || '').startsWith('isolated-turnstile-') ||
-        !['auth_magic_link', 'auth_membership_activation'].includes(options?.action) ||
-        typeof options?.callback !== 'function'
-      ) {
-        throw new Error('Invalid isolated Turnstile widget configuration')
-      }
-      const widgetId = 'isolated-turnstile-widget-' + String(++nextWidgetId)
-      widgets.set(widgetId, options)
-      complete(widgetId)
-      return widgetId
-    },
-    reset(widgetId) {
-      if (!widgets.has(widgetId)) throw new Error('Unknown isolated Turnstile widget')
-      complete(widgetId)
-    },
-    remove(widgetId) {
-      widgets.delete(widgetId)
-    }
-  })
-})()
-`
 
 test('home presents the WCU foundation and preserves client navigation', async ({ page }) => {
   const observations = observePage(page)
@@ -130,7 +73,7 @@ test('home presents the WCU foundation and preserves client navigation', async (
   const topbar = page.getByRole('banner', { name: 'Working Class Unity site header' })
   const hero = page.locator('.home-hero')
   await assertMinimumTargetSize(page.locator('.brand'))
-  await assertMinimumTargetSize(topbar.getByRole('link', { name: 'Member Login', exact: true }))
+  await assertMinimumTargetSize(topbar.getByRole('link', { name: 'Manage dues', exact: true }))
   await assertMinimumTargetSize(topbar.getByRole('link', { name: 'Get Involved', exact: true }))
   await assertMinimumTargetSize(hero.getByRole('link', { name: 'See upcoming events', exact: true }))
   await assertMinimumTargetSize(updatesLink)
@@ -288,7 +231,7 @@ test('global public navigation exposes current routes and a route-closing mobile
   await assertMinimumTargetSize(mobileNavigation.getByRole('link', { name: 'United Front', exact: true }))
   await assertMinimumTargetSize(mobileNavigation.getByRole('button', { name: 'Events', exact: true }))
   await assertMinimumTargetSize(mobileForumLink)
-  await assertMinimumTargetSize(page.getByRole('link', { name: 'Member Login', exact: true }))
+  await assertMinimumTargetSize(page.getByRole('link', { name: 'Manage dues', exact: true }))
   await assertMinimumTargetSize(page.getByRole('link', { name: 'Get Involved', exact: true }))
   await expect(mobileForumLink).toHaveAttribute('href', forumUrl)
   await expect(mobileForumLink).toHaveAttribute('target', '_blank')
@@ -650,396 +593,38 @@ test('campaign citations preview, navigate, and return at desktop and mobile wid
   await assertCleanPage(page, observations)
 })
 
-test('session retry announces progress and failure without losing focus', async ({ page }) => {
+test('joining and managing dues use public Stripe links without website account requests', async ({ page }) => {
   const observations = observePage(page)
-  await page.setViewportSize({ width: 1024, height: 900 })
-  await page.goto('/')
-  await page.waitForLoadState('networkidle')
-
-  let requestCount = 0
-  let deferSessionResponses = false
-  let releaseRetryResponse = () => {}
-  const retryResponseReady = new Promise((resolve) => {
-    releaseRetryResponse = resolve
-  })
-  await page.route('**/api/auth/get-session*', async (route) => {
-    requestCount += 1
-    if (deferSessionResponses) await retryResponseReady
-    await fulfillJson(route, { code: 'SESSION_UNAVAILABLE' }, 503)
-  })
-
-  await page.evaluate(async () => {
-    const sessionData = window.useNuxtApp?.()._asyncData?.['app-session']
-    if (!sessionData) throw new Error('The app-session async-data entry was unavailable')
-    await sessionData.execute()
-  })
-
-  const topbar = page.getByRole('banner', { name: 'Working Class Unity site header' })
-  const menuToggle = topbar.getByRole('button', { name: 'Menu', exact: true })
-  if (await menuToggle.isVisible()) await menuToggle.click()
-  await expect(topbar.getByText('Session check unavailable', { exact: true })).toBeVisible()
-  await expect(topbar.getByRole('alert')).toHaveCount(0)
-  await expect(topbar.getByRole('status')).toHaveCount(0)
-
-  const retryButton = topbar.locator('.topbar-session').getByRole('button')
-  const requestsBeforeRetry = requestCount
-  deferSessionResponses = true
-  await retryButton.focus()
-  await retryButton.click()
-  await expect.poll(() => requestCount).toBeGreaterThan(requestsBeforeRetry)
-  await expect(retryButton).toBeFocused()
-  await expect(retryButton).toHaveAttribute('aria-disabled', 'true')
-  await expect(retryButton).toHaveAccessibleName('Checking your session...')
-  await expect(topbar.getByRole('status')).toContainText('Checking your session...')
-  const pendingRequestCount = requestCount
-  await retryButton.dispatchEvent('click')
-  await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => resolve())))
-  expect(requestCount).toBe(pendingRequestCount)
-
-  releaseRetryResponse()
-  await expect(retryButton).toBeEnabled()
-  await expect(retryButton).toBeFocused()
-  await expect(retryButton).toHaveAccessibleName('Try again')
-  await expect(topbar.getByRole('alert')).toContainText('Session check unavailable')
-  await page.unroute('**/api/auth/get-session*')
-
-  observations.errorResponses = observations.errorResponses.filter(
-    (entry) => !(entry.includes('503') && entry.includes('/api/auth/get-session'))
-  )
-  observations.console = observations.console.filter(
-    (entry) => !/Failed to load resource: the server responded with a status of 503/.test(entry)
-  )
-  await assertCleanPage(page, observations)
-})
-
-test('login is accessible before and after requesting a magic link', async ({ page }) => {
-  test.setTimeout(35_000)
-  const observations = observePage(page)
-  await page.setViewportSize({ width: 390, height: 844 })
-  await page.goto('/login')
-  await expect(page.getByRole('heading', { name: 'Log in' })).toBeVisible()
-  await expect(page.locator('.brand')).toHaveAccessibleName(`${runtimeName} home`)
-  await expect(page).toHaveTitle('Log in')
-  await assertRuntimePublicConfig(page)
-  const emailInput = page.getByRole('textbox', { name: 'Email', exact: true })
-  await expect(emailInput).toBeVisible()
-  await expect(page.getByRole('textbox', { name: /(?:first|last|display) name/i })).toHaveCount(0)
-  await expect(page.locator('input[type="password"]')).toHaveCount(0)
-  await expect(page.locator('.mode-tabs')).toHaveCount(0)
-  await expect(page.getByRole('button', { name: 'Continue with Google' })).toHaveCount(0)
-  await expect(page.getByRole('button', { name: /^Account menu for / })).toHaveCount(0)
-  await expect(page.getByLabel('Security check')).toBeVisible()
-  await expect(page.locator(`script[src="${turnstileScriptUrl}"]`)).toHaveCount(1)
-  await expect(page.getByText('Security check complete.', { exact: true })).toBeVisible()
-  const submitButton = page.getByRole('button', { name: 'Send email link' })
-  await expect(submitButton).toBeEnabled()
-  await assertMinimumTargetSize(emailInput)
-  await assertMinimumTargetSize(submitButton)
-  await assertControlBoundaryContrast(emailInput)
-  await assertAccessibleWithoutOverflow(page)
-
-  await submitButton.click()
-  await expect(emailInput).toBeFocused()
-  await expect(emailInput).toHaveAttribute('aria-invalid', 'true')
-  await expect(emailInput).toHaveAttribute('aria-describedby', 'login-email-error')
-  await expect(page.getByText('Email is required.', { exact: true })).toBeVisible()
-
-  await emailInput.fill('browser.magic-link@example.test')
-  await submitButton.click()
-  await expect(page.locator('#login-form-status[role="status"]')).toHaveText(
-    'If you can receive email at that address, a sign-in link is on its way.'
-  )
-  await expect(page.getByText('Security check complete.', { exact: true })).toBeVisible()
-  await expect(page.locator('input[type="password"]')).toHaveCount(0)
-  await expect(page.locator('.mode-tabs')).toHaveCount(0)
-  await assertAccessibleWithoutOverflow(page)
-  await assertCleanPage(page, observations)
-})
-
-test('unknown login guidance leads to neutral paid-member activation', async ({ page }) => {
-  const observations = observePage(page)
-  await page.goto('/login?error=new_user_signup_disabled')
-  await expect(page.getByRole('alert')).toContainText('This email does not have an activated WCU website account.')
-  await expect(page.getByRole('link', { name: 'Join WCU.' })).toHaveAttribute('href', '/join')
-  await expect(page.getByRole('link', { name: 'Activate your account.' })).toHaveAttribute('href', '/activate')
-  await page.waitForLoadState('networkidle')
-
-  let activationRequest
-  await page.route('**/api/auth/stripe-membership/activate', async (route) => {
-    activationRequest = route.request()
-    await route.fulfill({ status: 200, contentType: 'application/json', body: '{"status":true}' })
-  })
-  await page.goto('/activate')
-  await expect(page).toHaveTitle('Activate your account')
-  await expect(page.getByRole('heading', { name: 'Activate your account', level: 1 })).toBeVisible()
-  await expect(page.getByText('Security check complete.', { exact: true })).toBeVisible()
-  const email = page.getByRole('textbox', { name: 'Email', exact: true })
-  await email.fill('legacy.member@example.test')
-  await page.getByRole('button', { name: 'Send activation link' }).click()
-  await expect(page.locator('#activate-form-status[role="status"]')).toContainText(
-    'If this email is eligible, an activation link will be sent to the email currently held by Stripe.'
-  )
-  expect(activationRequest?.postDataJSON()).toEqual({ email: 'legacy.member@example.test' })
-  expect(activationRequest?.headers()['x-turnstile-token']).toMatch(/^isolated-turnstile-/)
-  await assertAccessibleWithoutOverflow(page)
-  await assertCleanPage(page, observations)
-})
-
-test('identity and account journeys stay accessible', async ({ context, page }) => {
-  test.setTimeout(60_000)
-  await assertIdentityAccountJourney(context, {
-    assertAccessibleWithoutOverflow,
-    assertCleanPage,
-    observePage
-  })
-  const retiredAuthResponse = await page.goto('/auth')
-  expect(retiredAuthResponse?.status()).toBe(404)
-  await expect(page.getByRole('heading', { name: 'Page not found' })).toBeVisible()
-  await expect(page).toHaveTitle(`Page not found | ${runtimeName}`)
-  await expect(page.getByText('Browser Social User', { exact: true })).toHaveCount(0)
-})
-
-test('signed-out private routes reach login before private data is requested', async ({ page }) => {
-  const observations = observePage(page)
-
-  for (const path of ['/app', '/account']) {
-    const response = await page.goto(path)
-    expect(response?.status()).toBe(200)
-    await expect(page).toHaveURL(/\/login$/)
-    await expect(page.getByRole('heading', { name: 'Log in' })).toBeVisible()
-    await page.waitForLoadState('networkidle')
+  await page.goto('/join')
+  await page.waitForFunction(() => window.useNuxtApp?.().isHydrating === false)
+  await expect(page.getByRole('heading', { name: 'Join Working Class Unity', exact: true })).toBeVisible()
+  const joinPage = page.locator('.join-page')
+  const options = joinPage.getByRole('list')
+  await expect(options.getByRole('listitem')).toHaveCount(2)
+  for (const [label, url] of [
+    ['$10/month', 'https://pay.workingclassunity.com/b/7sI4hF1hc9IIepq4gh'],
+    ['$27/month', 'https://pay.workingclassunity.com/b/bIY4hF4tof325SUaEE']
+  ]) {
+    const link = options.getByRole('link', { name: label, exact: true })
+    await expect(link).toHaveAttribute('href', url)
+    await assertMinimumTargetSize(link)
   }
-
-  expect(observations.sameOriginRequests.some((request) => request.includes('/api/me'))).toBe(false)
-  expect(observations.sameOriginRequests.some((request) => request.includes('/w/'))).toBe(false)
-  expect(observations.sameOriginRequests.some((request) => request.includes('/api/workspaces'))).toBe(false)
+  const portalUrl = 'https://pay.workingclassunity.com/p/login/00g29l9RKespfsI7ss'
+  await expect(joinPage.getByRole('link', { name: 'Manage dues', exact: true })).toHaveAttribute('href', portalUrl)
+  await expect(page.getByRole('banner').getByRole('link', { name: 'Manage dues', exact: true })).toHaveAttribute(
+    'href',
+    portalUrl
+  )
+  await expect(joinPage.locator('form, input, iframe')).toHaveCount(0)
   await assertAccessibleWithoutOverflow(page)
+  await page.setViewportSize({ width: 320, height: 800 })
+  await assertAccessibleWithoutOverflow(page)
+  await page.evaluate(() => {
+    document.documentElement.style.fontSize = '200%'
+  })
+  await assertNoHorizontalOverflow(page)
   await assertCleanPage(page, observations)
 })
-
-const privateBrowserTest = test.extend({ screenshot: 'off', trace: 'off', video: 'off' })
-
-privateBrowserTest(
-  'real existing-account login keeps profile fields optional and editable later',
-  async ({ page }, testInfo) => {
-    testInfo.setTimeout(60_000)
-    const observations = observePage(page)
-    const project = testInfo.project.name.replaceAll(/[^a-z0-9]/gi, '-').toLowerCase()
-    const email = `browser.login+${project}.${authEmailMarker}@example.test`
-    const firstName = `Given ${project}`
-    const lastName = `Surname ${project}`
-    const displayName = `Browser ${testInfo.project.name} member`
-    const clientAddress = testInfo.project.name === 'desktop-chromium' ? '192.0.2.10' : '192.0.2.11'
-    const sqlite = new Database(runtimeDatabase)
-    sqlite
-      .prepare('insert into user (id, name, email, email_verified, created_at, updated_at) values (?, ?, ?, 1, 1, 1)')
-      .run(`browser-user-${project}`, 'WCU account', email)
-    sqlite.close()
-
-    await page.setExtraHTTPHeaders({ 'cf-connecting-ip': clientAddress })
-
-    await page.goto('/login')
-    await page.waitForLoadState('networkidle')
-    const manifestUrl = await nuxtManifestUrl(page)
-    await expect(page.getByRole('textbox', { name: /(?:first|last|display) name/i })).toHaveCount(0)
-    await page.getByRole('textbox', { name: 'Email', exact: true }).fill(email)
-    await expect(page.getByText('Security check complete.', { exact: true })).toBeVisible()
-    const sendEmailLink = page.getByRole('button', { name: 'Send email link' })
-    await expect(sendEmailLink).toBeEnabled()
-    const magicLinkRequestPromise = page.waitForRequest(
-      (request) => new URL(request.url()).pathname === '/api/auth/sign-in/magic-link'
-    )
-    await sendEmailLink.click()
-    const magicLinkRequest = await magicLinkRequestPromise
-    expect(magicLinkRequest.postDataJSON()).toEqual({
-      email,
-      callbackURL: '/app',
-      newUserCallbackURL: '/app',
-      errorCallbackURL: '/login'
-    })
-    await expect(page.locator('#login-form-status[role="status"]')).toBeVisible()
-    await expect(page.getByText('Security check complete.', { exact: true })).toBeVisible()
-
-    let magicLink
-    await expect
-      .poll(() => {
-        magicLink = capturedMagicLink(email)
-        return Boolean(magicLink)
-      })
-      .toBe(true)
-
-    const appResponse = await gotoForInitialResponse(page, magicLink.href, manifestUrl)
-    if (!appResponse) throw new Error('Magic-link navigation did not return a personal-app document response')
-    const appHtml = await appResponse.text()
-    expect(appResponse.status()).toBe(200)
-    expect(appResponse.url()).toBe(`${runtimeUrl}/app`)
-    expect(appResponse.headers()['cache-control']).toBe('private, no-store')
-    expect(appHtml.includes('Your WCU account is ready.'), 'initial app HTML contains the WCU shell').toBe(true)
-    expect(appHtml.includes(email), 'initial app HTML contains the authenticated identity').toBe(true)
-    expect(appHtml.includes(displayName), 'initial app HTML excludes profile data that was never collected').toBe(false)
-    expect(appHtml.includes('/w/'), 'initial app HTML excludes visible workspace navigation').toBe(false)
-    expect(appHtml.includes('activeOrganizationId'), 'initial app HTML excludes active-organization state').toBe(false)
-    await expect(page.getByText('Your WCU account is ready.', { exact: true })).toBeVisible()
-    await expect(page.getByRole('heading', { name: 'Welcome back', exact: true })).toBeVisible()
-    await expect(page.getByText(`Signed in as ${email}`, { exact: true })).toBeVisible()
-    await openMobileNavigationIfNeeded(page)
-    await expect(page.getByRole('button', { name: /^Account menu for / })).toBeVisible()
-    await expect(page.getByText(/workspace/i)).toHaveCount(0)
-    await expect(page.getByRole('link', { name: /workspace/i })).toHaveCount(0)
-    const topbar = page.getByRole('banner', { name: 'Working Class Unity site header' })
-    await expect(topbar.locator('[aria-current="page"]')).toHaveCount(1)
-    await expect(topbar.getByRole('link', { name: 'App', exact: true })).toHaveAttribute('aria-current', 'page')
-    expect(observations.sameOriginRequests.some((request) => request.includes('/api/workspaces'))).toBe(false)
-    await page.waitForLoadState('networkidle')
-    await assertAccountMenuContract(page, email, email, observations)
-
-    if (testInfo.project.name === 'desktop-chromium') {
-      const signedInHomeResponse = await gotoForInitialResponse(page, '/', manifestUrl)
-      if (!signedInHomeResponse) throw new Error('Signed-in home navigation did not return a document response')
-      const signedInHomeHtml = await signedInHomeResponse.text()
-      expect(signedInHomeResponse.status()).toBe(200)
-      expect(signedInHomeResponse.headers()['cache-control']).toBe('private, no-store')
-      expect(signedInHomeHtml.includes(email), 'signed-in public HTML contains only a non-cacheable identity').toBe(
-        true
-      )
-      await expect(page.getByRole('button', { name: /^Account menu for / })).toBeVisible()
-      await page.waitForLoadState('networkidle')
-    }
-
-    for (const signedInEntry of ['/login']) {
-      const entryResponse = await gotoForInitialResponse(page, signedInEntry, manifestUrl)
-      if (!entryResponse) throw new Error(`Signed-in ${signedInEntry} navigation did not return a document response`)
-      expect(entryResponse.status()).toBe(200)
-      expect(entryResponse.url()).toBe(`${runtimeUrl}/app`)
-      expect(
-        (await entryResponse.text()).includes('Your WCU account is ready.'),
-        `signed-in ${signedInEntry} continues to the WCU app`
-      ).toBe(true)
-      await expect(page.getByText(`Signed in as ${email}`, { exact: true })).toBeVisible()
-      await page.waitForLoadState('networkidle')
-    }
-
-    const accountResponse = await gotoForInitialResponse(page, '/account?checkout=success', manifestUrl)
-    if (!accountResponse) throw new Error('Account navigation did not return a document response')
-    const accountHtml = await accountResponse.text()
-    expect(accountResponse.status()).toBe(200)
-    expect(accountResponse.url()).toBe(`${runtimeUrl}/account?checkout=success`)
-    expect(accountResponse.headers()['cache-control']).toBe('private, no-store')
-    expect(
-      {
-        identity: accountHtml.includes(email),
-        sessionError: accountHtml.includes('Account unavailable'),
-        sessionPending: accountHtml.includes('Continuing to log in')
-      },
-      'initial account HTML contains the authenticated identity'
-    ).toEqual({ identity: true, sessionError: false, sessionPending: false })
-    expect(
-      accountHtml.includes('activeOrganizationId'),
-      'initial account HTML excludes active-organization state'
-    ).toBe(false)
-    await expect(page.getByRole('heading', { name: 'Account', exact: true, level: 1 })).toBeVisible()
-    await expect(page.getByLabel('Sign-in details').getByText(email, { exact: true })).toBeVisible()
-    await page.waitForLoadState('networkidle')
-    await page.waitForFunction(() => window.useNuxtApp?.().isHydrating === false)
-    await openMobileNavigationIfNeeded(page)
-
-    const firstNameInput = page.getByRole('textbox', { name: 'First name', exact: true })
-    const lastNameInput = page.getByRole('textbox', { name: 'Last name', exact: true })
-    const displayNameInput = page.getByRole('textbox', { name: 'Display name', exact: true })
-    await expect(firstNameInput).toHaveValue('')
-    await expect(lastNameInput).toHaveValue('')
-    await expect(displayNameInput).toHaveValue('')
-    await expect(page.getByText('They are not required to use your account.', { exact: false })).toBeVisible()
-    await expect(page.getByRole('button', { name: `Account menu for ${email}` })).toBeVisible()
-    const emailSection = page.locator('.email-section')
-    await expect(emailSection.getByRole('heading', { name: 'Email login', exact: true })).toBeVisible()
-    await expect(emailSection.getByText(email, { exact: true })).toBeVisible()
-    await expect(emailSection.getByText('Verified', { exact: true })).toBeVisible()
-    const membershipSection = page.locator('.membership-section')
-    await expect(membershipSection.getByRole('heading', { name: 'WCU membership', exact: true })).toBeVisible()
-    await expect(membershipSection.getByText('Supporter', { exact: true })).toBeVisible()
-    await expect(membershipSection.getByRole('button', { name: 'Become a member at $10/month' })).toBeVisible()
-    await expect(membershipSection.getByRole('button', { name: 'Become a member at $27/month' })).toBeVisible()
-
-    await firstNameInput.fill(`  ${firstName}  `)
-    await lastNameInput.fill(`  ${lastName}  `)
-    await displayNameInput.fill(`  ${displayName}  `)
-    await page.getByRole('button', { name: 'Save profile', exact: true }).click()
-    await expect(page.getByText('Profile saved.', { exact: true })).toBeVisible()
-    await expect(firstNameInput).toHaveValue(firstName)
-    await expect(lastNameInput).toHaveValue(lastName)
-    await expect(displayNameInput).toHaveValue(displayName)
-
-    const namedMenuTrigger = page.getByRole('button', { name: `Account menu for ${displayName}` })
-    await expect(namedMenuTrigger).toBeVisible()
-    await namedMenuTrigger.click()
-    await expect(page.getByRole('menu').getByText(displayName, { exact: true })).toBeVisible()
-    await expect(page.getByRole('menu').getByText(email, { exact: true })).toBeVisible()
-    await page.keyboard.press('Escape')
-    await page.waitForLoadState('networkidle')
-
-    const namedAppResponse = await gotoForInitialResponse(page, '/app', manifestUrl)
-    if (!namedAppResponse) throw new Error('Named-profile navigation did not return a personal-app response')
-    const namedAppHtml = await namedAppResponse.text()
-    expect(namedAppResponse.status()).toBe(200)
-    expect(namedAppHtml.includes(displayName), 'named app HTML contains the explicit display name').toBe(true)
-    expect(namedAppHtml.includes(firstName), 'named app HTML excludes the private first name').toBe(false)
-    expect(namedAppHtml.includes(lastName), 'named app HTML excludes the private last name').toBe(false)
-    await expect(page.getByRole('heading', { name: `Welcome back, ${displayName}` })).toBeVisible()
-    await expect(page.getByText(firstName, { exact: true })).toHaveCount(0)
-    await expect(page.getByText(lastName, { exact: true })).toHaveCount(0)
-    await page.waitForLoadState('networkidle')
-
-    const savedAccountResponse = await gotoForInitialResponse(page, '/account', manifestUrl)
-    if (!savedAccountResponse) throw new Error('Saved-profile navigation did not return an account response')
-    expect(savedAccountResponse.status()).toBe(200)
-    await page.waitForFunction(() => window.useNuxtApp?.().isHydrating === false)
-    await expect(page.getByRole('textbox', { name: 'First name', exact: true })).toHaveValue(firstName)
-    await expect(page.getByRole('textbox', { name: 'Last name', exact: true })).toHaveValue(lastName)
-    await expect(page.getByRole('textbox', { name: 'Display name', exact: true })).toHaveValue(displayName)
-    await page.getByRole('textbox', { name: 'First name', exact: true }).fill('')
-    await page.getByRole('textbox', { name: 'Last name', exact: true }).fill('')
-    await page.getByRole('textbox', { name: 'Display name', exact: true }).fill('')
-    await page.getByRole('button', { name: 'Save profile', exact: true }).click()
-    await expect(page.getByText('Profile saved.', { exact: true })).toBeVisible()
-    await openMobileNavigationIfNeeded(page)
-    await expect(page.getByRole('button', { name: `Account menu for ${email}` })).toBeVisible()
-    await page.waitForLoadState('networkidle')
-
-    const clearedAppResponse = await gotoForInitialResponse(page, '/app', manifestUrl)
-    if (!clearedAppResponse) throw new Error('Cleared-profile navigation did not return a personal-app response')
-    expect(clearedAppResponse.status()).toBe(200)
-    await expect(page.getByRole('heading', { name: 'Welcome back', exact: true })).toBeVisible()
-    await openMobileNavigationIfNeeded(page)
-    await expect(page.getByRole('button', { name: `Account menu for ${email}` })).toBeVisible()
-    await page.waitForLoadState('networkidle')
-
-    const deletionAccountResponse = await gotoForInitialResponse(page, '/account', manifestUrl)
-    if (!deletionAccountResponse) throw new Error('Deletion navigation did not return an account document response')
-    expect(deletionAccountResponse.status()).toBe(200)
-    expect(deletionAccountResponse.url()).toBe(`${runtimeUrl}/account`)
-    await page.waitForFunction(() => window.useNuxtApp?.().isHydrating === false)
-    await page.getByRole('textbox', { name: 'Type DELETE to confirm' }).fill('DELETE')
-    const deleteAccount = page.getByRole('button', { name: 'Delete account', exact: true })
-    await expect(deleteAccount).toBeEnabled()
-    await deleteAccount.click()
-    await expect(page).toHaveURL(/\/login$/)
-    await expect(page.getByRole('heading', { name: 'Log in' })).toBeVisible()
-    await expect(page.getByText(email, { exact: true })).toHaveCount(0)
-
-    await page.waitForLoadState('networkidle')
-    const deletedAppResponse = await gotoForInitialResponse(page, '/app', manifestUrl)
-    if (!deletedAppResponse) throw new Error('Deleted-account navigation did not return a document response')
-    expect(deletedAppResponse.status()).toBe(200)
-    expect(deletedAppResponse.url()).toBe(`${runtimeUrl}/login`)
-    expect((await deletedAppResponse.text()).includes(email), 'deleted identity is absent from signed-out HTML').toBe(
-      false
-    )
-    await expect(page.getByRole('heading', { name: 'Log in' })).toBeVisible()
-    await assertAccessibleWithoutOverflow(page)
-    await assertCleanPage(page, observations)
-  }
-)
 
 test('observability route is active without sending a missing token', async ({ page }) => {
   const observations = observePage(page)
@@ -1050,158 +635,11 @@ test('observability route is active without sending a missing token', async ({ p
   await expect(page).toHaveTitle('Observability test')
   await expect(page.locator('script[src*="challenges.cloudflare.com/turnstile"]')).toHaveCount(0)
   await assertAccessibleWithoutOverflow(page)
-  expect(observations.sameOriginRequests.filter((request) => request.includes('/api/auth'))).toEqual([
-    `GET ${runtimeUrl}/api/auth/get-session`
-  ])
+  expect(observations.sameOriginRequests.filter((request) => request.includes('/api/auth'))).toEqual([])
   expect(observations.sameOriginRequests.filter((request) => request.includes('/api/account/billing'))).toEqual([])
   expect(observations.sameOriginRequests.filter((request) => request.includes('/api/observability'))).toEqual([])
   await assertCleanPage(page, observations)
 })
-
-async function openMobileNavigationIfNeeded(page) {
-  const menuToggle = page.getByRole('button', { name: 'Menu', exact: true })
-  if (!(await menuToggle.isVisible())) return
-  if ((await menuToggle.getAttribute('aria-expanded')) === 'true') return
-  await page.waitForFunction(() => window.useNuxtApp?.().isHydrating === false)
-  await menuToggle.click()
-  await expect(menuToggle).toHaveAttribute('aria-expanded', 'true')
-}
-
-async function assertAccountMenuContract(page, displayName, email, observations) {
-  const trigger = page.getByRole('button', { name: `Account menu for ${displayName}` })
-  const menu = page.getByRole('menu')
-
-  await expect(trigger).toHaveAttribute('aria-expanded', 'false')
-  await trigger.click()
-  await expect(trigger).toHaveAttribute('aria-expanded', 'true')
-  await expect(menu).toBeVisible()
-  await expect(menu.getByText(displayName, { exact: true })).toBeVisible()
-  await expect(menu.getByText(email, { exact: true })).toBeVisible()
-  await page.evaluate(() => new Promise((resolveDelay) => window.setTimeout(resolveDelay, 0)))
-  await page.mouse.click(1, 1)
-  await expect(menu).toBeHidden()
-  await expect(trigger).toHaveAttribute('aria-expanded', 'false')
-
-  await trigger.focus()
-  await page.keyboard.press('Enter')
-  const accountItem = page.getByRole('menuitem', { name: 'Account', exact: true })
-  const signOutItem = page.getByRole('menuitem', { name: 'Sign out', exact: true })
-  await expect(accountItem).toBeFocused()
-  await page.keyboard.press('ArrowDown')
-  await expect(signOutItem).toBeFocused()
-  await page.keyboard.press('ArrowUp')
-  await expect(accountItem).toBeFocused()
-  await page.keyboard.press('ArrowDown')
-  await expect(signOutItem).toBeFocused()
-  await page.keyboard.press('Escape')
-  await expect(menu).toBeHidden()
-  await expect(trigger).toBeFocused()
-
-  await page.keyboard.press('Space')
-  await expect(menu).toBeVisible()
-  await expect(accountItem).toBeFocused()
-  await page.keyboard.press('s')
-  await expect(signOutItem).toBeFocused()
-  await page.keyboard.press('Escape')
-  await expect(trigger).toBeFocused()
-
-  const previousViewport = page.viewportSize()
-  await page.setViewportSize({ width: 320, height: 800 })
-  await openMobileNavigationIfNeeded(page)
-  await trigger.click()
-  await expect(menu).toBeVisible()
-  await assertNoHorizontalOverflow(page)
-  const menuBox = await menu.boundingBox()
-  expect(menuBox, 'account menu has a rendered box').not.toBeNull()
-  expect(menuBox.x, 'account menu stays inside the narrow viewport').toBeGreaterThanOrEqual(0)
-  expect(menuBox.x + menuBox.width, 'account menu stays inside the narrow viewport').toBeLessThanOrEqual(320)
-  await page.keyboard.press('Escape')
-  if (previousViewport) await page.setViewportSize(previousViewport)
-
-  let signOutRequested = false
-  let releaseSignOutResponse = () => {}
-  const signOutResponseReady = new Promise((resolve) => {
-    releaseSignOutResponse = resolve
-  })
-  await page.route('**/api/auth/sign-out', async (route) => {
-    signOutRequested = true
-    await signOutResponseReady
-    await route.fulfill({
-      status: 503,
-      contentType: 'application/json',
-      body: JSON.stringify({ code: 'SIGN_OUT_UNAVAILABLE', message: 'Sign out unavailable' })
-    })
-  })
-  await trigger.click()
-  await signOutItem.click()
-  await expect.poll(() => signOutRequested).toBe(true)
-  const pendingSignOut = page.getByRole('menuitem', { name: 'Signing out...', exact: true })
-  await expect(pendingSignOut).toBeDisabled()
-  await expect(pendingSignOut).toHaveAttribute('aria-busy', 'true')
-  await expect(pendingSignOut).toHaveAttribute('data-disabled', '')
-  await accountItem.focus()
-  await page.keyboard.press('ArrowDown')
-  await expect(accountItem).toBeFocused()
-  releaseSignOutResponse()
-  await expect(page.getByRole('alert')).toHaveText(
-    'We could not confirm that you were signed out. Your session may still be active. Please try again.'
-  )
-  await page.unroute('**/api/auth/sign-out')
-  observations.errorResponses = observations.errorResponses.filter(
-    (entry) => !(entry.includes('503') && entry.includes('/api/auth/sign-out'))
-  )
-  observations.console = observations.console.filter(
-    (entry) => !/Failed to load resource: the server responded with a status of 503/.test(entry)
-  )
-  await page.keyboard.press('Escape')
-
-  await trigger.click()
-  await page.evaluate(() => window.useNuxtApp?.().$router.push('/account'))
-  await expect(page).toHaveURL(/\/account$/)
-  await expect(menu).toBeHidden()
-  await expect(page.locator('.nuxt-route-announcer [role="status"]')).toHaveText('Account')
-}
-
-function capturedMagicLink(email) {
-  if (!existsSync(emailCaptureDirectory)) return undefined
-  const entries = readdirSync(emailCaptureDirectory, { withFileTypes: true })
-  if (entries.length > maxCaptureFiles) throw new Error('Too many passwordless capture envelopes were present')
-  for (const entry of entries) {
-    if (!entry.isFile() || !entry.name.endsWith('.json')) continue
-    let capture
-    try {
-      const path = join(emailCaptureDirectory, entry.name)
-      const expectedSize = statSync(path).size
-      if (expectedSize > maxCaptureFileBytes) throw new Error()
-      const bytes = readFileSync(path)
-      if (bytes.length !== expectedSize) throw new Error()
-      capture = JSON.parse(bytes.toString('utf8'))
-    } catch {
-      throw new Error('The passwordless capture envelope was unreadable')
-    }
-    if (capture.version !== 1 || capture.transport !== 'capture') {
-      throw new Error('The passwordless capture envelope had an unsupported format')
-    }
-    if (capture?.message?.to !== email) continue
-    const match = capture?.message?.text?.match(/https?:\/\/\S+/)
-    let url
-    try {
-      url = match ? new URL(match[0]) : undefined
-    } catch {
-      throw new Error('The passwordless capture envelope contained an invalid link')
-    }
-    if (
-      !url ||
-      url.origin !== new URL(runtimeUrl).origin ||
-      url.pathname !== '/api/auth/magic-link/verify' ||
-      !url.searchParams.get('token')
-    ) {
-      throw new Error('The passwordless capture envelope did not contain the expected private link')
-    }
-    return url
-  }
-  return undefined
-}
 
 async function assertContentSecurityPolicy(page, response, observations) {
   if (!response) throw new Error('The home navigation did not return a document response')
@@ -1217,12 +655,12 @@ async function assertContentSecurityPolicy(page, response, observations) {
     'font-src': ["'self'", 'data:'].sort(),
     'form-action': ["'self'"],
     'frame-ancestors': ["'none'"],
-    'frame-src': [turnstileOrigin],
+    'frame-src': ["'none'"],
     'img-src': ["'self'", 'data:'].sort(),
     'manifest-src': ["'self'"],
     'media-src': ["'self'"],
     'object-src': ["'none'"],
-    'script-src': ["'self'", "'strict-dynamic'", `'nonce-${nonce}'`, turnstileOrigin].sort(),
+    'script-src': ["'self'", "'strict-dynamic'", `'nonce-${nonce}'`].sort(),
     'script-src-attr': ["'none'"],
     'style-src': ["'self'", `'nonce-${nonce}'`].sort(),
     'style-src-attr': ["'unsafe-inline'"],
@@ -1264,7 +702,7 @@ async function assertContentSecurityPolicy(page, response, observations) {
     expect(asset.integrity).toMatch(/^sha384-/)
   }
 
-  const secondResponse = await page.request.get('/login')
+  const secondResponse = await page.request.get('/join')
   expect(secondResponse.ok()).toBe(true)
   expect(contentSecurityPolicyNonce(secondResponse.headers()['content-security-policy'] ?? '')).not.toBe(nonce)
 
@@ -1309,12 +747,9 @@ async function assertRuntimePublicConfig(page) {
   expect(configSource).not.toContain(buildName)
   expect(configSource).not.toContain(buildUrl)
   expect(configSource).not.toContain(buildSentryRelease)
-  expect(configSource).not.toContain(runtimeAuthSecret)
   expect(configSource).not.toContain(runtimeReadinessToken)
   expect(configSource).not.toContain(buildReadinessToken)
   expect(configSource).not.toContain(runtimeDatabase)
-  expect(configSource).not.toContain(runtimeStripeSecret)
-  expect(configSource).not.toContain(runtimeStripeWebhookSecret)
   expect(configSource).not.toContain('moduleStates')
 }
 
@@ -1332,14 +767,6 @@ async function nuxtManifestUrl(page) {
   const buildId = await page.evaluate(() => window.useNuxtApp?.()?.$config?.app?.buildId)
   expect(buildId, 'Nuxt runtime config exposes its build ID').toBeTruthy()
   return new URL(`/_nuxt/builds/meta/${encodeURIComponent(buildId)}.json`, runtimeUrl).href
-}
-
-async function fulfillJson(route, value, status = 200) {
-  await route.fulfill({
-    status,
-    contentType: 'application/json',
-    body: JSON.stringify(value)
-  })
 }
 
 async function assertForumPopup(page, activate) {
@@ -1395,15 +822,6 @@ async function assertVisibleFocusIndicator(page, locator) {
   expect(appearance.style).toBe('solid')
   expect(appearance.width).toBeGreaterThanOrEqual(2)
   expect(contrastRatio(appearance.color, canvas), 'focus ring contrast against the canvas').toBeGreaterThanOrEqual(3)
-}
-
-async function assertControlBoundaryContrast(locator) {
-  const colors = await locator.evaluate((element) => {
-    const style = getComputedStyle(element)
-    return { border: style.borderTopColor, background: style.backgroundColor }
-  })
-
-  expect(contrastRatio(colors.border, colors.background), 'control boundary contrast').toBeGreaterThanOrEqual(3)
 }
 
 function contrastRatio(first, second) {
@@ -1504,7 +922,6 @@ function observePage(page) {
 }
 
 function isIsolatedBrowserProviderRequest(request) {
-  if (request.method() === 'GET' && request.url() === turnstileScriptUrl) return true
   if (request.method() !== 'POST') return false
 
   const url = new URL(request.url())
@@ -1535,7 +952,7 @@ async function assertCleanPage(page, observations) {
     /hydration|mismatch|\[?vue warn\]?/i.test(message)
   )
   const excludedCapabilityRequests = observations.sameOriginRequests.filter((request) =>
-    /\/api\/(?:ai|files)(?:[/?]|$)/.test(request)
+    /\/api\/(?:auth|account|join|membership|ai|files)(?:[/?]|$)/.test(request)
   )
   expect(
     observations.console.filter((message) => message.startsWith('error:')),
@@ -1546,7 +963,7 @@ async function assertCleanPage(page, observations) {
   expect(observations.failedRequests, 'failed browser requests').toEqual([])
   expect(observations.errorResponses, 'same-origin HTTP error responses').toEqual([])
   expect(observations.externalRequests, 'external browser requests').toEqual([])
-  expect(excludedCapabilityRequests, 'AI/Files browser requests').toEqual([])
+  expect(excludedCapabilityRequests, 'retired feature browser requests').toEqual([])
   expect(observations.crashes, 'page crashes').toBe(0)
 }
 

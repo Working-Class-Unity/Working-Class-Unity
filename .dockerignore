@@ -16,17 +16,13 @@ scripts/**
 !scripts/toolchain-contract.mjs
 !scripts/generate-color-tokens.mjs
 !scripts/generate-hero-assets.mjs
-!scripts/import-stripe-membership.ts
-!scripts/sync-stripe-membership-links.ts
-!scripts/adopt-stripe-membership-account.ts
 !scripts/import-solidarity-events.ts
+!scripts/copy-legacy-events.ts
 !scripts/solidarity-event-operator.ts
-!scripts/normalize-solidarity-events.ts
 
 !nuxt.config.ts
 !sentry.client.config.ts
 !sentry.server.config.ts
-!worker-sentry.server.config.ts
 !source-map-cleanup.mjs
 !tsconfig.json
 

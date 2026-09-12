@@ -78,14 +78,10 @@
     }
   },
   "common": {
-    "email": "Email",
-    "emailInvalid": "Enter a valid email address.",
     "language": "Language",
     "opensInNewTab": "opens in a new tab",
     "required": "required",
     "retry": "Try again",
-    "checkingSession": "Checking your session...",
-    "sessionVerificationFailed": "We could not verify your session right now.",
     "source": "Source",
     "working": "Working...",
     "carousel": {
@@ -136,21 +132,6 @@
         "description": "Answers about safety, movement data, police technology, public spending, and removal."
       }
     },
-    "login": {
-      "title": "Log in"
-    },
-    "activate": {
-      "title": "Activate your account"
-    },
-    "signup": {
-      "title": "Sign up"
-    },
-    "app": {
-      "title": "App"
-    },
-    "account": {
-      "title": "Account"
-    },
     "observability": {
       "title": "Observability test"
     },
@@ -169,7 +150,6 @@
     "applicationLabel": "Working Class Unity site header",
     "brandHome": "{appName} home",
     "primaryLabel": "Primary",
-    "sessionUnavailable": "Session check unavailable",
     "about": "Who We Are",
     "currentWork": "Current Work",
     "allCurrentWork": "All current work",
@@ -177,9 +157,6 @@
     "calendar": "Events",
     "forum": "Member Forum",
     "menu": "Menu",
-    "app": "App",
-    "login": "Member Login",
-    "signup": "Join WCU",
     "getInvolved": "Get Involved",
     "otherCurrentWork": "Other current work",
     "knowYourRights": "Know Your Rights",
@@ -192,7 +169,8 @@
       "faq": "Answers about Flock, public safety, and the campaign.",
       "unitedFront": "A call for independent working-class political organization.",
       "rights": "Practical guides for encounters with immigration enforcement."
-    }
+    },
+    "join": "Join WCU"
   },
   "removeFlock": {
     "campaignLabel": "Remove mass surveillance from Stockton side-quest",
@@ -328,200 +306,6 @@
       "terms": "Terms"
     }
   },
-  "account": {
-    "eyebrow": "Personal settings",
-    "title": "Account",
-    "sessionUnavailable": {
-      "title": "Account unavailable"
-    },
-    "loginRequired": {
-      "title": "Continuing to log in",
-      "description": "A signed-in session is required to view this page."
-    },
-    "profile": {
-      "title": "Profile settings",
-      "description": "Add these details whenever you are ready. They are not required to use your account.",
-      "help": "First and last names stay in Account Settings. Only an explicit display name is used elsewhere in your WCU account.",
-      "firstName": "First name",
-      "lastName": "Last name",
-      "displayName": "Display name",
-      "optional": "Optional",
-      "displayNameHelp": "Optional. Your email or phone number is used in your dashboard and account menu when this is blank.",
-      "save": "Save profile",
-      "saving": "Saving profile...",
-      "saved": "Profile saved.",
-      "saveError": "We could not save your profile right now. Please try again."
-    },
-    "identity": {
-      "title": "Sign-in details",
-      "avatar": "Avatar",
-      "avatarAlt": "Avatar for {identity}",
-      "noAvatar": "No avatar set",
-      "phone": "Phone number",
-      "notAdded": "Not added"
-    },
-    "email": {
-      "title": "Email login",
-      "description": "A verified email gives you another way to log in to this same account.",
-      "current": "Email address",
-      "status": "Email status",
-      "verified": "Verified",
-      "notVerified": "Not verified",
-      "addEmail": "Add an email address",
-      "newEmail": "New email address",
-      "help": "We will send a WCU verification link. Your email becomes a login only after you click it.",
-      "required": "Email is required.",
-      "unchanged": "Enter a different email address.",
-      "sending": "Sending verification link...",
-      "send": "Send verification link",
-      "requested": "If that address can be used, a WCU verification link is on its way.",
-      "requestError": "We could not send the verification link. Try again or contact WCU."
-    },
-    "membership": {
-      "title": "WCU membership",
-      "description": "Your contribution amount does not change your membership rights.",
-      "loading": "Loading your membership status...",
-      "loadError": "We could not load your membership status right now.",
-      "accountType": "Account type",
-      "supporter": "Supporter",
-      "member": "Member",
-      "contribution": "Current contribution",
-      "amountMonthly": "${amount} per month",
-      "equalRights": "The $10 and $27 contributions have identical membership rights.",
-      "currentContribution": "Current contribution",
-      "scheduledContribution": "Scheduled contribution",
-      "identityReviewTitle": "Membership match needs review",
-      "identityReview": "We could not safely match this account to an existing membership. Contact WCU before starting another subscription.",
-      "joinContribution": "Become a member at ${amount}/month",
-      "changeContribution": "Change to ${amount}/month",
-      "changeSaved": "Your contribution change is scheduled for your next renewal.",
-      "paymentProblemTitle": "Payment needs attention",
-      "paymentProblem": "You keep all membership rights through {deadline}. Fix the payment before then to remain a member.",
-      "fixPayment": "Fix payment",
-      "managePayment": "Manage payment",
-      "cancellationTitle": "Membership cancellation scheduled",
-      "cancellation": "Your membership rights continue through {deadline}.",
-      "changePendingTitle": "Contribution change scheduled",
-      "changePending": "Your contribution changes to ${amount}/month on {deadline}. There is no proration.",
-      "checkoutCancelled": "Checkout was canceled. Your account was not charged.",
-      "refresh": "Refresh Stripe status",
-      "refreshed": "Your Stripe status is up to date.",
-      "commandError": "We could not complete that Stripe action. Try again or contact WCU.",
-      "dateUnavailable": "the date shown in Stripe"
-    },
-    "menu": {
-      "triggerLabel": "Account menu for {identity}",
-      "account": "Account",
-      "signingOut": "Signing out...",
-      "signOut": "Sign out",
-      "signOutError": "We could not confirm that you were signed out. Your session may still be active. Please try again."
-    },
-    "deletion": {
-      "title": "Delete account",
-      "description": "Deletion removes your login and private app content.",
-      "billingWarning": "If you own a Stripe subscription, deletion waits until cancellation is confirmed. Your account remains available while that result is uncertain; afterward, we may retain only minimized billing references needed for reconciliation.",
-      "confirmationLabel": "Type {confirmation} to confirm",
-      "help": "Once any required Stripe cancellation is confirmed, this action has no grace period.",
-      "deleting": "Deleting account...",
-      "submit": "Delete account",
-      "sessionTooOld": "Your session is too old for this action. Log out, sign in again, and then retry deletion.",
-      "billingPending": "Stripe cancellation is not confirmed, so your account was not deleted. Wait briefly and retry.",
-      "unknownResult": "We could not confirm whether deletion completed. Try signing in again; if this account still opens, you can retry."
-    }
-  },
-  "security": {
-    "check": {
-      "label": "Security check",
-      "complete": "Security check complete.",
-      "failure": "The security check could not be completed.",
-      "progress": "Security check in progress.",
-      "retry": "Retry security check"
-    }
-  },
-  "auth": {
-    "login": {
-      "eyebrow": "Welcome back",
-      "title": "Log in",
-      "introduction": "Use your email address or U.S. phone number to log in without a password.",
-      "needAccount": "Need a new account?",
-      "join": "Join WCU.",
-      "alreadyPay": "Already pay monthly dues?",
-      "activate": "Activate your account."
-    },
-    "signup": {
-      "eyebrow": "Get started",
-      "title": "Create your account",
-      "introduction": "Create a Supporter account with email or a U.S. phone number, or return to your existing WCU account."
-    },
-    "method": {
-      "label": "Choose how to continue",
-      "email": "Use email",
-      "phone": "Use phone"
-    },
-    "errors": {
-      "authenticationFailed": "We could not complete authentication. Request a new email link.",
-      "accountNotActivated": "This email does not have an activated WCU website account. Use Join WCU or Activate your account below.",
-      "loginLinkUnavailable": "This login link expired or was already used. Request a new email link.",
-      "activationLinkUnavailable": "This activation link is no longer available. Request another activation link or contact WCU.",
-      "formInvalid": "Check the highlighted field and try again.",
-      "securityRequired": "Complete the security check before continuing.",
-      "emailLink": "We could not send an email link right now. Please try again.",
-      "phoneCode": "We could not send a verification text. Check the U.S. phone number and try again.",
-      "phoneVerification": "That verification code did not work. Check the code or request a new one.",
-      "phoneUnavailable": "Phone verification is unavailable right now. Please try again."
-    },
-    "status": {
-      "signedOut": "You are signed out.",
-      "billingEmailChecked": "If this billing email could be verified, it is now ready for email login. Request a sign-in link below.",
-      "activationComplete": "Your account was activated, but automatic sign-in did not complete. Request a login link below.",
-      "emailLinkSent": "If you can receive email at that address, a sign-in link is on its way.",
-      "phoneCodeSent": "A one-time verification code is on its way."
-    },
-    "sessionUnavailable": {
-      "title": "Session check unavailable",
-      "description": "We could not check your current session. You can still request a new email link."
-    },
-    "email": {
-      "required": "Email is required.",
-      "sending": "Sending...",
-      "submit": "Send email link"
-    },
-    "phone": {
-      "label": "U.S. phone number",
-      "required": "Phone number is required.",
-      "invalid": "Enter a valid U.S. phone number.",
-      "help": "We will text this number a one-time verification code. Message and data rates may apply.",
-      "sending": "Sending code...",
-      "send": "Text me a code",
-      "codeLabel": "Verification code",
-      "codeRequired": "Verification code is required.",
-      "codeInvalid": "Enter the numeric code from the text message.",
-      "codeHelp": "Enter the code sent to {phone}.",
-      "verifying": "Verifying...",
-      "verify": "Verify and continue",
-      "change": "Use a different number"
-    },
-    "legal": {
-      "acknowledgment": "By continuing, you acknowledge the {terms} and {privacy}.",
-      "terms": "Terms",
-      "privacy": "Privacy Policy"
-    }
-  },
-  "activation": {
-    "eyebrow": "Existing paid members",
-    "title": "Activate your account",
-    "introduction": "If you already pay WCU monthly dues through Stripe, use the email on that Stripe membership to activate your website account.",
-    "emailHelp": "We will send the link only to the current email on the eligible Stripe membership.",
-    "submit": "Send activation link",
-    "sending": "Checking...",
-    "error": "We could not request account activation right now. Please try again.",
-    "status": "If this email is eligible, an activation link will be sent to the email currently held by Stripe. Otherwise, contact WCU.",
-    "existingAccount": "Already activated?",
-    "login": "Log in.",
-    "newAccount": "Need a new membership?",
-    "join": "Join WCU.",
-    "support": "Contact WCU"
-  },
   "errors": {
     "notFound": {
       "heading": "Page not found",
@@ -557,16 +341,11 @@
       },
       "providers": {
         "title": "Providers and sharing",
-        "description": "List every authentication, payment, infrastructure, analytics, email, and abuse-defense provider together with the information each provider receives."
-      },
-      "abuseDefense": {
-        "title": "Abuse defense",
-        "description": "The magic-link pages load Cloudflare's Turnstile challenge script and frame, which let Cloudflare process browser and network signals to distinguish people from bots. The application sends the resulting opaque token to Cloudflare Siteverify, but does not add the optional visitor IP field, enable widget failure feedback, retain the token or provider response in application data or ordinary logs, or surface provider error codes. Describe the deployment's actual retention and link to Cloudflare's {addendum}.",
-        "addendum": "Turnstile Privacy Addendum"
+        "description": "List every payment, infrastructure, analytics, and communications provider together with the information each provider receives."
       },
       "retention": {
         "title": "Retention and choices",
-        "description": "State the real retention periods, account-deletion behavior, billing-history exceptions, security controls, and a working contact method for privacy questions."
+        "description": "State the real retention periods, security controls, and a working contact method for privacy questions."
       }
     },
     "terms": {
@@ -574,15 +353,15 @@
       "notice": "This text is a customization prompt, not production terms or legal advice. Replace it before launch.",
       "service": {
         "title": "The service",
-        "description": "Describe what Working Class Unity provides, who may use it, and any eligibility or account requirements."
+        "description": "Describe what Working Class Unity provides, who may use it, and any eligibility requirements."
       },
       "conduct": {
         "title": "Acceptable use",
         "description": "Document the conduct, content, automation, and abuse rules that are appropriate for the service."
       },
       "payments": {
-        "title": "Payments and ending access",
-        "description": "Explain the real price, renewal, cancellation, refund, account-deletion, and access behavior."
+        "title": "Payments",
+        "description": "Explain the real price, renewal, cancellation, and refund behavior."
       }
     }
   },
@@ -755,7 +534,7 @@
   "calendar": {
     "eyebrow": "WCU calendar",
     "title": "Find your place in the work",
-    "description": "Come to an organizing meeting, take action with your neighbors, or meet people at a community gathering. Public events are open to newcomers. Signed-in members may also see member meetings.",
+    "description": "Come to an organizing meeting, take action with your neighbors, or meet people at a community gathering. Public events are open to newcomers.",
     "view": {
       "label": "Calendar view",
       "agenda": "Agenda",
@@ -821,16 +600,13 @@
       "copy": "Copy address",
       "copied": "Address copied",
       "copiedAnnouncement": "Address copied."
-    }
+    },
+    "resetDate": "Show all upcoming events"
   },
   "join": {
     "title": "Join Working Class Unity",
     "chooseTier": "Choose your tier",
     "tiers": {
-      "supporter": {
-        "name": "Supporter",
-        "price": "$0/month"
-      },
       "member": {
         "name": "Member",
         "price": "$10/month"
@@ -840,35 +616,10 @@
         "price": "$27/month"
       }
     },
-    "tierExplanation": "Supporter is account-only. Both paid tiers include the same member rights.",
-    "continueToStripe": "Continue to Stripe",
+    "tierExplanation": "Both dues options include the same member rights.",
     "codeOfConduct": "Joining means accepting WCU’s Code of Conduct.",
-    "errors": {
-      "invalidLink": "That membership link is invalid or no longer available.",
-      "checkoutUnavailable": "Checkout is temporarily unavailable. Please try again."
-    },
-    "complete": {
-      "title": "Check your email",
-      "pending": "Validating your Stripe enrollment…",
-      "sent": "We sent an account link to the email used in Stripe Checkout. Use it within five minutes to finish.",
-      "error": "We could not validate this Checkout.",
-      "return": "Return to Join"
-    }
-  },
-  "personalApp": {
-    "eyebrow": "Working Class Unity",
-    "welcome": "Welcome back",
-    "welcomeNamed": "Welcome back, {name}",
-    "loading": {
-      "title": "Loading your account",
-      "description": "Retrieving your account session."
-    },
-    "unavailable": {
-      "title": "App unavailable",
-      "description": "We could not load your account right now."
-    },
-    "ready": "Your WCU account is ready.",
-    "signedInAs": "Signed in as {identity}",
-    "manageAccount": "Manage account"
+    "description": "Choose monthly dues and continue to Stripe to pay.",
+    "manageTitle": "Already paying dues?",
+    "manageDues": "Manage dues"
   }
 }
