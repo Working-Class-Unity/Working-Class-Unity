@@ -492,11 +492,9 @@ function cleanupSync() {
 function redact(value) {
   return String(value)
     .replaceAll(readinessToken, '[redacted]')
-    .replaceAll(authSecret, '[redacted]')
     .replaceAll(persistenceKey, '[redacted]')
     .replaceAll(persistenceValue, '[redacted]')
     .replaceAll(mutatedValue, '[redacted]')
-    .replaceAll(objectValue, '[redacted]')
 }
 
 function volumeMount() {
