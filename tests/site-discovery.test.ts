@@ -65,12 +65,37 @@ describe('public website discovery', () => {
     expect(markdown).not.toMatch(/\/api\/|\/account|\/join\/complete|session_id|attendees|memberOnly/)
   })
 
-  it('advertises the sitemap without preventing public crawlers from fetching the site', () => {
+  it('opts out of training while preserving public search and user-requested AI access', () => {
     const robots = renderRobotsText(origin)
-    expect(robots).toContain('User-agent: *\n')
-    expect(robots).toContain('Disallow: /api/\n')
+    const groups = new Map(
+      robots
+        .trim()
+        .split('\n\n')
+        .filter((group) => group.startsWith('User-agent: '))
+        .map((group) => {
+          const [agent, ...rules] = group.split('\n')
+          return [agent!.slice('User-agent: '.length), rules]
+        })
+    )
+
+    for (const agent of ['GPTBot', 'ClaudeBot', 'Applebot-Extended']) {
+      expect(groups.get(agent), agent).toEqual(['Disallow: /'])
+    }
+    for (const agent of [
+      'Googlebot',
+      'bingbot',
+      'OAI-SearchBot',
+      'ChatGPT-User',
+      'Claude-SearchBot',
+      'Claude-User',
+      'Applebot',
+      'Google-Extended',
+      'Amazonbot',
+      'meta-externalagent'
+    ]) {
+      expect(groups.get(agent) ?? groups.get('*'), agent).toEqual(['Disallow: /api/'])
+    }
     expect(robots).toContain(`Sitemap: ${origin}/sitemap.xml`)
-    expect(robots).not.toMatch(/^Disallow: \/$/m)
   })
 
   it('uses stable localized canonicals in structured data and safely embeds public copy', () => {

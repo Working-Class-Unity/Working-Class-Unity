@@ -73,5 +73,19 @@ export function renderLlmsText(origin: string): string {
 }
 
 export function renderRobotsText(origin: string): string {
-  return `User-agent: *\nDisallow: /api/\n\nSitemap: ${absoluteSiteUrl(origin, '/sitemap.xml')}\n`
+  // Search and user-requested AI fetches retain the public wildcard policy.
+  return `User-agent: *
+Disallow: /api/
+
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: Applebot-Extended
+Disallow: /
+
+Sitemap: ${absoluteSiteUrl(origin, '/sitemap.xml')}
+`
 }
