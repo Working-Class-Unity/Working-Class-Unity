@@ -1,27 +1,18 @@
 <script setup lang="ts">
-import CalendarDatePicker from '~/components/calendar/CalendarDatePicker.vue'
 import CalendarEventActions from '~/components/calendar/CalendarEventActions.vue'
 import CalendarEventBadge from '~/components/calendar/CalendarEventBadge.vue'
-import { calendarFilters, type CalendarEvent, type CalendarFilter } from '~/content/calendar'
+import type { CalendarEvent } from '~/content/calendar'
 
 const props = defineProps<{
-  date: string | null
   events: readonly CalendarEvent[]
-  jumpMessage: string
+  hasFilters?: boolean
 }>()
 
-const activeFilter = defineModel<CalendarFilter>('activeFilter', { required: true })
-const emit = defineEmits<{ jump: [date: string] }>()
 const { locale, localeProperties, t } = useI18n()
 const languageTag = computed(() => localeProperties.value.language ?? locale.value)
 
-const filteredEvents = computed(() => {
-  if (activeFilter.value === 'Everything') return props.events
-  return props.events.filter((event) => event.kind === activeFilter.value)
-})
-const featuredEvent = computed(() => filteredEvents.value[0] ?? null)
-const recurringEvents = computed(() => filteredEvents.value.filter((event) => event.recurring))
-const agendaEvents = computed(() => filteredEvents.value.slice(1))
+const featuredEvent = computed(() => props.events[0] ?? null)
+const agendaEvents = computed(() => props.events.slice(1))
 const featuredDate = computed(() => {
   const event = featuredEvent.value
   if (!event) return null
@@ -41,10 +32,6 @@ function eventStartTime(event: CalendarEvent) {
     timeZone: event.timezone
   }).format(new Date(event.startsAt))
 }
-
-function recurrenceSchedule(event: CalendarEvent) {
-  return event.recurring?.split(' · ')[0] ?? ''
-}
 </script>
 
 <template>
@@ -54,9 +41,7 @@ function recurrenceSchedule(event: CalendarEvent) {
         <h2 id="agenda-title">{{ t('calendar.agenda.title') }}</h2>
         <p>{{ t('calendar.agenda.description') }}</p>
       </div>
-      <CalendarDatePicker :date="date" @select="emit('jump', $event)" />
     </div>
-    <p v-if="jumpMessage" class="jump-message" aria-live="polite">{{ jumpMessage }}</p>
 
     <article v-if="featuredEvent" class="featured-event">
       <time :datetime="featuredEvent.startsAt" class="featured-date">
@@ -69,7 +54,6 @@ function recurrenceSchedule(event: CalendarEvent) {
           <CalendarEventBadge :kind="featuredEvent.kind" />
         </div>
         <h3>{{ featuredEvent.title }}</h3>
-        <p>{{ featuredEvent.description }}</p>
         <dl class="event-details">
           <div>
             <dt>{{ t('calendar.details.time') }}</dt>
@@ -84,62 +68,32 @@ function recurrenceSchedule(event: CalendarEvent) {
       <CalendarEventActions class="featured-actions" :event="featuredEvent" show-directions />
     </article>
 
-    <div class="agenda-filter-row">
-      <p>{{ t('calendar.filters.label') }}</p>
-      <div class="event-filters" role="group" :aria-label="t('calendar.filters.label')">
-        <AppButton
-          v-for="filter in calendarFilters"
-          :key="filter"
-          class="filter-action"
-          size="compact"
-          variant="secondary"
-          :aria-pressed="activeFilter === filter"
-          @click="activeFilter = filter"
-        >
-          {{ t(`calendar.filters.${filter.toLowerCase()}`) }}
-        </AppButton>
-      </div>
-    </div>
-
     <p v-if="!featuredEvent" class="empty-state">
-      {{ t(activeFilter === 'Everything' && !date ? 'calendar.empty' : 'calendar.agenda.noMatches') }}
+      {{ t(!hasFilters ? 'calendar.empty' : 'calendar.agenda.noMatches') }}
     </p>
-    <div v-else class="agenda-layout">
-      <section aria-labelledby="up-next-title">
-        <div class="section-heading-row">
-          <h3 id="up-next-title">{{ t('calendar.agenda.upNext') }}</h3>
-        </div>
-        <ol class="event-list" role="list">
-          <li v-for="event in agendaEvents" :key="event.id" class="event-row">
-            <time :datetime="event.startsAt"
-              ><strong>{{ event.dateLabel.replace(',', '') }}</strong
-              ><span>{{ eventStartTime(event) }}</span></time
-            >
-            <div class="event-row-copy">
-              <div class="event-labels">
-                <CalendarEventBadge :kind="event.kind" />
-                <span v-if="event.recurring" class="series-badge">{{ t('calendar.agenda.series') }}</span>
-              </div>
-              <h4>{{ event.title }}</h4>
-              <p>{{ event.description }}</p>
-              <p v-if="event.recurring" class="recurrence-copy">{{ event.recurring }}</p>
+    <section v-else aria-labelledby="up-next-title">
+      <div class="section-heading-row">
+        <h3 id="up-next-title">{{ t('calendar.agenda.upNext') }}</h3>
+      </div>
+      <ol class="event-list" role="list">
+        <li v-for="event in agendaEvents" :key="event.id" class="event-row">
+          <time :datetime="event.startsAt"
+            ><strong>{{ event.dateLabel.replace(',', '') }}</strong
+            ><span>{{ eventStartTime(event) }}</span></time
+          >
+          <div class="event-row-copy">
+            <div class="event-labels">
+              <CalendarEventBadge :kind="event.kind" />
+              <span v-if="event.recurring" class="series-badge">{{ t('calendar.agenda.series') }}</span>
             </div>
-            <CalendarEventActions class="row-actions" :event="event" rsvp-variant="secondary" />
-          </li>
-          <li v-if="agendaEvents.length === 0" class="empty-state">{{ t('calendar.agenda.noAdditional') }}</li>
-        </ol>
-      </section>
-
-      <aside class="series-panel" aria-labelledby="series-title">
-        <p class="section-label">{{ t('calendar.agenda.recurring') }}</p>
-        <h3 id="series-title">{{ t('calendar.agenda.moreDates') }}</h3>
-        <div v-for="event in recurringEvents" :key="event.id" class="series-item">
-          <CalendarEventBadge :kind="event.kind" />
-          <h4>{{ event.title }}</h4>
-          <p>{{ recurrenceSchedule(event) }} · {{ eventStartTime(event) }}</p>
-        </div>
-      </aside>
-    </div>
+            <h4>{{ event.title }}</h4>
+            <p v-if="event.recurring" class="recurrence-copy">{{ event.recurring }}</p>
+          </div>
+          <CalendarEventActions class="row-actions" :event="event" rsvp-variant="secondary" show-directions />
+        </li>
+        <li v-if="agendaEvents.length === 0" class="empty-state">{{ t('calendar.agenda.noAdditional') }}</li>
+      </ol>
+    </section>
   </section>
 </template>
 
@@ -159,7 +113,8 @@ function recurrenceSchedule(event: CalendarEvent) {
   }
 
   .view-heading h2,
-  .featured-copy h3 {
+  .featured-copy h3,
+  .event-row-copy h4 {
     color: var(--color-brand-primary);
     font-family: var(--font-family-display);
     font-weight: 650;
@@ -176,11 +131,6 @@ function recurrenceSchedule(event: CalendarEvent) {
     margin: var(--space-2) 0 0;
     color: var(--color-text-muted);
     line-height: 1.5;
-  }
-
-  .jump-message {
-    margin: calc(var(--space-4) * -1) 0 0;
-    color: var(--color-text-muted);
   }
 
   .featured-event {
@@ -229,17 +179,14 @@ function recurrenceSchedule(event: CalendarEvent) {
     min-inline-size: 0;
   }
 
-  .featured-copy h3 {
+  .featured-copy h3,
+  .event-row-copy h4 {
+    --font-size-heading-3: clamp(1.75rem, 3vw, 2.25rem);
+
     max-inline-size: 28ch;
     margin: var(--space-2) 0;
-    font-size: clamp(1.75rem, 3vw, 2.25rem);
-  }
-
-  .featured-copy > p {
-    max-inline-size: 60ch;
-    margin: 0;
-    color: var(--color-text-muted);
-    line-height: 1.55;
+    font-size: var(--font-size-heading-3);
+    line-height: 1.15;
   }
 
   .event-details {
@@ -273,68 +220,7 @@ function recurrenceSchedule(event: CalendarEvent) {
     inline-size: 9.5rem;
   }
 
-  .agenda-filter-row {
-    display: flex;
-    align-items: center;
-    gap: var(--space-4);
-    flex-wrap: wrap;
-  }
-
-  .agenda-filter-row > p {
-    margin: 0;
-    color: var(--color-brand-primary);
-    font-size: 0.875rem;
-    font-weight: 650;
-  }
-
-  .event-filters {
-    display: flex;
-    gap: var(--space-2);
-    flex-wrap: wrap;
-  }
-
-  .event-filters .filter-action[data-variant='secondary'] {
-    min-block-size: var(--control-min-block-size);
-    border: 0;
-    border-radius: var(--radius-2);
-    padding: 0.6rem 0.75rem;
-    color: var(--color-text-muted);
-    background: transparent;
-    font: inherit;
-    font-weight: 650;
-    filter: none;
-    cursor: pointer;
-  }
-
-  .event-filters .filter-action[data-variant='secondary']:hover,
-  .event-filters .filter-action[data-variant='secondary'][aria-pressed='true'] {
-    color: var(--color-action);
-    background: var(--color-action-soft);
-  }
-
-  .event-filters .filter-action[data-variant='secondary'][aria-pressed='true'] {
-    box-shadow: inset 0 0 0 1px var(--color-action);
-  }
-
-  .agenda-layout {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 17rem;
-    gap: var(--space-7);
-    align-items: start;
-  }
-
-  .section-label {
-    margin: 0 0 var(--space-2);
-    color: var(--color-brand-accent);
-    font-family: var(--font-family-mono);
-    font-size: 0.8125rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
-  .section-heading-row h3,
-  .series-panel h3 {
+  .section-heading-row h3 {
     margin: 0;
     color: var(--color-brand-primary);
     font-family: var(--font-family-display);
@@ -372,55 +258,17 @@ function recurrenceSchedule(event: CalendarEvent) {
     min-inline-size: 0;
   }
 
-  .event-row-copy h4,
-  .series-item h4 {
-    margin: var(--space-2) 0 var(--space-1);
-    color: var(--color-text);
-    font-size: 1rem;
-    font-weight: 650;
-  }
-
-  .event-row-copy p,
-  .series-item p {
+  .event-row-copy p {
     margin: 0;
     color: var(--color-text-muted);
     font-size: 0.875rem;
     line-height: 1.5;
   }
 
-  .series-panel {
-    display: grid;
-    gap: var(--space-4);
-    border-radius: var(--radius-3);
-    padding: var(--space-5);
-    background: var(--color-surface-subtle);
-  }
-
-  .series-panel .section-label {
-    margin-block-end: calc(var(--space-3) * -1);
-  }
-
-  .series-item {
-    display: grid;
-    gap: var(--space-1);
-    border-block-start: 1px solid var(--color-divider);
-    padding-block-start: var(--space-4);
-  }
-
-  .series-item h4 {
-    margin-block: var(--space-1) 0;
-  }
-
   .empty-state {
     border-block-start: 1px solid var(--color-divider);
     padding-block: var(--space-5);
     color: var(--color-text-muted);
-  }
-
-  @media (width <= 60rem) {
-    .agenda-layout {
-      grid-template-columns: 1fr;
-    }
   }
 
   @media (width <= 44rem) {
@@ -430,12 +278,7 @@ function recurrenceSchedule(event: CalendarEvent) {
     }
 
     .view-heading p,
-    .event-row-copy p,
-    .series-item p {
-      font-size: 1rem;
-    }
-
-    .event-filters .filter-action {
+    .event-row-copy p {
       font-size: 1rem;
     }
 
@@ -457,16 +300,6 @@ function recurrenceSchedule(event: CalendarEvent) {
 
     .featured-actions,
     .row-actions {
-      inline-size: 100%;
-    }
-
-    .agenda-filter-row {
-      align-items: flex-start;
-      flex-direction: column;
-      gap: var(--space-2);
-    }
-
-    .event-filters {
       inline-size: 100%;
     }
 
@@ -494,10 +327,6 @@ function recurrenceSchedule(event: CalendarEvent) {
 
     .series-badge {
       font-size: 0.875rem;
-    }
-
-    .series-panel {
-      padding: var(--space-4);
     }
   }
 }

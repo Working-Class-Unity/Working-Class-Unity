@@ -9,7 +9,7 @@ const safetyLabels = ['homes', 'work', 'care']
 
 <template>
   <div class="landing-case">
-    <section class="landing-power flock-section" aria-labelledby="power-title">
+    <section id="why-remove" class="landing-power flock-section" aria-labelledby="power-title">
       <div class="flock-field landing-power-inner">
         <header class="flock-section-head">
           <p class="flock-kicker">{{ t('removeFlock.landing.whyRemoval') }}</p>
@@ -32,7 +32,7 @@ const safetyLabels = ['homes', 'work', 'care']
       </div>
     </section>
 
-    <section class="flock-section flock-field landing-safety" aria-labelledby="safety-title">
+    <section id="real-safety" class="flock-section flock-field landing-safety" aria-labelledby="safety-title">
       <header class="flock-section-head">
         <p class="flock-kicker">{{ t('removeFlock.landing.safetyEyebrow') }}</p>
         <h2 id="safety-title" class="flock-heading">{{ safety.title }}</h2>

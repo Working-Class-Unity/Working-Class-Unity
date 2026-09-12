@@ -49,7 +49,7 @@ const { petitionDemand } = useRemoveFlockContent()
       </div>
     </section>
 
-    <section class="campaign-newsletter flock-section" aria-labelledby="campaign-updates-title">
+    <section id="updates" class="campaign-newsletter flock-section" aria-labelledby="campaign-updates-title">
       <div class="flock-field landing-updates-inner">
         <header class="flock-section-head">
           <p class="flock-kicker">{{ t('removeFlock.landing.updatesEyebrow') }}</p>

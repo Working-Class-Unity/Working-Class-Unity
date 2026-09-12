@@ -43,11 +43,9 @@ The normative interface architecture is
   Events panel, omits credentials, and provides the next three scheduled public sessions. The header
   owns pending, error/retry, and empty presentation, with All events always available.
 - `LanguageSelector`: compact native select with a globe label, localized accessible name, and full language names.
-- `calendar/CalendarDatePicker`: feature-owned Reka calendar and popover for agenda date navigation,
-  initialized to the current date in America/Los_Angeles. Date controls remain available when no events match.
 - `calendar/EventDirectionsMenu`: feature-owned Reka dropdown for map and address actions.
 - `calendar/CalendarAgendaView`, `calendar/CalendarMonthView`, `calendar/CalendarEventActions`, and
-  `calendar/CalendarEventBadge`: calendar-owned views, recurring event presentation, and outbound Solidarity RSVP links.
+  `calendar/CalendarEventBadge`: calendar-owned views, series labels, and outbound Solidarity RSVP and details links.
 - `PageOutline`: shared desktop index and mobile Reka drawer for flat or nested page outlines.
 - `BylawsPageOutline`: bylaws-owned configuration of `PageOutline`.
 - `CampaignCitedText`: feature-owned renderer for claim-level citation parts and deterministic occurrences.
@@ -55,6 +53,8 @@ The normative interface architecture is
 - `CampaignPageOutline`: campaign-owned configuration of `PageOutline`.
 - `CampaignEditorialHeader`: shared long-form campaign page heading group.
 - `campaign/Landing*`: campaign-owned narrative sections composed by `CampaignLanding`.
+  `LandingEvents` reads the public calendar, shows scheduled Deflock sessions in date order, and falls
+  back to the next public event when none match. The full-calendar link remains available in every state.
 - `KnowYourRightsShell`, `KnowYourRightsGuide`, and `KnowYourRightsScript`: feature-owned localized
   navigation, long-form guide framing, and speakable scripts for the Know Your Rights page family.
 - `/join`: an Open Assembly membership explanation, with participation and governance before two
@@ -63,8 +63,8 @@ The normative interface architecture is
   or free-supporter registration. `shared/membership-links.ts` owns the public URLs.
 
 Direct `reka-ui` imports are allowed only in `components/AppTopbar.vue`,
-`components/CampaignCitation.vue`, `components/PageOutline.vue`, and the three documented
-`components/calendar/` integrations.
+`components/CampaignCitation.vue`, `components/PageOutline.vue`, and
+`components/calendar/EventDirectionsMenu.vue`.
 Pages and unrelated components consume app-owned contracts. Do not add another Reka primitive or a
 generic wrapper without a documented product journey.
 

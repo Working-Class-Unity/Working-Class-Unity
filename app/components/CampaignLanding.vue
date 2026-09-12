@@ -13,6 +13,7 @@ function section(id: string): CampaignSection {
 <template>
   <article class="campaign-landing" aria-labelledby="remove-flock-title">
     <CampaignLandingHero :page="campaignLandingPage" />
+    <CampaignLandingEvents />
     <CampaignLandingCouncil :section="section('verified-facts')" :facts="campaignFacts" />
     <CampaignLandingSystem :section="section('system')" />
     <CampaignLandingCase
@@ -34,6 +35,10 @@ function section(id: string): CampaignSection {
   }
 
   /* Shared presentation contract for the overview's feature-owned sections. */
+  .campaign-landing :deep(section[id]) {
+    scroll-margin-block-start: var(--space-5);
+  }
+
   .campaign-landing :deep(.flock-field) {
     inline-size: 100%;
     max-inline-size: var(--home-content-max-width);

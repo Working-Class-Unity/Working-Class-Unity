@@ -285,6 +285,12 @@
       "recordValues": {
         "term": "ਅਪ੍ਰੈਲ 14, 2031",
         "system": "ਇੱਕ ਜੁੜਿਆ ਸਿਸਟਮ"
+      },
+      "events": {
+        "title": "Deflock Stockton ਦੇ ਸਮਾਗਮ",
+        "none": "Deflock Stockton ਦਾ ਕੋਈ ਸਮਾਗਮ ਨਹੀਂ ਹੈ",
+        "instead": "ਇਸ ਦੀ ਬਜਾਏ, ਸਾਡੇ ਨਾਲ ਇੱਥੇ ਸ਼ਾਮਲ ਹੋਵੋ…",
+        "calendar": "ਪੂਰਾ ਕੈਲੰਡਰ ਵੇਖੋ"
       }
     },
     "faq": {
@@ -544,7 +550,6 @@
     "loadError": "ਅਸੀਂ ਕੈਲੰਡਰ ਲੋਡ ਨਹੀਂ ਕਰ ਸਕੇ।",
     "empty": "ਹਾਲੇ ਕੋਈ ਆਗਾਮੀ ਇਵੈਂਟ ਪ੍ਰਕਾਸ਼ਿਤ ਨਹੀਂ ਕੀਤੇ ਗਏ ਹਨ।",
     "upcomingDates": "{count} ਆਉਣ ਵਾਲੀ ਮਿਤੀ | {count} ਆਉਣ ਵਾਲੀਆਂ ਤਾਰੀਖਾਂ",
-    "showingFrom": "{date} ਤੋਂ ਇਵੈਂਟ ਦਿਖਾ ਰਿਹਾ ਹੈ।",
     "delivery": {
       "virtual": "ਔਨਲਾਈਨ",
       "hybrid": "ਵਿਅਕਤੀਗਤ ਅਤੇ ਔਨਲਾਈਨ",
@@ -574,9 +579,7 @@
       "noMatches": "ਅਜੇ ਤੱਕ ਇਸ ਫਿਲਟਰ ਨਾਲ ਕੋਈ ਇਵੈਂਟ ਮੇਲ ਨਹੀਂ ਖਾਂਦਾ।",
       "upNext": "ਅਗਲਾ",
       "series": "ਲੜੀ",
-      "noAdditional": "ਇਸ ਦ੍ਰਿਸ਼ ਵਿੱਚ ਕੋਈ ਵਾਧੂ ਇਵੈਂਟ ਨਹੀਂ ਹਨ।",
-      "recurring": "ਆਵਰਤੀ ਘਟਨਾਵਾਂ",
-      "moreDates": "ਹੋਰ ਤਾਰੀਖਾਂ"
+      "noAdditional": "ਇਸ ਦ੍ਰਿਸ਼ ਵਿੱਚ ਕੋਈ ਵਾਧੂ ਇਵੈਂਟ ਨਹੀਂ ਹਨ।"
     },
     "month": {
       "title": "ਮਹੀਨਾ ਦ੍ਰਿਸ਼",
@@ -587,12 +590,8 @@
       "noEvents": "ਇਸ ਮਹੀਨੇ ਕੋਈ ਇਵੈਂਟ ਨਹੀਂ ਹੈ",
       "browse": "ਕਿਸੇ ਹੋਰ ਮਹੀਨੇ ਨੂੰ ਬ੍ਰਾਊਜ਼ ਕਰਨ ਲਈ ਪਿਛਲਾ ਜਾਂ ਅਗਲਾ ਵਰਤੋ।"
     },
-    "picker": {
-      "jump": "ਤਾਰੀਖ 'ਤੇ ਜਾਓ",
-      "label": "ਇੱਕ ਏਜੰਡਾ ਮਿਤੀ ਚੁਣੋ"
-    },
     "actions": {
-      "rsvp": "RSVP",
+      "rsvp": "RSVP + ਵੇਰਵੇ",
       "details": "ਘਟਨਾ ਦੇ ਵੇਰਵੇ"
     },
     "directions": {
@@ -601,7 +600,19 @@
       "copied": "ਪਤਾ ਕਾਪੀ ਕੀਤਾ ਗਿਆ",
       "copiedAnnouncement": "ਪਤਾ ਕਾਪੀ ਕੀਤਾ ਗਿਆ।"
     },
-    "resetDate": "ਆਉਣ ਵਾਲੇ ਸਾਰੇ ਸਮਾਗਮ ਵੇਖੋ"
+    "refine": {
+      "type": "ਸਮਾਗਮ ਦੀ ਕਿਸਮ",
+      "campaign": "ਮੁਹਿੰਮ",
+      "future": "ਭਵਿੱਖ ਵਿੱਚ",
+      "clear": "ਫਿਲਟਰ ਹਟਾਓ",
+      "results": "ਕੋਈ ਮੇਲ ਖਾਂਦਾ ਸਮਾਗਮ ਨਹੀਂ | 1 ਮੇਲ ਖਾਂਦਾ ਸਮਾਗਮ | {count} ਮੇਲ ਖਾਂਦੇ ਸਮਾਗਮ"
+    },
+    "campaigns": {
+      "all": "ਸਾਰੀਆਂ ਮੁਹਿੰਮਾਂ",
+      "unitedFront": "SQ - United Front",
+      "deflockStockton": "SQ - Deflock Stockton",
+      "tenantUnion": "CA - Tenant Union"
+    }
   },
   "join": {
     "title": "Working Class Unity ਵਿੱਚ ਸ਼ਾਮਲ ਹੋਵੋ",

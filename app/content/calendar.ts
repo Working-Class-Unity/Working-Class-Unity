@@ -6,6 +6,7 @@ export type CalendarFilter = 'Everything' | CalendarEventKind
 
 export type CalendarEvent = Readonly<{
   address: string
+  campaignTags?: readonly string[]
   dateLabel: string
   description: string
   endsAt: string | null
@@ -24,6 +25,7 @@ export type CalendarEvent = Readonly<{
 export type CalendarApiResponse = Readonly<{
   events: readonly Readonly<{
     category: CalendarEventCategory
+    campaignTags?: readonly string[]
     description: string | null
     eventPageUrl: string | null
     id: string
@@ -65,3 +67,11 @@ export const eventKindByCategory = Object.freeze({
   meeting: 'Meeting',
   social: 'Social'
 } satisfies Record<CalendarEventCategory, CalendarEventKind>)
+
+export const calendarCampaigns = [
+  { id: 'all', label: 'all', tag: null, future: false },
+  { id: 'united-front', label: 'unitedFront', tag: 'sidequest-2025-06-kyr', future: false },
+  { id: 'deflock-stockton', label: 'deflockStockton', tag: 'sidequest-2026-03-deflock-stockton', future: false },
+  { id: 'tenant-union', label: 'tenantUnion', tag: 'focus-tenant-union', future: true }
+] as const
+export type CalendarCampaignFilter = (typeof calendarCampaigns)[number]['id']

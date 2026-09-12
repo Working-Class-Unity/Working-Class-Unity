@@ -285,6 +285,12 @@
       "recordValues": {
         "term": "14 de abril de 2031",
         "system": "Un sistema conectado"
+      },
+      "events": {
+        "title": "Eventos de Deflock Stockton",
+        "none": "No hay eventos de Deflock Stockton",
+        "instead": "En su lugar, acompáñanos en…",
+        "calendar": "Ver el calendario completo"
       }
     },
     "faq": {
@@ -544,7 +550,6 @@
     "loadError": "No pudimos cargar el calendario.",
     "empty": "Aún no se han publicado próximos eventos.",
     "upcomingDates": "{count} próxima fecha | {count} próximas fechas",
-    "showingFrom": "Mostrando eventos de {date}.",
     "delivery": {
       "virtual": "En línea",
       "hybrid": "En persona y en línea",
@@ -574,9 +579,7 @@
       "noMatches": "Ningún evento coincide con este filtro todavía.",
       "upNext": "A continuación",
       "series": "Serie",
-      "noAdditional": "No hay eventos adicionales en esta vista.",
-      "recurring": "Eventos recurrentes",
-      "moreDates": "Más fechas"
+      "noAdditional": "No hay eventos adicionales en esta vista."
     },
     "month": {
       "title": "Vista mensual",
@@ -587,12 +590,8 @@
       "noEvents": "No hay eventos este mes",
       "browse": "Utilice Anterior o Siguiente para buscar otro mes."
     },
-    "picker": {
-      "jump": "Saltar a la fecha",
-      "label": "Elija una fecha de la agenda"
-    },
     "actions": {
-      "rsvp": "RSVP",
+      "rsvp": "RSVP + Detalles",
       "details": "Detalles del evento"
     },
     "directions": {
@@ -601,7 +600,19 @@
       "copied": "Dirección copiada",
       "copiedAnnouncement": "Dirección copiada."
     },
-    "resetDate": "Mostrar todos los próximos eventos"
+    "refine": {
+      "type": "Tipo de evento",
+      "campaign": "Campaña",
+      "future": "A futuro",
+      "clear": "Quitar filtros",
+      "results": "No hay eventos que coincidan | 1 evento coincide | {count} eventos coinciden"
+    },
+    "campaigns": {
+      "all": "Todas las campañas",
+      "unitedFront": "SQ - United Front",
+      "deflockStockton": "SQ - Deflock Stockton",
+      "tenantUnion": "CA - Tenant Union"
+    }
   },
   "join": {
     "title": "Únase a Working Class Unity",

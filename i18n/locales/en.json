@@ -285,6 +285,12 @@
       "recordValues": {
         "term": "April 14, 2031",
         "system": "A connected system"
+      },
+      "events": {
+        "title": "Deflock Stockton events",
+        "none": "No Deflock Stockton Events",
+        "instead": "Instead, join us at…",
+        "calendar": "View the full calendar"
       }
     },
     "faq": {
@@ -544,7 +550,6 @@
     "loadError": "We couldn’t load the calendar.",
     "empty": "No upcoming events are published yet.",
     "upcomingDates": "{count} upcoming date | {count} upcoming dates",
-    "showingFrom": "Showing events from {date}.",
     "delivery": {
       "virtual": "Online",
       "hybrid": "In person and online",
@@ -574,9 +579,7 @@
       "noMatches": "No events match this filter yet.",
       "upNext": "Up next",
       "series": "Series",
-      "noAdditional": "No additional events in this view.",
-      "recurring": "Recurring events",
-      "moreDates": "More dates"
+      "noAdditional": "No additional events in this view."
     },
     "month": {
       "title": "Month view",
@@ -587,12 +590,8 @@
       "noEvents": "No events this month",
       "browse": "Use Previous or Next to browse another month."
     },
-    "picker": {
-      "jump": "Jump to date",
-      "label": "Choose an agenda date"
-    },
     "actions": {
-      "rsvp": "RSVP",
+      "rsvp": "RSVP + Details",
       "details": "Event details"
     },
     "directions": {
@@ -601,7 +600,19 @@
       "copied": "Address copied",
       "copiedAnnouncement": "Address copied."
     },
-    "resetDate": "Show all upcoming events"
+    "refine": {
+      "type": "Event type",
+      "campaign": "Campaign",
+      "future": "Future",
+      "clear": "Clear filters",
+      "results": "No matching events | 1 matching event | {count} matching events"
+    },
+    "campaigns": {
+      "all": "All campaigns",
+      "unitedFront": "SQ - United Front",
+      "deflockStockton": "SQ - Deflock Stockton",
+      "tenantUnion": "CA - Tenant Union"
+    }
   },
   "join": {
     "title": "Join Working Class Unity",
