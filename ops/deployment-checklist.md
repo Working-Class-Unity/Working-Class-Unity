@@ -14,7 +14,12 @@ it does not authorize deployment or production data access by itself.
   `stripe-sync-runner` containers and disable their tasks before installing the new database; check
   for orphan containers even after their Compose definitions are removed.
 - Use current environment examples. Keep Sentry upload secrets separate from runtime, backup credentials
-  restricted to the private runner, and Solidarity browser credentials off the server.
+  restricted to the private runner, and Solidarity passwords, two-factor codes, and browser profiles off
+  the server; the unattended sync's cookie jar is the only stored session secret, mode 0600 in the volume.
+- Schedule the unattended event sync (locked 30-minute one-shot container command), set the
+  `EVENT_SYNC_*` environment, and confirm the cookie refresh automation can replace the jar.
+  Use the supplied host wrapper so container selection survives redeployments; verify one dry run
+  before enabling its crontab entry.
 - Record the approved rollback boundary and the temporary private backup location without exposing data.
 
 ## After release

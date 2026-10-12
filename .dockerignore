@@ -19,6 +19,14 @@ scripts/**
 !scripts/import-solidarity-events.ts
 !scripts/copy-legacy-events.ts
 !scripts/solidarity-event-operator.ts
+!scripts/solidarity-event-auto.mjs
+!scripts/lib/
+scripts/lib/**
+!scripts/lib/solidarity-alerts.mjs
+!scripts/lib/solidarity-auto.mjs
+!scripts/lib/solidarity-cookies.mjs
+!scripts/lib/solidarity-dashboard.mjs
+!scripts/lib/solidarity-headless-collect.mjs
 
 !nuxt.config.ts
 !sentry.client.config.ts

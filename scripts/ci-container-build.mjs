@@ -95,7 +95,8 @@ async function run() {
 
   for (const [entry, usage] of [
     ['import-solidarity-events.mjs', 'Usage: node .output/server/import-solidarity-events.mjs'],
-    ['solidarity-event-operator.mjs', 'Usage: solidarity-event-operator.mjs <preview|apply>']
+    ['solidarity-event-operator.mjs', 'Usage: solidarity-event-operator.mjs <preview|apply>'],
+    ['solidarity-event-auto.mjs', 'Usage: solidarity-event-auto.mjs']
   ]) {
     const help = await docker(
       ['run', '--rm', '--entrypoint', 'node', image, `.output/server/${entry}`, '--help'],
@@ -124,7 +125,7 @@ const directory = mkdtempSync(join(tmpdir(), 'wcu-event-package-proof-'));
 try {
   const env = { ...process.env, NUXT_DATABASE_URL: 'file:' + join(directory, 'events.db') };
   for (const [args, expected] of [
-    [['migrate', '--confirm-app-stopped'], 'Migration passed: 1 newly applied; 1/1 current'],
+    [['migrate', '--confirm-app-stopped'], 'Migration passed: 2 newly applied; 2/2 current'],
     [['verify'], 'Database verification passed: integrity ok; foreign keys ok; migration ledger current.']
   ]) {
     const result = spawnSync(process.execPath, ['.output/server/maintenance.mjs', ...args], { encoding: 'utf8', env, timeout: 10000 });

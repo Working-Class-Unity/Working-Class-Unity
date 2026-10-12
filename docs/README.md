@@ -7,7 +7,7 @@ These guides describe the public WCU website and its events-only database.
 - [CSS and interface](baseline/css-and-interface.md): the current interface contract; component
   inventory and frontend instructions are in [app/AGENTS.md](../app/AGENTS.md).
 - [Events and Solidarity](events-and-solidarity.md): event metadata and importer contract.
-- [On-demand event sync](solidarity-event-sync.md): collect, review, and apply event updates.
+- [Event sync](solidarity-event-sync.md): collect, review, apply, and schedule event updates.
 - [Solidarity taxonomy](solidarity-taxonomy.md): organizer-owned fields, hosted forms, and tags.
 - [Database cutover](database-cutover.md): convert the retired database into a new events-only file.
 - [Deployment](deployment.md), [verification](ci.md), [Cloudflare](cloudflare.md), and

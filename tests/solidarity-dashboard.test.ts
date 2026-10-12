@@ -14,7 +14,7 @@ const pages: Record<string, string> = {
     '<h2>All Events</h2><table data-data-table-target="dataTable" class="st-table"><tbody></tbody></table>'
   ),
   '/events/73':
-    html(`<h2 data-event-name="Meeting">Meeting</h2><a href="https://tech.workingclassunity.com/meeting">View event page</a>
+    html(`<h2 class="st-page-header--title"><span class="event-name editable" data-event-name="Meeting">Meeting</span></h2><a href="https://tech.workingclassunity.com/meeting">View event page</a>
     <div id="event_schedule">${['5011', '5012']
       .map(
         (id) => `<turbo-frame id="edit_calendar_item_${id}">

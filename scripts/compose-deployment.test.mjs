@@ -12,7 +12,14 @@ const serviceNames = ['migrate', 'web', 'backup-runner']
 const sourceCommit = '0123456789abcdef0123456789abcdef01234567'
 const project = 'wcu-compose-test'
 const cleared = '${WCU_CLEARED_ENVIRONMENT:-}'
-const applicationSecrets = ['NUXT_READINESS_TOKEN', 'NUXT_SENTRY_DSN', 'NUXT_OBSERVABILITY_TEST_TOKEN']
+const applicationSecrets = [
+  'NUXT_READINESS_TOKEN',
+  'NUXT_SENTRY_DSN',
+  'NUXT_OBSERVABILITY_TEST_TOKEN',
+  'EVENT_SYNC_RESEND_API_KEY',
+  'EVENT_SYNC_ALERT_FROM',
+  'EVENT_SYNC_ALERT_TO'
+]
 const backupEnvironment = {
   BACKUP_R2_ACCOUNT_ID: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
   BACKUP_R2_BUCKET: 'private-database-backups',
@@ -23,7 +30,9 @@ const backupEnvironment = {
 
 function environment(overrides = {}) {
   const result = Object.fromEntries(
-    Object.entries(process.env).filter(([name]) => !/^(NUXT_|BACKUP_|WCU_|SOURCE_COMMIT|COMPOSE_)/.test(name))
+    Object.entries(process.env).filter(
+      ([name]) => !/^(NUXT_|BACKUP_|WCU_|EVENT_SYNC_|SOURCE_COMMIT|COMPOSE_)/.test(name)
+    )
   )
   return {
     ...result,

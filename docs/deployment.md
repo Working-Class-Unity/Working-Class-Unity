@@ -2,7 +2,8 @@
 
 The public WCU website deploys as one Nuxt/Nitro web process with an events-only SQLite database.
 The Compose definition contains `migrate`, `web`, and `backup-runner`. It has no account,
-billing, email, or event-sync background worker.
+billing, email, or event-sync background worker; the unattended event sync runs as a one-shot
+scheduled `docker exec` command (see [the sync guide](solidarity-event-sync.md)).
 
 ## Image and persistent data
 
@@ -31,10 +32,22 @@ The web process needs:
 
 The public application URL is an origin; production uses HTTPS except for loopback verification.
 Credentials remain runtime-only except for the separately scoped Sentry build upload token. There
-are no `MODULES_*` switches, Stripe runtime credentials, Better Auth secret, Resend/Twilio inputs,
+are no `MODULES_*` switches, Stripe runtime credentials, Better Auth secret, Twilio inputs,
 OpenAI credentials, or user-file R2 inputs. Remove retired values from deployment configuration
-when carrying out the approved cutover. The events operator uses a local organizer browser session;
-Solidarity credentials are not deployed.
+when carrying out the approved cutover. The reviewed events operator uses a local organizer browser
+session; the unattended cookie jar holds only dashboard session cookies refreshed from the
+organizer workstation, never passwords or two-factor codes.
+
+The unattended event sync operator runs as a one-shot `docker exec` command inside the web container
+and reads its environment from the container:
+
+- `EVENT_SYNC_COOKIES_PATH`, recommended as `/app/data/solidarity/cookies.json`, points at the
+  private cookie jar (mode 0600) the refresh helper replaces; Compose supplies this path;
+- `EVENT_SYNC_RESEND_API_KEY`, `EVENT_SYNC_ALERT_FROM`, and `EVENT_SYNC_ALERT_TO` enable the change
+  and failure email alerts. Resend is scoped to this operator only.
+
+Schedule the 30-minute locked run with the supplied host wrapper and crontab as described in
+[the sync guide](solidarity-event-sync.md); the Compose file still defines no always-on worker.
 
 Start the web output with the Sentry preload retained by the image:
 

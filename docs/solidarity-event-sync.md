@@ -1,17 +1,27 @@
-# On-demand Solidarity event sync
+# Solidarity event sync
 
-Use this process for event metadata only. People, RSVP, attendance, consent, and membership data stay outside the website database.
-Solidarity remains the authoring system; the WCU website reads SQLite. This is a WCU browser-assisted
+Use these processes for event metadata only. People, RSVP, attendance, consent, and membership data stay outside the website database.
+Solidarity remains the authoring system; the WCU website reads SQLite. This is a WCU
 connector to an undocumented dashboard interface, not the paid or officially supported Solidarity API.
-It runs on demand. Do not schedule unattended synchronization or store Solidarity credentials on the server.
+Two modes share the same collector, planner, and transactional importer:
+
+- the **reviewed on-demand sync** below, for structural or high-attention changes; and
+- the **unattended auto sync**, a one-shot scheduled container command that applies validated
+  changes automatically and emails a summary.
+
+The server stores no Solidarity passwords or two-factor codes. Unattended mode reads a private
+cookie jar (mode 0600) inside the application volume that the organizer workstation refreshes with
+the cookie command in that section. An expired session fails the run and sends an alert instead of
+guessing.
 
 ## One-time setup
 
 - Use the repository's Node 24 and pinned pnpm toolchain, plus an installed Agent Browser CLI with JSON output.
-- Sign into `https://dashboard.solidarity.tech` yourself in Agent Browser. The command reuses that session;
+- Sign into `https://dashboard.solidarity.tech` yourself in Agent Browser. The reviewed command reuses that session;
   it never exports cookies, passwords, or two-factor codes. Use `--session NAME` for a named browser session.
+  The unattended mode's cookie refresh is a separate explicit command; see [Unattended auto sync](#unattended-auto-sync).
 - Deploy the version containing `.output/server/solidarity-event-operator.mjs` through the normal approved
-  release process before production use. Routine event updates need no new port, public write endpoint, or cron task. Deploying the events-only release requires the separately approved database cutover first.
+  release process before production use. Reviewed event updates need no new port, public write endpoint, or cron task. The unattended mode also packages `.output/server/solidarity-event-auto.mjs`. Deploying the events-only release requires the separately approved database cutover first.
 - Keep an SSH connection file outside Git. The server must already be in `known_hosts`; SSH uses batch
   authentication and strict host-key verification. Its account needs access to Docker on the intended server.
 
@@ -99,6 +109,67 @@ make a fresh preview before deciding what remains. Do not repeatedly apply an ol
 backup and receipt private; restoring a whole database is a separate recovery operation, not an automatic
 undo that is safe alongside other writers.
 
+## Unattended auto sync
+
+The packaged `solidarity-event-auto.mjs` operator runs inside the web container as a one-shot
+scheduled command. It reads the private cookie jar, collects the complete dashboard inventory, plans
+against `/app/data/app.db`, and applies every validated change in one transaction with a pre-change
+backup. A session missing from a complete inventory is retired immediately, including sessions whose
+whole parent series disappeared (the row becomes canceled; IDs and reviewed metadata are retained).
+Completed history remains intact. Failed or incomplete collection, unrecognized markup, or
+uncertain pairings abort the run without changes.
+
+Compose sets `EVENT_SYNC_COOKIES_PATH=/app/data/solidarity/cookies.json` for the web container.
+Set the three Resend variables below in the runtime environment. On the production host, install
+the scheduling wrapper from the selected source revision:
+
+```sh
+install -m 0755 ops/run-solidarity-event-sync.sh /usr/local/bin/wcu-event-sync
+```
+
+Add this to the host crontab, replacing `<applicationUuid>` with the same Coolify application UUID
+used in the private connection file:
+
+```cron
+*/30 * * * * /usr/local/bin/wcu-event-sync <applicationUuid> >> /var/log/wcu-event-sync.log 2>&1
+```
+
+The wrapper resolves exactly one current `web-<applicationUuid>-...` container on each run, so a
+redeployment does not leave cron pointing at an old container ID. It holds an application-specific
+host lock that the cookie-refresh command also uses. The host needs Docker and `flock` (util-linux).
+Use `/usr/local/bin/wcu-event-sync <applicationUuid> --dry-run` for a live collection and database
+preview without applying changes or sending email. This still saves rotated session cookies.
+Each run prints one JSON summary line (status, counts, receipt and backup paths); it never prints
+cookie values or source captures. Receipts land in `/app/data/sync-runs/` (mode 0600) and backups in
+`/app/data/backups/`.
+
+Email alerts use Resend and need `EVENT_SYNC_RESEND_API_KEY`, `EVENT_SYNC_ALERT_FROM`, and
+`EVENT_SYNC_ALERT_TO` in the container environment. A run with changes emails the applied change list
+and retirements; a failed run emails the failure and next steps, including a dashboard sign-in
+failure that means the cookie jar needs refreshing. A no-op run is silent. Without Resend
+configuration, alerts are skipped with a warning on stderr.
+
+### Cookie refresh
+
+Run this on the organizer workstation, signed into the dashboard in Agent Browser:
+
+```sh
+pnpm events:cookies --session solidarity --connection /private/events/production.json
+```
+
+The command extracts only `remember_user_token` and the Rails session cookie, writes
+`/app/data/solidarity/cookies.json` (mode 0600) in the running web container through the same
+validated SSH flow as the reviewed sync, and prints cookie names only. Cookie replacement is atomic
+and waits for the shared host lock, so it cannot overwrite cookies being rotated by a running sync.
+`--output <path>` saves the private jar locally instead; a recurring refresh should use `--connection`.
+An agent running this command needs local CLI access, a signed-in named Agent Browser session, and
+the configured SSH identity. Configure its login and recurrence separately; the helper itself is not
+a login automation. Refresh weekly as an initial operating cadence and refresh again on a sign-in
+failure email; the provider can revoke sessions before the cookies' browser expiry dates. Every
+successful sync reuses rotated cookies immediately and saves them for the next run.
+Never commit cookie jars, connection files, receipts, or backups, and keep
+them outside Git worktrees (the command refuses those paths).
+
 ## Source limitations
 
 The collector uses authenticated GET requests to the event inventory, schedule, settings, and session
@@ -109,8 +180,11 @@ It does not use the limited `/user-filters/event-sessions` lookup as a complete 
 Currently listed parents are represented as locally active; past/upcoming is a date distinction, not proof
 of provider archival or attendance. Metadata refreshes preserve existing local completed/canceled states
 rather than reopening them.
-Missing source records are only candidates within the covered event/date scope. Parents absent from the
-covered inventory are not automatically archived. Unsupported state/pairing changes need organizer review.
+Missing source records are only candidates within the covered event/date scope. The headless collector
+marks full discovery explicitly; filtered or unmarked captures cannot authorize unattended retirement.
+The auto-sync window covers all retained event dates. Deleted parents keep their stored metadata,
+while their scheduled sessions are canceled. The reviewed workflow keeps its selected-parent scope.
+Unsupported state/pairing changes need organizer review.
 Existing hybrid groups cannot be silently downgraded by incomplete input.
 
 An expired login, failed request, missing required markup, or inconsistent pairing aborts collection.
@@ -126,7 +200,7 @@ receipt. They do not require a test suite, disposable-copy rehearsal, or a secon
 When changing collector or reconciliation code, run the focused suites:
 
 ```sh
-pnpm test tests/solidarity-dashboard.test.ts tests/solidarity-event-sync.test.ts tests/solidarity-event-import.test.ts
+pnpm test tests/solidarity-dashboard.test.ts tests/solidarity-headless-collect.test.ts tests/solidarity-event-sync.test.ts tests/solidarity-auto-sync.test.ts tests/solidarity-event-import.test.ts
 ```
 
 Two small HTML checks cover acquisition and failed reads. One real migrated SQLite integration covers
