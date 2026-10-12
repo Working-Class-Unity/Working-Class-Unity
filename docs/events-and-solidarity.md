@@ -62,9 +62,12 @@ personal records into the database. Private source captures and reviewed preview
 
 ## Updating the calendar
 
-Use the [on-demand browser-assisted sync](solidarity-event-sync.md) for ordinary updates. Collect
-metadata from an authenticated organizer browser, review its preview, and apply the exact approved
-change. The server stores no Solidarity login credentials and runs no unattended sync.
+Use the [event sync](solidarity-event-sync.md) for updates. Routine changes apply automatically
+through the scheduled unattended sync: the server reads a private cookie jar (mode 0600) in the
+application volume that the organizer workstation refreshes, applies validated changes
+transactionally with a pre-change backup, and emails a summary. Structural or high-attention
+changes can still use the reviewed on-demand workflow. The server stores no Solidarity passwords or
+two-factor codes.
 
 For an already normalized events-only bundle, use the importer:
 

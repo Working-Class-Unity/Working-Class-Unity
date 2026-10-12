@@ -146,7 +146,7 @@ export async function collectSolidarityDashboardEvents({ from, to, timezone, eve
     let title
     let eventPageUrl
     await pages(path, (doc) => {
-      const currentTitle = required(doc, 'h2[data-event-name]', 'event title').getAttribute('data-event-name').trim()
+      const currentTitle = required(doc, '[data-event-name]', 'event title').getAttribute('data-event-name').trim()
       if (!currentTitle || (title !== undefined && title !== currentTitle)) fail('missing or inconsistent event title')
       title = currentTitle
       const allLinks = [...doc.querySelectorAll('a[href]')]

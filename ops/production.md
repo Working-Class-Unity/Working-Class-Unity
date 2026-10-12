@@ -8,14 +8,15 @@ Use the selected release's packaged operators and these guides:
 
 - [Deployment](../docs/deployment.md) and [release checklist](deployment-checklist.md).
 - [Events-only database cutover](../docs/database-cutover.md).
-- [On-demand event sync](../docs/solidarity-event-sync.md).
+- [Event sync](../docs/solidarity-event-sync.md).
 - [Backups](backup-runbook.md) and [restore](restore-runbook.md).
 - [External services](external-services.md) and [evidence template](production-evidence-template.md).
 
 The Compose services are `migrate`, `web`, and `backup-runner`; the runner requires its R2 credentials.
-The event-sync command runs
-on demand from an organizer workstation and connects to the packaged operator. Never deploy organizer
-browser credentials or configure unattended dashboard scraping.
+The reviewed event-sync command runs on demand from an organizer workstation and connects to the
+packaged operator. The unattended auto sync runs as a one-shot scheduled container command against a
+private cookie jar that the organizer workstation refreshes. Never deploy organizer passwords,
+two-factor codes, or browser profiles.
 
 Documentation and passing local checks do not establish production authorization or provider health.
 Keep real environment values, database files, source captures, and receipts outside Git. A routine

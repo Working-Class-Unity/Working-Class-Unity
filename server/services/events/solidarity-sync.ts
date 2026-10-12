@@ -8,12 +8,13 @@ import {
   solidarityEventFields,
   solidaritySessionFields,
   type SolidarityEventImportDataset,
+  type SolidarityEventRecord,
   type SolidaritySessionRecord
 } from './solidarity-import'
 
 export type SolidarityEventSyncCapture = Readonly<{
   dataset: SolidarityEventImportDataset
-  scope: Readonly<{ eventIds: readonly string[]; from: string; to: string }>
+  scope: Readonly<{ eventIds: readonly string[]; from: string; to: string; completeInventory?: boolean }>
   observedAt: string
 }>
 
@@ -64,10 +65,17 @@ function planSync(connection: DatabaseConnection, capture: SolidarityEventSyncCa
   )
   const storedWindowIds = connection.sqlite
     .prepare(
-      `select id from event_sessions
-    where event_id in (select value from json_each(?)) and starts_at >= ? and starts_at < ? order by id`
+      `select s.id from event_sessions s
+    where (s.event_id in (select value from json_each(?)) or
+      (? = 1 and exists (select 1 from event_provider_links l where l.event_id = s.event_id and l.provider = 'solidarity')))
+    and s.starts_at >= ? and s.starts_at < ? order by s.id`
     )
-    .all(JSON.stringify(inventory.events.map(({ after }) => after.id)), scope.from, scope.to) as Array<{ id: string }>
+    .all(
+      JSON.stringify(inventory.events.map(({ after }) => after.id)),
+      scope.completeInventory === true ? 1 : 0,
+      scope.from,
+      scope.to
+    ) as Array<{ id: string }>
   const storedWindow = readSolidarityEventImportState(connection, {
     eventIds: [],
     sessionIds: storedWindowIds.map(({ id }) => id)
@@ -103,9 +111,17 @@ function planSync(connection: DatabaseConnection, capture: SolidarityEventSyncCa
         )
       )
   )
+  const missingParents = readSolidarityEventImportState(connection, {
+    eventIds: missing.map(({ projection: stored }) => stored!.eventId),
+    sessionIds: []
+  }).events.filter(({ id }) => !selectedEvents.some(({ after }) => after.id === id))
+  const retirementDataset: SolidarityEventImportDataset = {
+    ...scopedDataset,
+    events: [...scopedDataset.events, ...missingParents.flatMap((stored) => rehydrateMissingEvent(connection, stored))]
+  }
   const retirements = missing.map((stored) => {
-    const sessions = rehydrateRetirement(connection, stored, scopedDataset)
-    const retirementProjection = previewSolidarityEventImport(connection, { ...scopedDataset, sessions })
+    const sessions = rehydrateRetirement(connection, stored, retirementDataset)
+    const retirementProjection = previewSolidarityEventImport(connection, { ...retirementDataset, sessions })
     const proposed = retirementProjection.sessions[0]
     if (
       retirementProjection.sessions.length !== 1 ||
@@ -121,7 +137,7 @@ function planSync(connection: DatabaseConnection, capture: SolidarityEventSyncCa
     return { sessionId: stored.id, sessions, projection: proposed }
   })
   const before = readSolidarityEventImportState(connection, {
-    eventIds: selectedEvents.map(({ after }) => after.id),
+    eventIds: [...selectedEvents.map(({ after }) => after.id), ...missingParents.map(({ id }) => id)],
     sessionIds: [...selectedSessions.map(({ after }) => after.id), ...storedWindowIds.map(({ id }) => id)]
   })
   const result = {
@@ -138,7 +154,7 @@ function planSync(connection: DatabaseConnection, capture: SolidarityEventSyncCa
       providerIds: links.map(({ externalId }) => externalId)
     })),
     // Private file payload: console output must use changes/candidates, never this plan or capture.
-    plan: { dataset: scopedDataset, projection, before, retirements }
+    plan: { dataset: retirementDataset, projection, before, retirements }
   }
   return freeze({ ...result, digest: hash(result) })
 }
@@ -214,6 +230,34 @@ export function applySolidarityEventSync(
       }
     })
     .immediate()
+}
+
+function rehydrateMissingEvent(
+  connection: DatabaseConnection,
+  stored: ImportState['events'][number]
+): SolidarityEventRecord[] {
+  const projection = stored.projection
+  if (!projection || !stored.links.length) throw new Error('Missing safe metadata for a deleted Solidarity event')
+  const events = stored.links.map((link) => ({
+    id: link.externalId,
+    primaryEventId: link.primaryExternalId,
+    title: projection.title,
+    description: projection.description,
+    eventPageUrl: link.sourceUrl,
+    eventTags: projection.eventTags,
+    campaignTags: projection.campaignTags,
+    status: projection.status,
+    timezone: projection.timezone
+  }))
+  const proposed = previewSolidarityEventImport(connection, { events, sessions: [] })
+  if (
+    proposed.events.length !== 1 ||
+    hash(proposed.events[0]!.after) !== hash(projection) ||
+    hash(proposed.events[0]!.linksAfter) !== hash(stored.links)
+  ) {
+    throw new Error('Cannot retire a deleted Solidarity event without changing its metadata or identity')
+  }
+  return events
 }
 
 function rehydrateRetirement(
@@ -313,12 +357,15 @@ function summarizeChanges(projection: ImportPreview): SolidarityEventSyncChange[
 
 function validateCapture(input: SolidarityEventSyncCapture): SolidarityEventSyncCapture {
   assertFields(input, ['dataset', 'scope', 'observedAt'])
-  assertFields(input.scope, ['eventIds', 'from', 'to'])
+  assertFields(input.scope, ['eventIds', 'from', 'to', 'completeInventory'])
   assertFields(input.dataset, ['events', 'sessions'])
   assertTimestamp(input.observedAt)
   assertTimestamp(input.scope.from)
   assertTimestamp(input.scope.to)
   if (input.scope.from >= input.scope.to) throw new TypeError('Solidarity scope from must precede to')
+  if (input.scope.completeInventory !== undefined && typeof input.scope.completeInventory !== 'boolean') {
+    throw new TypeError('Solidarity complete inventory marker must be boolean')
+  }
   if (
     !Array.isArray(input.scope.eventIds) ||
     input.scope.eventIds.some((id) => !validId(id)) ||

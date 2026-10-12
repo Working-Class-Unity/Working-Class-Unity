@@ -26,6 +26,7 @@
     "db:backup": "node --env-file-if-exists=.env server/db/backup.mjs",
     "db:import:solidarity-events": "node --env-file-if-exists=.env scripts/run-pnpm.mjs exec tsx scripts/import-solidarity-events.ts",
     "events:sync": "node scripts/sync-solidarity-events.mjs",
+    "events:cookies": "node scripts/solidarity-cookie-refresh.mjs",
     "db:migrate:check": "node --env-file-if-exists=.env scripts/run-pnpm.mjs exec tsx server/db/migration-check.ts",
     "doctor": "node scripts/doctor.mjs",
     "check:toolchain": "node --test scripts/toolchain-contract.test.mjs",

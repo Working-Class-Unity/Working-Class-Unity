@@ -25,6 +25,7 @@ const entries = [
   ['server/off-host-backup.mjs', 'off-host-backup.mjs'],
   ['scripts/import-solidarity-events.ts', 'import-solidarity-events.mjs'],
   ['scripts/solidarity-event-operator.ts', 'solidarity-event-operator.mjs'],
+  ['scripts/solidarity-event-auto.mjs', 'solidarity-event-auto.mjs'],
   ['scripts/copy-legacy-events.ts', 'copy-legacy-events.mjs']
 ]
 

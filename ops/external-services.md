@@ -1,13 +1,14 @@
 # External services
 
-| Service            | Current responsibility                                                           | Website integration                                                   |
-| ------------------ | -------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| Stripe             | Membership payments, customer verification, receipts, subscriptions, management  | Two public payment links and one portal link; no API key or webhook.  |
-| Solidarity         | Events, hosted RSVP and organizing forms, people, attendance, follow-up          | Public links plus manually reviewed event-metadata collection/import. |
-| Coolify / host     | Build, web runtime, persistent event database, maintenance and backup runner     | Selected image and explicit deployment configuration.                 |
-| Cloudflare DNS/CDN | Public routing, TLS/CDN configuration                                            | Existing domain configuration; review origin/cache behavior.          |
-| Cloudflare R2      | Private event-database backup storage required by the shipped Compose deployment | Separate private backup runner only.                                  |
-| Sentry             | Optional error reporting and release diagnostics                                 | Paired runtime DSNs and separately scoped build upload configuration. |
+| Service            | Current responsibility                                                           | Website integration                                                                   |
+| ------------------ | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Stripe             | Membership payments, customer verification, receipts, subscriptions, management  | Two public payment links and one portal link; no API key or webhook.                  |
+| Solidarity         | Events, hosted RSVP and organizing forms, people, attendance, follow-up          | Public links plus reviewed and scheduled unattended event-metadata sync.              |
+| Coolify / host     | Build, web runtime, persistent event database, maintenance and backup runner     | Selected image, explicit deployment configuration, and the scheduled event-sync task. |
+| Cloudflare DNS/CDN | Public routing, TLS/CDN configuration                                            | Existing domain configuration; review origin/cache behavior.                          |
+| Cloudflare R2      | Private event-database backup storage required by the shipped Compose deployment | Separate private backup runner only.                                                  |
+| Sentry             | Optional error reporting and release diagnostics                                 | Paired runtime DSNs and separately scoped build upload configuration.                 |
+| Resend             | Event-sync change and failure email only                                         | Scoped API key for the unattended sync operator.                                      |
 
 ## Hosted membership links
 
@@ -19,6 +20,7 @@ The website does not verify a visitor's membership, create a user account, or se
 Opening a link for review does not require completing checkout or making a subscription change.
 Provider-side payment, subscription, or portal configuration changes require their own authorization.
 
-The current application needs no Better Auth, Resend, Twilio, OpenAI, or user-file R2 configuration.
+The current application needs no Better Auth, Twilio, OpenAI, or user-file R2 configuration. Resend
+is used only by the unattended event sync for change and failure email.
 Retiring unused integration inputs is part of the approved deployment; it does not delete provider
 records or cancel real subscriptions. External organization data and form automation remain in Solidarity.

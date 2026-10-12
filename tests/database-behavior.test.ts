@@ -68,6 +68,7 @@ describe('event database integrity', () => {
       ).toEqual(
         [
           'event_provider_links',
+          'event_session_campaign_tags',
           'event_session_provider_links',
           'event_sessions',
           'event_tags',

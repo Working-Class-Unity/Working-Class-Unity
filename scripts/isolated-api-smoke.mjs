@@ -212,6 +212,7 @@ function seedEventFixture() {
         JSON.stringify([
           '__drizzle_migrations',
           'event_provider_links',
+          'event_session_campaign_tags',
           'event_session_provider_links',
           'event_sessions',
           'event_tags',
